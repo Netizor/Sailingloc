@@ -1,0 +1,14 @@
+[phases.setup]
+nixPkgs = ["php83", "php83Extensions.pdo", "php83Extensions.pdo_mysql", "php83Extensions.intl", "php83Extensions.mbstring", "php83Extensions.openssl", "php83Extensions.tokenizer", "php83Extensions.ctype", "php83Extensions.json", "php83Extensions.xml", "php83Extensions.curl", "php83Extensions.zip", "php83Packages.composer"]
+
+[phases.install]
+cmds = ["composer install --no-dev --optimize-autoloader"]
+
+[phases.build]
+cmds = [
+    "php bin/console cache:warmup --env=prod",
+    "php bin/console doctrine:migrations:migrate --no-interaction --env=prod"
+]
+
+[start]
+cmd = "php -S 0.0.0.0:$PORT public/index.php"

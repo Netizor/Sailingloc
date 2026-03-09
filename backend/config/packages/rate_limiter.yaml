@@ -1,0 +1,33 @@
+# Limitation de débit pour les endpoints sensibles (G4).
+# Utilise le stockage en cache (APCu/Redis/fichier selon l'environnement).
+framework:
+    rate_limiter:
+        # Authentification : 10 tentatives par minute par IP
+        login:
+            policy: 'sliding_window'
+            limit:  10
+            interval: '1 minute'
+
+        # Inscription : 5 créations de compte par heure par IP
+        register:
+            policy: 'sliding_window'
+            limit:  5
+            interval: '1 hour'
+
+        # Réinitialisation de mot de passe : 5 demandes par heure par IP
+        reset_password:
+            policy: 'sliding_window'
+            limit:  5
+            interval: '1 hour'
+
+        # Création de réservation : 20 par heure par utilisateur
+        booking_create:
+            policy: 'sliding_window'
+            limit:  20
+            interval: '1 hour'
+
+        # Envoi de messages : 60 par heure par utilisateur
+        message_send:
+            policy: 'sliding_window'
+            limit:  60
+            interval: '1 hour'

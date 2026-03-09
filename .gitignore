@@ -1,0 +1,104 @@
+# =============================================================================
+#  SailingLoc — .gitignore racine (monorepo frontend + backend)
+#  Les sous-dossiers frontend/ et backend/ ont leur propre .gitignore.
+# =============================================================================
+
+# ─── Node.js (lanceur racine / concurrently) ─────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# ─── Variables d'environnement ───────────────────────────────────────────────
+.env.local
+.env.*.local
+.env.production
+
+# ─── Frontend — Build & cache ────────────────────────────────────────────────
+frontend/dist/
+frontend/dist-ssr/
+frontend/build/
+frontend/.cache/
+frontend/coverage/
+frontend/.eslintcache
+frontend/.stylelintcache
+frontend/*.tsbuildinfo
+frontend/vite.config.ts.timestamp-*
+frontend/node_modules/
+frontend/.env.local
+frontend/.env.*.local
+
+# ─── Backend — Symfony ───────────────────────────────────────────────────────
+backend/vendor/
+backend/var/
+backend/.env.local
+backend/.env.local.php
+backend/.env.*.local
+backend/config/secrets/prod/prod.decrypt.private.pem
+backend/public/bundles/
+backend/public/uploads/
+
+# ─── Clés JWT (ne jamais versionner les clés privées) ───────────────────────
+backend/config/jwt/private.pem
+backend/config/jwt/public.pem
+*.pem
+*.key
+
+# ─── Logs ────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ─── PHP ─────────────────────────────────────────────────────────────────────
+backend/.phpunit.result.cache
+backend/phpunit.xml
+backend/.php-cs-fixer.cache
+backend/.php_cs.cache
+backend/.phpstan/
+
+# ─── Données sensibles / fichiers locaux ─────────────────────────────────────
+*.sql
+*.sqlite
+*.db
+sailingloc-mes-donnees-*.json
+*.png
+roadmap.md
+.claude/
+CLAUDE.md
+
+# ─── Fichiers d'audit et de travail internes ─────────────────────────────────
+audit.txt
+TO_FIX.txt
+error_*.png
+project_extracted/
+agents/
+claude/
+
+# ─── Archives ────────────────────────────────────────────────────────────────
+*.zip
+*.tar.gz
+*.rar
+
+# ─── IDE ─────────────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+!.vscode/extensions.json
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+.fleet/
+
+# ─── OS ──────────────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ─── Docker (overrides locaux) ───────────────────────────────────────────────
+docker-compose.override.yml
+docker-compose.local.yml
