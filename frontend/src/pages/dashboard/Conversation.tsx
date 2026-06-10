@@ -7,6 +7,7 @@ import {
   sendMessage,
   getConversations,
 } from '../../api/messages.api'
+import { resolveApiBaseUrl } from '../../lib/axios'
 import { useAuthStore } from '../../store/auth.store'
 import { usePageTitle } from '../../hooks/usePageTitle'
 import type { Message } from '../../types'
@@ -83,9 +84,9 @@ const Conversation: React.FC = () => {
       // Lit le token directement depuis le store (évite le token périmé en cas de reconnexion)
       const token = useAuthStore.getState().accessToken
       if (!token) return
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+      const apiBase = resolveApiBaseUrl()
       const url =
-        `${baseUrl}/api/messages/stream/${conversationId}` +
+        `${apiBase}/messages/stream/${conversationId}` +
         `?token=${encodeURIComponent(token)}&lastId=${lastMsgIdRef.current}`
 
       es = new EventSource(url)

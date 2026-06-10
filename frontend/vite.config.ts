@@ -85,9 +85,10 @@ export default defineConfig({
 
   server: {
     port: 5173,
+    // Même origine en dev : le navigateur appelle /api sur :5173, Vite relaie vers Symfony (:8000) → pas de CORS
     proxy: {
       '/api': {
-        target: process.env.VITE_API_URL || 'http://localhost:3000',
+        target: 'http://localhost:8000',
         changeOrigin: true,
       },
     },

@@ -1,8 +1,23 @@
 import axios from 'axios'
 import { useAuthStore } from '../store/auth.store'
 
+/**
+ * En dev, sans VITE_API_URL : base `/api` → servie par Vite (proxy vers Symfony :8000), donc pas de CORS.
+ * Avec VITE_API_URL : appel direct (il faut CORS_ALLOW_ORIGIN côté backend).
+ */
+export function resolveApiBaseUrl(): string {
+  const fromEnv = import.meta.env.VITE_API_URL?.trim()
+  if (fromEnv) {
+    return `${fromEnv.replace(/\/$/, '')}/api`
+  }
+  if (import.meta.env.DEV) {
+    return '/api'
+  }
+  return 'http://localhost:8000/api'
+}
+
 const api = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api`,
+  baseURL: resolveApiBaseUrl(),
   headers: { 'Content-Type': 'application/json' },
   timeout: 30000,
 })
