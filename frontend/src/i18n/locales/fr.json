@@ -60,6 +60,13 @@
   "footer": {
     "tagline": "La plateforme de location de bateaux entre particuliers. Naviguez en toute confiance, louez ou proposez votre bateau en quelques clics.",
     "taglineShort": "La plateforme premium de location de bateaux entre particuliers. Naviguez en toute confiance.",
+    "taglineListing": "Découvrez la liberté de naviguer avec notre sélection de bateaux d'exception.",
+    "navigation": "Navigation",
+    "support": "Support",
+    "legalCol": "Légal",
+    "rentBoat": "Louer un bateau",
+    "helpSupport": "Aide & Support",
+    "editorial": "L'Horizon Éditorial.",
     "platform": "Plateforme",
     "destinationsCol": "Destinations",
     "newsletter": "Newsletter",
@@ -87,6 +94,8 @@
     "careers": "Carrières",
     "legal": {
       "cgu": "CGU",
+      "cguFull": "Conditions Générales",
+      "privacy": "Politique de Confidentialité",
       "mentions": "Mentions légales",
       "rgpd": "RGPD",
       "cookies": "Politique de cookies"
@@ -147,6 +156,11 @@
     "estimationNote": "*Estimation indicative basée sur la moyenne des propriétaires actifs."
   },
   "search": {
+    "adventures_one": "{{count}} aventure maritime disponible",
+    "adventures_other": "{{count}} aventures maritimes disponibles",
+    "subtitle": "Découvrez les meilleures locations à travers le monde.",
+    "showMore": "Afficher plus de résultats",
+    "viewAll": "Tout voir",
     "title_one": "{{count}} bateau trouvé",
     "title_other": "{{count}} bateaux trouvés",
     "noResults": "Aucun bateau trouvé",

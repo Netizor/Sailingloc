@@ -3,12 +3,22 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --sl-navy: #003366;
+    --sl-blue: #2563ff;
+    --sl-teal: #006875;
+    --sl-slate: #334155;
+    --sl-muted: #8a94a6;
+    --sl-light: #eef3fb;
+  }
+
   html {
     scroll-behavior: smooth;
   }
+
   body {
     @apply font-sans antialiased;
-    color: #003366;
+    color: var(--sl-navy);
     background-color: #ffffff;
   }
 }
@@ -35,5 +45,88 @@
     @apply rounded-2xl border shadow-sm transition-shadow duration-200;
     background-color: #eef3fb;
     border-color: #adc9eb;
+  }
+
+  /* Carte style maquette : teal profond + lueur cyan (pas noir) */
+  .map-teal-blueprint {
+    position: relative;
+    background: radial-gradient(
+      ellipse at 50% 42%,
+      #1a7a8c 0%,
+      #0d4f5e 35%,
+      #002b36 70%,
+      #001f28 100%
+    );
+    overflow: hidden;
+  }
+
+  .map-teal-blueprint::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at 52% 38%,
+      rgba(0, 220, 220, 0.28) 0%,
+      rgba(0, 180, 200, 0.1) 30%,
+      transparent 68%
+    );
+    pointer-events: none;
+    z-index: 450;
+  }
+
+  .map-teal-blueprint::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(0, 230, 230, 0.6), transparent);
+    pointer-events: none;
+    z-index: 450;
+  }
+
+  .map-teal-blueprint .leaflet-container {
+    background: transparent;
+  }
+
+  .map-teal-blueprint .leaflet-tile-pane {
+    filter: sepia(0.15) hue-rotate(155deg) saturate(2.8) brightness(1.35) contrast(0.9);
+    opacity: 0.88;
+  }
+
+  .map-teal-blueprint .leaflet-control-zoom a {
+    background-color: rgba(0, 43, 54, 0.85) !important;
+    color: #7df9ff !important;
+    border-color: rgba(0, 220, 220, 0.35) !important;
+  }
+
+  .map-teal-blueprint .leaflet-control-zoom a:hover {
+    background-color: rgba(0, 80, 95, 0.9) !important;
+  }
+
+  .sl-btn-navy {
+    background-color: var(--sl-navy);
+    color: #ffffff;
+  }
+
+  .sl-btn-navy:hover {
+    background-color: #002952;
+  }
+
+  .sl-btn-outline {
+    background-color: #ffffff;
+    color: var(--sl-blue);
+    border: 2px solid var(--sl-blue);
+  }
+
+  .sl-btn-outline:hover {
+    background-color: var(--sl-light);
+  }
+
+  .sl-btn-filled {
+    background-color: var(--sl-navy);
+    color: #ffffff;
+    border: 2px solid var(--sl-navy);
   }
 }

@@ -95,16 +95,18 @@ const Header: React.FC = () => {
 
   const linkClass = (to: string) =>
     cn(
-      'px-3 py-2 text-xs font-semibold uppercase tracking-[0.1em] whitespace-nowrap',
-      isActive(to) ? 'text-brand-navy' : 'text-gray-500'
+      'inline-flex items-center h-full px-4 text-xs font-semibold uppercase tracking-[0.1em] whitespace-nowrap border-b-[3px] transition-colors',
+      isActive(to)
+        ? 'text-[#2563FF] border-[#2563FF] font-bold'
+        : 'text-gray-500 border-transparent hover:text-[#2563FF]'
     )
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-[72px] gap-6">
+      <div className="w-full px-[10%]">
+        <div className="flex items-stretch justify-between h-[72px] gap-6">
           {/* Logo complet — object-contain pour ne pas couper */}
-          <Link to="/" className="flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-brand-blue rounded-lg">
+          <Link to="/" className="flex-shrink-0 self-center focus:outline-none focus:ring-2 focus:ring-brand-blue rounded-lg">
             <img
               src="/logo.jpeg"
               alt="SailingLoc"
@@ -113,7 +115,7 @@ const Header: React.FC = () => {
           </Link>
 
           {/* Nav desktop */}
-          <nav className="hidden lg:flex items-center justify-center gap-2 flex-1" aria-label="Navigation principale">
+          <nav className="hidden lg:flex items-stretch justify-center gap-1 flex-1 h-full" aria-label="Navigation principale">
             {navLinks.map((link) => (
               <Link key={link.to} to={link.to} className={linkClass(link.to)}>
                 {link.label}
@@ -122,7 +124,7 @@ const Header: React.FC = () => {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-3 flex-shrink-0">
+          <div className="flex items-center gap-3 flex-shrink-0 self-center">
             <button
               onClick={toggleTheme}
               aria-label={theme === 'dark' ? t('nav.lightMode') : t('nav.darkMode')}
@@ -208,14 +210,14 @@ const Header: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/connexion')}
-                  className="px-5 py-2.5 text-sm font-medium text-brand-navy bg-white border border-gray-200 rounded-lg"
+                  className="px-5 py-2.5 text-sm font-semibold text-[#2563FF] bg-white border-2 border-[#2563FF] rounded-lg hover:bg-blue-50 transition-colors"
                 >
                   {t('nav.login')}
                 </button>
                 <button
                   type="button"
                   onClick={() => navigate('/inscription')}
-                  className="px-5 py-2.5 text-sm font-medium text-white bg-[#2563FF] rounded-lg whitespace-nowrap"
+                  className="px-5 py-2.5 text-sm font-semibold text-white bg-[#2563FF] hover:bg-[#1a4fcc] rounded-lg whitespace-nowrap transition-colors"
                 >
                   {t('nav.becomeOwner')}
                 </button>
@@ -235,12 +237,15 @@ const Header: React.FC = () => {
 
       {mobileOpen && (
         <div className="lg:hidden border-t border-gray-100 bg-white shadow-lg">
-          <nav className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-1">
+          <nav className="w-full px-[10%] py-4 flex flex-col gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
-                className="px-3 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide text-gray-600"
+                className={cn(
+                  'px-3 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide',
+                  isActive(link.to) ? 'text-[#2563FF] bg-blue-50' : 'text-gray-600'
+                )}
               >
                 {link.label}
               </Link>
@@ -250,7 +255,7 @@ const Header: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/connexion')}
-                  className="px-5 py-2.5 text-sm font-medium text-brand-navy bg-white border border-gray-200 rounded-lg"
+                  className="px-5 py-2.5 text-sm font-semibold text-[#2563FF] bg-white border-2 border-[#2563FF] rounded-lg hover:bg-blue-50 transition-colors"
                 >
                   {t('nav.login')}
                 </button>

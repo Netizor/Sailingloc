@@ -18,6 +18,7 @@ interface SearchBarProps {
   defaultValues?: Partial<SearchParams>
   compact?: boolean
   hero?: boolean
+  listing?: boolean
   className?: string
 }
 
@@ -28,6 +29,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   defaultValues = {},
   compact = false,
   hero = false,
+  listing = false,
   className,
 }) => {
   const [location, setLocation] = useState(defaultValues.location ?? '')
@@ -41,6 +43,95 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSearch({ location, startDate, endDate, capacity, boatType: boatType || undefined })
+  }
+
+  if (listing) {
+    return (
+      <form
+        onSubmit={handleSubmit}
+        className={cn(
+          'bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,51,102,0.10)] border border-gray-100 p-2',
+          className
+        )}
+        aria-label="Rechercher un bateau"
+      >
+        <div className="flex flex-col md:flex-row md:items-center">
+          <div className="flex-1 flex items-center gap-3 px-4 py-3 md:py-2.5 border-b md:border-b-0 md:border-r border-gray-100">
+            <MapPin size={18} className="text-[#8A94A6] flex-shrink-0" strokeWidth={1.5} />
+            <div className="flex-1 min-w-0 text-left">
+              <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[#8A94A6] mb-0.5">
+                Lieu
+              </span>
+              <input
+                type="text"
+                placeholder="Où naviguez-vous ?"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="w-full text-sm text-[#334155] placeholder:text-[#8A94A6] bg-transparent border-none outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="flex-1 flex items-center gap-3 px-4 py-3 md:py-2.5 border-b md:border-b-0 md:border-r border-gray-100">
+            <Calendar size={18} className="text-[#8A94A6] flex-shrink-0" strokeWidth={1.5} />
+            <div className="flex-1 min-w-0 text-left relative">
+              <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[#8A94A6] mb-0.5">
+                Dates
+              </span>
+              <input
+                type="date"
+                value={startDate}
+                min={today}
+                onChange={(e) => setStartDate(e.target.value)}
+                className={cn(
+                  'w-full text-sm bg-transparent border-none outline-none cursor-pointer relative z-10',
+                  startDate ? 'text-[#334155]' : 'text-transparent'
+                )}
+              />
+              {!startDate && (
+                <span className="absolute left-0 bottom-0 text-sm text-[#8A94A6] pointer-events-none">
+                  Ajouter dates
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="flex-1 flex items-center gap-3 px-4 py-3 md:py-2.5">
+            <Ship size={18} className="text-[#8A94A6] flex-shrink-0" strokeWidth={1.5} />
+            <div className="flex-1 min-w-0 text-left">
+              <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[#8A94A6] mb-0.5">
+                Type
+              </span>
+              <select
+                value={boatType}
+                onChange={(e) => setBoatType(e.target.value)}
+                className={cn(
+                  'w-full text-sm bg-transparent border-none outline-none cursor-pointer appearance-none',
+                  boatType ? 'text-[#334155]' : 'text-[#8A94A6]'
+                )}
+              >
+                <option value="">Catamaran, Voilier...</option>
+                {BOAT_TYPE_OPTIONS.map((type) => (
+                  <option key={type} value={type}>
+                    {BOAT_TYPE_LABELS[type]}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex items-center p-2 md:pl-0">
+            <button
+              type="submit"
+              className="sl-btn-navy w-12 h-12 flex items-center justify-center rounded-full shadow-md transition-colors flex-shrink-0"
+              aria-label="Rechercher"
+            >
+              <Search size={20} strokeWidth={2.5} color="#ffffff" />
+            </button>
+          </div>
+        </div>
+      </form>
+    )
   }
 
   if (compact) {

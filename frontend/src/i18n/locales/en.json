@@ -60,6 +60,13 @@
   "footer": {
     "tagline": "The peer-to-peer boat rental platform. Sail with confidence, rent or list your boat in a few clicks.",
     "taglineShort": "The premium peer-to-peer boat rental platform. Sail with confidence.",
+    "taglineListing": "Discover the freedom to sail with our selection of exceptional boats.",
+    "navigation": "Navigation",
+    "support": "Support",
+    "legalCol": "Legal",
+    "rentBoat": "Rent a boat",
+    "helpSupport": "Help & Support",
+    "editorial": "The Horizon Editorial.",
     "platform": "Platform",
     "destinationsCol": "Destinations",
     "newsletter": "Newsletter",
@@ -87,6 +94,8 @@
     "careers": "Careers",
     "legal": {
       "cgu": "Terms of Service",
+      "cguFull": "Terms & Conditions",
+      "privacy": "Privacy Policy",
       "mentions": "Legal notice",
       "rgpd": "GDPR",
       "cookies": "Cookie policy"
@@ -147,6 +156,11 @@
     "estimationNote": "*Indicative estimate based on the average of active owners."
   },
   "search": {
+    "adventures_one": "{{count}} maritime adventure available",
+    "adventures_other": "{{count}} maritime adventures available",
+    "subtitle": "Discover the best rentals around the world.",
+    "showMore": "Show more results",
+    "viewAll": "View all",
     "title_one": "{{count}} boat found",
     "title_other": "{{count}} boats found",
     "noResults": "No boats found",
