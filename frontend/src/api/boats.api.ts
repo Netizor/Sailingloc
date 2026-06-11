@@ -7,7 +7,16 @@ import type { Boat, BoatListParams, BoatStatus, PaginatedResponse } from '../typ
 export const listBoats = async (
   params: BoatListParams = {},
 ): Promise<PaginatedResponse<Boat>> => {
-  const { data } = await api.get<PaginatedResponse<Boat>>('/boats', { params })
+  const { types, ...rest } = params
+  const query = new URLSearchParams()
+  Object.entries(rest).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      query.append(key, String(value))
+    }
+  })
+  types?.forEach((type) => query.append('types[]', type))
+  const qs = query.toString()
+  const { data } = await api.get<PaginatedResponse<Boat>>(`/boats${qs ? `?${qs}` : ''}`)
   return data
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { MapPin, Calendar, Users, Search, Ship } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import Button from '../ui/Button'
@@ -38,6 +38,20 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [capacity, setCapacity] = useState<number | ''>(defaultValues.capacity ?? '')
   const [boatType, setBoatType] = useState(defaultValues.boatType ?? '')
 
+  useEffect(() => {
+    setLocation(defaultValues.location ?? '')
+    setStartDate(defaultValues.startDate ?? '')
+    setEndDate(defaultValues.endDate ?? '')
+    setCapacity(defaultValues.capacity ?? '')
+    setBoatType(defaultValues.boatType ?? '')
+  }, [
+    defaultValues.location,
+    defaultValues.startDate,
+    defaultValues.endDate,
+    defaultValues.capacity,
+    defaultValues.boatType,
+  ])
+
   const today = new Date().toISOString().split('T')[0]
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -74,25 +88,40 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
           <div className="flex-1 flex items-center gap-3 px-4 py-3 md:py-2.5 border-b md:border-b-0 md:border-r border-gray-100">
             <Calendar size={18} className="text-[#8A94A6] flex-shrink-0" strokeWidth={1.5} />
-            <div className="flex-1 min-w-0 text-left relative">
-              <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[#8A94A6] mb-0.5">
-                Dates
-              </span>
-              <input
-                type="date"
-                value={startDate}
-                min={today}
-                onChange={(e) => setStartDate(e.target.value)}
-                className={cn(
-                  'w-full text-sm bg-transparent border-none outline-none cursor-pointer relative z-10',
-                  startDate ? 'text-[#334155]' : 'text-transparent'
-                )}
-              />
-              {!startDate && (
-                <span className="absolute left-0 bottom-0 text-sm text-[#8A94A6] pointer-events-none">
-                  Ajouter dates
+            <div className="flex-1 min-w-0 grid grid-cols-2 gap-2">
+              <div className="relative text-left">
+                <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[#8A94A6] mb-0.5">
+                  Départ
                 </span>
-              )}
+                <input
+                  type="date"
+                  value={startDate}
+                  min={today}
+                  onChange={(e) => {
+                    setStartDate(e.target.value)
+                    if (endDate && e.target.value > endDate) setEndDate('')
+                  }}
+                  className={cn(
+                    'w-full text-sm bg-transparent border-none outline-none cursor-pointer',
+                    startDate ? 'text-[#334155]' : 'text-[#8A94A6]'
+                  )}
+                />
+              </div>
+              <div className="relative text-left">
+                <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[#8A94A6] mb-0.5">
+                  Retour
+                </span>
+                <input
+                  type="date"
+                  value={endDate}
+                  min={startDate || today}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className={cn(
+                    'w-full text-sm bg-transparent border-none outline-none cursor-pointer',
+                    endDate ? 'text-[#334155]' : 'text-[#8A94A6]'
+                  )}
+                />
+              </div>
             </div>
           </div>
 

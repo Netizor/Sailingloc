@@ -1,0 +1,82 @@
+/**
+ * Service email minimal — utilise Resend si RESEND_API_KEY est défini,
+ * sinon tombe sur un log console (utile en dev sans config email).
+ *
+ * Pour passer sur SMTP classique, remplacer l'implémentation par nodemailer.
+ */
+
+const MAIL_FROM = process.env.MAIL_FROM || 'noreply@sailingloc.fr'
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
+
+async function sendMail({ to, subject, html }) {
+  if (process.env.RESEND_API_KEY) {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ from: MAIL_FROM, to, subject, html }),
+    })
+    if (!res.ok) {
+      const err = await res.text()
+      console.error('[Email] Resend error:', err)
+    }
+  } else {
+    // Fallback dev : afficher dans les logs
+    console.log(`[Email DEV] to=${to} | subject=${subject}`)
+    console.log(html.replace(/<[^>]+>/g, '').substring(0, 300))
+  }
+}
+
+export async function sendEmailVerification(to, firstName, token) {
+  const link = `${FRONTEND_URL}/verify-email?token=${token}`
+  await sendMail({
+    to,
+    subject: 'Vérifiez votre adresse email – SailingLoc',
+    html: `
+      <h2>Bonjour ${firstName},</h2>
+      <p>Merci de vous être inscrit sur SailingLoc. Cliquez sur le lien ci-dessous pour vérifier votre email :</p>
+      <p><a href="${link}" style="background:#0ea5e9;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;">Vérifier mon email</a></p>
+      <p>Ce lien est valable 24 heures.</p>
+      <p>Si vous n'avez pas créé de compte, ignorez cet email.</p>
+    `,
+  })
+}
+
+export async function sendPasswordReset(to, firstName, token) {
+  const link = `${FRONTEND_URL}/reset-password?token=${token}`
+  await sendMail({
+    to,
+    subject: 'Réinitialisation de votre mot de passe – SailingLoc',
+    html: `
+      <h2>Bonjour ${firstName},</h2>
+      <p>Vous avez demandé la réinitialisation de votre mot de passe.</p>
+      <p><a href="${link}" style="background:#0ea5e9;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;">Réinitialiser mon mot de passe</a></p>
+      <p>Ce lien est valable 1 heure. Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.</p>
+    `,
+  })
+}
+
+export async function sendBookingNotification(to, firstName, { type, boatTitle, startDate, endDate }) {
+  const messages = {
+    confirmed: { subject: 'Réservation confirmée – SailingLoc', intro: 'Votre réservation a été confirmée !' },
+    cancelled: { subject: 'Réservation annulée – SailingLoc', intro: 'Une réservation a été annulée.' },
+    new_request: { subject: 'Nouvelle demande de réservation – SailingLoc', intro: 'Vous avez reçu une nouvelle demande de réservation.' },
+  }
+  const msg = messages[type] || { subject: 'Mise à jour de réservation', intro: 'Votre réservation a été mise à jour.' }
+  await sendMail({
+    to,
+    subject: msg.subject,
+    html: `
+      <h2>Bonjour ${firstName},</h2>
+      <p>${msg.intro}</p>
+      <ul>
+        <li><strong>Bateau :</strong> ${boatTitle}</li>
+        <li><strong>Du :</strong> ${startDate}</li>
+        <li><strong>Au :</strong> ${endDate}</li>
+      </ul>
+      <p><a href="${FRONTEND_URL}/dashboard" style="background:#0ea5e9;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;">Voir mes réservations</a></p>
+    `,
+  })
+}

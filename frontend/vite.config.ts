@@ -88,7 +88,7 @@ export default defineConfig({
     // Même origine en dev : le navigateur appelle /api sur :5173, Vite relaie vers Symfony (:8000) → pas de CORS
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:3000',
         changeOrigin: true,
       },
     },
