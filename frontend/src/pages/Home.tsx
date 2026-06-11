@@ -466,7 +466,7 @@ const Home: React.FC = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => navigate('/inscription')}
+                  onClick={() => navigate('/devenir-proprietaire')}
                   className="px-8 py-3 text-sm font-medium text-white bg-[#003366] rounded-full whitespace-nowrap"
                 >
                   {t('nav.becomeOwner')}

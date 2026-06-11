@@ -36,12 +36,11 @@ export const reportBoat = async (payload: ReportPayload): Promise<void> => {
 
 /** Admin — liste paginée des signalements */
 export const adminListReports = async (params?: { status?: string; page?: number; limit?: number }) => {
-  const { data } = await api.get<{ data: { data: Report[]; total: number; page: number; totalPages: number } }>('/admin/reports', { params })
-  return data.data
+  const { data } = await api.get<{ data: Report[]; total: number; page: number; totalPages: number }>('/admin/reports', { params })
+  return data
 }
 
 /** Admin — met à jour le statut d'un signalement */
-export const adminUpdateReport = async (id: number, payload: { status?: ReportStatus; adminNote?: string }): Promise<Report> => {
-  const { data } = await api.patch<{ data: Report }>(`/admin/reports/${id}`, payload)
-  return data.data
+export const adminUpdateReport = async (id: number, payload: { status?: ReportStatus; adminNote?: string }): Promise<void> => {
+  await api.patch(`/admin/reports/${id}`, payload)
 }

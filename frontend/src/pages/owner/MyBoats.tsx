@@ -48,10 +48,9 @@ const MyBoats: React.FC = () => {
   const boats: Boat[] = data?.data ?? []
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div>
         {/* Header */}
-        <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
+        <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Mes bateaux</h1>
             <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
@@ -59,14 +58,15 @@ const MyBoats: React.FC = () => {
             </p>
           </div>
           <DisabledTooltip disabled={!canManageBoat} tooltip={blockedTooltip}>
-            <Button
-              variant="primary"
-              size="md"
+            <button
+              type="button"
+              disabled={!canManageBoat}
               onClick={() => navigate('/proprietaire/bateaux/nouveau')}
-              leftIcon={<Plus size={16} />}
+              className="flex items-center gap-2 bg-brand-teal hover:bg-brand-teal/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-sm px-5 py-3 rounded-xl shadow-lg shadow-brand-teal/25 transition-all"
             >
+              <Plus size={16} strokeWidth={2.5} />
               Ajouter un bateau
-            </Button>
+            </button>
           </DisabledTooltip>
         </div>
 
@@ -109,7 +109,6 @@ const MyBoats: React.FC = () => {
             ))}
           </div>
         )}
-      </div>
     </div>
   )
 }

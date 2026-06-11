@@ -8,7 +8,7 @@ const Footer: React.FC = () => {
 
   const navLinks = [
     { label: t('footer.rentBoat'), to: '/bateaux' },
-    { label: t('footer.becomeOwner'), to: '/inscription' },
+    { label: t('footer.becomeOwner'), to: '/devenir-proprietaire' },
     { label: t('nav.destinationsShort'), to: '/destinations' },
   ]
 

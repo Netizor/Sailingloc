@@ -7,6 +7,26 @@ export const cn = (...inputs: ClassValue[]) => clsx(inputs)
 export const formatDate = (date: string | Date) =>
   format(typeof date === 'string' ? parseISO(date) : date, 'd MMMM yyyy', { locale: fr })
 
+export const formatDateShort = (date: string | Date) =>
+  format(typeof date === 'string' ? parseISO(date) : date, 'd MMM yyyy', { locale: fr })
+
+export const formatDateRangeShort = (start: string | Date, end: string | Date) => {
+  const s = typeof start === 'string' ? parseISO(start) : start
+  const e = typeof end === 'string' ? parseISO(end) : end
+  return `${format(s, 'd MMM', { locale: fr })} — ${format(e, 'd MMM yyyy', { locale: fr })}`
+}
+
+export const formatDateRangeDash = (start: string | Date, end: string | Date) => {
+  const s = typeof start === 'string' ? parseISO(start) : start
+  const e = typeof end === 'string' ? parseISO(end) : end
+  return `${format(s, 'd MMM', { locale: fr })} - ${format(e, 'd MMM yyyy', { locale: fr })}`
+}
+
+export const daysUntil = (date: string | Date) => {
+  const target = typeof date === 'string' ? parseISO(date) : date
+  return differenceInCalendarDays(target, new Date())
+}
+
 export const formatPrice = (amount: number) =>
   new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount)
 

@@ -498,11 +498,11 @@ const UserProfile: React.FC = () => {
   if (!user) return null
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
+    <div className="max-w-2xl">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
           <UserCircle size={22} className="text-ocean-700 dark:text-ocean-400" />
-          Mon profil
+          Paramètres
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
           Gérez vos informations personnelles et votre sécurité

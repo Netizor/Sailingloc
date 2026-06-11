@@ -306,6 +306,8 @@ export interface AdminDashboardStats {
   recentBookings?: Partial<Booking>[]
   recentUsers?: Partial<User>[]
   revenueByMonth?: { month: string; revenue: number }[]
+  bookingsByMonth?: { month: string; bookings: number }[]
+  activeBoats?: number
 }
 
 // ─── Owner Revenues ───────────────────────────────────────────────────────────

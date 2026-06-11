@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 import Layout, { ProtectedRoute, OwnerRoute, AdminRoute } from './components/layout/Layout'
+import UserDashboardLayout from './components/layout/UserDashboardLayout'
+import AdminDashboardLayout from './components/layout/AdminDashboardLayout'
 import { FullPageSpinner } from './components/ui/Spinner'
 import CookieBanner from './components/ui/CookieBanner'
 import { initSessionGuard } from './store/auth.store'
@@ -55,6 +57,8 @@ const Faq = React.lazy(() => import('./pages/Faq'))
 const Contact = React.lazy(() => import('./pages/Contact'))
 const APropos = React.lazy(() => import('./pages/APropos'))
 const GuideProprietaire = React.lazy(() => import('./pages/GuideProprietaire'))
+const DevenirProprietaire = React.lazy(() => import('./pages/DevenirProprietaire'))
+const OwnerAuthPage = React.lazy(() => import('./pages/OwnerAuthPage'))
 
 // ── Comparateur ────────────────────────────────────────────────────────────────
 const Comparer = React.lazy(() => import('./pages/Comparer'))
@@ -103,6 +107,8 @@ export default function App() {
               <Route path="contact" element={<Contact />} />
               <Route path="a-propos" element={<APropos />} />
               <Route path="guide-proprietaire" element={<GuideProprietaire />} />
+              <Route path="devenir-proprietaire" element={<DevenirProprietaire />} />
+              <Route path="devenir-proprietaire/commencer" element={<OwnerAuthPage />} />
               <Route path="cgu" element={<Cgu />} />
               <Route path="mentions-legales" element={<MentionsLegales />} />
               <Route path="rgpd" element={<Rgpd />} />
@@ -116,6 +122,7 @@ export default function App() {
 
               {/* ── Renter (any authenticated user) ───────────────────────── */}
               <Route path="mon-espace" element={<ProtectedRoute />}>
+                <Route element={<UserDashboardLayout />}>
                 <Route index element={<RenterDashboard />} />
                 <Route path="reservations" element={<MyBookings />} />
                 <Route path="reservations/:id" element={<BookingDetail />} />
@@ -134,10 +141,12 @@ export default function App() {
                 <Route path="verification" element={<KycVerification />} />
                 {/* C9 — Recherches sauvegardées */}
                 <Route path="alertes" element={<SavedSearches />} />
+                </Route>
               </Route>
 
               {/* ── Owner (OWNER or ADMIN role) ───────────────────────────── */}
               <Route path="proprietaire" element={<OwnerRoute />}>
+                <Route element={<UserDashboardLayout />}>
                 <Route index element={<OwnerDashboard />} />
                 <Route path="bateaux" element={<MyBoats />} />
                 <Route path="bateaux/nouveau" element={<CreateEditBoat />} />
@@ -148,18 +157,19 @@ export default function App() {
                 {/* D1 — Propriétaire évalue un locataire */}
                 <Route path="reservations/:id/avis" element={<LeaveReview />} />
                 <Route path="revenus" element={<OwnerRevenues />} />
+                </Route>
               </Route>
 
               {/* ── Admin (ADMIN role only) ───────────────────────────────── */}
               <Route path="admin" element={<AdminRoute />}>
+                <Route element={<AdminDashboardLayout />}>
                 <Route index element={<AdminDashboard />} />
                 <Route path="utilisateurs" element={<AdminUsers />} />
                 <Route path="bateaux" element={<AdminBoats />} />
                 <Route path="reservations" element={<AdminBookings />} />
-                {/* F3 — Signalements */}
                 <Route path="signalements" element={<AdminReports />} />
-                {/* F4 — Modération des avis */}
                 <Route path="avis" element={<AdminReviews />} />
+                </Route>
               </Route>
 
               {/* ── 404 ───────────────────────────────────────────────────── */}

@@ -216,7 +216,7 @@ const Header: React.FC = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => navigate('/inscription')}
+                  onClick={() => navigate('/devenir-proprietaire')}
                   className="px-5 py-2.5 text-sm font-semibold text-white bg-[#2563FF] hover:bg-[#1a4fcc] rounded-lg whitespace-nowrap transition-colors"
                 >
                   {t('nav.becomeOwner')}
@@ -261,7 +261,7 @@ const Header: React.FC = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => navigate('/inscription')}
+                  onClick={() => navigate('/devenir-proprietaire')}
                   className="px-5 py-2.5 text-sm font-medium text-white bg-[#2563FF] rounded-lg"
                 >
                   {t('nav.becomeOwner')}

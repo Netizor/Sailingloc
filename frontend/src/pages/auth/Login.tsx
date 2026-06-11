@@ -14,13 +14,21 @@ interface LoginForm {
   password: string
 }
 
-const Login: React.FC = () => {
+interface LoginProps {
+  embedded?: boolean
+  redirectAfterLogin?: string
+}
+
+const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) => {
   const navigate = useNavigate()
   const location = useLocation()
   const { setAuth } = useAuthStore()
   const { t } = useTranslation()
 
-  const from = (location.state as { from?: Location })?.from?.pathname ?? '/mon-espace'
+  const from =
+    redirectAfterLogin ??
+    (location.state as { from?: Location })?.from?.pathname ??
+    '/mon-espace'
 
   const [form, setForm] = useState<LoginForm>({ email: '', password: '' })
   const [showPassword, setShowPassword] = useState(false)
@@ -73,10 +81,7 @@ const Login: React.FC = () => {
     loginMutation.mutate()
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-ocean-950 via-ocean-800 to-ocean-600 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        {/* Card */}
+  const card = (
         <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden">
           {/* Header banner */}
           <div className="bg-ocean-700 px-8 py-8 text-center">
@@ -160,25 +165,37 @@ const Login: React.FC = () => {
               </Button>
             </form>
 
-            {/* Register link */}
-            <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
-              {t('auth.login.noAccount')}{' '}
-              <Link
-                to="/inscription"
-                className="text-ocean-700 font-semibold hover:text-ocean-900"
-              >
-                {t('auth.login.register')}
-              </Link>
-            </p>
-
-            <div className="mt-6 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-center">
-              <p className="text-xs text-amber-700 font-medium">
-                {t('auth.login.demo')}
+            {!embedded && (
+              <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
+                {t('auth.login.noAccount')}{' '}
+                <Link
+                  to="/inscription"
+                  className="text-ocean-700 font-semibold hover:text-ocean-900"
+                >
+                  {t('auth.login.register')}
+                </Link>
               </p>
-            </div>
+            )}
+
+            {!embedded && (
+              <div className="mt-6 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-center">
+                <p className="text-xs text-amber-700 font-medium">
+                  {t('auth.login.demo')}
+                </p>
+              </div>
+            )}
           </div>
         </div>
+  )
 
+  if (embedded) {
+    return <div className="w-full">{card}</div>
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-ocean-950 via-ocean-800 to-ocean-600 flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md">
+        {card}
         <p className="text-center text-ocean-200/60 text-xs mt-6">
           © {new Date().getFullYear()} SailingLoc
         </p>

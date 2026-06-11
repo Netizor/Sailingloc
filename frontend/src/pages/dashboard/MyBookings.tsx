@@ -1,33 +1,51 @@
-import React, { useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Anchor, Clock, ExternalLink, MessageSquarePlus } from 'lucide-react'
+import {
+  Anchor,
+  Calendar,
+  ChevronDown,
+  Download,
+  Filter,
+  Heart,
+  MapPin,
+  Star,
+} from 'lucide-react'
 import { bookingsApi } from '../../api/bookings.api'
-import { formatDate, formatPrice } from '../../lib/utils'
+import { getFavorites } from '../../api/favorites.api'
+import {
+  daysUntil,
+  formatDateRangeDash,
+  formatDateRangeShort,
+  formatPrice,
+  getBookingStatusColor,
+  getBookingStatusLabel,
+} from '../../lib/utils'
 import { BookingStatus } from '../../types'
 import type { Booking } from '../../types'
-
-// Le backend ajoute hasReview pour afficher le CTA avis, absent de l'interface Booking de base
-interface BookingWithReview extends Booking {
-  hasReview?: boolean
-}
-import BookingStatusBadge from '../../components/bookings/BookingStatusBadge'
 import Spinner from '../../components/ui/Spinner'
 import Button from '../../components/ui/Button'
 
-type TabFilter = 'ALL' | BookingStatus
+interface BookingWithReview extends Booking {
+  hasReview?: boolean
+  reviewRating?: number
+}
 
-const tabs: { value: TabFilter; label: string }[] = [
-  { value: 'ALL', label: 'Toutes' },
-  { value: BookingStatus.PENDING, label: 'En attente' },
-  { value: BookingStatus.CONFIRMED, label: 'Confirmées' },
-  { value: BookingStatus.COMPLETED, label: 'Terminées' },
-  { value: BookingStatus.CANCELLED, label: 'Annulées' },
-]
+type HistoryFilter = 'ALL' | 'UPCOMING' | 'COMPLETED' | 'PENDING' | 'CANCELLED'
+
+const filterLabels: Record<HistoryFilter, string> = {
+  ALL: 'Toutes',
+  UPCOMING: 'À venir',
+  COMPLETED: 'Terminées',
+  PENDING: 'En attente',
+  CANCELLED: 'Annulées',
+}
 
 const MyBookings: React.FC = () => {
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<TabFilter>('ALL')
+  const [historyFilter, setHistoryFilter] = useState<HistoryFilter>('ALL')
+  const [filterOpen, setFilterOpen] = useState(false)
+  const tableRef = useRef<HTMLDivElement>(null)
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['bookings', 'my'],
@@ -35,68 +53,219 @@ const MyBookings: React.FC = () => {
     staleTime: 2 * 60 * 1000,
   })
 
+  const { data: favorites } = useQuery({
+    queryKey: ['favorites'],
+    queryFn: getFavorites,
+    staleTime: 60 * 1000,
+  })
+
   const bookings: BookingWithReview[] = data?.data ?? []
 
-  const filtered =
-    activeTab === 'ALL'
-      ? bookings
-      : bookings.filter((b) => b.status === activeTab)
+  const {
+    totalBookings,
+    bookingsThisMonth,
+    reviewsGiven,
+    avgReviewRating,
+    nextBooking,
+    filteredHistory,
+  } = useMemo(() => {
+    const now = new Date()
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+    let reviewsGiven = 0
+    let ratingSum = 0
+    let ratingCount = 0
+    let bookingsThisMonth = 0
 
-  const tabCount = (status: TabFilter) =>
-    status === 'ALL' ? bookings.length : bookings.filter((b) => b.status === status).length
+    for (const b of bookings) {
+      if (new Date(b.createdAt) >= monthStart) bookingsThisMonth++
+      if (b.hasReview) {
+        reviewsGiven++
+        if (b.reviewRating) {
+          ratingSum += b.reviewRating
+          ratingCount++
+        }
+      }
+    }
+
+    const nextBooking =
+      bookings
+        .filter(
+          (b) =>
+            (b.status === BookingStatus.CONFIRMED || b.status === BookingStatus.PENDING) &&
+            new Date(b.endDate) >= now,
+        )
+        .sort(
+          (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
+        )[0] ?? null
+
+    const filteredHistory = bookings.filter((b) => {
+      if (historyFilter === 'ALL') return true
+      if (historyFilter === 'UPCOMING') {
+        return (
+          (b.status === BookingStatus.CONFIRMED || b.status === BookingStatus.PENDING) &&
+          new Date(b.startDate) >= now
+        )
+      }
+      if (historyFilter === 'PENDING') return b.status === BookingStatus.PENDING
+      if (historyFilter === 'CANCELLED') return b.status === BookingStatus.CANCELLED
+      return b.status === BookingStatus.COMPLETED
+    })
+
+    return {
+      totalBookings: bookings.length,
+      bookingsThisMonth,
+      reviewsGiven,
+      avgReviewRating: ratingCount > 0 ? ratingSum / ratingCount : null,
+      nextBooking,
+      filteredHistory,
+    }
+  }, [bookings, historyFilter])
+
+  const handleExportPdf = () => {
+    window.print()
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-24">
+        <Spinner size="lg" />
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="text-center py-24 text-red-500">
+        Erreur lors du chargement de vos réservations.
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Mes réservations</h1>
+    <div className="space-y-8">
+      {/* En-tête */}
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+          Mes Réservations
+        </h1>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+          Gérez vos escapades maritimes et l'historique de vos locations.
+        </p>
+      </div>
 
-        {/* Tabs */}
-        <div className="flex items-center gap-1 overflow-x-auto pb-0.5 mb-6 border-b border-gray-200 dark:border-gray-600">
-          {tabs.map((tab) => {
-            const count = tabCount(tab.value)
-            return (
+      {/* Statistiques */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard
+          icon={<Calendar size={20} />}
+          value={totalBookings}
+          label="Total Réservations"
+          sub={
+            bookingsThisMonth > 0
+              ? `+${bookingsThisMonth} ce mois-ci`
+              : 'Aucune ce mois-ci'
+          }
+        />
+        <StatCard
+          icon={<Star size={20} />}
+          value={reviewsGiven}
+          label="Avis Donnés"
+          sub={
+            avgReviewRating
+              ? `Moyenne de ${avgReviewRating.toFixed(1)}/5`
+              : reviewsGiven > 0
+                ? 'Avis publiés'
+                : "Aucun avis pour l'instant"
+          }
+        />
+        <StatCard
+          icon={<Heart size={20} />}
+          value={favorites?.length ?? 0}
+          label="Favoris"
+          sub="Bateaux enregistrés"
+        />
+      </div>
+
+      {/* Prochaine escapade — toujours visible */}
+      <section>
+        <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3">
+          Prochaine escapade
+        </h2>
+        {nextBooking ? (
+          <NextTripHero
+            booking={nextBooking}
+            onClick={() => navigate(`/mon-espace/reservations/${nextBooking.id}`)}
+          />
+        ) : (
+          <div className="relative w-full h-56 sm:h-64 rounded-2xl overflow-hidden bg-gradient-to-br from-ocean-600 to-brand-navy flex flex-col items-center justify-center text-center px-6">
+            <Anchor size={40} className="text-white/40 mb-3" />
+            <p className="text-white font-semibold text-lg">Aucune escapade prévue</p>
+            <p className="text-white/70 text-sm mt-1 mb-5 max-w-sm">
+              Réservez votre prochain bateau et retrouvez ici les détails de votre prochain départ.
+            </p>
+            <Button variant="primary" onClick={() => navigate('/bateaux')}>
+              Explorer les bateaux
+            </Button>
+          </div>
+        )}
+      </section>
+
+      {/* Historique */}
+      <section ref={tableRef} className="print:block">
+        <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
+          <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+            Historique des réservations
+          </h2>
+          <div className="flex items-center gap-2 print:hidden">
+            <div className="relative">
               <button
-                key={tab.value}
-                onClick={() => setActiveTab(tab.value)}
-                className={`flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors focus:outline-none -mb-px ${
-                  activeTab === tab.value
-                    ? 'border-ocean-600 dark:border-ocean-400 text-ocean-700 dark:text-ocean-400'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
-                }`}
+                onClick={() => setFilterOpen((o) => !o)}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-gray-300 transition-colors"
               >
-                {tab.label}
-                {count > 0 && (
-                  <span
-                    className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
-                      activeTab === tab.value
-                        ? 'bg-ocean-100 dark:bg-ocean-900/30 text-ocean-700 dark:text-ocean-400'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
-                    }`}
-                  >
-                    {count}
-                  </span>
-                )}
+                <Filter size={15} />
+                Filtrer
+                <ChevronDown size={14} className={`transition-transform ${filterOpen ? 'rotate-180' : ''}`} />
               </button>
-            )
-          })}
+              {filterOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setFilterOpen(false)} />
+                  <div className="absolute right-0 top-full mt-1 z-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg py-1 min-w-[160px]">
+                    {(Object.keys(filterLabels) as HistoryFilter[]).map((key) => (
+                      <button
+                        key={key}
+                        onClick={() => {
+                          setHistoryFilter(key)
+                          setFilterOpen(false)
+                        }}
+                        className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                          historyFilter === key
+                            ? 'text-brand-blue font-medium bg-blue-50 dark:bg-blue-900/20'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        {filterLabels[key]}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+            <button
+              onClick={handleExportPdf}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-gray-300 transition-colors"
+            >
+              <Download size={15} />
+              Exporter PDF
+            </button>
+          </div>
         </div>
 
-        {/* Content */}
-        {isLoading ? (
-          <div className="flex justify-center py-20">
-            <Spinner size="lg" />
-          </div>
-        ) : isError ? (
-          <div className="text-center py-20 text-red-500">
-            Erreur lors du chargement de vos réservations.
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-20">
-            <Anchor size={40} className="text-gray-200 dark:text-gray-700 mx-auto mb-3" />
+        {filteredHistory.length === 0 ? (
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-12 text-center">
+            <Anchor size={36} className="text-gray-200 dark:text-gray-700 mx-auto mb-3" />
             <p className="text-gray-500 dark:text-gray-400 font-medium">Aucune réservation trouvée</p>
-            <p className="text-gray-400 dark:text-gray-500 text-sm mt-1 mb-6">
-              {activeTab === 'ALL'
-                ? 'Vous n\'avez pas encore fait de réservation.'
+            <p className="text-gray-400 dark:text-gray-500 text-sm mt-1 mb-5">
+              {historyFilter === 'ALL'
+                ? "Vous n'avez pas encore fait de réservation."
                 : 'Aucune réservation dans cette catégorie.'}
             </p>
             <Button variant="primary" onClick={() => navigate('/bateaux')}>
@@ -104,85 +273,161 @@ const MyBookings: React.FC = () => {
             </Button>
           </div>
         ) : (
-          <div className="space-y-4">
-            {filtered.map((booking) => (
-              <BookingCard key={booking.id} booking={booking} />
-            ))}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100 dark:border-gray-700 text-left bg-gray-50/50 dark:bg-gray-800/50">
+                    <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">Bateau</th>
+                    <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">Dates</th>
+                    <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">Lieu</th>
+                    <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">Statut</th>
+                    <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase text-right">Montant</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredHistory.map((booking) => (
+                    <tr
+                      key={booking.id}
+                      onClick={() => navigate(`/mon-espace/reservations/${booking.id}`)}
+                      className="border-b border-gray-50 dark:border-gray-700/50 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/30 cursor-pointer transition-colors"
+                    >
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <BoatThumbnail booking={booking} />
+                          <span className="font-medium text-gray-900 dark:text-gray-100">
+                            {booking.boat?.title ?? 'Bateau'}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-4 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                        {formatDateRangeShort(booking.startDate, booking.endDate)}
+                      </td>
+                      <td className="px-5 py-4 text-gray-600 dark:text-gray-400">
+                        {booking.boat?.city ?? booking.boat?.port ?? '—'}
+                      </td>
+                      <td className="px-5 py-4">
+                        <StatusPill status={booking.status} />
+                      </td>
+                      <td className="px-5 py-4 text-right font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">
+                        {formatPrice(booking.totalAmount ?? 0)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
-      </div>
+      </section>
     </div>
   )
 }
 
-const BookingCard: React.FC<{ booking: BookingWithReview }> = ({ booking }) => {
-  const navigate = useNavigate()
-  const canReview =
-    booking.status === 'COMPLETED' && !booking.hasReview
-
-  return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col sm:flex-row shadow-sm">
-      {/* Boat image */}
-      <div className="sm:w-36 h-36 sm:h-auto bg-gray-100 dark:bg-gray-700 flex-shrink-0">
-        {booking.boat?.images?.[0] ? (
-          <img
-            src={booking.boat.images[0]}
-            alt={booking.boat?.title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-ocean-50 dark:bg-ocean-900/30">
-            <Anchor size={28} className="text-ocean-300" />
-          </div>
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="flex-1 p-5 flex flex-col justify-between gap-3">
-        <div className="flex items-start justify-between gap-3 flex-wrap">
-          <div>
-            <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-base">
-              {booking.boat?.title ?? 'Bateau'}
-            </h3>
-            <p className="text-sm text-gray-400 dark:text-gray-500 flex items-center gap-1 mt-1">
-              <Clock size={13} />
-              {formatDate(booking.startDate)} — {formatDate(booking.endDate)}
-            </p>
-          </div>
-          <BookingStatusBadge status={booking.status} />
-        </div>
-
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div>
-            <p className="text-xs text-gray-400 dark:text-gray-500">Total</p>
-            <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
-              {formatPrice(booking.totalAmount ?? 0)}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {canReview && (
-              <Button
-                variant="secondary"
-                size="sm"
-                leftIcon={<MessageSquarePlus size={14} />}
-                onClick={() => navigate(`/mon-espace/reservations/${booking.id}/avis`)}
-              >
-                Laisser un avis
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              leftIcon={<ExternalLink size={14} />}
-              onClick={() => navigate(`/mon-espace/reservations/${booking.id}`)}
-            >
-              Voir détail
-            </Button>
-          </div>
-        </div>
+const StatCard: React.FC<{
+  icon: React.ReactNode
+  value: number
+  label: string
+  sub: string
+}> = ({ icon, value, label, sub }) => (
+  <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-5">
+    <div className="flex items-start justify-between mb-3">
+      <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-brand-blue flex items-center justify-center">
+        {icon}
       </div>
     </div>
+    <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
+    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mt-0.5">{label}</p>
+    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{sub}</p>
+  </div>
+)
+
+const BoatThumbnail: React.FC<{ booking: BookingWithReview }> = ({ booking }) => (
+  <div className="h-10 w-14 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex-shrink-0">
+    {booking.boat?.images?.[0] ? (
+      <img
+        src={booking.boat.images[0]}
+        alt={booking.boat.title ?? 'Bateau'}
+        className="h-full w-full object-cover"
+      />
+    ) : (
+      <div className="h-full w-full flex items-center justify-center bg-ocean-50 dark:bg-ocean-900/30">
+        <Anchor size={14} className="text-ocean-300" />
+      </div>
+    )}
+  </div>
+)
+
+const StatusPill: React.FC<{ status: BookingStatus }> = ({ status }) => {
+  const color = getBookingStatusColor(status)
+  const label = getBookingStatusLabel(status).toUpperCase()
+
+  return (
+    <span className={`inline-block text-[10px] font-bold tracking-wide px-2.5 py-1 rounded-md ${color}`}>
+      {label}
+    </span>
+  )
+}
+
+const NextTripHero: React.FC<{
+  booking: BookingWithReview
+  onClick: () => void
+}> = ({ booking, onClick }) => {
+  const daysLeft = daysUntil(booking.startDate)
+  const location = [booking.boat?.city, booking.boat?.country].filter(Boolean).join(', ') || '—'
+  const departureLabel =
+    daysLeft > 0
+      ? `Départ dans ${daysLeft} Jour${daysLeft > 1 ? 's' : ''}`
+      : daysLeft === 0
+        ? "Départ aujourd'hui"
+        : 'En cours'
+
+  return (
+    <button
+      onClick={onClick}
+      className="relative w-full h-56 sm:h-64 rounded-2xl overflow-hidden group text-left"
+    >
+      {booking.boat?.images?.[0] ? (
+        <img
+          src={booking.boat.images[0]}
+          alt={booking.boat.title ?? 'Bateau'}
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-ocean-600 to-brand-navy" />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-black/50" />
+
+      <div className="relative h-full flex items-end justify-between p-5 sm:p-6 gap-4">
+        <div className="flex flex-col items-start gap-2">
+          <span
+            className={`text-white text-[10px] font-bold tracking-wider px-2.5 py-1 rounded-md uppercase ${
+              booking.status === BookingStatus.CONFIRMED
+                ? 'bg-green-500'
+                : 'bg-yellow-500'
+            }`}
+          >
+            {booking.status === BookingStatus.CONFIRMED ? 'Confirmée' : 'En attente'}
+          </span>
+          <h3 className="text-lg sm:text-xl font-bold text-white leading-tight">
+            {booking.boat?.title ?? 'Bateau'}
+          </h3>
+          <p className="text-sm text-white/80 flex items-center gap-1.5">
+            <MapPin size={14} />
+            {location}
+          </p>
+        </div>
+
+        <div className="bg-black/50 backdrop-blur-sm rounded-xl px-4 py-3 text-right flex-shrink-0">
+          <p className="text-[10px] font-semibold tracking-wider text-white/70 uppercase mb-1">
+            {departureLabel}
+          </p>
+          <p className="text-sm font-bold text-white whitespace-nowrap">
+            {formatDateRangeDash(booking.startDate, booking.endDate)}
+          </p>
+        </div>
+      </div>
+    </button>
   )
 }
 

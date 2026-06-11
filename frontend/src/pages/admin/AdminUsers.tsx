@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Search, UserCheck, UserX, Shield, User as UserIcon, Ship } from 'lucide-react'
+import { Search, UserCheck, UserX, Shield, User as UserIcon, Ship, Eye, X } from 'lucide-react'
 import { adminApi } from '../../api/admin.api'
 import { formatDate } from '../../lib/utils'
 import Badge from '../../components/ui/Badge'
@@ -25,6 +25,7 @@ const AdminUsers: React.FC = () => {
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState<string>('ALL')
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin', 'users', { search, roleFilter }],
@@ -52,12 +53,17 @@ const AdminUsers: React.FC = () => {
     onError: () => toast.error('Erreur'),
   })
 
+  const { data: userDetail } = useQuery({
+    queryKey: ['admin', 'user', selectedUserId],
+    queryFn: () => adminApi.getUser(selectedUserId!),
+    enabled: selectedUserId != null,
+  })
+
   const users: AdminUser[] = data?.users ?? []
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="mb-8">
+    <div>
+        <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Gestion des utilisateurs</h1>
           <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{data?.total ?? 0} utilisateur(s)</p>
         </div>
@@ -172,26 +178,27 @@ const AdminUsers: React.FC = () => {
 
                         {/* Actions */}
                         <td className="px-5 py-4">
-                          <Button
-                            variant={user.isActive ? 'danger' : 'secondary'}
-                            size="sm"
-                            leftIcon={
-                              user.isActive ? (
-                                <UserX size={13} />
-                              ) : (
-                                <UserCheck size={13} />
-                              )
-                            }
-                            onClick={() =>
-                              toggleActiveMutation.mutate({
-                                userId: user.id,
-                                active: !user.isActive,
-                              })
-                            }
-                            loading={toggleActiveMutation.isPending}
-                          >
-                            {user.isActive ? 'Suspendre' : 'Activer'}
-                          </Button>
+                          <div className="flex items-center gap-1.5">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              leftIcon={<Eye size={13} />}
+                              onClick={() => setSelectedUserId(user.id)}
+                            >
+                              Détail
+                            </Button>
+                            <Button
+                              variant={user.isActive ? 'danger' : 'secondary'}
+                              size="sm"
+                              leftIcon={user.isActive ? <UserX size={13} /> : <UserCheck size={13} />}
+                              onClick={() =>
+                                toggleActiveMutation.mutate({ userId: user.id, active: !user.isActive })
+                              }
+                              loading={toggleActiveMutation.isPending}
+                            >
+                              {user.isActive ? 'Bloquer' : 'Débloquer'}
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     )
@@ -201,7 +208,28 @@ const AdminUsers: React.FC = () => {
             </div>
           )}
         </div>
-      </div>
+
+      {selectedUserId && userDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setSelectedUserId(null)}>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start justify-between mb-5">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">Profil utilisateur</h2>
+              <button onClick={() => setSelectedUserId(null)} className="text-gray-400 hover:text-gray-600"><X size={18} /></button>
+            </div>
+            <div className="space-y-3 text-sm">
+              <p><span className="text-gray-500">Nom :</span> <strong>{userDetail.firstName} {userDetail.lastName}</strong></p>
+              <p><span className="text-gray-500">Email :</span> {userDetail.email}</p>
+              <p><span className="text-gray-500">Rôle :</span> {userDetail.role}</p>
+              <p><span className="text-gray-500">Téléphone :</span> {userDetail.phone ?? '—'}</p>
+              <p><span className="text-gray-500">Statut :</span> {userDetail.isActive ? 'Actif' : 'Bloqué'}</p>
+              <p><span className="text-gray-500">Inscrit le :</span> {formatDate(userDetail.createdAt)}</p>
+              {(userDetail as AdminUser).boatsCount != null && (
+                <p><span className="text-gray-500">Bateaux :</span> {(userDetail as AdminUser).boatsCount}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
