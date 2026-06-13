@@ -30,7 +30,7 @@ const Footer: React.FC = () => {
   ]
 
   return (
-    <footer className="bg-white text-brand-slate border-t border-gray-200">
+    <footer className="bg-white dark:bg-gray-900 text-brand-slate dark:text-gray-300 border-t border-gray-200 dark:border-gray-800">
       <div className="w-full px-[10%] pt-14 pb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
           <div>
@@ -47,8 +47,8 @@ const Footer: React.FC = () => {
           <FooterColumn title={t('footer.legalCol')} links={legalLinks} />
         </div>
 
-        <div className="border-t border-gray-200 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-brand-muted">
+        <div className="border-t border-gray-200 dark:border-gray-800 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-brand-muted dark:text-gray-500">
             © 2024 SailingLoc. {t('footer.editorial')}
           </p>
           <div className="flex items-center gap-3">
@@ -58,7 +58,7 @@ const Footer: React.FC = () => {
                 href={s.href}
                 aria-label={s.label}
                 onClick={s.href === '#' ? (e) => e.preventDefault() : undefined}
-                className="p-2 text-brand-muted hover:text-brand-navy transition-colors"
+                className="p-2 text-brand-muted dark:text-gray-500 hover:text-brand-navy dark:hover:text-gray-200 transition-colors"
               >
                 <s.icon size={16} />
               </a>
@@ -77,11 +77,11 @@ interface FooterColumnProps {
 
 const FooterColumn: React.FC<FooterColumnProps> = ({ title, links }) => (
   <div>
-    <h3 className="text-xs font-bold uppercase tracking-wider text-brand-navy mb-4">{title}</h3>
+    <h3 className="text-xs font-bold uppercase tracking-wider text-brand-navy dark:text-gray-100 mb-4">{title}</h3>
     <ul className="space-y-2.5">
       {links.map((link) => (
         <li key={link.label}>
-          <Link to={link.to} className="text-sm text-brand-slate hover:text-brand-navy transition-colors">
+          <Link to={link.to} className="text-sm text-brand-slate dark:text-gray-400 hover:text-brand-navy dark:hover:text-gray-200 transition-colors">
             {link.label}
           </Link>
         </li>

@@ -8,6 +8,7 @@ import AdminDashboardLayout from './components/layout/AdminDashboardLayout'
 import { FullPageSpinner } from './components/ui/Spinner'
 import CookieBanner from './components/ui/CookieBanner'
 import { initSessionGuard } from './store/auth.store'
+import { usePreferencesStore } from './store/preferences.store'
 
 // ─── Pages — lazy loaded for code splitting ───────────────────────────────────
 const Home = React.lazy(() => import('./pages/Home'))
@@ -84,9 +85,45 @@ const queryClient = new QueryClient({
 })
 
 // ─── App ──────────────────────────────────────────────────────────────────────
+function ThemedToaster() {
+  const theme = usePreferencesStore((s) => s.theme)
+
+  return (
+    <Toaster
+      position="top-right"
+      toastOptions={{
+        duration: 4000,
+        style: {
+          background: theme === 'dark' ? '#1f2937' : '#fff',
+          color: theme === 'dark' ? '#f3f4f6' : '#111827',
+          borderRadius: '12px',
+          border: theme === 'dark' ? '1px solid #374151' : '1px solid #f3f4f6',
+          boxShadow:
+            '0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.05)',
+          fontSize: '14px',
+          maxWidth: '380px',
+        },
+        success: {
+          iconTheme: {
+            primary: '#0369a1',
+            secondary: theme === 'dark' ? '#1f2937' : '#fff',
+          },
+        },
+        error: {
+          iconTheme: {
+            primary: '#dc2626',
+            secondary: theme === 'dark' ? '#1f2937' : '#fff',
+          },
+        },
+      }}
+    />
+  )
+}
+
 export default function App() {
   // Vérifie au démarrage si la session "sans souvenir" a expiré (navigateur fermé)
   useEffect(() => { initSessionGuard() }, [])
+  useEffect(() => { usePreferencesStore.getState().init() }, [])
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -183,34 +220,7 @@ export default function App() {
       </BrowserRouter>
 
       {/* Toast notifications */}
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#fff',
-            color: '#111827',
-            borderRadius: '12px',
-            border: '1px solid #f3f4f6',
-            boxShadow:
-              '0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.05)',
-            fontSize: '14px',
-            maxWidth: '380px',
-          },
-          success: {
-            iconTheme: {
-              primary: '#0369a1',
-              secondary: '#fff',
-            },
-          },
-          error: {
-            iconTheme: {
-              primary: '#dc2626',
-              secondary: '#fff',
-            },
-          },
-        }}
-      />
+      <ThemedToaster />
     </QueryClientProvider>
   )
 }

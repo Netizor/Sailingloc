@@ -12,22 +12,19 @@ import {
   X,
   LayoutDashboard,
   Settings,
-  Moon,
-  Sun,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/utils'
 import { useAuthStore } from '../../store/auth.store'
 import { getUnreadCount } from '../../api/notifications.api'
 import { getUnreadMessagesCount } from '../../api/messages.api'
-import { useTheme } from '../../hooks/useTheme'
 import NotificationPanel from '../notifications/NotificationPanel'
+import SiteSettingsMenu from './SiteSettingsMenu'
 
 const Header: React.FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { user, isAuthenticated, logout } = useAuthStore()
-  const { theme, toggle: toggleTheme } = useTheme()
   const { t } = useTranslation()
 
   const navLinks = [
@@ -97,12 +94,12 @@ const Header: React.FC = () => {
     cn(
       'inline-flex items-center h-full px-4 text-xs font-semibold uppercase tracking-[0.1em] whitespace-nowrap border-b-[3px] transition-colors',
       isActive(to)
-        ? 'text-[#2563FF] border-[#2563FF] font-bold'
-        : 'text-gray-500 border-transparent hover:text-[#2563FF]'
+        ? 'text-[#2563FF] border-[#2563FF] font-bold dark:text-blue-400 dark:border-blue-400'
+        : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-[#2563FF] dark:hover:text-blue-400'
     )
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shadow-sm">
       <div className="w-full px-[10%]">
         <div className="flex items-stretch justify-between h-[72px] gap-6">
           {/* Logo complet — object-contain pour ne pas couper */}
@@ -124,21 +121,15 @@ const Header: React.FC = () => {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-3 flex-shrink-0 self-center">
-            <button
-              onClick={toggleTheme}
-              aria-label={theme === 'dark' ? t('nav.lightMode') : t('nav.darkMode')}
-              className="hidden sm:flex p-2 rounded-lg text-gray-500"
-            >
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 self-center">
+            <SiteSettingsMenu />
 
             {isAuthenticated && user ? (
               <>
                 <Link
                   to="/mon-espace/messages"
                   aria-label={t('nav.messages')}
-                  className="relative p-2 rounded-lg text-gray-500"
+                  className="relative p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
                 >
                   <MessageSquare size={20} />
                   {unreadMsgCount > 0 && (
@@ -152,7 +143,7 @@ const Header: React.FC = () => {
                   <button
                     onClick={() => setNotifOpen((v) => !v)}
                     aria-label={t('nav.notifications')}
-                    className="relative p-2 rounded-lg text-gray-500"
+                    className="relative p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
                   >
                     <Bell size={20} />
                     {unreadCount > 0 && (
@@ -180,12 +171,12 @@ const Header: React.FC = () => {
                   </button>
 
                   {dropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
-                      <div className="px-4 py-2 border-b border-gray-50">
-                        <p className="text-sm font-semibold text-gray-900">
+                    <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1 z-50">
+                      <div className="px-4 py-2 border-b border-gray-50 dark:border-gray-700">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                           {user.firstName} {user.lastName}
                         </p>
-                        <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{user.email}</p>
                       </div>
                       <DropdownItem icon={<LayoutDashboard size={15} />} label={t('nav.mySpace')} to="/mon-espace" onClick={() => setDropdownOpen(false)} />
                       {(user.role === 'OWNER' || user.role === 'ADMIN') && (
@@ -195,8 +186,8 @@ const Header: React.FC = () => {
                         <DropdownItem icon={<Settings size={15} />} label={t('nav.admin')} to="/admin" onClick={() => setDropdownOpen(false)} />
                       )}
                       <DropdownItem icon={<User size={15} />} label={t('nav.myProfile')} to="/mon-espace/profil" onClick={() => setDropdownOpen(false)} />
-                      <div className="border-t border-gray-50 mt-1 pt-1">
-                        <button onClick={handleLogout} className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-red-600">
+                      <div className="border-t border-gray-50 dark:border-gray-700 mt-1 pt-1">
+                        <button onClick={handleLogout} className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700/50">
                           <LogOut size={15} />
                           {t('nav.logout')}
                         </button>
@@ -210,7 +201,7 @@ const Header: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/connexion')}
-                  className="px-5 py-2.5 text-sm font-semibold text-[#2563FF] bg-white border-2 border-[#2563FF] rounded-lg hover:bg-blue-50 transition-colors"
+                  className="px-5 py-2.5 text-sm font-semibold text-[#2563FF] dark:text-blue-400 bg-white dark:bg-gray-800 border-2 border-[#2563FF] dark:border-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   {t('nav.login')}
                 </button>
@@ -226,7 +217,7 @@ const Header: React.FC = () => {
 
             <button
               onClick={() => setMobileOpen((v) => !v)}
-              className="lg:hidden p-2 rounded-lg text-gray-600"
+              className="lg:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300"
               aria-label={mobileOpen ? t('nav.closeMenu') : t('nav.openMenu')}
             >
               {mobileOpen ? <X size={22} /> : <Menu size={22} />}
@@ -236,7 +227,7 @@ const Header: React.FC = () => {
       </div>
 
       {mobileOpen && (
-        <div className="lg:hidden border-t border-gray-100 bg-white shadow-lg">
+        <div className="lg:hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg">
           <nav className="w-full px-[10%] py-4 flex flex-col gap-1">
             {navLinks.map((link) => (
               <Link
@@ -244,18 +235,18 @@ const Header: React.FC = () => {
                 to={link.to}
                 className={cn(
                   'px-3 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide',
-                  isActive(link.to) ? 'text-[#2563FF] bg-blue-50' : 'text-gray-600'
+                  isActive(link.to) ? 'text-[#2563FF] dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30' : 'text-gray-600 dark:text-gray-300'
                 )}
               >
                 {link.label}
               </Link>
             ))}
             {!isAuthenticated && (
-              <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-gray-100">
+              <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                 <button
                   type="button"
                   onClick={() => navigate('/connexion')}
-                  className="px-5 py-2.5 text-sm font-semibold text-[#2563FF] bg-white border-2 border-[#2563FF] rounded-lg hover:bg-blue-50 transition-colors"
+                  className="px-5 py-2.5 text-sm font-semibold text-[#2563FF] dark:text-blue-400 bg-white dark:bg-gray-800 border-2 border-[#2563FF] dark:border-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   {t('nav.login')}
                 </button>
@@ -268,6 +259,7 @@ const Header: React.FC = () => {
                 </button>
               </div>
             )}
+            <SiteSettingsMenu variant="mobile" />
           </nav>
         </div>
       )}
@@ -283,8 +275,8 @@ interface DropdownItemProps {
 }
 
 const DropdownItem: React.FC<DropdownItemProps> = ({ icon, label, to, onClick }) => (
-  <Link to={to} onClick={onClick} className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-600">
-    <span className="text-gray-400">{icon}</span>
+  <Link to={to} onClick={onClick} className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+    <span className="text-gray-400 dark:text-gray-500">{icon}</span>
     {label}
   </Link>
 )

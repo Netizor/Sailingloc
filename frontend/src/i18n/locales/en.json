@@ -57,6 +57,14 @@
     "language": "Language",
     "comingSoon": "Coming soon"
   },
+  "accessibility": {
+    "display": "Display",
+    "colorBlind": "Color blind mode",
+    "colorBlindOn": "Enable color blind mode (yellow)",
+    "colorBlindOff": "Disable color blind mode",
+    "french": "French",
+    "english": "English"
+  },
   "footer": {
     "tagline": "The peer-to-peer boat rental platform. Sail with confidence, rent or list your boat in a few clicks.",
     "taglineShort": "The premium peer-to-peer boat rental platform. Sail with confidence.",

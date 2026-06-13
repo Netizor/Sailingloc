@@ -57,6 +57,14 @@
     "language": "Langue",
     "comingSoon": "Prochainement"
   },
+  "accessibility": {
+    "display": "Affichage",
+    "colorBlind": "Mode daltonien",
+    "colorBlindOn": "Activer le mode daltonien (jaune)",
+    "colorBlindOff": "Désactiver le mode daltonien",
+    "french": "Français",
+    "english": "Anglais"
+  },
   "footer": {
     "tagline": "La plateforme de location de bateaux entre particuliers. Naviguez en toute confiance, louez ou proposez votre bateau en quelques clics.",
     "taglineShort": "La plateforme premium de location de bateaux entre particuliers. Naviguez en toute confiance.",

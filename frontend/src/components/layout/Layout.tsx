@@ -31,7 +31,7 @@ const ScrollToHash: React.FC = () => {
 
 const Layout: React.FC = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
       <ScrollToHash />
       <Header />
       {/* Bandeau de vérification email / téléphone manquant — visible uniquement si connecté */}
