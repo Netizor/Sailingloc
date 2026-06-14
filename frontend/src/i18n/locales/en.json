@@ -516,8 +516,10 @@
     "error": "Error publishing review"
   },
   "notFound": {
-    "title": "Page not found",
-    "subtitle": "The page you're looking for doesn't exist or has been moved.",
-    "backHome": "Back to home"
+    "pageTitle": "Page not found",
+    "title": "You are in uncharted waters.",
+    "subtitle": "The page you are looking for does not exist or has been moved to another port.",
+    "backHome": "Back to home",
+    "seeFleet": "See the fleet"
   }
 }

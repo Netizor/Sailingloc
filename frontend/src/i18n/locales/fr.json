@@ -516,8 +516,10 @@
     "error": "Erreur lors de la publication"
   },
   "notFound": {
-    "title": "Page introuvable",
-    "subtitle": "La page que vous cherchez n'existe pas ou a été déplacée.",
-    "backHome": "Retour à l'accueil"
+    "pageTitle": "Page introuvable",
+    "title": "Vous êtes en eaux inconnues.",
+    "subtitle": "La page que vous cherchez n'existe pas ou a été déplacée vers un autre port.",
+    "backHome": "Retour à l'accueil",
+    "seeFleet": "Voir la flotte"
   }
 }
