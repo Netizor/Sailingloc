@@ -24,9 +24,9 @@ const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:5173'
 const API_URL  = process.env.PLAYWRIGHT_API_URL  ?? 'http://localhost:8000'
 
 const ACCOUNTS = {
-  renter: { email: 'renter@demo.fr',       password: 'Renter123!' },
-  owner:  { email: 'owner@demo.fr',        password: 'Owner123!'  },
-  admin:  { email: 'admin@sailingloc.fr',  password: 'Admin123!'  },
+  renter: { email: 'renter@demo.fr',       password: 'Renter@Sail2026!' },
+  owner:  { email: 'owner@demo.fr',        password: 'Owner@Sail2026!'  },
+  admin:  { email: 'admin@sailingloc.fr',  password: 'Admin@Sail2026!'  },
 } as const
 
 const AUTH_DIR = path.join(__dirname, '../.auth')

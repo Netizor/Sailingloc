@@ -120,7 +120,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ bookingId, onSuccess, onErr
       {/* Security note */}
       <div className="flex items-center justify-center gap-1.5 text-xs text-gray-400">
         <Lock size={11} />
-        Paiement sécurisé par Stripe — Données chiffrées (TLS 1.3)
+        Paiement sécurisé par Stripe - Données chiffrées (TLS 1.3)
       </div>
 
       <p className="text-xs text-gray-400 text-center">

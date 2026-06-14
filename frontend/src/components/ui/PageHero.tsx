@@ -2,7 +2,7 @@ import React from 'react'
 import type { LucideIcon } from 'lucide-react'
 
 interface PageHeroProps {
-  /** 'ocean' = dégradé bleu (py-20, titre large) — 'gray' = dégradé gris (py-16, titre moyen) */
+  /** 'ocean' = dégradé bleu (py-20, titre large) - 'gray' = dégradé gris (py-16, titre moyen) */
   variant?: 'ocean' | 'gray'
   icon: LucideIcon
   badge: string

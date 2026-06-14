@@ -194,7 +194,7 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
               <BookingStatusBadge status={booking.status} />
             </div>
             <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-lg leading-tight">
-              {boat?.title ?? '—'}
+              {boat?.title ?? ''}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
               {formatDate(booking.startDate)} → {formatDate(booking.endDate)}
@@ -239,7 +239,7 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
           </div>
         )}
 
-        {/* D1 — Évaluer le locataire pour les réservations terminées */}
+        {/* D1 - Évaluer le locataire pour les réservations terminées */}
         {isCompleted && (
           <div className="flex items-center gap-2 flex-wrap">
             <Link

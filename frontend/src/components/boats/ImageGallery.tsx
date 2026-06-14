@@ -53,7 +53,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, title, className })
       >
         <img
           src={mainImage}
-          alt={`${title} — image ${activeIndex + 1}`}
+          alt={`${title} - image ${activeIndex + 1}`}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
         />
 
@@ -98,7 +98,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, title, className })
             >
               <img
                 src={img}
-                alt={`${title} — miniature ${i + 1}`}
+                alt={`${title} - miniature ${i + 1}`}
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
@@ -181,7 +181,7 @@ const Lightbox: React.FC<LightboxProps> = ({
       <div className="relative flex-1 flex items-center justify-center w-full px-16 py-8">
         <img
           src={images[activeIndex]}
-          alt={`${title} — image ${activeIndex + 1}`}
+          alt={`${title} - image ${activeIndex + 1}`}
           className="max-h-full max-w-full object-contain rounded-lg shadow-2xl"
         />
 

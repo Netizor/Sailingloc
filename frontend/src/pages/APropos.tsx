@@ -54,17 +54,17 @@ const PRESS_ITEMS = [
 const JOB_OFFERS = [
   {
     title: 'Développeur·se Full-Stack (React / Symfony)',
-    type: 'CDI — Marseille / Remote',
+    type: 'CDI - Marseille / Remote',
     desc: "Rejoignez l'équipe tech pour construire les nouvelles fonctionnalités de la plateforme.",
   },
   {
     title: 'Chargé·e de partenariats portuaires',
-    type: 'CDI — France entière',
+    type: 'CDI - France entière',
     desc: 'Développez notre réseau de ports partenaires et accompagnez les propriétaires de bateaux.',
   },
   {
     title: 'Community Manager',
-    type: 'Alternance — Marseille',
+    type: 'Alternance - Marseille',
     desc: 'Animez nos réseaux sociaux et construisez la communauté des passionnés de voile SailingLoc.',
   },
 ]
@@ -72,12 +72,12 @@ const JOB_OFFERS = [
 // ─── Page À propos ─────────────────────────────────────────────────────────────
 
 const APropos: React.FC = () => {
-  // #6 — Titre de l'onglet pour le SEO et l'accessibilité
+  // #6 - Titre de l'onglet pour le SEO et l'accessibilité
   usePageTitle('À propos de SailingLoc')
 
   return (
   <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
-    {/* #2 — Hero extrait en composant partagé PageHero */}
+    {/* #2 - Hero extrait en composant partagé PageHero */}
     <PageHero
       icon={Anchor}
       badge="Notre histoire"

@@ -80,7 +80,7 @@ export const resendVerification = async (): Promise<{ message: string }> => {
 
 /**
  * Vérifie si le mot de passe fourni figure dans des fuites de données connues (Have I Been Pwned).
- * Utilise la méthode k-anonymity côté backend — le mot de passe n'est jamais transmis à HIBP.
+ * Utilise la méthode k-anonymity côté backend - le mot de passe n'est jamais transmis à HIBP.
  * Appelé en arrière-plan après connexion réussie, sans bloquer la navigation.
  */
 export const checkPasswordHibp = async (

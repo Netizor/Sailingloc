@@ -50,7 +50,7 @@ export const getPublicProfile = async (id: number): Promise<PublicProfile> => {
 }
 
 /**
- * RGPD Art. 20 — Export de toutes les données personnelles de l'utilisateur connecté.
+ * RGPD Art. 20 - Export de toutes les données personnelles de l'utilisateur connecté.
  * Renvoie un objet JSON téléchargeable côté client.
  */
 export const exportMyData = async (): Promise<object> => {
@@ -59,7 +59,7 @@ export const exportMyData = async (): Promise<object> => {
 }
 
 /**
- * RGPD Art. 17 — Suppression du compte (anonymisation des données personnelles).
+ * RGPD Art. 17 - Suppression du compte (anonymisation des données personnelles).
  * L'utilisateur doit être déconnecté immédiatement après.
  */
 export const deleteAccount = async (): Promise<void> => {

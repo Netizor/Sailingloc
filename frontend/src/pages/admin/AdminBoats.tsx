@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Search, ExternalLink, ShieldOff, ShieldCheck, Star } from 'lucide-react'
+import { Search, ExternalLink, ShieldOff, ShieldCheck, Star, Trash2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { adminApi } from '../../api/admin.api'
 import { formatPrice } from '../../lib/utils'
@@ -11,10 +11,11 @@ import type { BadgeVariant } from '../../components/ui/Badge'
 import toast from 'react-hot-toast'
 
 const statusConfig: Record<string, { label: string; variant: BadgeVariant }> = {
-  PUBLISHED: { label: 'Publié', variant: 'success' },
+  ACTIVE: { label: 'Actif', variant: 'success' },
+  PUBLISHED: { label: 'Actif', variant: 'success' },
+  INACTIVE: { label: 'Inactif', variant: 'danger' },
+  SUSPENDED: { label: 'Inactif', variant: 'danger' },
   DRAFT: { label: 'Brouillon', variant: 'default' },
-  SUSPENDED: { label: 'Suspendu', variant: 'danger' },
-  PENDING_REVIEW: { label: 'En révision', variant: 'warning' },
 }
 
 const boatTypeLabels: Record<string, string> = {
@@ -44,20 +45,28 @@ const AdminBoats: React.FC = () => {
 
   const toggleStatusMutation = useMutation({
     mutationFn: ({ boatId, action }: { boatId: number; action: 'suspend' | 'activate' }) =>
-      adminApi.setBoatStatus(boatId, action === 'activate' ? 'PUBLISHED' : 'SUSPENDED'),
+      adminApi.setBoatStatus(boatId, action === 'activate' ? 'ACTIVE' : 'INACTIVE'),
     onSuccess: (_, { action }) => {
-      toast.success(action === 'activate' ? 'Bateau réactivé' : 'Bateau suspendu')
+      toast.success(action === 'activate' ? 'Bateau activé' : 'Bateau désactivé')
       queryClient.invalidateQueries({ queryKey: ['admin', 'boats'] })
     },
     onError: () => toast.error('Erreur lors de la mise à jour'),
   })
 
+  const deleteMutation = useMutation({
+    mutationFn: (boatId: number) => adminApi.deleteBoat(boatId),
+    onSuccess: () => {
+      toast.success('Annonce supprimée')
+      queryClient.invalidateQueries({ queryKey: ['admin', 'boats'] })
+    },
+    onError: () => toast.error('Erreur lors de la suppression'),
+  })
+
   const boats: any[] = data?.boats ?? []
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="mb-8">
+    <div>
+        <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Gestion des bateaux</h1>
           <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{data?.total ?? 0} bateau(x)</p>
         </div>
@@ -80,10 +89,9 @@ const AdminBoats: React.FC = () => {
             className="border border-gray-300 dark:border-gray-600 rounded-xl px-3 py-2 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-white dark:bg-gray-700"
           >
             <option value="ALL">Tous les statuts</option>
-            <option value="PUBLISHED">Publiés</option>
+            <option value="ACTIVE">Actifs</option>
             <option value="DRAFT">Brouillons</option>
-            <option value="PENDING_REVIEW">En révision</option>
-            <option value="SUSPENDED">Suspendus</option>
+            <option value="INACTIVE">Inactifs</option>
           </select>
         </div>
 
@@ -115,7 +123,7 @@ const AdminBoats: React.FC = () => {
                 <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
                   {boats.map((boat: any) => {
                     const statusInfo = statusConfig[boat.status ?? 'DRAFT'] ?? statusConfig['DRAFT']
-                    const isSuspended = boat.status === 'SUSPENDED'
+                    const isInactive = boat.status === 'INACTIVE' || boat.status === 'SUSPENDED'
                     return (
                       <tr key={boat.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
                         {/* Image + title */}
@@ -151,23 +159,21 @@ const AdminBoats: React.FC = () => {
                           {boat.owner?.firstName} {boat.owner?.lastName}
                         </td>
 
-                        <td className="px-5 py-4 text-gray-500 dark:text-gray-400">{boat.city ?? '—'}</td>
+                        <td className="px-5 py-4 text-gray-500 dark:text-gray-400">{boat.city ?? ''}</td>
 
                         <td className="px-5 py-4 font-medium text-gray-900 dark:text-gray-100">
                           {formatPrice(boat.dailyRate)}
                         </td>
 
                         <td className="px-5 py-4">
-                          {boat.averageRating != null && boat.averageRating > 0 ? (
+                          {(boat.rating ?? 0) > 0 ? (
                             <div className="flex items-center gap-1">
                               <Star size={13} fill="currentColor" strokeWidth={0} className="text-amber-400" />
                               <span className="text-gray-700 dark:text-gray-300 font-medium">
-                                {boat.averageRating.toFixed(1)}
+                                {boat.rating.toFixed(1)}
                               </span>
                             </div>
-                          ) : (
-                            <span className="text-gray-300 dark:text-gray-600 text-xs">—</span>
-                          )}
+                          ) : null}
                         </td>
 
                         <td className="px-5 py-4">
@@ -186,25 +192,30 @@ const AdminBoats: React.FC = () => {
                               aria-label="Voir l'annonce"
                             />
                             <Button
-                              variant={isSuspended ? 'secondary' : 'danger'}
+                              variant={isInactive ? 'secondary' : 'danger'}
                               size="sm"
-                              leftIcon={
-                                isSuspended ? (
-                                  <ShieldCheck size={12} />
-                                ) : (
-                                  <ShieldOff size={12} />
-                                )
-                              }
+                              leftIcon={isInactive ? <ShieldCheck size={12} /> : <ShieldOff size={12} />}
                               onClick={() =>
                                 toggleStatusMutation.mutate({
                                   boatId: boat.id,
-                                  action: isSuspended ? 'activate' : 'suspend',
+                                  action: isInactive ? 'activate' : 'suspend',
                                 })
                               }
                               loading={toggleStatusMutation.isPending}
                             >
-                              {isSuspended ? 'Activer' : 'Suspendre'}
+                              {isInactive ? 'Activer' : 'Désactiver'}
                             </Button>
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              leftIcon={<Trash2 size={12} />}
+                              onClick={() => {
+                                if (window.confirm(`Supprimer l'annonce « ${boat.title} » ?`)) {
+                                  deleteMutation.mutate(boat.id)
+                                }
+                              }}
+                              loading={deleteMutation.isPending}
+                            />
                           </div>
                         </td>
                       </tr>
@@ -215,7 +226,6 @@ const AdminBoats: React.FC = () => {
             </div>
           )}
         </div>
-      </div>
     </div>
   )
 }

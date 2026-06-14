@@ -75,7 +75,7 @@ const PriceForm: React.FC<PriceFormProps> = ({ initial = EMPTY_FORM, onSubmit, o
             type="text"
             value={form.label}
             onChange={set('label')}
-            placeholder="Ex : Haute saison, Week-end, Juillet–Août…"
+            placeholder="Ex : Haute saison, Week-end, Juillet à Août…"
             className={inputCls}
             maxLength={100}
           />

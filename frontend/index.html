@@ -7,16 +7,23 @@
     <meta name="description" content="SailingLoc — Location de bateaux entre particuliers dans les ports français et européens" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <title>SailingLoc — Location de bateaux entre particuliers</title>
-  <!-- Script anti-FOUC : applique la classe dark sur <html> AVANT que React ne rende,
-       évitant le flash de mauvais thème au chargement initial. -->
+  <!-- Script anti-FOUC : applique thème et daltonien AVANT que React ne rende -->
   <script>
     (function () {
       var stored = localStorage.getItem('sailingloc_theme')
       var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
       if (stored === 'dark' || (!stored && prefersDark)) {
         document.documentElement.classList.add('dark')
+      }
+      var cb = localStorage.getItem('sailingloc_color_blind')
+      if (cb && cb !== 'none') {
+        document.documentElement.classList.add('cb-yellow')
+      }
+      var lang = localStorage.getItem('sailingloc_lang')
+      if (lang) {
+        document.documentElement.lang = lang
       }
     })()
   </script>

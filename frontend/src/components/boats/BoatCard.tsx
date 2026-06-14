@@ -98,7 +98,7 @@ const BoatCard: React.FC<BoatCardProps> = ({
             <Heart size={16} fill={isFavorite ? 'currentColor' : 'none'} strokeWidth={2} />
           </button>
 
-          {/* Bouton comparateur — coin bas gauche */}
+          {/* Bouton comparateur - coin bas gauche */}
           <button
             onClick={handleCompareClick}
             aria-label={isCompared ? 'Retirer du comparateur' : 'Ajouter au comparateur'}

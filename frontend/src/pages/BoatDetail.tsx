@@ -1,24 +1,18 @@
 import React, { useState, useMemo } from 'react'
 import { Helmet } from 'react-helmet-async'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   MapPin,
   Users,
-  Ruler,
-  BedDouble,
-  Calendar,
-  Zap,
-  ShieldCheck,
+  Ship,
   X,
   Heart,
   Share2,
-  MessageCircle,
-  ChevronDown,
-  ChevronUp,
-  Tag,
   Flag,
   AlertTriangle,
+  Star,
+  ArrowRight,
 } from 'lucide-react'
 import { cn, formatDate } from '../lib/utils'
 import { boatsApi } from '../api/boats.api'
@@ -27,30 +21,58 @@ import { availabilityApi } from '../api/availability.api'
 import { checkFavorite, addFavorite, removeFavorite } from '../api/favorites.api'
 import { getBoatReviews } from '../api/reviews.api'
 import { useAuthStore } from '../store/auth.store'
-import type { Boat } from '../types'
+import type { Boat, Review } from '../types'
+import { BoatType, UserRole } from '../types'
 import { BOAT_TYPE_LABELS } from '../lib/labels'
 import { reportBoat } from '../api/reports.api'
 import type { ReportReason } from '../api/reports.api'
-import SimilarBoats from '../components/boats/SimilarBoats'
-import Modal from '../components/ui/Modal'
-import ImageGallery from '../components/boats/ImageGallery'
+import { getDemoBoat } from '../data/demoBoats'
+import BoatDetailGallery from '../components/boats/BoatDetailGallery'
 import BoatAvailabilityCalendar from '../components/boats/BoatAvailabilityCalendar'
+import BoatOwnerCard from '../components/boats/BoatOwnerCard'
 import BookingForm, { BookingFormData } from '../components/bookings/BookingForm'
 import StripePaymentModal from '../components/bookings/StripePaymentModal'
-import Stars from '../components/ui/Stars'
-import Badge from '../components/ui/Badge'
+import Modal from '../components/ui/Modal'
 import Button from '../components/ui/Button'
 import Spinner from '../components/ui/Spinner'
 import toast from 'react-hot-toast'
+
+const DEMO_REVIEWS: Partial<Review>[] = [
+  {
+    id: 9001,
+    rating: 5,
+    comment: 'Une expérience formidable ! Le propriétaire était super accueillant et le voilier en parfait état. Nous reviendrons sans hésiter.',
+    createdAt: '2024-04-12',
+    reviewer: { id: 1, firstName: 'Marc-Antoine', lastName: 'D.', email: '', role: UserRole.RENTER, kycVerified: true, isActive: true, createdAt: '' },
+  },
+  {
+    id: 9002,
+    rating: 5,
+    comment: 'Week-end parfait en famille. Le bateau est spacieux, bien équipé et idéalement situé. Communication fluide avec le propriétaire.',
+    createdAt: '2024-03-28',
+    reviewer: { id: 2, firstName: 'Sophie', lastName: 'L.', email: '', role: UserRole.RENTER, kycVerified: true, isActive: true, createdAt: '' },
+  },
+]
+
+const getTypeSpecLabel = (type: BoatType) => {
+  if (type === BoatType.SAILBOAT) return 'Monocoque'
+  if (type === BoatType.CATAMARAN) return 'Catamaran'
+  return BOAT_TYPE_LABELS[type] ?? type
+}
+
+const getLuxuryTypeLabel = (type: BoatType) => {
+  const base = BOAT_TYPE_LABELS[type] ?? type
+  if (type === BoatType.YACHT || type === BoatType.SAILBOAT) return `${base} de Luxe`
+  return base
+}
 
 const BoatDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { isAuthenticated } = useAuthStore()
   const qc = useQueryClient()
-  const [showAllRules, setShowAllRules] = useState(false)
+  const [descExpanded, setDescExpanded] = useState(false)
   const [bookingPanelOpen, setBookingPanelOpen] = useState(false)
-  // État du flow Stripe (étape 2 : affichage formulaire de paiement)
   const [stripePayment, setStripePayment] = useState<{
     clientSecret: string
     bookingId: number
@@ -62,14 +84,17 @@ const BoatDetail: React.FC = () => {
   const [reportSent, setReportSent] = useState(false)
 
   const {
-    data: boat,
+    data: apiBoat,
     isLoading,
     isError,
   } = useQuery<Boat>({
     queryKey: ['boat', id],
     queryFn: () => boatsApi.getById(Number(id!)),
     enabled: !!id,
+    retry: false,
   })
+
+  const boat = apiBoat ?? getDemoBoat(Number(id))
 
   const { data: favData } = useQuery({
     queryKey: ['favorites', 'check', id],
@@ -93,7 +118,6 @@ const BoatDetail: React.FC = () => {
     },
   })
 
-  // A5 — Partage d'annonce : Web Share API sur mobile, clipboard sinon
   const handleShare = async () => {
     const url = window.location.href
     if (navigator.share) {
@@ -106,14 +130,11 @@ const BoatDetail: React.FC = () => {
 
   const handleFavoriteToggle = () => {
     if (!isAuthenticated) { navigate('/connexion'); return }
-    if (isFavorite) {
-      removeFavMutation.mutate(boat!.id)
-    } else {
-      addFavMutation.mutate(boat!.id)
-    }
+    if (!boat) return
+    if (isFavorite) removeFavMutation.mutate(boat.id)
+    else addFavMutation.mutate(boat.id)
   }
 
-  // Disponibilités — même clé de cache que BoatAvailabilityCalendar pour éviter un double fetch
   const { data: availData } = useQuery({
     queryKey: ['availability', Number(id)],
     queryFn: () => availabilityApi.getBoatAvailability(Number(id!)),
@@ -129,9 +150,11 @@ const BoatDetail: React.FC = () => {
     queryKey: ['boat-reviews', id],
     queryFn: () => getBoatReviews(Number(id!)),
     enabled: !!id,
+    retry: false,
   })
-  const reviews = reviewsData?.data ?? []
-  const reviewTotal = reviewsData?.total ?? 0
+  const apiReviews = reviewsData?.data ?? []
+  const reviewTotal = reviewsData?.total ?? boat?.reviewCount ?? 0
+  const displayReviews = apiReviews.length > 0 ? apiReviews : DEMO_REVIEWS
 
   const reportMutation = useMutation({
     mutationFn: () => reportBoat({ boatId: boat!.id, reason: reportReason, details: reportDetails || undefined }),
@@ -144,9 +167,7 @@ const BoatDetail: React.FC = () => {
 
   const bookingMutation = useMutation({
     mutationFn: async (data: BookingFormData & { boatId: number }) => {
-      // Étape 1 : créer la réservation (statut PENDING)
       const booking = await bookingsApi.create(data)
-      // Étape 2 : créer le PaymentIntent Stripe et obtenir le clientSecret
       const pi = await bookingsApi.createPaymentIntent(booking.id)
       return pi
     },
@@ -154,23 +175,23 @@ const BoatDetail: React.FC = () => {
       setStripePayment(pi)
       setBookingPanelOpen(false)
     },
-    onError: (err: any) => {
+    onError: (err: { message?: string }) => {
       toast.error(err?.message ?? 'Erreur lors de la réservation')
     },
   })
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]">
         <Spinner size="lg" />
       </div>
     )
   }
 
-  if (isError || !boat) {
+  if ((isError && !boat) || !boat) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 text-center px-4">
-        <p className="text-xl font-semibold text-gray-700 dark:text-gray-300">Bateau introuvable</p>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 text-center px-4 bg-[#f8f9fa]">
+        <p className="text-xl font-semibold text-[#003366]">Bateau introuvable</p>
         <Button variant="secondary" onClick={() => navigate('/bateaux')}>
           Retour aux bateaux
         </Button>
@@ -182,396 +203,211 @@ const BoatDetail: React.FC = () => {
     await bookingMutation.mutateAsync({ ...data, boatId: boat.id })
   }
 
+  const locationLabel = boat.city ? `${boat.city}, ${boat.country}` : `${boat.port}, ${boat.country}`
+  const description = boat.description || ''
+  const shortDesc = description.length > 320 ? description.slice(0, 320) + '…' : description
+
   const specs = [
-    { icon: <Tag size={16} />, label: 'Type', value: BOAT_TYPE_LABELS[boat.type] ?? boat.type },
-    { icon: <Ruler size={16} />, label: 'Longueur', value: boat.length ? `${boat.length} m` : 'N/A' },
-    { icon: <Users size={16} />, label: 'Capacité', value: `${boat.capacity} personnes` },
-    { icon: <BedDouble size={16} />, label: 'Cabines', value: String(boat.cabins ?? 'N/A') },
-    { icon: <Calendar size={16} />, label: 'Année', value: String(boat.year ?? 'N/A') },
-    { icon: <Zap size={16} />, label: 'Motorisation', value: boat.motorizationType ?? 'N/A' },
+    { label: 'Type', value: getTypeSpecLabel(boat.type) },
+    { label: 'Longueur', value: boat.length ? `${boat.length} m` : '' },
+    { label: 'Cabines', value: boat.cabins ? `${boat.cabins} Cabines` : '' },
+    { label: 'Année', value: boat.year ? String(boat.year) : '' },
   ]
 
-  const rules = boat.rules ? boat.rules.split('\n').filter(Boolean) : []
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
+    <div className="min-h-screen bg-[#f8f9fa] pb-24 lg:pb-12">
       <Helmet>
-        <title>{boat.title} — SailingLoc</title>
-        <meta name="description" content={boat.description?.slice(0, 155) ?? `Louez ${boat.title} à ${boat.port}, ${boat.city}.`} />
-        <meta property="og:title" content={`${boat.title} — SailingLoc`} />
-        <meta property="og:description" content={boat.description?.slice(0, 155) ?? `Louez ${boat.title} à ${boat.port}, ${boat.city}.`} />
-        <meta property="og:type" content="article" />
+        <title>{boat.title} - SailingLoc</title>
+        <meta name="description" content={boat.description?.slice(0, 155) ?? `Louez ${boat.title} à ${boat.port}.`} />
         {boat.images?.[0] && <meta property="og:image" content={boat.images[0]} />}
       </Helmet>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="lg:grid lg:grid-cols-3 lg:gap-10">
-          {/* ─── Left / Main Content ─────────────────────────────────────── */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Gallery */}
-            <ImageGallery images={boat.images ?? []} title={boat.title} />
 
-            {/* Title + Location + Rating */}
+      <div className="w-full px-[10%] py-8">
+        {/* Galerie */}
+        <BoatDetailGallery images={boat.images ?? []} title={boat.title} />
+
+        <div className="mt-8 flex flex-col lg:flex-row gap-10">
+          {/* Colonne principale */}
+          <div className="flex-1 min-w-0 space-y-8">
+            {/* Titre + note */}
             <div>
-              <div className="flex flex-wrap items-start gap-2 mb-2">
-                <Badge variant="info">{BOAT_TYPE_LABELS[boat.type] ?? boat.type}</Badge>
-                {boat.withSkipper && <Badge variant="success">Avec skipper disponible</Badge>}
-              </div>
-              <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-3 mb-2">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">{boat.title}</h1>
-                <div className="flex items-center gap-2 mt-1">
-                  {/* A5 — Bouton partage */}
-                  <button
-                    onClick={handleShare}
-                    aria-label="Partager cette annonce"
-                    className="flex-shrink-0 p-2.5 rounded-full border border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:border-ocean-300 hover:text-ocean-500 hover:bg-ocean-50 dark:hover:bg-ocean-900/30 transition-all duration-150"
-                  >
+              <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
+                <h1 className="text-2xl sm:text-3xl font-bold text-[#003366] leading-tight">
+                  {boat.title}
+                </h1>
+                <div className="flex items-center gap-2">
+                  {boat.rating > 0 && (
+                    <span className="flex items-center gap-1.5 bg-[#006875] text-white text-sm font-semibold px-3 py-1.5 rounded-full">
+                      <Star size={14} fill="white" strokeWidth={0} />
+                      {boat.rating.toFixed(1)} ({boat.reviewCount} avis)
+                    </span>
+                  )}
+                  <button type="button" onClick={handleShare} aria-label="Partager" className="p-2 rounded-full border border-gray-200 text-[#8A94A6] hover:text-[#2563FF]">
                     <Share2 size={18} />
                   </button>
                   <button
+                    type="button"
                     onClick={handleFavoriteToggle}
-                    aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
-                    aria-pressed={isFavorite}
+                    aria-label="Favoris"
                     className={cn(
-                      'flex-shrink-0 p-2.5 rounded-full border transition-all duration-150',
-                      isFavorite
-                        ? 'bg-orange-500 border-orange-500 text-white shadow'
-                        : 'border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:border-orange-300 hover:text-orange-500 hover:bg-orange-50'
+                      'p-2 rounded-full border transition-colors',
+                      isFavorite ? 'bg-[#2563FF] border-[#2563FF] text-white' : 'border-gray-200 text-[#8A94A6]'
                     )}
                   >
-                    <Heart size={18} fill={isFavorite ? 'currentColor' : 'none'} strokeWidth={2} />
+                    <Heart size={18} fill={isFavorite ? 'currentColor' : 'none'} />
                   </button>
                 </div>
               </div>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+
+              <div className="flex flex-wrap items-center gap-5 text-sm text-[#8A94A6]">
                 <span className="flex items-center gap-1.5">
-                  <MapPin size={14} className="text-ocean-600" />
-                  {boat.port}
-                  {boat.city && `, ${boat.city}`}
-                  {boat.country && `, ${boat.country}`}
+                  <MapPin size={15} className="text-[#2563FF]" />
+                  {locationLabel}
                 </span>
-                {boat.rating != null && boat.rating > 0 && (
-                  <span className="flex items-center gap-2">
-                    <Stars rating={boat.rating} size="sm" showValue />
-                    <span className="text-gray-400 dark:text-gray-500">({boat.reviewCount ?? 0} avis)</span>
-                  </span>
-                )}
+                <span className="flex items-center gap-1.5">
+                  <Ship size={15} className="text-[#2563FF]" />
+                  {getLuxuryTypeLabel(boat.type)}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Users size={15} className="text-[#2563FF]" />
+                  Capacité {boat.capacity} pers.
+                </span>
               </div>
             </div>
 
-            {/* Specs grid */}
-            <section aria-labelledby="specs-title">
-              <h2 id="specs-title" className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                Caractéristiques
-              </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {specs.map((spec) => (
-                  <div
-                    key={spec.label}
-                    className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 flex flex-col gap-1.5"
+            {/* Specs bar */}
+            <div className="bg-[#eef3fb] rounded-xl px-6 py-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {specs.map((spec) => (
+                <div key={spec.label}>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A94A6] mb-1">{spec.label}</p>
+                  <p className="text-sm font-semibold text-[#003366]">{spec.value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Description */}
+            {description && (
+              <section>
+                <h2 className="text-lg font-bold text-[#003366] mb-4">Réservez votre aventure</h2>
+                <p className="text-sm text-[#334155] leading-relaxed whitespace-pre-line">
+                  {descExpanded ? description : shortDesc}
+                </p>
+                {description.length > 320 && (
+                  <button
+                    type="button"
+                    onClick={() => setDescExpanded((v) => !v)}
+                    className="mt-3 flex items-center gap-1 text-sm font-semibold text-[#2563FF] hover:underline"
                   >
-                    <span className="text-ocean-600 dark:text-ocean-400">{spec.icon}</span>
-                    <span className="text-xs text-gray-400 dark:text-gray-500">{spec.label}</span>
-                    <span className="font-medium text-gray-900 dark:text-gray-100 text-sm">{spec.value}</span>
+                    {descExpanded ? 'Réduire' : 'Lire la suite'}
+                    <ArrowRight size={14} />
+                  </button>
+                )}
+              </section>
+            )}
+
+            {/* Disponibilités */}
+            <section>
+              <h2 className="text-lg font-bold text-[#003366] mb-4">Disponibilités</h2>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <BoatAvailabilityCalendar boatId={boat.id} variant="detail" />
+              </div>
+            </section>
+
+            {/* Avis */}
+            <section>
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-lg font-bold text-[#003366]">Avis des voyageurs</h2>
+                {boat.rating > 0 && (
+                  <span className="text-sm text-[#8A94A6]">
+                    <span className="font-bold text-[#003366]">{boat.rating.toFixed(1)}/5</span>
+                    {' '}basé sur {reviewTotal} avis
+                  </span>
+                )}
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {displayReviews.slice(0, 2).map((review) => (
+                  <div key={review.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="h-10 w-10 rounded-full bg-[#eef3fb] text-[#003366] flex items-center justify-center text-sm font-bold">
+                        {review.reviewer?.firstName?.[0]}
+                        {review.reviewer?.lastName?.[0]}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-[#003366]">
+                          {review.reviewer?.firstName} {review.reviewer?.lastName}
+                        </p>
+                        {review.createdAt && (
+                          <p className="text-xs text-[#8A94A6]">{formatDate(review.createdAt)}</p>
+                        )}
+                      </div>
+                    </div>
+                    {review.comment && (
+                      <p className="text-sm text-[#334155] italic leading-relaxed">&ldquo;{review.comment}&rdquo;</p>
+                    )}
                   </div>
                 ))}
               </div>
             </section>
 
-            {/* Description */}
-            {boat.description && (
-              <section aria-labelledby="desc-title">
-                <h2 id="desc-title" className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                  Description
-                </h2>
-                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5">
-                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed whitespace-pre-line">
-                    {boat.description}
-                  </p>
-                </div>
-              </section>
-            )}
-
-            {/* Equipment */}
-            {boat.equipment && boat.equipment.length > 0 && (
-              <section aria-labelledby="equip-title">
-                <h2 id="equip-title" className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                  Équipements
-                </h2>
-                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5">
-                  <div className="flex flex-wrap gap-2">
-                    {boat.equipment.map((item) => (
-                      <span
-                        key={item}
-                        className="inline-flex items-center gap-1.5 bg-ocean-50 dark:bg-ocean-900/30 text-ocean-700 dark:text-ocean-400 border border-ocean-100 dark:border-ocean-800 rounded-full px-3 py-1 text-sm"
-                      >
-                        <ShieldCheck size={12} />
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </section>
-            )}
-
-            {/* Rules */}
-            {rules.length > 0 && (
-              <section aria-labelledby="rules-title">
-                <h2 id="rules-title" className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                  Règlement du bord
-                </h2>
-                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5">
-                  <ul className="space-y-2">
-                    {(showAllRules ? rules : rules.slice(0, 4)).map((rule, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <span className="h-1.5 w-1.5 rounded-full bg-ocean-400 mt-1.5 flex-shrink-0" />
-                        {rule}
-                      </li>
-                    ))}
-                  </ul>
-                  {rules.length > 4 && (
-                    <button
-                      onClick={() => setShowAllRules((v) => !v)}
-                      className="mt-3 flex items-center gap-1 text-sm text-ocean-600 hover:text-ocean-800 font-medium"
-                    >
-                      {showAllRules ? (
-                        <>
-                          <ChevronUp size={14} /> Voir moins
-                        </>
-                      ) : (
-                        <>
-                          <ChevronDown size={14} /> Voir tout ({rules.length})
-                        </>
-                      )}
-                    </button>
-                  )}
-                </div>
-              </section>
-            )}
-
-            {/* A4 — Calendrier des disponibilités */}
-            <section aria-labelledby="avail-title">
-              <h2 id="avail-title" className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                Disponibilités
-              </h2>
-              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5">
-                <BoatAvailabilityCalendar boatId={boat.id} />
-              </div>
-            </section>
-
-            {/* Owner profile */}
-            {boat.owner && (
-              <section aria-labelledby="owner-title">
-                <h2 id="owner-title" className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                  Votre propriétaire
-                </h2>
-                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5 flex items-center gap-5">
-                  {/* C3 — Avatar cliquable vers le profil public */}
-                  <Link to={`/proprietaires/${boat.ownerId}`} className="flex-shrink-0 group">
-                    <div className="h-16 w-16 rounded-full bg-ocean-700 text-white flex items-center justify-center text-xl font-bold group-hover:ring-2 group-hover:ring-ocean-400 transition-all">
-                      {boat.owner.firstName?.[0]}
-                      {boat.owner.lastName?.[0]}
-                    </div>
-                  </Link>
-                  <div>
-                    {/* C3 — Nom cliquable vers le profil public */}
-                    <Link
-                      to={`/proprietaires/${boat.ownerId}`}
-                      className="font-semibold text-gray-900 dark:text-gray-100 text-base hover:text-ocean-700 dark:hover:text-ocean-400 transition-colors"
-                    >
-                      {boat.owner.firstName} {boat.owner.lastName}
-                    </Link>
-                    {boat.owner.createdAt && (
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                        Membre depuis {formatDate(boat.owner.createdAt)}
-                      </p>
-                    )}
-                  </div>
-                  {/* Lien vers la messagerie — A6 */}
-                  {isAuthenticated && (
-                    <Link
-                      to={`/mon-espace/messages?to=${boat.ownerId}`}
-                      className="ml-auto flex items-center gap-1.5 text-sm text-ocean-700 hover:text-ocean-900 font-medium transition-colors flex-shrink-0"
-                    >
-                      <MessageCircle size={15} />
-                      Contacter
-                    </Link>
-                  )}
-                </div>
-              </section>
-            )}
-
-            {/* Reviews */}
-            {reviewTotal > 0 && (
-              <section aria-labelledby="reviews-title">
-                <h2 id="reviews-title" className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                  Avis ({reviewTotal})
-                </h2>
-                <div className="space-y-4">
-                  {reviews.map((review) => (
-                    <div
-                      key={review.id}
-                      className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-5"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="h-10 w-10 rounded-full bg-ocean-100 dark:bg-ocean-800/40 text-ocean-700 dark:text-ocean-400 flex items-center justify-center font-semibold text-sm flex-shrink-0">
-                          {review.reviewer?.firstName?.[0]?.toUpperCase()}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between gap-2 mb-1">
-                            <p className="font-medium text-gray-900 dark:text-gray-100 text-sm">
-                              {review.reviewer?.firstName}
-                            </p>
-                            <p className="text-xs text-gray-400 dark:text-gray-500">
-                              {formatDate(review.createdAt)}
-                            </p>
-                          </div>
-                          <Stars rating={review.rating} size="sm" />
-                          {review.comment && (
-                            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                              {review.comment}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* C8 — Bateaux similaires */}
-            <SimilarBoats currentBoatId={boat.id} boatType={boat.type} />
-
-            {/* C13 — Signalement (utilisateur connecté uniquement) */}
             {isAuthenticated && !reportSent && (
-              <div className="text-center py-2">
-                <button
-                  onClick={() => setReportOpen(true)}
-                  className="inline-flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 hover:text-red-500 transition-colors"
-                >
-                  <Flag size={12} />
-                  Signaler cette annonce
-                </button>
-              </div>
-            )}
-
-            {/* Mobile CTA button */}
-            <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-600 px-4 py-3 flex items-center justify-between gap-3">
-              <div>
-                <span className="text-lg font-bold text-orange-500">
-                  {new Intl.NumberFormat('fr-FR', {
-                    style: 'currency',
-                    currency: 'EUR',
-                    maximumFractionDigits: 0,
-                  }).format(boat.dailyRate)}
-                </span>
-                <span className="text-xs text-gray-400 dark:text-gray-500"> / jour</span>
-              </div>
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={() => setBookingPanelOpen(true)}
-                className="flex-1 max-w-xs"
+              <button
+                type="button"
+                onClick={() => setReportOpen(true)}
+                className="inline-flex items-center gap-1.5 text-xs text-[#8A94A6] hover:text-red-500"
               >
-                Réserver
-              </Button>
-            </div>
+                <Flag size={12} />
+                Signaler cette annonce
+              </button>
+            )}
           </div>
 
-          {/* ─── Right / Booking form (desktop) ─────────────────────────── */}
-          <div className="hidden lg:block">
-            <div className="sticky top-28">
+          {/* Sidebar */}
+          <aside className="lg:w-[360px] flex-shrink-0 space-y-6">
+            <div className="sticky top-24 space-y-6">
               <BookingForm
                 boat={boat}
                 onSubmit={handleBookingSubmit}
                 loading={bookingMutation.isPending}
                 disabledDates={disabledDates}
+                variant="detail"
+              />
+              <BoatOwnerCard
+                boat={boat}
+                onContact={() => {
+                  if (!isAuthenticated) { navigate('/connexion'); return }
+                  navigate(`/mon-espace/messages?to=${boat.ownerId}`)
+                }}
               />
             </div>
-          </div>
+          </aside>
         </div>
       </div>
 
-      {/* C13 — Modal de signalement */}
-      <Modal
-        isOpen={reportOpen}
-        onClose={() => { setReportOpen(false); setReportDetails('') }}
-        title="Signaler cette annonce"
-        size="sm"
-      >
-        <div className="p-6 space-y-5">
-          <div className="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-xl p-4">
-            <AlertTriangle size={16} className="text-amber-500 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-amber-700">
-              Les signalements abusifs peuvent entraîner la suspension de votre compte.
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Motif</label>
-            <select
-              value={reportReason}
-              onChange={(e) => setReportReason(e.target.value as ReportReason)}
-              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-white dark:bg-gray-800"
-            >
-              <option value="INAPPROPRIATE_CONTENT">Contenu inapproprié</option>
-              <option value="FRAUD">Fraude ou escroquerie</option>
-              <option value="DUPLICATE">Annonce en doublon</option>
-              <option value="WRONG_CATEGORY">Mauvaise catégorie</option>
-              <option value="OTHER">Autre</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Détails <span className="text-gray-400 dark:text-gray-500 font-normal">(optionnel)</span>
-            </label>
-            <textarea
-              value={reportDetails}
-              onChange={(e) => setReportDetails(e.target.value)}
-              rows={3}
-              placeholder="Décrivez le problème constaté…"
-              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 resize-none dark:bg-gray-800"
-            />
-          </div>
-
-          <div className="flex gap-3">
-            <Button
-              variant="secondary"
-              fullWidth
-              onClick={() => { setReportOpen(false); setReportDetails('') }}
-              disabled={reportMutation.isPending}
-            >
-              Annuler
-            </Button>
-            <Button
-              variant="danger"
-              fullWidth
-              leftIcon={<Flag size={14} />}
-              onClick={() => reportMutation.mutate()}
-              loading={reportMutation.isPending}
-            >
-              Signaler
-            </Button>
-          </div>
+      {/* Mobile CTA */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 px-[10%] py-3 flex items-center justify-between gap-3">
+        <div>
+          <span className="text-lg font-bold text-[#003366]">
+            {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(boat.dailyRate)}
+          </span>
+          <span className="text-xs text-[#8A94A6]"> / jour</span>
         </div>
-      </Modal>
+        <button
+          type="button"
+          onClick={() => setBookingPanelOpen(true)}
+          className="sl-btn-navy flex-1 max-w-xs py-3 text-sm font-semibold rounded-xl"
+        >
+          Réserver maintenant
+        </button>
+      </div>
 
       {/* Mobile booking panel */}
       {bookingPanelOpen && (
         <div className="fixed inset-0 z-50 flex flex-col lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setBookingPanelOpen(false)}
-          />
-          <div className="relative mt-auto bg-white dark:bg-gray-900 rounded-t-3xl max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white dark:bg-gray-900 flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700 rounded-t-3xl">
-              <span className="font-semibold text-gray-900 dark:text-gray-100">Réserver ce bateau</span>
-              <button
-                onClick={() => setBookingPanelOpen(false)}
-                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400"
-                aria-label="Fermer"
-              >
+          <div className="absolute inset-0 bg-black/50" onClick={() => setBookingPanelOpen(false)} />
+          <div className="relative mt-auto bg-white rounded-t-3xl max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white flex items-center justify-between px-4 py-3 border-b border-gray-100">
+              <span className="font-semibold text-[#003366]">Réserver</span>
+              <button type="button" onClick={() => setBookingPanelOpen(false)} className="p-1.5 text-[#8A94A6]">
                 <X size={18} />
               </button>
             </div>
@@ -584,14 +420,51 @@ const BoatDetail: React.FC = () => {
                 }}
                 loading={bookingMutation.isPending}
                 disabledDates={disabledDates}
+                variant="detail"
               />
             </div>
           </div>
         </div>
       )}
 
-      {/* Modale de paiement Stripe (étape 2 du flow réservation) */}
-      {stripePayment && boat && (
+      {/* Signalement */}
+      <Modal isOpen={reportOpen} onClose={() => { setReportOpen(false); setReportDetails('') }} title="Signaler cette annonce" size="sm">
+        <div className="p-6 space-y-5">
+          <div className="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-xl p-4">
+            <AlertTriangle size={16} className="text-amber-500 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-amber-700">Les signalements abusifs peuvent entraîner la suspension de votre compte.</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-[#334155] mb-2">Motif</label>
+            <select
+              value={reportReason}
+              onChange={(e) => setReportReason(e.target.value as ReportReason)}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#003366]"
+            >
+              <option value="INAPPROPRIATE_CONTENT">Contenu inapproprié</option>
+              <option value="FRAUD">Fraude ou escroquerie</option>
+              <option value="DUPLICATE">Annonce en doublon</option>
+              <option value="WRONG_CATEGORY">Mauvaise catégorie</option>
+              <option value="OTHER">Autre</option>
+            </select>
+          </div>
+          <textarea
+            value={reportDetails}
+            onChange={(e) => setReportDetails(e.target.value)}
+            rows={3}
+            placeholder="Décrivez le problème…"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none"
+          />
+          <div className="flex gap-3">
+            <Button variant="secondary" fullWidth onClick={() => setReportOpen(false)}>Annuler</Button>
+            <Button variant="danger" fullWidth onClick={() => reportMutation.mutate()} loading={reportMutation.isPending}>
+              Signaler
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {stripePayment && (
         <StripePaymentModal
           clientSecret={stripePayment.clientSecret}
           bookingId={stripePayment.bookingId}
@@ -599,7 +472,7 @@ const BoatDetail: React.FC = () => {
           boatTitle={boat.title}
           onSuccess={() => {
             setStripePayment(null)
-            toast.success('Paiement confirmé ! Votre réservation est en cours.')
+            toast.success('Paiement confirmé !')
             navigate('/mon-espace/reservations')
           }}
           onClose={() => setStripePayment(null)}

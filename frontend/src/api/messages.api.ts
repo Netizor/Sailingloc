@@ -4,7 +4,7 @@ import type { Conversation, Message } from '../types'
 export interface SendMessageData {
   receiverId: number
   content: string
-  /** ID de la conversation existante (optionnel — backend la crée si absent) */
+  /** ID de la conversation existante (optionnel - backend la crée si absent) */
   conversationId?: string
 }
 

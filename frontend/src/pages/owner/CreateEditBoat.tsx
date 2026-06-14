@@ -102,7 +102,7 @@ const CreateEditBoat: React.FC = () => {
   const [errors, setErrors] = useState<Partial<Record<keyof BoatFormData, string>>>({})
   const [equipmentInput, setEquipmentInput] = useState('')
   const [imageInput, setImageInput] = useState('')
-  // Règles de réduction dégressive (E2) — gérées séparément car structure complexe
+  // Règles de réduction dégressive (E2) - gérées séparément car structure complexe
   const [discountRules, setDiscountRules] = useState<{ minDays: string; discountPercent: string }[]>([])
   // Upload documents (E5)
   const insuranceRef  = useRef<HTMLInputElement>(null)
@@ -127,7 +127,7 @@ const CreateEditBoat: React.FC = () => {
     }
   }, [id, qc])
 
-  // Load existing boat data — onSuccess est retiré (TanStack Query v5) :
+  // Load existing boat data - onSuccess est retiré (TanStack Query v5) :
   // l'effet écoute `boatData` pour pré-remplir le formulaire.
   const { data: boatData, isLoading: isLoadingBoat } = useQuery({
     queryKey: ['boat', id],
@@ -283,7 +283,7 @@ const CreateEditBoat: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Modale bloquante si le profil est incomplet — la page reste visible en arrière-plan flouté */}
+      {/* Modale bloquante si le profil est incomplet - la page reste visible en arrière-plan flouté */}
       {!canManageBoat && <BlockedModal issues={issues} />}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">
@@ -333,7 +333,7 @@ const CreateEditBoat: React.FC = () => {
         {/* Form card */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 sm:p-8">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
-            Étape {step} — {STEPS[step - 1].title}
+            Étape {step} : {STEPS[step - 1].title}
           </h2>
 
           {/* Step 1 */}
@@ -480,7 +480,7 @@ const CreateEditBoat: React.FC = () => {
                   placeholder="1200"
                   value={form.weeklyRate}
                   onChange={(e) => setField('weeklyRate', e.target.value)}
-                  helperText="Optionnel — réduction automatique"
+                  helperText="Optionnel - réduction automatique"
                 />
                 <Input
                   label="Caution (€)"

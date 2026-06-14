@@ -8,7 +8,7 @@ const BASE_TITLE = 'SailingLoc'
  */
 export function usePageTitle(title: string): void {
   useEffect(() => {
-    document.title = title ? `${title} — ${BASE_TITLE}` : BASE_TITLE
+    document.title = title ? `${title} | ${BASE_TITLE}` : BASE_TITLE
     return () => {
       document.title = BASE_TITLE
     }

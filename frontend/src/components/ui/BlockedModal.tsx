@@ -17,7 +17,7 @@ const BlockedModal: React.FC<BlockedModalProps> = ({ issues }) => {
   const navigate = useNavigate()
 
   return (
-    /* Fond flouté — backdrop-blur agit sur le contenu de la page derrière */
+    /* Fond flouté - backdrop-blur agit sur le contenu de la page derrière */
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4"
          style={{ backdropFilter: 'blur(6px)', backgroundColor: 'rgba(0,0,0,0.45)' }}>
 

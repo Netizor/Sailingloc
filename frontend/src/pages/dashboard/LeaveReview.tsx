@@ -8,6 +8,7 @@ import type { ReviewCreateData } from '../../types'
 import Spinner from '../../components/ui/Spinner'
 import Button from '../../components/ui/Button'
 import toast from 'react-hot-toast'
+import { formatDate } from '../../lib/utils'
 
 // ─── Sélecteur d'étoiles ──────────────────────────────────────────────────────
 
@@ -56,7 +57,7 @@ const LeaveReview: React.FC = () => {
   const [searchParams] = useSearchParams()
   const qc = useQueryClient()
 
-  // ?target=renter — propriétaire évalue un locataire (D1)
+  // ?target=renter - propriétaire évalue un locataire (D1)
   const targetRenter = searchParams.get('target') === 'renter'
   const reviewType    = targetRenter ? 'OWNER_TO_RENTER' : 'RENTER_TO_BOAT'
   const backUrl       = targetRenter ? '/proprietaire/reservations' : '/mon-espace/reservations'
@@ -142,7 +143,7 @@ const LeaveReview: React.FC = () => {
           {renter ? `${renter.firstName} ${renter.lastName}` : 'Locataire'}
         </p>
         <p className="text-sm text-gray-400 dark:text-gray-500 mt-0.5">
-          {booking.startDate} — {booking.endDate}
+          {formatDate(booking.startDate)} au {formatDate(booking.endDate)}
         </p>
       </div>
     </>
@@ -160,7 +161,7 @@ const LeaveReview: React.FC = () => {
       <div>
         <p className="font-semibold text-gray-900 dark:text-gray-100">{boat?.title ?? 'Bateau'}</p>
         <p className="text-sm text-gray-400 dark:text-gray-500 mt-0.5">
-          {booking.startDate} — {booking.endDate}
+          {formatDate(booking.startDate)} au {formatDate(booking.endDate)}
         </p>
       </div>
     </>

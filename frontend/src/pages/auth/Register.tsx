@@ -72,7 +72,17 @@ function getPasswordStrengthScore(criteria: PasswordCriteria): number {
 
 const STRENGTH_COLORS = ['bg-gray-200', 'bg-red-500', 'bg-orange-400', 'bg-yellow-400', 'bg-green-400', 'bg-green-600']
 
-const Register: React.FC = () => {
+interface RegisterProps {
+  embedded?: boolean
+  defaultRole?: RegistrationRole
+  hideRoleToggle?: boolean
+}
+
+const Register: React.FC<RegisterProps> = ({
+  embedded = false,
+  defaultRole = UserRole.RENTER,
+  hideRoleToggle = false,
+}) => {
   const navigate = useNavigate()
   const { setAuth } = useAuthStore()
   const { t } = useTranslation()
@@ -84,7 +94,7 @@ const Register: React.FC = () => {
     phone: '',
     password: '',
     confirmPassword: '',
-    role: UserRole.RENTER,
+    role: defaultRole,
     acceptTerms: false,
   })
 
@@ -155,9 +165,7 @@ const Register: React.FC = () => {
     registerMutation.mutate()
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-ocean-950 via-ocean-800 to-ocean-600 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-lg">
+  const card = (
         <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden">
           {/* Header */}
           <div className="bg-ocean-700 px-8 py-8 text-center">
@@ -181,6 +189,7 @@ const Register: React.FC = () => {
               )}
 
               {/* Role toggle */}
+              {!hideRoleToggle && (
               <div>
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('auth.register.iWantTo')}</p>
                 <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 dark:bg-gray-700 rounded-xl">
@@ -205,6 +214,7 @@ const Register: React.FC = () => {
                   ))}
                 </div>
               </div>
+              )}
 
               {/* Name row */}
               <div className="grid grid-cols-2 gap-3">
@@ -377,23 +387,37 @@ const Register: React.FC = () => {
               </Button>
             </form>
 
-            <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
-              {t('auth.register.alreadyMember')}{' '}
-              <Link
-                to="/connexion"
-                className="text-ocean-700 font-semibold hover:text-ocean-900"
-              >
-                {t('auth.register.loginLink')}
-              </Link>
-            </p>
-
-            <div className="mt-4 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-center">
-              <p className="text-xs text-amber-700 font-medium">
-                {t('auth.register.demo')}
+            {!embedded && (
+              <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
+                {t('auth.register.alreadyMember')}{' '}
+                <Link
+                  to="/connexion"
+                  className="text-ocean-700 font-semibold hover:text-ocean-900"
+                >
+                  {t('auth.register.loginLink')}
+                </Link>
               </p>
-            </div>
+            )}
+
+            {!embedded && (
+              <div className="mt-4 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-center">
+                <p className="text-xs text-amber-700 font-medium">
+                  {t('auth.register.demo')}
+                </p>
+              </div>
+            )}
           </div>
         </div>
+  )
+
+  if (embedded) {
+    return <div className="w-full">{card}</div>
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-ocean-950 via-ocean-800 to-ocean-600 flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-lg">
+        {card}
       </div>
     </div>
   )

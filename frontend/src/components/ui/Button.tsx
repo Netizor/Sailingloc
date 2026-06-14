@@ -15,13 +15,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    'bg-ocean-700 text-white hover:bg-ocean-800 focus:ring-ocean-500 border border-transparent shadow-sm',
+    'bg-brand-blue text-white hover:bg-ocean-600 focus:ring-brand-blue border border-transparent shadow-sm',
   secondary:
-    'bg-white text-ocean-700 hover:bg-ocean-50 focus:ring-ocean-500 border border-ocean-700 dark:bg-gray-800 dark:text-ocean-400 dark:border-ocean-600 dark:hover:bg-gray-700',
+    'bg-white text-brand-navy hover:bg-ocean-50 focus:ring-brand-navy border border-brand-navy dark:bg-gray-800 dark:text-ocean-400 dark:border-ocean-600 dark:hover:bg-gray-700',
   danger:
     'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 border border-transparent shadow-sm',
   ghost:
-    'bg-transparent text-ocean-700 hover:bg-ocean-50 focus:ring-ocean-500 border border-transparent dark:text-ocean-400 dark:hover:bg-ocean-900/30',
+    'bg-transparent text-brand-slate hover:text-brand-navy hover:bg-gray-50 focus:ring-brand-blue border border-transparent dark:text-gray-300 dark:hover:bg-gray-800',
 }
 
 const sizeClasses: Record<ButtonSize, string> = {

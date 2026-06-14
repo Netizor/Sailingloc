@@ -7,7 +7,18 @@ import type { Boat, BoatListParams, BoatStatus, PaginatedResponse } from '../typ
 export const listBoats = async (
   params: BoatListParams = {},
 ): Promise<PaginatedResponse<Boat>> => {
-  const { data } = await api.get<PaginatedResponse<Boat>>('/boats', { params })
+  const { types, countries, locations, ...rest } = params
+  const query = new URLSearchParams()
+  Object.entries(rest).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      query.append(key, String(value))
+    }
+  })
+  types?.forEach((type) => query.append('types[]', type))
+  countries?.forEach((c) => query.append('countries[]', c))
+  locations?.forEach((l) => query.append('locations[]', l))
+  const qs = query.toString()
+  const { data } = await api.get<PaginatedResponse<Boat>>(`/boats${qs ? `?${qs}` : ''}`)
   return data
 }
 
@@ -91,9 +102,21 @@ export const uploadBoatDocument = async (
   return data
 }
 
+export interface DestinationCountrySummary {
+  country: string
+  count: number
+  image: string | null
+}
+
+export const getDestinationSummary = async (): Promise<DestinationCountrySummary[]> => {
+  const { data } = await api.get<{ countries: DestinationCountrySummary[] }>('/boats/destinations/summary')
+  return data.countries
+}
+
 export const boatsApi = {
   list: listBoats,
   search: listBoats,
+  getDestinationSummary,
   getById: getBoat,
   getMyBoats,
   create: createBoat,

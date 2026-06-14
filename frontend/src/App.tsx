@@ -3,11 +3,14 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 import Layout, { ProtectedRoute, OwnerRoute, AdminRoute } from './components/layout/Layout'
+import UserDashboardLayout from './components/layout/UserDashboardLayout'
+import AdminDashboardLayout from './components/layout/AdminDashboardLayout'
 import { FullPageSpinner } from './components/ui/Spinner'
 import CookieBanner from './components/ui/CookieBanner'
 import { initSessionGuard } from './store/auth.store'
+import { usePreferencesStore } from './store/preferences.store'
 
-// ─── Pages — lazy loaded for code splitting ───────────────────────────────────
+// ─── Pages - lazy loaded for code splitting ───────────────────────────────────
 const Home = React.lazy(() => import('./pages/Home'))
 const Search = React.lazy(() => import('./pages/Search'))
 const BoatDetail = React.lazy(() => import('./pages/BoatDetail'))
@@ -55,6 +58,8 @@ const Faq = React.lazy(() => import('./pages/Faq'))
 const Contact = React.lazy(() => import('./pages/Contact'))
 const APropos = React.lazy(() => import('./pages/APropos'))
 const GuideProprietaire = React.lazy(() => import('./pages/GuideProprietaire'))
+const DevenirProprietaire = React.lazy(() => import('./pages/DevenirProprietaire'))
+const OwnerAuthPage = React.lazy(() => import('./pages/OwnerAuthPage'))
 
 // ── Comparateur ────────────────────────────────────────────────────────────────
 const Comparer = React.lazy(() => import('./pages/Comparer'))
@@ -80,9 +85,45 @@ const queryClient = new QueryClient({
 })
 
 // ─── App ──────────────────────────────────────────────────────────────────────
+function ThemedToaster() {
+  const theme = usePreferencesStore((s) => s.theme)
+
+  return (
+    <Toaster
+      position="top-right"
+      toastOptions={{
+        duration: 4000,
+        style: {
+          background: theme === 'dark' ? '#1f2937' : '#fff',
+          color: theme === 'dark' ? '#f3f4f6' : '#111827',
+          borderRadius: '12px',
+          border: theme === 'dark' ? '1px solid #374151' : '1px solid #f3f4f6',
+          boxShadow:
+            '0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.05)',
+          fontSize: '14px',
+          maxWidth: '380px',
+        },
+        success: {
+          iconTheme: {
+            primary: '#0369a1',
+            secondary: theme === 'dark' ? '#1f2937' : '#fff',
+          },
+        },
+        error: {
+          iconTheme: {
+            primary: '#dc2626',
+            secondary: theme === 'dark' ? '#1f2937' : '#fff',
+          },
+        },
+      }}
+    />
+  )
+}
+
 export default function App() {
   // Vérifie au démarrage si la session "sans souvenir" a expiré (navigateur fermé)
   useEffect(() => { initSessionGuard() }, [])
+  useEffect(() => { usePreferencesStore.getState().init() }, [])
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -103,19 +144,22 @@ export default function App() {
               <Route path="contact" element={<Contact />} />
               <Route path="a-propos" element={<APropos />} />
               <Route path="guide-proprietaire" element={<GuideProprietaire />} />
+              <Route path="devenir-proprietaire" element={<DevenirProprietaire />} />
+              <Route path="devenir-proprietaire/commencer" element={<OwnerAuthPage />} />
               <Route path="cgu" element={<Cgu />} />
               <Route path="mentions-legales" element={<MentionsLegales />} />
               <Route path="rgpd" element={<Rgpd />} />
               <Route path="cookies" element={<Cookies />} />
               <Route path="bateaux/comparer" element={<Comparer />} />
-              {/* C3 — Profil public propriétaire */}
+              {/* C3 - Profil public propriétaire */}
               <Route path="proprietaires/:id" element={<OwnerProfile />} />
-              {/* C10 — Pages destination */}
+              {/* C10 - Pages destination */}
               <Route path="destinations" element={<Destinations />} />
               <Route path="destinations/:port" element={<Destination />} />
 
               {/* ── Renter (any authenticated user) ───────────────────────── */}
               <Route path="mon-espace" element={<ProtectedRoute />}>
+                <Route element={<UserDashboardLayout />}>
                 <Route index element={<RenterDashboard />} />
                 <Route path="reservations" element={<MyBookings />} />
                 <Route path="reservations/:id" element={<BookingDetail />} />
@@ -126,18 +170,20 @@ export default function App() {
                 <Route path="notifications" element={<Notifications />} />
                 <Route path="notifications/:id" element={<NotificationDetail />} />
                 <Route path="profil" element={<UserProfile />} />
-                {/* D3 — Historique des paiements */}
+                {/* D3 - Historique des paiements */}
                 <Route path="paiements" element={<MyPayments />} />
-                {/* D6 — Cartes de paiement sauvegardées */}
+                {/* D6 - Cartes de paiement sauvegardées */}
                 <Route path="cartes" element={<PaymentMethods />} />
-                {/* C1 — KYC */}
+                {/* C1 - KYC */}
                 <Route path="verification" element={<KycVerification />} />
-                {/* C9 — Recherches sauvegardées */}
+                {/* C9 - Recherches sauvegardées */}
                 <Route path="alertes" element={<SavedSearches />} />
+                </Route>
               </Route>
 
               {/* ── Owner (OWNER or ADMIN role) ───────────────────────────── */}
               <Route path="proprietaire" element={<OwnerRoute />}>
+                <Route element={<UserDashboardLayout />}>
                 <Route index element={<OwnerDashboard />} />
                 <Route path="bateaux" element={<MyBoats />} />
                 <Route path="bateaux/nouveau" element={<CreateEditBoat />} />
@@ -145,21 +191,22 @@ export default function App() {
                 <Route path="bateaux/:id/disponibilites" element={<ManageAvailability />} />
                 <Route path="bateaux/:id/tarifs" element={<ManageSeasonalPrices />} />
                 <Route path="reservations" element={<OwnerBookings />} />
-                {/* D1 — Propriétaire évalue un locataire */}
+                {/* D1 - Propriétaire évalue un locataire */}
                 <Route path="reservations/:id/avis" element={<LeaveReview />} />
                 <Route path="revenus" element={<OwnerRevenues />} />
+                </Route>
               </Route>
 
               {/* ── Admin (ADMIN role only) ───────────────────────────────── */}
               <Route path="admin" element={<AdminRoute />}>
+                <Route element={<AdminDashboardLayout />}>
                 <Route index element={<AdminDashboard />} />
                 <Route path="utilisateurs" element={<AdminUsers />} />
                 <Route path="bateaux" element={<AdminBoats />} />
                 <Route path="reservations" element={<AdminBookings />} />
-                {/* F3 — Signalements */}
                 <Route path="signalements" element={<AdminReports />} />
-                {/* F4 — Modération des avis */}
                 <Route path="avis" element={<AdminReviews />} />
+                </Route>
               </Route>
 
               {/* ── 404 ───────────────────────────────────────────────────── */}
@@ -167,40 +214,11 @@ export default function App() {
             </Route>
           </Routes>
         </Suspense>
-        {/* RGPD — Bandeau de consentement aux cookies (affiché à la première visite) */}
-        {/* Doit être à l'intérieur de <BrowserRouter> car il contient un <Link> */}
         <CookieBanner />
       </BrowserRouter>
 
       {/* Toast notifications */}
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#fff',
-            color: '#111827',
-            borderRadius: '12px',
-            border: '1px solid #f3f4f6',
-            boxShadow:
-              '0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.05)',
-            fontSize: '14px',
-            maxWidth: '380px',
-          },
-          success: {
-            iconTheme: {
-              primary: '#0369a1',
-              secondary: '#fff',
-            },
-          },
-          error: {
-            iconTheme: {
-              primary: '#dc2626',
-              secondary: '#fff',
-            },
-          },
-        }}
-      />
+      <ThemedToaster />
     </QueryClientProvider>
   )
 }

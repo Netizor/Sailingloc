@@ -31,12 +31,12 @@ const ScrollToHash: React.FC = () => {
 
 const Layout: React.FC = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
       <ScrollToHash />
       <Header />
-      {/* Bandeau de vérification email / téléphone manquant — visible uniquement si connecté */}
+      {/* Bandeau de vérification email / téléphone manquant - visible uniquement si connecté */}
       <VerificationBanner />
-      <main className="flex-1">
+      <main className="flex-1 pt-[72px]">
         <Outlet />
       </main>
       <Footer />

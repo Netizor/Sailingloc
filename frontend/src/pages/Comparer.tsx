@@ -119,7 +119,7 @@ const Comparer: React.FC = () => {
                 <CompareRow
                   label="Longueur"
                   icon={<Ruler size={14} />}
-                  values={boats.map((b) => (b.length ? `${b.length} m` : '—'))}
+                  values={boats.map((b) => (b.length ? `${b.length} m` : ''))}
                 />
                 <CompareRow
                   label="Capacité"

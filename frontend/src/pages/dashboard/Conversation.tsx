@@ -7,6 +7,7 @@ import {
   sendMessage,
   getConversations,
 } from '../../api/messages.api'
+import { resolveApiBaseUrl } from '../../lib/axios'
 import { useAuthStore } from '../../store/auth.store'
 import { usePageTitle } from '../../hooks/usePageTitle'
 import type { Message } from '../../types'
@@ -28,7 +29,7 @@ const Conversation: React.FC = () => {
   const [draft, setDraft] = useState('')
   const endRef = useRef<HTMLDivElement>(null)
 
-  // Dernier ID reçu — utilisé par le SSE pour ne pas renvoyer l'historique lors des reconnexions
+  // Dernier ID reçu - utilisé par le SSE pour ne pas renvoyer l'historique lors des reconnexions
   const lastMsgIdRef = useRef(0)
 
   // ── Chargement des messages ──────────────────────────────────────────────────
@@ -61,7 +62,7 @@ const Conversation: React.FC = () => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages.length])
 
-  // ── SSE (G3) — mise à jour de lastMsgIdRef depuis les données initiales ──────
+  // ── SSE (G3) - mise à jour de lastMsgIdRef depuis les données initiales ──────
   // Doit être placé AVANT l'effet SSE pour que lastMsgIdRef soit correct au premier connect
   useEffect(() => {
     const msgs = data?.messages ?? []
@@ -71,7 +72,7 @@ const Conversation: React.FC = () => {
     }
   }, [data])
 
-  // ── SSE (G3) — remplace le polling ───────────────────────────────────────────
+  // ── SSE (G3) - remplace le polling ───────────────────────────────────────────
   useEffect(() => {
     if (!conversationId || !accessToken) return
 
@@ -83,9 +84,9 @@ const Conversation: React.FC = () => {
       // Lit le token directement depuis le store (évite le token périmé en cas de reconnexion)
       const token = useAuthStore.getState().accessToken
       if (!token) return
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+      const apiBase = resolveApiBaseUrl()
       const url =
-        `${baseUrl}/api/messages/stream/${conversationId}` +
+        `${apiBase}/messages/stream/${conversationId}` +
         `?token=${encodeURIComponent(token)}&lastId=${lastMsgIdRef.current}`
 
       es = new EventSource(url)
@@ -113,7 +114,7 @@ const Conversation: React.FC = () => {
           // Rafraîchit la liste des conversations (badge non-lus, dernier message)
           qc.invalidateQueries({ queryKey: ['conversations'] })
           qc.invalidateQueries({ queryKey: ['unread-messages-count'] })
-        } catch { /* SSE parse error — silencieux */ }
+        } catch { /* SSE parse error - silencieux */ }
       }
 
       es.onerror = () => {

@@ -20,7 +20,7 @@ const checkSupport = (): boolean =>
   'PushManager' in window
 
 /**
- * D5 — Hook pour gérer l'abonnement aux notifications push PWA.
+ * D5 - Hook pour gérer l'abonnement aux notifications push PWA.
  *
  * Usage :
  * ```tsx
@@ -44,7 +44,7 @@ export const usePushNotifications = () => {
     navigator.serviceWorker.ready
       .then((reg) => reg.pushManager.getSubscription())
       .then((sub) => setIsSubscribed(!!sub))
-      .catch(() => {/* SW pas encore actif — silencieux */})
+      .catch(() => {/* SW pas encore actif - silencieux */})
   }, [isSupported, isAuthenticated])
 
   /**

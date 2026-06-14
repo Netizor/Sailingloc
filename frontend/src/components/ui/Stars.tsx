@@ -116,7 +116,7 @@ const StarInput: React.FC<StarInputProps> = ({
             <button
               key={starValue}
               type="button"
-              aria-label={`${starValue} étoile${starValue > 1 ? 's' : ''} – ${labels[i] ?? ''}`}
+              aria-label={`${starValue} étoile${starValue > 1 ? 's' : ''}, ${labels[i] ?? ''}`}
               aria-pressed={value === starValue}
               onClick={() => onChange(starValue)}
               onMouseEnter={() => setHovered(starValue)}
