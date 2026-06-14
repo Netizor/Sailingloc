@@ -214,8 +214,6 @@ export default function App() {
             </Route>
           </Routes>
         </Suspense>
-        {/* RGPD - Bandeau de consentement aux cookies (affiché à la première visite) */}
-        {/* Doit être à l'intérieur de <BrowserRouter> car il contient un <Link> */}
         <CookieBanner />
       </BrowserRouter>
 

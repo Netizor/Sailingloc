@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { Facebook, Instagram, Twitter } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { openCookiePreferences } from '../ui/CookieBanner'
 
 const Footer: React.FC = () => {
   const { t } = useTranslation()
@@ -21,6 +22,8 @@ const Footer: React.FC = () => {
   const legalLinks = [
     { label: t('footer.legal.cguFull'), to: '/cgu' },
     { label: t('footer.legal.privacy'), to: '/rgpd' },
+    { label: t('footer.legal.cookies'), to: '/cookies' },
+    { label: t('footer.legal.mentions'), to: '/mentions-legales' },
   ]
 
   const socialLinks = [
@@ -40,6 +43,9 @@ const Footer: React.FC = () => {
             <p className="text-sm text-brand-slate leading-relaxed max-w-xs">
               {t('footer.taglineListing')}
             </p>
+            <p className="mt-3 text-xs font-semibold text-amber-700 dark:text-amber-400">
+              {t('footer.copyright')}
+            </p>
           </div>
 
           <FooterColumn title={t('footer.navigation')} links={navLinks} />
@@ -48,9 +54,16 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="border-t border-gray-200 dark:border-gray-800 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-brand-muted dark:text-gray-500">
-            © 2024 SailingLoc. {t('footer.editorial')}
-          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-xs text-brand-muted dark:text-gray-500">
+            <p>© 2024 SailingLoc. {t('footer.editorial')}</p>
+            <button
+              type="button"
+              onClick={() => openCookiePreferences()}
+              className="text-ocean-600 dark:text-ocean-400 hover:underline font-medium"
+            >
+              {t('cookies.manage')}
+            </button>
+          </div>
           <div className="flex items-center gap-3">
             {socialLinks.map((s) => (
               <a
@@ -80,7 +93,7 @@ const FooterColumn: React.FC<FooterColumnProps> = ({ title, links }) => (
     <h3 className="text-xs font-bold uppercase tracking-wider text-brand-navy dark:text-gray-100 mb-4">{title}</h3>
     <ul className="space-y-2.5">
       {links.map((link) => (
-        <li key={link.label}>
+        <li key={link.to}>
           <Link to={link.to} className="text-sm text-brand-slate dark:text-gray-400 hover:text-brand-navy dark:hover:text-gray-200 transition-colors">
             {link.label}
           </Link>

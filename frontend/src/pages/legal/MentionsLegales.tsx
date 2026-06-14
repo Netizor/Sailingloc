@@ -1,6 +1,5 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Scale } from 'lucide-react'
 import LegalSection from '../../components/ui/LegalSection'
 import LegalPageLayout from '../../components/ui/LegalPageLayout'
 import { usePageTitle } from '../../hooks/usePageTitle'
@@ -14,8 +13,6 @@ const MentionsLegales: React.FC = () => {
   return (
     // #7 - badge <span> (cohérence via PageHero)  #8 - boilerplate hero + carte extrait dans LegalPageLayout
     <LegalPageLayout
-      icon={Scale}
-      badge="Légal"
       title="Mentions légales"
       lastUpdated="Dernière mise à jour : 1er janvier 2026"
     >

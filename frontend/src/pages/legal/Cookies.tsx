@@ -1,5 +1,4 @@
 import React from 'react'
-import { Cookie } from 'lucide-react'
 import LegalSection from '../../components/ui/LegalSection'
 import LegalPageLayout from '../../components/ui/LegalPageLayout'
 import { usePageTitle } from '../../hooks/usePageTitle'
@@ -36,8 +35,6 @@ const Cookies: React.FC = () => {
   return (
     // #7 - badge <span> (cohérence via PageHero)  #8 - boilerplate hero + carte extrait dans LegalPageLayout
     <LegalPageLayout
-      icon={Cookie}
-      badge="Légal"
       title="Politique de cookies"
       lastUpdated="Dernière mise à jour : 1er janvier 2026"
     >

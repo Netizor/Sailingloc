@@ -110,6 +110,42 @@
     },
     "copyright": "Projet étudiant DSP4 O24. Aucune transaction réelle"
   },
+  "legal": {
+    "documentation": "Documentation",
+    "nav": {
+      "mentions": "Mentions Légales",
+      "cgu": "Conditions Générales",
+      "privacy": "Confidentialité",
+      "cookies": "Politique Cookies"
+    }
+  },
+  "studentNotice": {
+    "title": "Projet étudiant — aucun paiement accepté",
+    "message": "SailingLoc est un projet pédagogique (DSP4 O24). Aucun paiement réel n'est accepté sur ce site : les fonctionnalités de réservation et de paiement sont simulées.",
+    "dismiss": "Fermer ce message",
+    "footerTitle": "Projet étudiant DSP4 O24 — démonstration uniquement",
+    "footerMessage": "Aucun paiement réel est accepté sur ce site. Les réservations et transactions sont fictives, à des fins pédagogiques."
+  },
+  "cookies": {
+    "manage": "Gérer les cookies",
+    "banner": {
+      "ariaLabel": "Bandeau de consentement aux cookies",
+      "title": "Nous utilisons des cookies",
+      "description": "Les cookies essentiels assurent le fonctionnement du site (session, préférences). Les cookies analytiques et marketing ne sont activés qu'avec votre accord. Consultez notre",
+      "customize": "Personnaliser",
+      "essentialOnly": "Essentiels uniquement",
+      "acceptAll": "Tout accepter",
+      "customizeTitle": "Personnaliser mes préférences",
+      "back": "Retour",
+      "save": "Enregistrer mes choix",
+      "essentialLabel": "Cookies essentiels",
+      "essentialDesc": "Authentification, sécurité, préférences de session. Ne peuvent pas être désactivés.",
+      "analyticalLabel": "Cookies analytiques",
+      "analyticalDesc": "Mesure d'audience anonymisée pour améliorer nos pages. Durée : 13 mois.",
+      "marketingLabel": "Cookies marketing",
+      "marketingDesc": "Personnalisation des publicités et retargeting. Durée : 30 jours."
+    }
+  },
   "home": {
     "badge": "Location de bateaux entre particuliers",
     "heroTitle": "L'élégance de la mer à votre portée",

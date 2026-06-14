@@ -110,6 +110,42 @@
     },
     "copyright": "Student project DSP4 O24. No real transactions"
   },
+  "legal": {
+    "documentation": "Documentation",
+    "nav": {
+      "mentions": "Legal notice",
+      "cgu": "Terms & Conditions",
+      "privacy": "Privacy",
+      "cookies": "Cookie policy"
+    }
+  },
+  "studentNotice": {
+    "title": "Student project — no payments accepted",
+    "message": "SailingLoc is an educational project (DSP4 O24). No real payments are accepted on this site: booking and payment features are simulated.",
+    "dismiss": "Close this message",
+    "footerTitle": "Student project DSP4 O24 — demonstration only",
+    "footerMessage": "No real payments are accepted on this site. Bookings and transactions are fictional, for educational purposes."
+  },
+  "cookies": {
+    "manage": "Manage cookies",
+    "banner": {
+      "ariaLabel": "Cookie consent banner",
+      "title": "We use cookies",
+      "description": "Essential cookies keep the site working (session, preferences). Analytics and marketing cookies are only enabled with your consent. See our",
+      "customize": "Customize",
+      "essentialOnly": "Essential only",
+      "acceptAll": "Accept all",
+      "customizeTitle": "Customize my preferences",
+      "back": "Back",
+      "save": "Save my choices",
+      "essentialLabel": "Essential cookies",
+      "essentialDesc": "Authentication, security, session preferences. Cannot be disabled.",
+      "analyticalLabel": "Analytics cookies",
+      "analyticalDesc": "Anonymous audience measurement to improve our pages. Duration: 13 months.",
+      "marketingLabel": "Marketing cookies",
+      "marketingDesc": "Ad personalization and retargeting. Duration: 30 days."
+    }
+  },
   "home": {
     "badge": "Peer-to-peer boat rental",
     "heroTitle": "The elegance of the sea within reach",
