@@ -5,7 +5,7 @@ import { Cookie, X } from 'lucide-react'
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface CookieConsent {
-  essential:  true         // toujours vrai — pas modifiable
+  essential:  true         // toujours vrai - pas modifiable
   analytical: boolean
   marketing:  boolean
   date:       string
@@ -129,7 +129,7 @@ const CookieBanner: React.FC = () => {
             </div>
 
             <div className="space-y-3 mb-5">
-              {/* Essentiels — toujours actifs */}
+              {/* Essentiels - toujours actifs */}
               <CookieToggle
                 label="Cookies essentiels"
                 description="Authentification, sécurité, préférences de session. Ne peuvent pas être désactivés."

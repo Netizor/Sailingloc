@@ -40,7 +40,7 @@ const ManageAvailability: React.FC = () => {
   const { id: boatId } = useParams<{ id: string }>()
   const navigate = useNavigate()
 
-  // Référence stable — évite d'invalider le useCallback à chaque rendu
+  // Référence stable - évite d'invalider le useCallback à chaque rendu
   const today = useMemo(() => new Date(), [])
   const [baseMonth, setBaseMonth] = useState(today)
   // Show 3 months
@@ -209,7 +209,7 @@ const ManageAvailability: React.FC = () => {
           </div>
         </div>
 
-        {/* C7 — Statistiques d'occupation sur les 3 mois affichés */}
+        {/* C7 - Statistiques d'occupation sur les 3 mois affichés */}
         {availabilityData && (() => {
           const booked    = (availabilityData.booked    ?? []).length
           const available = (availabilityData.available ?? []).length
@@ -266,7 +266,7 @@ const ManageAvailability: React.FC = () => {
             <ChevronLeft size={16} />
           </button>
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">
-            {format(baseMonth, 'MMMM yyyy', { locale: fr })} — {format(months[2], 'MMMM yyyy', { locale: fr })}
+            {format(baseMonth, 'MMMM yyyy', { locale: fr })} à {format(months[2], 'MMMM yyyy', { locale: fr })}
           </span>
           <button
             onClick={() => setBaseMonth((m) => addMonths(m, 1))}
@@ -276,7 +276,7 @@ const ManageAvailability: React.FC = () => {
           </button>
         </div>
 
-        {/* Calendars grid — user-select désactivé pendant le drag pour éviter la sélection de texte */}
+        {/* Calendars grid - user-select désactivé pendant le drag pour éviter la sélection de texte */}
         <div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           style={{ userSelect: isDragging ? 'none' : 'auto' }}

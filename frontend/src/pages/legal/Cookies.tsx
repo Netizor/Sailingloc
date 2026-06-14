@@ -30,11 +30,11 @@ const COOKIE_TYPES = [
 // ─── Page Politique de cookies ────────────────────────────────────────────────
 
 const Cookies: React.FC = () => {
-  // #6 — Titre de l'onglet pour le SEO et l'accessibilité
+  // #6 - Titre de l'onglet pour le SEO et l'accessibilité
   usePageTitle('Politique de cookies')
 
   return (
-    // #7 — badge <span> (cohérence via PageHero)  #8 — boilerplate hero + carte extrait dans LegalPageLayout
+    // #7 - badge <span> (cohérence via PageHero)  #8 - boilerplate hero + carte extrait dans LegalPageLayout
     <LegalPageLayout
       icon={Cookie}
       badge="Légal"

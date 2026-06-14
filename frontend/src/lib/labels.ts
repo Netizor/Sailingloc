@@ -1,6 +1,6 @@
 /**
  * Traductions françaises des énumérations métier.
- * Source unique pour tous les composants — évite les divergences entre vues.
+ * Source unique pour tous les composants - évite les divergences entre vues.
  * Typage strict avec les enums : si une valeur est ajoutée à l'enum, TypeScript
  * signalera immédiatement une clé manquante ici.
  */

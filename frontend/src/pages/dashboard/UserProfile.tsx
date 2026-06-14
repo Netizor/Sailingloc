@@ -240,7 +240,7 @@ const SecuritySection: React.FC = () => {
     confirmPassword: '',
   })
 
-  // Un seul état pour les trois toggles de visibilité — moins de boilerplate
+  // Un seul état pour les trois toggles de visibilité - moins de boilerplate
   const [visible, setVisible] = useState<Record<VisibleField, boolean>>({
     current: false,
     new:     false,
@@ -276,7 +276,7 @@ const SecuritySection: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Validation côté client — miroir des règles backend pour un retour immédiat
+    // Validation côté client - miroir des règles backend pour un retour immédiat
     if (form.newPassword.length < MIN_PASSWORD_LEN) {
       setFieldError(
         `Le nouveau mot de passe doit contenir au moins ${MIN_PASSWORD_LEN} caractères`,
@@ -387,7 +387,7 @@ const DataPrivacySection: React.FC = () => {
   const deleteMutation = useMutation({
     mutationFn: deleteAccount,
     onSuccess: () => {
-      toast.success('Compte supprimé — vos données ont été effacées.')
+      toast.success('Compte supprimé. Vos données ont été effacées.')
       logout()
       navigate('/', { replace: true })
     },

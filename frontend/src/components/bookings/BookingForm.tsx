@@ -214,7 +214,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
             )}>
               <p className="text-[10px] font-medium uppercase tracking-wide mb-0.5">Départ</p>
               <p className="font-medium">
-                {range?.from ? format(range.from, 'd MMM yyyy', { locale: fr }) : '—'}
+                {range?.from ? format(range.from, 'd MMM yyyy', { locale: fr }) : ''}
               </p>
             </div>
             <div className={cn(
@@ -223,7 +223,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
             )}>
               <p className="text-[10px] font-medium uppercase tracking-wide mb-0.5">Retour</p>
               <p className="font-medium">
-                {range?.to ? format(range.to, 'd MMM yyyy', { locale: fr }) : '—'}
+                {range?.to ? format(range.to, 'd MMM yyyy', { locale: fr }) : ''}
               </p>
             </div>
           </div>
@@ -347,7 +347,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
             loading={loading}
             disabled={loading}
           >
-            {totalDays > 0 ? `Réserver & Payer — ${totalDays}j` : 'Réserver & Payer'}
+            {totalDays > 0 ? `Réserver & Payer - ${totalDays}j` : 'Réserver & Payer'}
           </Button>
         )}
 

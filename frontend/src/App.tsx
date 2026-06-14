@@ -10,7 +10,7 @@ import CookieBanner from './components/ui/CookieBanner'
 import { initSessionGuard } from './store/auth.store'
 import { usePreferencesStore } from './store/preferences.store'
 
-// ─── Pages — lazy loaded for code splitting ───────────────────────────────────
+// ─── Pages - lazy loaded for code splitting ───────────────────────────────────
 const Home = React.lazy(() => import('./pages/Home'))
 const Search = React.lazy(() => import('./pages/Search'))
 const BoatDetail = React.lazy(() => import('./pages/BoatDetail'))
@@ -151,9 +151,9 @@ export default function App() {
               <Route path="rgpd" element={<Rgpd />} />
               <Route path="cookies" element={<Cookies />} />
               <Route path="bateaux/comparer" element={<Comparer />} />
-              {/* C3 — Profil public propriétaire */}
+              {/* C3 - Profil public propriétaire */}
               <Route path="proprietaires/:id" element={<OwnerProfile />} />
-              {/* C10 — Pages destination */}
+              {/* C10 - Pages destination */}
               <Route path="destinations" element={<Destinations />} />
               <Route path="destinations/:port" element={<Destination />} />
 
@@ -170,13 +170,13 @@ export default function App() {
                 <Route path="notifications" element={<Notifications />} />
                 <Route path="notifications/:id" element={<NotificationDetail />} />
                 <Route path="profil" element={<UserProfile />} />
-                {/* D3 — Historique des paiements */}
+                {/* D3 - Historique des paiements */}
                 <Route path="paiements" element={<MyPayments />} />
-                {/* D6 — Cartes de paiement sauvegardées */}
+                {/* D6 - Cartes de paiement sauvegardées */}
                 <Route path="cartes" element={<PaymentMethods />} />
-                {/* C1 — KYC */}
+                {/* C1 - KYC */}
                 <Route path="verification" element={<KycVerification />} />
-                {/* C9 — Recherches sauvegardées */}
+                {/* C9 - Recherches sauvegardées */}
                 <Route path="alertes" element={<SavedSearches />} />
                 </Route>
               </Route>
@@ -191,7 +191,7 @@ export default function App() {
                 <Route path="bateaux/:id/disponibilites" element={<ManageAvailability />} />
                 <Route path="bateaux/:id/tarifs" element={<ManageSeasonalPrices />} />
                 <Route path="reservations" element={<OwnerBookings />} />
-                {/* D1 — Propriétaire évalue un locataire */}
+                {/* D1 - Propriétaire évalue un locataire */}
                 <Route path="reservations/:id/avis" element={<LeaveReview />} />
                 <Route path="revenus" element={<OwnerRevenues />} />
                 </Route>
@@ -214,7 +214,7 @@ export default function App() {
             </Route>
           </Routes>
         </Suspense>
-        {/* RGPD — Bandeau de consentement aux cookies (affiché à la première visite) */}
+        {/* RGPD - Bandeau de consentement aux cookies (affiché à la première visite) */}
         {/* Doit être à l'intérieur de <BrowserRouter> car il contient un <Link> */}
         <CookieBanner />
       </BrowserRouter>

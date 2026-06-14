@@ -185,7 +185,7 @@ const MyBookings: React.FC = () => {
         />
       </div>
 
-      {/* Prochaine escapade — toujours visible */}
+      {/* Prochaine escapade - toujours visible */}
       <section>
         <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3">
           Prochaine escapade
@@ -304,7 +304,7 @@ const MyBookings: React.FC = () => {
                         {formatDateRangeShort(booking.startDate, booking.endDate)}
                       </td>
                       <td className="px-5 py-4 text-gray-600 dark:text-gray-400">
-                        {booking.boat?.city ?? booking.boat?.port ?? '—'}
+                        {booking.boat?.city ?? booking.boat?.port ?? ''}
                       </td>
                       <td className="px-5 py-4">
                         <StatusPill status={booking.status} />
@@ -374,7 +374,7 @@ const NextTripHero: React.FC<{
   onClick: () => void
 }> = ({ booking, onClick }) => {
   const daysLeft = daysUntil(booking.startDate)
-  const location = [booking.boat?.city, booking.boat?.country].filter(Boolean).join(', ') || '—'
+  const location = [booking.boat?.city, booking.boat?.country].filter(Boolean).join(', ') || ''
   const departureLabel =
     daysLeft > 0
       ? `Départ dans ${daysLeft} Jour${daysLeft > 1 ? 's' : ''}`

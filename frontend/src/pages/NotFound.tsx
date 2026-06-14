@@ -51,7 +51,7 @@ const NotFound: React.FC = () => {
           </Button>
         </div>
 
-        <p className="mt-10 text-xs text-gray-300 dark:text-gray-600">SailingLoc — Projet étudiant DSP4 O24</p>
+        <p className="mt-10 text-xs text-gray-300 dark:text-gray-600">SailingLoc - Projet étudiant DSP4 O24</p>
       </div>
     </div>
   )

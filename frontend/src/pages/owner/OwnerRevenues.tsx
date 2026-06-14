@@ -128,10 +128,10 @@ const MonthlyTable: React.FC<{ rows: RevenueByMonth[] }> = ({ rows }) => (
             >
               <td className="px-5 py-3 font-medium">{row.label}</td>
               <td className="px-5 py-3 text-right">
-                {row.bookings > 0 ? row.bookings : '—'}
+                {row.bookings > 0 ? row.bookings : ''}
               </td>
               <td className="px-5 py-3 text-right font-semibold">
-                {row.earnings > 0 ? formatPrice(row.earnings) : '—'}
+                {row.earnings > 0 ? formatPrice(row.earnings) : ''}
               </td>
             </tr>
           ))}
@@ -214,14 +214,14 @@ const OwnerRevenues: React.FC = () => {
   const [year, setYear]     = useState(currentYear)
   const [boatId, setBoatId] = useState('')
 
-  // Requête principale — filtrée si un bateau est sélectionné
+  // Requête principale - filtrée si un bateau est sélectionné
   const { data, isLoading, isError } = useQuery({
     queryKey: ['owner', 'revenues', year, boatId] as const,
     queryFn: () => getOwnerRevenues({ year, boatId: boatId ? Number(boatId) : undefined }),
     staleTime: 5 * 60 * 1000,
   })
 
-  // Requête sans filtre — uniquement pour peupler le sélecteur quand un bateau est actif.
+  // Requête sans filtre - uniquement pour peupler le sélecteur quand un bateau est actif.
   // Désactivée quand boatId vaut '' : la requête principale suffit (même clé → déduplication React Query).
   const { data: allData } = useQuery({
     queryKey: ['owner', 'revenues', year, ''] as const,
@@ -287,7 +287,7 @@ const OwnerRevenues: React.FC = () => {
               ))}
             </select>
 
-            {/* C6 — Export CSV des réservations récentes */}
+            {/* C6 - Export CSV des réservations récentes */}
             {recentBookings.length > 0 && (
               <button
                 onClick={() => downloadCsv(
@@ -397,7 +397,7 @@ const OwnerRevenues: React.FC = () => {
                         </p>
                         <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                           {booking.startDate && booking.endDate
-                            ? `${formatDate(booking.startDate)} — ${formatDate(booking.endDate)}`
+                            ? `${formatDate(booking.startDate)} au ${formatDate(booking.endDate)}`
                             : ''}
                         </p>
                         {booking.renter && (

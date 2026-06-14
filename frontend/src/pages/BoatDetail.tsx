@@ -209,15 +209,15 @@ const BoatDetail: React.FC = () => {
 
   const specs = [
     { label: 'Type', value: getTypeSpecLabel(boat.type) },
-    { label: 'Longueur', value: boat.length ? `${boat.length} m` : '—' },
-    { label: 'Cabines', value: boat.cabins ? `${boat.cabins} Cabines` : '—' },
-    { label: 'Année', value: boat.year ? String(boat.year) : '—' },
+    { label: 'Longueur', value: boat.length ? `${boat.length} m` : '' },
+    { label: 'Cabines', value: boat.cabins ? `${boat.cabins} Cabines` : '' },
+    { label: 'Année', value: boat.year ? String(boat.year) : '' },
   ]
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] pb-24 lg:pb-12">
       <Helmet>
-        <title>{boat.title} — SailingLoc</title>
+        <title>{boat.title} - SailingLoc</title>
         <meta name="description" content={boat.description?.slice(0, 155) ?? `Louez ${boat.title} à ${boat.port}.`} />
         {boat.images?.[0] && <meta property="og:image" content={boat.images[0]} />}
       </Helmet>

@@ -19,6 +19,7 @@ import type { SearchParams } from '../components/boats/SearchBar'
 import type { Boat } from '../types'
 import { BoatStatus, BoatType, MotorizationType } from '../types'
 import { boatsApi } from '../api/boats.api'
+import { HOME_DESTINATIONS } from '../data/destinations'
 
 type PopularBoatItem = {
   boat: Boat
@@ -183,39 +184,6 @@ const IMAGES = {
   boatFallback: '/ai-generated-boat-picture.jpg',
 } as const
 
-const destinations = [
-  {
-    slug: 'saint-tropez',
-    label: 'Saint-Tropez',
-    image: '/marcin-ciszewski-Zexjl0v3MRU-unsplash.jpg',
-    gridClass: 'col-span-12 sm:col-span-7 row-span-1',
-  },
-  {
-    slug: 'grece',
-    label: 'Grèce',
-    image: '/view-luxurious-cruise-ship (2).jpg',
-    gridClass: 'col-span-12 sm:col-span-2 sm:col-start-8 row-span-1',
-  },
-  {
-    slug: 'corse',
-    label: 'Corse',
-    image: '/andrii-denysenko-kcWrmRUOMc8-unsplash.jpg',
-    gridClass: 'col-span-12 sm:col-span-3 sm:col-start-10 sm:row-span-2 row-span-1 min-h-[420px] sm:min-h-0',
-  },
-  {
-    slug: 'cote-azur',
-    label: "Côte d'Azur",
-    image: '/view-luxurious-cruise-ship (1).jpg',
-    gridClass: 'col-span-12 sm:col-span-7 sm:row-start-2 row-span-1',
-  },
-  {
-    slug: 'bretagne',
-    label: 'Bretagne',
-    image: '/boat-navigating-through-canyon.jpg',
-    gridClass: 'col-span-12 sm:col-span-2 sm:col-start-8 sm:row-start-2 row-span-1',
-  },
-]
-
 const testimonials = [
   {
     id: 1,
@@ -245,7 +213,7 @@ const testimonials = [
 
 const Home: React.FC = () => {
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [carouselIndex, setCarouselIndex] = useState(0)
 
   const steps = [
@@ -260,6 +228,13 @@ const Home: React.FC = () => {
       const result = await boatsApi.list({ limit: 6, sort: 'rating_desc' })
       return result.data
     },
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  })
+
+  const { data: destinationSummary } = useQuery({
+    queryKey: ['destinations', 'summary'],
+    queryFn: () => boatsApi.getDestinationSummary(),
     staleTime: 5 * 60 * 1000,
     retry: false,
   })
@@ -291,7 +266,7 @@ const Home: React.FC = () => {
         <meta name="description" content="Louez un voilier, catamaran ou yacht d'exception dans les plus beaux ports de France et d'Europe." />
       </Helmet>
 
-      {/* Hero — coucher de soleil */}
+      {/* Hero - coucher de soleil */}
       <section className="relative min-h-[calc(100vh-72px)] flex flex-col" aria-label="Bannière principale">
         <div className="absolute inset-0 overflow-hidden">
           <img src={IMAGES.hero} alt="Marina au coucher du soleil" className="w-full h-full object-cover" loading="eager" />
@@ -388,24 +363,30 @@ const Home: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-12 auto-rows-[200px] sm:auto-rows-[220px] gap-4">
-            {destinations.map((dest) => (
-              <Link
-                key={dest.slug}
-                to={`/destinations/${dest.slug}`}
-                className={`relative overflow-hidden rounded-2xl ${dest.gridClass}`}
-              >
-                <img
-                  src={dest.image}
-                  alt={dest.label}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-brand-navy/30" />
-                <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-brand-navy/70 to-transparent">
-                  <p className="font-serif text-xl font-bold text-white">{dest.label}</p>
-                </div>
-              </Link>
-            ))}
+            {HOME_DESTINATIONS.map((dest) => {
+              const cover =
+                dest.country && destinationSummary?.find((s) => s.country === dest.country)?.image
+              const image = cover || dest.image
+              const label = i18n.language.startsWith('en') ? dest.nameEn : dest.name
+              return (
+                <Link
+                  key={dest.slug}
+                  to={`/destinations/${dest.slug}`}
+                  className={`relative overflow-hidden rounded-2xl ${dest.homeGridClass ?? 'col-span-12'}`}
+                >
+                  <img
+                    src={image}
+                    alt={label}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-brand-navy/30" />
+                  <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-brand-navy/70 to-transparent">
+                    <p className="font-serif text-xl font-bold text-white">{label}</p>
+                  </div>
+                </Link>
+              )
+            })}
           </div>
         </div>
       </section>

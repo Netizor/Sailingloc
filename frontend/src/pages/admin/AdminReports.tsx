@@ -135,7 +135,7 @@ const AdminReports: React.FC = () => {
                           {REASON_LABELS[report.reason] ?? report.reason}
                         </td>
                         <td className="px-4 py-3 text-gray-500 dark:text-gray-400 max-w-[180px] truncate text-xs italic">
-                          {report.details ?? '—'}
+                          {report.details ?? ''}
                         </td>
                         <td className="px-4 py-3">
                           <Badge variant={sc.variant} size="sm">

@@ -92,27 +92,30 @@ const Header: React.FC = () => {
 
   const linkClass = (to: string) =>
     cn(
-      'inline-flex items-center h-full px-4 text-xs font-semibold uppercase tracking-[0.1em] whitespace-nowrap border-b-[3px] transition-colors',
+      'inline-flex items-center h-full px-2 xl:px-3 text-xs font-semibold uppercase tracking-[0.08em] whitespace-nowrap border-b-[3px] transition-colors',
       isActive(to)
         ? 'text-[#2563FF] border-[#2563FF] font-bold dark:text-blue-400 dark:border-blue-400'
         : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-[#2563FF] dark:hover:text-blue-400'
     )
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shadow-sm">
-      <div className="w-full px-[10%]">
-        <div className="flex items-stretch justify-between h-[72px] gap-6">
-          {/* Logo complet — object-contain pour ne pas couper */}
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shadow-sm overflow-visible">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
+        <div className="flex items-stretch justify-between h-[72px] gap-3 lg:gap-4 min-w-0">
+          {/* Logo */}
           <Link to="/" className="flex-shrink-0 self-center focus:outline-none focus:ring-2 focus:ring-brand-blue rounded-lg">
             <img
               src="/logo.jpeg"
               alt="SailingLoc"
-              className="h-10 sm:h-11 w-auto max-w-[200px] object-contain"
+              className="h-9 sm:h-10 lg:h-11 w-auto max-w-[140px] lg:max-w-[180px] object-contain"
             />
           </Link>
 
-          {/* Nav desktop */}
-          <nav className="hidden lg:flex items-stretch justify-center gap-1 flex-1 h-full" aria-label="Navigation principale">
+          {/* Nav desktop - reculée vers le logo pour libérer la droite */}
+          <nav
+            className="hidden lg:flex items-stretch justify-start flex-1 min-w-0 h-full pl-2 xl:pl-6"
+            aria-label="Navigation principale"
+          >
             {navLinks.map((link) => (
               <Link key={link.to} to={link.to} className={linkClass(link.to)}>
                 {link.label}
@@ -120,8 +123,27 @@ const Header: React.FC = () => {
             ))}
           </nav>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 self-center">
+          {/* Actions - boutons auth avant les icônes pour éviter la coupure à droite */}
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 self-center min-w-0">
+            {!isAuthenticated && (
+              <div className="hidden lg:flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => navigate('/connexion')}
+                  className="px-3 xl:px-4 py-2 text-xs xl:text-sm font-semibold text-[#2563FF] dark:text-blue-400 bg-white dark:bg-gray-800 border-2 border-[#2563FF] dark:border-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap"
+                >
+                  {t('nav.login')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('/devenir-proprietaire')}
+                  className="px-3 xl:px-4 py-2 text-xs xl:text-sm font-semibold text-white bg-[#2563FF] hover:bg-[#1a4fcc] rounded-lg whitespace-nowrap transition-colors"
+                >
+                  {t('nav.becomeOwner')}
+                </button>
+              </div>
+            )}
+
             <SiteSettingsMenu />
 
             {isAuthenticated && user ? (
@@ -196,24 +218,7 @@ const Header: React.FC = () => {
                   )}
                 </div>
               </>
-            ) : (
-              <div className="hidden lg:flex items-center gap-3 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => navigate('/connexion')}
-                  className="px-5 py-2.5 text-sm font-semibold text-[#2563FF] dark:text-blue-400 bg-white dark:bg-gray-800 border-2 border-[#2563FF] dark:border-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                  {t('nav.login')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate('/devenir-proprietaire')}
-                  className="px-5 py-2.5 text-sm font-semibold text-white bg-[#2563FF] hover:bg-[#1a4fcc] rounded-lg whitespace-nowrap transition-colors"
-                >
-                  {t('nav.becomeOwner')}
-                </button>
-              </div>
-            )}
+            ) : null}
 
             <button
               onClick={() => setMobileOpen((v) => !v)}
@@ -228,7 +233,7 @@ const Header: React.FC = () => {
 
       {mobileOpen && (
         <div className="lg:hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg">
-          <nav className="w-full px-[10%] py-4 flex flex-col gap-1">
+          <nav className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.to}

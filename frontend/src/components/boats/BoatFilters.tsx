@@ -144,7 +144,7 @@ const BoatFilters: React.FC<BoatFiltersProps> = ({ filters, onChange, className 
               className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-ocean-500 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
             />
           </div>
-          <span className="text-gray-300 dark:text-gray-600 mt-4">—</span>
+          <span className="text-gray-300 dark:text-gray-600 mt-4">-</span>
           <div className="flex-1">
             <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">{t('filters.max')}</label>
             <input

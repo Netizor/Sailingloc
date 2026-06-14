@@ -300,9 +300,9 @@ const Search: React.FC = () => {
 
   const searchTitle = location
 
-    ? `Bateaux à ${location} — SailingLoc`
+    ? `Bateaux à ${location} - SailingLoc`
 
-    : 'Nos bateaux — SailingLoc'
+    : 'Nos bateaux - SailingLoc'
 
 
 
@@ -566,11 +566,11 @@ const Search: React.FC = () => {
 
                   {isError
 
-                    ? 'Connexion API indisponible — recherche appliquée sur les bateaux de démonstration.'
+                    ? 'Connexion API indisponible - recherche appliquée sur les bateaux de démonstration.'
 
                     : hasActiveFilters
 
-                      ? 'Aucun résultat API pour ces critères — affichage des bateaux de démonstration correspondants.'
+                      ? 'Aucun résultat API pour ces critères - affichage des bateaux de démonstration correspondants.'
 
                       : 'Affichage de bateaux de démonstration.'}
 

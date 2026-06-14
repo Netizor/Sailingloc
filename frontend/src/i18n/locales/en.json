@@ -108,12 +108,12 @@
       "rgpd": "GDPR",
       "cookies": "Cookie policy"
     },
-    "copyright": "Student project DSP4 O24 — No real transactions"
+    "copyright": "Student project DSP4 O24. No real transactions"
   },
   "home": {
     "badge": "Peer-to-peer boat rental",
     "heroTitle": "The elegance of the sea within reach",
-    "heroSubtitle": "Sailboats, catamarans and exceptional yachts — book in a few clicks among the most beautiful destinations.",
+    "heroSubtitle": "Sailboats, catamarans and exceptional yachts. Book in a few clicks among the world's most beautiful destinations.",
     "statsBoats": "available boats",
     "statsPorts": "ports covered",
     "statsRenters": "happy renters",
@@ -223,7 +223,7 @@
       "errorEmail": "Email is required",
       "errorEmailInvalid": "Invalid email",
       "errorPassword": "Password is required",
-      "demo": "Student project DSP4 O24 — No real transactions"
+      "demo": "Student project DSP4 O24. No real transactions"
     },
     "forgotPassword": {
       "title": "Forgot password",
@@ -270,7 +270,7 @@
       "emailPlaceholder": "you@example.com",
       "phone": "Phone",
       "phonePlaceholder": "+44 7911 123456",
-      "phoneHint": "Optional — useful for owners",
+      "phoneHint": "Optional, useful for owners",
       "password": "Password",
       "passwordPlaceholder": "Minimum 12 characters",
       "confirmPassword": "Confirm password",
@@ -305,7 +305,7 @@
       "errorConfirmPassword": "Please confirm your password",
       "errorPasswordMatch": "Passwords do not match",
       "errorTerms": "You must accept the terms",
-      "demo": "Student project DSP4 O24 — No real transactions"
+      "demo": "Student project DSP4 O24. No real transactions"
     }
   },
   "boat": {
@@ -439,7 +439,7 @@
     "approved": "Identity verified",
     "rejected": "Verification rejected",
     "submit": "Submit your ID document",
-    "formats": "Accepted formats: JPEG, PNG, PDF — max 10 MB per file.",
+    "formats": "Accepted formats: JPEG, PNG, PDF (max 10 MB per file).",
     "front": "Front side",
     "back": "Back side",
     "sendDocs": "Send documents",
@@ -459,9 +459,14 @@
   },
   "destinations": {
     "title": "Destinations",
-    "subtitle": "Explore the most beautiful ports in France and the Mediterranean.",
+    "heroTitle": "Explore our destinations",
+    "subtitle": "Infinite horizons from the Mediterranean to the Caribbean, Asia and Oceania.",
     "boats": "{{count}} boat available",
     "boats_other": "{{count}} boats available",
+    "noBoats": "No boats available for {{name}} at the moment.",
+    "emptyRegion": "No destinations in this region yet.",
+    "seasonPick": "Season's pick",
+    "seeSelection": "See the selection",
     "explore": "Explore",
     "backToDestinations": "Back to destinations"
   },

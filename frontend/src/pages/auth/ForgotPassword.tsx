@@ -54,7 +54,7 @@ const ForgotPassword: React.FC = () => {
 
           <div className="px-8 py-8">
             {sent ? (
-              /* État succès — message neutre (ne révèle pas l'existence du compte) */
+              /* État succès - message neutre (ne révèle pas l'existence du compte) */
               <div className="text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="bg-green-100 dark:bg-green-900/30 rounded-full p-4">

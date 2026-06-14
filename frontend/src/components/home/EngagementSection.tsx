@@ -21,7 +21,7 @@ const EngagementSection: React.FC = () => {
           style={{ backgroundColor: '#0A1120' }}
         >
           <div className="flex flex-col lg:flex-row lg:items-center gap-12 lg:gap-16">
-            {/* Colonne gauche — texte */}
+            {/* Colonne gauche - texte */}
             <div className="lg:w-[44%] flex flex-col justify-center">
               <p className="text-brand-blue text-[11px] font-bold uppercase tracking-[0.25em] mb-6">
                 {t('home.featuresLabel')}
@@ -56,7 +56,7 @@ const EngagementSection: React.FC = () => {
               </ul>
             </div>
 
-            {/* Colonne droite — image + badge */}
+            {/* Colonne droite - image + badge */}
             <div className="lg:w-[56%] relative">
               <img
                 src={FEATURE_IMAGE}

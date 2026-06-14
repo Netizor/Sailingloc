@@ -13,6 +13,47 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
+function parseArrayParam(query, key) {
+  const raw = query[key] ?? query[`${key}[]`]
+  if (!raw) return []
+  return Array.isArray(raw) ? raw : [raw]
+}
+
+function applyBoatSearchFilters(query, reqQuery) {
+  const countries = parseArrayParam(reqQuery, 'countries')
+  const locations = parseArrayParam(reqQuery, 'locations')
+
+  if (reqQuery.country) {
+    query = query.ilike('country', `%${reqQuery.country}%`)
+  } else if (countries.length) {
+    const parts = countries.map((c) => `country.ilike.%${c}%`)
+    query = query.or(parts.join(','))
+  }
+
+  if (locations.length) {
+    const parts = locations.flatMap((loc) => [
+      `city.ilike.%${loc}%`,
+      `port.ilike.%${loc}%`,
+    ])
+    query = query.or(parts.join(','))
+  } else if (reqQuery.location) {
+    const loc = reqQuery.location
+    query = query.or(`city.ilike.%${loc}%,port.ilike.%${loc}%,country.ilike.%${loc}%`)
+  }
+
+  const types = reqQuery['types[]'] || reqQuery.types
+  if (types) {
+    const arr = Array.isArray(types) ? types : [types]
+    if (arr.length) query = query.in('type', arr)
+  }
+  if (reqQuery.capacity) query = query.gte('capacity', parseInt(reqQuery.capacity))
+  if (reqQuery.minPrice) query = query.gte('price_per_day', parseFloat(reqQuery.minPrice))
+  if (reqQuery.maxPrice) query = query.lte('price_per_day', parseFloat(reqQuery.maxPrice))
+  if (reqQuery.withSkipper !== undefined) query = query.eq('with_skipper', reqQuery.withSkipper === 'true')
+
+  return query
+}
+
 // ─── Format réponse (snake_case BDD → camelCase frontend) ──
 function formatBoat(b, withOwner = false) {
   const base = {
@@ -72,18 +113,7 @@ router.get('/', optionalAuth, async (req, res) => {
     .select('*, users(id, first_name, last_name, avatar)', { count: 'exact' })
     .eq('status', 'active')
 
-  if (req.query.location) {
-    query = query.or(`city.ilike.%${req.query.location}%,port.ilike.%${req.query.location}%`)
-  }
-  const types = req.query['types[]'] || req.query.types
-  if (types) {
-    const arr = Array.isArray(types) ? types : [types]
-    if (arr.length) query = query.in('type', arr)
-  }
-  if (req.query.capacity) query = query.gte('capacity', parseInt(req.query.capacity))
-  if (req.query.minPrice)  query = query.gte('price_per_day', parseFloat(req.query.minPrice))
-  if (req.query.maxPrice)  query = query.lte('price_per_day', parseFloat(req.query.maxPrice))
-  if (req.query.withSkipper !== undefined) query = query.eq('with_skipper', req.query.withSkipper === 'true')
+  query = applyBoatSearchFilters(query, req.query)
 
   const sort = req.query.sort
   if (sort === 'price_asc')   query = query.order('price_per_day', { ascending: true })
@@ -123,6 +153,29 @@ router.get('/my', authenticate, async (req, res) => {
   return res.json({ data: (data || []).map(b => formatBoat(b, true)), total: count || 0, page, limit })
 })
 
+// ─── GET /boats/destinations/summary ───────────────────────
+router.get('/destinations/summary', async (req, res) => {
+  const { data, error } = await supabase
+    .from('boats')
+    .select('country, city, port, images')
+    .eq('status', 'active')
+
+  if (error) return res.status(500).json({ message: error.message })
+
+  const byCountry = new Map()
+  for (const boat of data || []) {
+    const country = (boat.country || 'France').trim()
+    if (!byCountry.has(country)) {
+      byCountry.set(country, { country, count: 0, image: null })
+    }
+    const entry = byCountry.get(country)
+    entry.count += 1
+    if (!entry.image && boat.images?.[0]) entry.image = boat.images[0]
+  }
+
+  return res.json({ countries: [...byCountry.values()] })
+})
+
 // ─── GET /boats/:id ────────────────────────────────────────
 router.get('/:id', optionalAuth, async (req, res) => {
   const { data: boat, error } = await supabase
@@ -150,7 +203,7 @@ router.get('/:id', optionalAuth, async (req, res) => {
   return res.json({ ...formatBoat(boat, true), reviews: reviews || [] })
 })
 
-// ─── POST /boats ───────────────────────────────────────────
+// ─── POST /boats ───
 router.post('/', authenticate, requireRole('OWNER', 'ADMIN'), async (req, res) => {
   const {
     title, description, type, manufacturer, model, year, length,

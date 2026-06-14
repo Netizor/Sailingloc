@@ -67,7 +67,7 @@ const ResolveDisputeModal: React.FC<ResolveModalProps> = ({ booking, onClose, on
   }
 
   return (
-    /* Overlay — désactivé pendant le traitement pour éviter une fermeture accidentelle */
+    /* Overlay - désactivé pendant le traitement pour éviter une fermeture accidentelle */
     <div
       role="dialog"
       aria-modal="true"
@@ -99,10 +99,10 @@ const ResolveDisputeModal: React.FC<ResolveModalProps> = ({ booking, onClose, on
         {/* Résumé réservation */}
         <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 mb-5 text-sm text-gray-600 dark:text-gray-300">
           <p className="font-medium text-gray-800 dark:text-gray-200 mb-0.5">
-            {booking.boat?.title ?? '—'}
+            {booking.boat?.title ?? ''}
           </p>
           <p>
-            {booking.renter?.firstName} {booking.renter?.lastName} —{' '}
+            {booking.renter?.firstName} {booking.renter?.lastName},{' '}
             {formatDate(booking.startDate)} au {formatDate(booking.endDate)}
           </p>
           <p className="font-semibold text-gray-900 dark:text-gray-100 mt-1">
@@ -325,7 +325,7 @@ const AdminBookings: React.FC = () => {
                           </div>
                           <div className="max-w-[160px]">
                             <p className="font-medium text-gray-900 dark:text-gray-100 truncate">
-                              {booking.boat?.title ?? '—'}
+                              {booking.boat?.title ?? ''}
                             </p>
                           </div>
                         </div>
@@ -343,7 +343,7 @@ const AdminBookings: React.FC = () => {
 
                       {/* Dates */}
                       <td className="px-5 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                        {formatDate(booking.startDate)} — {formatDate(booking.endDate)}
+                        {formatDate(booking.startDate)} au {formatDate(booking.endDate)}
                       </td>
 
                       {/* Jours */}
@@ -411,7 +411,7 @@ const AdminBookings: React.FC = () => {
               <p><span className="text-gray-500">Bateau :</span> <strong>{selectedBooking.boat?.title}</strong></p>
               <p><span className="text-gray-500">Locataire :</span> {selectedBooking.renter?.firstName} {selectedBooking.renter?.lastName}</p>
               <p><span className="text-gray-500">Propriétaire :</span> {selectedBooking.owner?.firstName} {selectedBooking.owner?.lastName}</p>
-              <p><span className="text-gray-500">Dates :</span> {formatDate(selectedBooking.startDate)} — {formatDate(selectedBooking.endDate)}</p>
+              <p><span className="text-gray-500">Dates :</span> {formatDate(selectedBooking.startDate)} au {formatDate(selectedBooking.endDate)}</p>
               <p><span className="text-gray-500">Montant :</span> <strong>{formatPrice(selectedBooking.totalAmount)}</strong></p>
               <p><span className="text-gray-500">Statut :</span> <BookingStatusBadge status={selectedBooking.status} /></p>
             </div>

@@ -108,7 +108,7 @@
       "rgpd": "RGPD",
       "cookies": "Politique de cookies"
     },
-    "copyright": "Projet étudiant DSP4 O24 — Aucune transaction réelle"
+    "copyright": "Projet étudiant DSP4 O24. Aucune transaction réelle"
   },
   "home": {
     "badge": "Location de bateaux entre particuliers",
@@ -223,7 +223,7 @@
       "errorEmail": "L'email est requis",
       "errorEmailInvalid": "Email invalide",
       "errorPassword": "Le mot de passe est requis",
-      "demo": "Projet étudiant DSP4 O24 — Aucune transaction réelle"
+      "demo": "Projet étudiant DSP4 O24. Aucune transaction réelle"
     },
     "forgotPassword": {
       "title": "Mot de passe oublié",
@@ -270,7 +270,7 @@
       "emailPlaceholder": "vous@exemple.fr",
       "phone": "Téléphone",
       "phonePlaceholder": "+33 6 12 34 56 78",
-      "phoneHint": "Optionnel — utile pour les propriétaires",
+      "phoneHint": "Optionnel, utile pour les propriétaires",
       "password": "Mot de passe",
       "passwordPlaceholder": "Minimum 12 caractères",
       "confirmPassword": "Confirmer le mot de passe",
@@ -305,7 +305,7 @@
       "errorConfirmPassword": "Confirmez le mot de passe",
       "errorPasswordMatch": "Les mots de passe ne correspondent pas",
       "errorTerms": "Vous devez accepter les conditions",
-      "demo": "Projet étudiant DSP4 O24 — Aucune transaction réelle"
+      "demo": "Projet étudiant DSP4 O24. Aucune transaction réelle"
     }
   },
   "boat": {
@@ -439,7 +439,7 @@
     "approved": "Identité vérifiée",
     "rejected": "Vérification refusée",
     "submit": "Soumettre votre pièce d'identité",
-    "formats": "Formats acceptés : JPEG, PNG, PDF — max. 10 Mo par fichier.",
+    "formats": "Formats acceptés : JPEG, PNG, PDF (max. 10 Mo par fichier).",
     "front": "Recto (face avant)",
     "back": "Verso (face arrière)",
     "sendDocs": "Envoyer les documents",
@@ -459,9 +459,14 @@
   },
   "destinations": {
     "title": "Destinations",
-    "subtitle": "Explorez les plus beaux ports de France et de Méditerranée.",
+    "heroTitle": "Explorez nos destinations",
+    "subtitle": "Des horizons infinis, du Méditerranée aux Caraïbes, d'Asie à l'Océanie.",
     "boats": "{{count}} bateau disponible",
     "boats_other": "{{count}} bateaux disponibles",
+    "noBoats": "Aucun bateau disponible pour {{name}} pour le moment.",
+    "emptyRegion": "Aucune destination dans cette région pour le moment.",
+    "seasonPick": "La sélection de la saison",
+    "seeSelection": "Voir la sélection",
     "explore": "Explorer",
     "backToDestinations": "Retour aux destinations"
   },

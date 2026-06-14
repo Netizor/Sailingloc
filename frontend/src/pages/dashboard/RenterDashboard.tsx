@@ -194,7 +194,7 @@ const RenterDashboard: React.FC = () => {
                         {formatDateRangeShort(booking.startDate, booking.endDate)}
                       </td>
                       <td className="px-5 py-4 text-gray-600 dark:text-gray-400">
-                        {booking.boat?.city ?? booking.boat?.port ?? '—'}
+                        {booking.boat?.city ?? booking.boat?.port ?? ''}
                       </td>
                       <td className="px-5 py-4">
                         <span
@@ -232,7 +232,7 @@ const NextTripCard: React.FC<{
 }> = ({ booking, onDetails }) => {
   const navigate = useNavigate()
   const days = daysBetween(booking.startDate, booking.endDate) || booking.totalDays || 1
-  const location = [booking.boat?.city, booking.boat?.country].filter(Boolean).join(', ') || '—'
+  const location = [booking.boat?.city, booking.boat?.country].filter(Boolean).join(', ') || ''
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col md:flex-row">
@@ -278,7 +278,7 @@ const NextTripCard: React.FC<{
                 Passagers
               </p>
               <p className="text-sm font-semibold">
-                {booking.boat?.capacity ?? '—'} Personnes
+                {booking.boat?.capacity ?? ''} Personnes
               </p>
             </div>
           </div>

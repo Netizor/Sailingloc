@@ -159,7 +159,7 @@ const AdminBoats: React.FC = () => {
                           {boat.owner?.firstName} {boat.owner?.lastName}
                         </td>
 
-                        <td className="px-5 py-4 text-gray-500 dark:text-gray-400">{boat.city ?? '—'}</td>
+                        <td className="px-5 py-4 text-gray-500 dark:text-gray-400">{boat.city ?? ''}</td>
 
                         <td className="px-5 py-4 font-medium text-gray-900 dark:text-gray-100">
                           {formatPrice(boat.dailyRate)}
@@ -173,9 +173,7 @@ const AdminBoats: React.FC = () => {
                                 {boat.rating.toFixed(1)}
                               </span>
                             </div>
-                          ) : (
-                            <span className="text-gray-300 dark:text-gray-600 text-xs">—</span>
-                          )}
+                          ) : null}
                         </td>
 
                         <td className="px-5 py-4">

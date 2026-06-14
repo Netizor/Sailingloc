@@ -16,7 +16,7 @@ import { usePageTitle } from '../hooks/usePageTitle'
 
 // ─── Étapes pour mettre un bateau en location ─────────────────────────────────
 
-// #1 — Référence de composant au lieu de JSX pré-rendu dans les données
+// #1 - Référence de composant au lieu de JSX pré-rendu dans les données
 interface Step {
   number: string
   icon: LucideIcon
@@ -77,7 +77,7 @@ const DAILY_RATES: Record<string, number> = {
   Catamaran: 600,
 }
 
-// #10 — Constantes nommées pour les valeurs magiques du calcul
+// #10 - Constantes nommées pour les valeurs magiques du calcul
 /** Taux de commission prélevé par SailingLoc sur chaque location */
 const PLATFORM_COMMISSION = 0.15
 /** Durée indicative de la saison nautique (en mois) */
@@ -86,20 +86,20 @@ const SEASON_MONTHS = 10
 // ─── Page Guide propriétaire ──────────────────────────────────────────────────
 
 const GuideProprietaire: React.FC = () => {
-  // #6 — Titre de l'onglet pour le SEO et l'accessibilité
+  // #6 - Titre de l'onglet pour le SEO et l'accessibilité
   usePageTitle('Guide propriétaire')
 
   const [boatType, setBoatType] = useState('Voilier')
   const [daysPerMonth, setDaysPerMonth] = useState(8)
 
   const dailyRate = DAILY_RATES[boatType] ?? 350
-  // #10 — Utilisation des constantes nommées
+  // #10 - Utilisation des constantes nommées
   const monthlyNet = Math.round(dailyRate * daysPerMonth * (1 - PLATFORM_COMMISSION))
   const yearlyNet = monthlyNet * SEASON_MONTHS
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
-      {/* #2 — Hero extrait en composant partagé PageHero */}
+      {/* #2 - Hero extrait en composant partagé PageHero */}
       <PageHero
         icon={TrendingUp}
         badge="Guide propriétaire"
@@ -111,7 +111,7 @@ const GuideProprietaire: React.FC = () => {
             to="/inscription"
             className="inline-flex items-center gap-2 bg-white text-ocean-800 font-semibold px-7 py-3 rounded-xl hover:bg-ocean-50 transition-colors text-sm"
           >
-            Devenir propriétaire — c'est gratuit
+            Devenir propriétaire - c'est gratuit
           </Link>
         </div>
       </PageHero>
@@ -131,7 +131,7 @@ const GuideProprietaire: React.FC = () => {
                 <div className="shrink-0 flex flex-col items-center gap-2">
                   <span className="text-2xl font-black text-ocean-200 dark:text-ocean-700">{step.number}</span>
                   <div className="bg-ocean-50 dark:bg-ocean-900/30 p-2 rounded-xl">
-                    {/* #1 — Instanciation à la volée depuis la référence de composant */}
+                    {/* #1 - Instanciation à la volée depuis la référence de composant */}
                     <step.icon size={22} className="text-ocean-600 dark:text-ocean-400" />
                   </div>
                 </div>
@@ -157,7 +157,7 @@ const GuideProprietaire: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
               {/* Type de bateau */}
               <div>
-                {/* #5 — htmlFor/id pour l'accessibilité WCAG 2.1 */}
+                {/* #5 - htmlFor/id pour l'accessibilité WCAG 2.1 */}
                 <label htmlFor="boat-type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                   Type de bateau
                 </label>
@@ -177,7 +177,7 @@ const GuideProprietaire: React.FC = () => {
 
               {/* Jours par mois */}
               <div>
-                {/* #5 — htmlFor/id + attributs ARIA sur le range */}
+                {/* #5 - htmlFor/id + attributs ARIA sur le range */}
                 <label htmlFor="days-per-month" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                   Jours loués par mois : <span className="text-ocean-700 dark:text-ocean-400 font-bold">{daysPerMonth}</span>
                 </label>

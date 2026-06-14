@@ -21,7 +21,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-import { formatDate, formatPrice } from '../../lib/utils'
+import { formatDate, formatPrice, EMPTY_VALUE } from '../../lib/utils'
 import { adminApi } from '../../api/admin.api'
 import BookingStatusBadge from '../../components/bookings/BookingStatusBadge'
 import Spinner from '../../components/ui/Spinner'
@@ -42,42 +42,42 @@ const AdminDashboard: React.FC = () => {
   const statCards = [
     {
       label: 'Utilisateurs',
-      value: stats?.totalUsers ?? '—',
+      value: stats?.totalUsers ?? 0,
       icon: <Users size={22} />,
       color: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
       to: '/admin/utilisateurs',
     },
     {
       label: 'Bateaux actifs',
-      value: stats?.activeBoats ?? stats?.totalBoats ?? '—',
+      value: stats?.activeBoats ?? stats?.totalBoats ?? 0,
       icon: <Ship size={22} />,
       color: 'bg-ocean-50 text-ocean-600 dark:bg-ocean-900/30 dark:text-ocean-400',
       to: '/admin/bateaux',
     },
     {
       label: 'Réservations',
-      value: stats?.totalBookings ?? '—',
+      value: stats?.totalBookings ?? 0,
       icon: <CalendarCheck size={22} />,
       color: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
       to: '/admin/reservations',
     },
     {
       label: 'Revenus plateforme',
-      value: stats?.platformRevenue != null ? formatPrice(stats.platformRevenue) : '—',
+      value: stats?.platformRevenue != null ? formatPrice(stats.platformRevenue) : EMPTY_VALUE,
       icon: <Euro size={22} />,
       color: 'bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400',
       to: '/admin/reservations',
     },
     {
       label: 'Volume total',
-      value: stats?.totalRevenue != null ? formatPrice(stats.totalRevenue) : '—',
+      value: stats?.totalRevenue != null ? formatPrice(stats.totalRevenue) : EMPTY_VALUE,
       icon: <TrendingUp size={22} />,
       color: 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
       to: '/admin/reservations',
     },
     {
       label: 'Avis',
-      value: stats?.pendingReviews ?? '—',
+      value: stats?.pendingReviews ?? 0,
       icon: <Star size={22} />,
       color: 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
       to: '/admin/avis',
@@ -126,7 +126,7 @@ const AdminDashboard: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <section>
             <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">
-              Revenus par mois — {new Date().getFullYear()}
+              Revenus par mois ({new Date().getFullYear()})
             </h2>
             <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm px-4 pt-5 pb-2">
               <ResponsiveContainer width="100%" height={220}>
@@ -149,7 +149,7 @@ const AdminDashboard: React.FC = () => {
 
           <section>
             <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">
-              Réservations par mois — {new Date().getFullYear()}
+              Réservations par mois ({new Date().getFullYear()})
             </h2>
             <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm px-4 pt-5 pb-2">
               <ResponsiveContainer width="100%" height={220}>
@@ -194,7 +194,7 @@ const AdminDashboard: React.FC = () => {
                     <tr key={booking.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
                       <td className="px-5 py-3.5 font-medium text-gray-900 dark:text-gray-100">{booking.boat?.title ?? 'N/A'}</td>
                       <td className="px-5 py-3.5 text-gray-600 dark:text-gray-400">{booking.renter?.firstName} {booking.renter?.lastName}</td>
-                      <td className="px-5 py-3.5 text-gray-500">{formatDate(booking.startDate)} — {formatDate(booking.endDate)}</td>
+                      <td className="px-5 py-3.5 text-gray-500">{formatDate(booking.startDate)} au {formatDate(booking.endDate)}</td>
                       <td className="px-5 py-3.5 font-medium">{formatPrice(booking.totalAmount ?? 0)}</td>
                       <td className="px-5 py-3.5"><BookingStatusBadge status={booking.status} /></td>
                     </tr>

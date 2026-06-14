@@ -74,7 +74,7 @@ const OwnerDashboard: React.FC = () => {
           <p className="text-gray-500 dark:text-gray-400 mt-1">Bonjour, {user?.firstName} !</p>
         </div>
 
-        {/* CTA Ajouter un bateau — mis en avant */}
+        {/* CTA Ajouter un bateau - mis en avant */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-teal to-brand-navy p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 shadow-lg shadow-brand-teal/20">
           <div className="relative z-10">
             <p className="text-white/70 text-xs font-semibold tracking-wider uppercase mb-1">
@@ -226,7 +226,7 @@ const OwnerDashboard: React.FC = () => {
         </div>
     </div>
 
-    {/* Onboarding — affiché une seule fois après l'inscription */}
+    {/* Onboarding - affiché une seule fois après l'inscription */}
     {showOnboarding && (
       <OnboardingModal onClose={() => setShowOnboarding(false)} />
     )}
@@ -264,7 +264,7 @@ const PendingBookingCard: React.FC<{
         <p className="font-medium text-gray-900 dark:text-gray-100 text-sm">{booking.boat?.title ?? 'Bateau'}</p>
         <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1 mt-0.5">
           <Clock size={11} />
-          {formatDate(booking.startDate)} — {formatDate(booking.endDate)}
+          {formatDate(booking.startDate)} au {formatDate(booking.endDate)}
         </p>
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           Locataire : {booking.renter?.firstName} {booking.renter?.lastName}

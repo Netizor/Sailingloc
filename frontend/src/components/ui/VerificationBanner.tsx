@@ -38,8 +38,8 @@ const VerificationBanner: React.FC = () => {
           <div className="max-w-7xl mx-auto flex items-center gap-3">
             <MailWarning size={16} className="text-amber-600 dark:text-amber-400 flex-shrink-0" />
             <p className="flex-1 text-sm text-amber-800 dark:text-amber-300">
-              <span className="font-semibold">Vérifiez votre email</span>
-              {' '}— Consultez votre boite mail et cliquez sur le lien pour débloquer toutes les fonctionnalités.
+              <span className="font-semibold">Vérifiez votre email.</span>
+              {' '}Consultez votre boite mail et cliquez sur le lien pour débloquer toutes les fonctionnalités.
             </p>
             <button
               onClick={() => resendMutation.mutate()}
@@ -65,8 +65,8 @@ const VerificationBanner: React.FC = () => {
           <div className="max-w-7xl mx-auto flex items-center gap-3">
             <Phone size={16} className="text-blue-600 dark:text-blue-400 flex-shrink-0" />
             <p className="flex-1 text-sm text-blue-800 dark:text-blue-300">
-              <span className="font-semibold">Téléphone requis</span>
-              {' '}— En tant que propriétaire, votre numéro de téléphone est obligatoire pour publier un bateau.
+              <span className="font-semibold">Téléphone requis.</span>
+              {' '}En tant que propriétaire, votre numéro de téléphone est obligatoire pour publier un bateau.
             </p>
             <Link
               to="/mon-espace/profil"

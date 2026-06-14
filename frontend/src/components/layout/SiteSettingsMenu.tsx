@@ -20,7 +20,7 @@ const SiteSettingsMenu: React.FC<SiteSettingsMenuProps> = ({ variant = 'header' 
   }
 
   const colorBlindButtonClass = cn(
-    'p-2 rounded-lg transition-colors',
+    'p-1.5 rounded-lg transition-colors',
     isYellowMode
       ? 'text-black bg-[#FFFF00] ring-2 ring-black'
       : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200'
@@ -70,7 +70,7 @@ const SiteSettingsMenu: React.FC<SiteSettingsMenuProps> = ({ variant = 'header' 
   }
 
   return (
-    <div className="flex items-center gap-1 sm:gap-2">
+    <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
       <div
         className="flex items-center rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden"
         role="group"
@@ -108,7 +108,7 @@ const SiteSettingsMenu: React.FC<SiteSettingsMenuProps> = ({ variant = 'header' 
         type="button"
         onClick={toggleTheme}
         aria-label={theme === 'dark' ? t('nav.lightMode') : t('nav.darkMode')}
-        className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+        className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
       >
         {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
       </button>

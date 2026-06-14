@@ -50,7 +50,7 @@ const getPriceIcon = (dailyRate: number, dark = false): L.DivIcon => {
   return icon
 }
 
-// ─── MapUpdater — recentre la carte quand les résultats changent ──────────────
+// ─── MapUpdater - recentre la carte quand les résultats changent ──────────────
 // MapContainer ne relit pas center/zoom après le premier rendu (react-leaflet v4).
 // Ce composant enfant force la mise à jour via l'API Leaflet directement.
 const MapUpdater: React.FC<{ center: [number, number]; zoom: number }> = ({
@@ -74,7 +74,7 @@ interface MapViewProps {
   fullHeight?: boolean
 }
 
-// Centre de la France métropolitaine — fallback si aucun bateau géolocalisé
+// Centre de la France métropolitaine - fallback si aucun bateau géolocalisé
 const DEFAULT_CENTER: [number, number] = [46.5, 2.5]
 const DEFAULT_ZOOM = 6
 
@@ -179,7 +179,7 @@ const PopupContent: React.FC<{ boat: Boat }> = ({ boat }) => (
       {BOAT_TYPE_LABELS[boat.type] ?? boat.type} · {boat.port}
     </p>
 
-    {/* Prix — formatPrice pour la cohérence avec le reste de l'UI */}
+    {/* Prix - formatPrice pour la cohérence avec le reste de l'UI */}
     <p style={{ fontWeight: 700, fontSize: '16px', color: '#f97316', marginBottom: '8px' }}>
       {formatPrice(boat.dailyRate)}
       <span style={{ fontWeight: 400, fontSize: '12px', color: '#9ca3af' }}> /jour</span>

@@ -20,6 +20,8 @@ import Badge from '../../components/ui/Badge'
 import Stars from '../../components/ui/Stars'
 import Spinner from '../../components/ui/Spinner'
 import type { BadgeVariant } from '../../components/ui/Badge'
+import { useAuthStore } from '../../store/auth.store'
+import { UserRole } from '../../types'
 
 // Clés alignées sur les valeurs renvoyées par le backend (BoatStatus)
 const statusConfig: Record<string, { label: string; variant: BadgeVariant }> = {
@@ -33,7 +35,9 @@ const statusConfig: Record<string, { label: string; variant: BadgeVariant }> = {
 
 const MyBoats: React.FC = () => {
   const navigate = useNavigate()
+  const { user } = useAuthStore()
   const { canManageBoat, issues } = useProfileCompletion()
+  const isAdmin = user?.role === UserRole.ADMIN
 
   // Message synthétique pour le tooltip des boutons bloqués
   const blockedTooltip = issues.map((i) => i.title).join(' · ')
@@ -88,19 +92,27 @@ const MyBoats: React.FC = () => {
             <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
               Aucun bateau pour le moment
             </h2>
-            <p className="text-gray-400 dark:text-gray-500 text-sm max-w-xs mx-auto mb-8">
-              Publiez votre premier bateau et commencez à générer des revenus dès aujourd&apos;hui.
+            <p className="text-gray-400 dark:text-gray-500 text-sm max-w-md mx-auto mb-6">
+              {isAdmin
+                ? 'Cette page liste uniquement les bateaux dont vous êtes propriétaire. Les annonces créées par d’autres utilisateurs sont visibles dans l’espace administration.'
+                : 'Publiez votre premier bateau et commencez à générer des revenus dès aujourd&apos;hui.'}
             </p>
-            <DisabledTooltip disabled={!canManageBoat} tooltip={blockedTooltip}>
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={() => navigate('/proprietaire/bateaux/nouveau')}
-                leftIcon={<Plus size={18} />}
-              >
-                Ajouter mon premier bateau
+            {isAdmin ? (
+              <Button variant="primary" size="lg" onClick={() => navigate('/admin/bateaux')}>
+                Voir tous les bateaux (admin)
               </Button>
-            </DisabledTooltip>
+            ) : (
+              <DisabledTooltip disabled={!canManageBoat} tooltip={blockedTooltip}>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  onClick={() => navigate('/proprietaire/bateaux/nouveau')}
+                  leftIcon={<Plus size={18} />}
+                >
+                  Ajouter mon premier bateau
+                </Button>
+              </DisabledTooltip>
+            )}
           </div>
         ) : (
           <div className="space-y-4">

@@ -28,7 +28,7 @@ export const createReview = async (reviewData: ReviewCreateData): Promise<Review
 }
 
 /**
- * Admin — liste paginée de tous les avis avec filtre optionnel sur moderationStatus.
+ * Admin - liste paginée de tous les avis avec filtre optionnel sur moderationStatus.
  */
 export const adminListReviews = async (
   params: { page?: number; limit?: number; status?: ReviewModerationStatus } = {},
@@ -38,7 +38,7 @@ export const adminListReviews = async (
 }
 
 /**
- * Admin — approuve ou rejette un avis.
+ * Admin - approuve ou rejette un avis.
  */
 export const adminUpdateReview = async (
   id: number,

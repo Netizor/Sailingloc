@@ -8,11 +8,11 @@ import { usePageTitle } from '../../hooks/usePageTitle'
 // ─── Page Mentions légales ─────────────────────────────────────────────────────
 
 const MentionsLegales: React.FC = () => {
-  // #6 — Titre de l'onglet pour le SEO et l'accessibilité
+  // #6 - Titre de l'onglet pour le SEO et l'accessibilité
   usePageTitle('Mentions légales')
 
   return (
-    // #7 — badge <span> (cohérence via PageHero)  #8 — boilerplate hero + carte extrait dans LegalPageLayout
+    // #7 - badge <span> (cohérence via PageHero)  #8 - boilerplate hero + carte extrait dans LegalPageLayout
     <LegalPageLayout
       icon={Scale}
       badge="Légal"
@@ -36,7 +36,7 @@ const MentionsLegales: React.FC = () => {
       <LegalSection title="Hébergement">
         <p>
           Le site est hébergé par <strong>Vercel Inc.</strong>, 340 Pine Street, Suite 900,
-          San Francisco, CA 94104, USA — pour le frontend.
+          San Francisco, CA 94104, USA - pour le frontend.
         </p>
         <p>
           Le backend est hébergé par <strong>Railway Corp.</strong>, 340 S Lemon Ave #4133,
@@ -72,7 +72,7 @@ const MentionsLegales: React.FC = () => {
         </p>
       </LegalSection>
 
-      <LegalSection title="Protection des données — CNIL">
+      <LegalSection title="Protection des données - CNIL">
         <p>
           Conformément à la loi n° 78-17 du 6 janvier 1978 relative à l'informatique, aux fichiers
           et aux libertés (loi Informatique et Libertés) et au Règlement général sur la protection

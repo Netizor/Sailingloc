@@ -179,7 +179,7 @@ const KycVerification: React.FC = () => {
                 Soumettre votre pièce d'identité
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Formats acceptés : JPEG, PNG, PDF — max. 10 Mo par fichier.
+                Formats acceptés : JPEG, PNG, PDF - max. 10 Mo par fichier.
                 Pièces acceptées : carte nationale d'identité, passeport, permis de conduire.
               </p>
 

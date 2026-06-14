@@ -5,6 +5,9 @@ import i18n from '../i18n'
 
 export const cn = (...inputs: ClassValue[]) => clsx(inputs)
 
+/** Valeur vide affichée quand une donnée est absente (sans tiret). */
+export const EMPTY_VALUE = ''
+
 const getDateLocale = () => (i18n.language?.startsWith('en') ? enUS : fr)
 const getNumberLocale = () => (i18n.language?.startsWith('en') ? 'en-GB' : 'fr-FR')
 
@@ -16,16 +19,18 @@ export const formatDateShort = (date: string | Date) =>
 
 export const formatDateRangeShort = (start: string | Date, end: string | Date) => {
   const locale = getDateLocale()
+  const sep = i18n.language?.startsWith('en') ? 'to' : 'au'
   const s = typeof start === 'string' ? parseISO(start) : start
   const e = typeof end === 'string' ? parseISO(end) : end
-  return `${format(s, 'd MMM', { locale })} — ${format(e, 'd MMM yyyy', { locale })}`
+  return `${format(s, 'd MMM', { locale })} ${sep} ${format(e, 'd MMM yyyy', { locale })}`
 }
 
 export const formatDateRangeDash = (start: string | Date, end: string | Date) => {
   const locale = getDateLocale()
+  const sep = i18n.language?.startsWith('en') ? 'to' : 'au'
   const s = typeof start === 'string' ? parseISO(start) : start
   const e = typeof end === 'string' ? parseISO(end) : end
-  return `${format(s, 'd MMM', { locale })} - ${format(e, 'd MMM yyyy', { locale })}`
+  return `${format(s, 'd MMM', { locale })} ${sep} ${format(e, 'd MMM yyyy', { locale })}`
 }
 
 export const daysUntil = (date: string | Date) => {

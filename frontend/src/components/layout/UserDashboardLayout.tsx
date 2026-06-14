@@ -7,6 +7,7 @@ import {
   MessageCircle,
   Settings,
   Plus,
+  Shield,
 } from 'lucide-react'
 import { useAuthStore } from '../../store/auth.store'
 import { getInitials, cn } from '../../lib/utils'
@@ -41,7 +42,8 @@ const UserDashboardLayout: React.FC = () => {
   const { user } = useAuthStore()
   const navigate = useNavigate()
   const { pathname } = useLocation()
-  const isOwner = user?.role === UserRole.OWNER || user?.role === UserRole.ADMIN
+  const isAdmin = user?.role === UserRole.ADMIN
+  const isOwner = user?.role === UserRole.OWNER || isAdmin
   const isOwnerSpace = pathname.startsWith('/proprietaire')
 
   const navItems = isOwnerSpace ? ownerNavItems : renterNavItems
@@ -113,9 +115,25 @@ const UserDashboardLayout: React.FC = () => {
                       {item.label}
                     </NavLink>
                   ))}
+                {isAdmin && (
+                  <NavLink
+                    to="/admin/bateaux"
+                    className={({ isActive }) =>
+                      cn(
+                        'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mt-2 border border-dashed',
+                        isActive
+                          ? 'bg-brand-navy text-white border-brand-navy'
+                          : 'text-brand-navy dark:text-gray-200 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50',
+                      )
+                    }
+                  >
+                    <Shield size={18} />
+                    Administration (tous les bateaux)
+                  </NavLink>
+                )}
               </nav>
 
-              {/* Ajouter un bateau — bouton mis en avant */}
+              {/* Ajouter un bateau - bouton mis en avant */}
               {isOwner && (
                 <button
                   onClick={() => navigate('/proprietaire/bateaux/nouveau')}

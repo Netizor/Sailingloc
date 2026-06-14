@@ -71,7 +71,7 @@ export const DEMO_BOATS: Boat[] = [
     id: 103,
     ownerId: 1,
     owner: { id: 1, firstName: 'Jean-Marc', lastName: 'T.', email: '', role: UserRole.OWNER, kycVerified: true, isActive: true, createdAt: '2019-03-15' },
-    title: "L'Horizon Bleu — Oceanis 51.1",
+    title: "L'Horizon Bleu - Oceanis 51.1",
     description: DEFAULT_DESCRIPTION,
     type: BoatType.SAILBOAT,
     length: 15.94,

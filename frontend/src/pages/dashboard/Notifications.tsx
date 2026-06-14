@@ -145,7 +145,7 @@ const Notifications: React.FC = () => {
         )}
       </div>
 
-      {/* D5 — Bandeau activation push notifications */}
+      {/* D5 - Bandeau activation push notifications */}
       {push.isSupported && push.permission !== 'denied' && (
         <div className="mb-5 flex items-center justify-between gap-4 bg-ocean-50 dark:bg-ocean-900/20 border border-ocean-100 dark:border-ocean-800 rounded-xl px-4 py-3">
           <div className="flex items-center gap-2.5">

@@ -7,11 +7,11 @@ import { usePageTitle } from '../../hooks/usePageTitle'
 // ─── Page RGPD ────────────────────────────────────────────────────────────────
 
 const Rgpd: React.FC = () => {
-  // #6 — Titre de l'onglet pour le SEO et l'accessibilité
+  // #6 - Titre de l'onglet pour le SEO et l'accessibilité
   usePageTitle('Politique RGPD')
 
   return (
-    // #7 — badge <span> (cohérence via PageHero)  #8 — boilerplate hero + carte extrait dans LegalPageLayout
+    // #7 - badge <span> (cohérence via PageHero)  #8 - boilerplate hero + carte extrait dans LegalPageLayout
     <LegalPageLayout
       icon={Shield}
       badge="Légal"
@@ -21,7 +21,7 @@ const Rgpd: React.FC = () => {
       <LegalSection title="1. Responsable du traitement">
         <p>
           Le responsable du traitement des données personnelles est <strong>SailingLoc SAS</strong>,
-          12 Quai de la Joliette, 13002 Marseille — contact@sailingloc.fr.
+          12 Quai de la Joliette, 13002 Marseille - contact@sailingloc.fr.
         </p>
         <p>
           Délégué à la Protection des Données (DPO) : dpo@sailingloc.fr.
@@ -98,24 +98,24 @@ const Rgpd: React.FC = () => {
         </p>
         <ul className="list-disc list-inside space-y-1 pl-2">
           <li>
-            <strong>Vercel Inc.</strong> (USA) — hébergement du frontend.
+            <strong>Vercel Inc.</strong> (USA) - hébergement du frontend.
             Transfert encadré par les Clauses Contractuelles Types (CCT) approuvées par la Commission
             européenne.
           </li>
           <li>
-            <strong>Railway Corp.</strong> (USA) — hébergement du backend.
+            <strong>Railway Corp.</strong> (USA) - hébergement du backend.
             Transfert encadré par les CCT.
           </li>
           <li>
-            <strong>Cloudinary Ltd.</strong> (USA) — stockage des photos (bateaux, avatars, documents KYC).
+            <strong>Cloudinary Ltd.</strong> (USA) - stockage des photos (bateaux, avatars, documents KYC).
             Transfert encadré par les CCT.
           </li>
           <li>
-            <strong>Stripe Inc.</strong> (USA) — traitement des paiements.
+            <strong>Stripe Inc.</strong> (USA) - traitement des paiements.
             Certifié PCI-DSS ; transfert encadré par les CCT.
           </li>
           <li>
-            <strong>Resend Inc.</strong> (USA) — envoi des e-mails transactionnels.
+            <strong>Resend Inc.</strong> (USA) - envoi des e-mails transactionnels.
             Transfert encadré par les CCT.
           </li>
         </ul>

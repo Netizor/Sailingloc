@@ -45,7 +45,7 @@ const AdminReviews: React.FC = () => {
           Gestion des avis
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          {data?.total ?? 0} avis — supprimez les contenus inappropriés
+          {data?.total ?? 0} avis. Supprimez les contenus inappropriés.
         </p>
       </div>
 

@@ -11,7 +11,7 @@ import { formatPrice } from '../../lib/utils'
 import Button from '../ui/Button'
 import { bookingsApi } from '../../api/bookings.api'
 
-// Issue #3 — avertissement explicite si la clé Stripe est absente en développement
+// Issue #3 - avertissement explicite si la clé Stripe est absente en développement
 const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY
 if (!stripePublicKey && import.meta.env.DEV) {
   console.error('[Stripe] VITE_STRIPE_PUBLIC_KEY est absent. Le paiement ne fonctionnera pas.')
@@ -120,7 +120,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           <div>
             <p className="font-semibold mb-0.5">Carte de test Stripe</p>
             <p>Numéro : <span className="font-mono">4242 4242 4242 4242</span></p>
-            <p>Date : <span className="font-mono">12/34</span> — CVC : <span className="font-mono">123</span></p>
+            <p>Date : <span className="font-mono">12/34</span> - CVC : <span className="font-mono">123</span></p>
           </div>
         </div>
       )}
@@ -183,7 +183,7 @@ const StripePaymentModal: React.FC<StripePaymentModalProps> = ({
   onSuccess,
   onClose,
 }) => {
-  // Issue #5/#6 — état de traitement remonté depuis PaymentForm pour bloquer la fermeture
+  // Issue #5/#6 - état de traitement remonté depuis PaymentForm pour bloquer la fermeture
   const [isProcessing, setIsProcessing] = useState(false)
 
   // Verrouillez le scroll pendant l'ouverture de la modale
@@ -192,7 +192,7 @@ const StripePaymentModal: React.FC<StripePaymentModalProps> = ({
     return () => { document.body.style.overflow = '' }
   }, [])
 
-  // Issue #6 — Escape bloqué pendant le traitement du paiement
+  // Issue #6 - Escape bloqué pendant le traitement du paiement
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !isProcessing) onClose()
@@ -212,7 +212,7 @@ const StripePaymentModal: React.FC<StripePaymentModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Issue #6 — overlay désactivé pendant le traitement */}
+      {/* Issue #6 - overlay désactivé pendant le traitement */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={isProcessing ? undefined : onClose}
@@ -235,7 +235,7 @@ const StripePaymentModal: React.FC<StripePaymentModalProps> = ({
             <CreditCard size={18} className="text-ocean-600 dark:text-ocean-400" />
             Paiement sécurisé
           </h2>
-          {/* Issue #6 — bouton fermer désactivé pendant le traitement */}
+          {/* Issue #6 - bouton fermer désactivé pendant le traitement */}
           <button
             onClick={isProcessing ? undefined : onClose}
             disabled={isProcessing}

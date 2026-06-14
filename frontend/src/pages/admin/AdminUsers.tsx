@@ -220,7 +220,7 @@ const AdminUsers: React.FC = () => {
               <p><span className="text-gray-500">Nom :</span> <strong>{userDetail.firstName} {userDetail.lastName}</strong></p>
               <p><span className="text-gray-500">Email :</span> {userDetail.email}</p>
               <p><span className="text-gray-500">Rôle :</span> {userDetail.role}</p>
-              <p><span className="text-gray-500">Téléphone :</span> {userDetail.phone ?? '—'}</p>
+              <p><span className="text-gray-500">Téléphone :</span> {userDetail.phone ?? ''}</p>
               <p><span className="text-gray-500">Statut :</span> {userDetail.isActive ? 'Actif' : 'Bloqué'}</p>
               <p><span className="text-gray-500">Inscrit le :</span> {formatDate(userDetail.createdAt)}</p>
               {(userDetail as AdminUser).boatsCount != null && (

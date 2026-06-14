@@ -44,7 +44,7 @@ const BoatDetailGallery: React.FC<BoatDetailGalleryProps> = ({ images, title }) 
         >
           <img
             src={galleryImages[0]}
-            alt={`${title} — photo principale`}
+            alt={`${title} - photo principale`}
             className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
           />
         </button>
@@ -57,7 +57,7 @@ const BoatDetailGallery: React.FC<BoatDetailGalleryProps> = ({ images, title }) 
           >
             <img
               src={galleryImages[1]}
-              alt={`${title} — photo 2`}
+              alt={`${title} - photo 2`}
               className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
             />
           </button>
@@ -71,7 +71,7 @@ const BoatDetailGallery: React.FC<BoatDetailGalleryProps> = ({ images, title }) 
           >
             <img
               src={galleryImages[2]}
-              alt={`${title} — photo 3`}
+              alt={`${title} - photo 3`}
               className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
             />
           </button>
@@ -82,7 +82,7 @@ const BoatDetailGallery: React.FC<BoatDetailGalleryProps> = ({ images, title }) 
             <button type="button" onClick={() => openLightbox(3)} className="w-full h-full">
               <img
                 src={galleryImages[3]}
-                alt={`${title} — photo 4`}
+                alt={`${title} - photo 4`}
                 className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
               />
             </button>
@@ -138,7 +138,7 @@ const Lightbox: React.FC<LightboxProps> = ({ images, title, activeIndex, onClose
       <div className="relative flex-1 flex items-center justify-center w-full px-16 py-8">
         <img
           src={images[activeIndex]}
-          alt={`${title} — ${activeIndex + 1}`}
+          alt={`${title} - ${activeIndex + 1}`}
           className="max-h-full max-w-full object-contain rounded-lg"
         />
         {images.length > 1 && (

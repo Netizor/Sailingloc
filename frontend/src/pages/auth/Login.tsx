@@ -43,7 +43,7 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
       toast.success(t('auth.login.welcome', { name: data.user.firstName }))
       navigate(from, { replace: true })
 
-      // Vérification HIBP en arrière-plan — non bloquante, silencieuse en cas d'erreur réseau.
+      // Vérification HIBP en arrière-plan - non bloquante, silencieuse en cas d'erreur réseau.
       // Le backend utilise k-anonymity : seuls 5 chars du hash SHA-1 sont envoyés à l'API HIBP.
       authApi.checkPasswordHibp(form.password).then(({ compromised, count }) => {
         if (compromised) {
@@ -52,7 +52,7 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
             { duration: 10000, id: 'hibp-warning' },
           )
         }
-      }).catch(() => { /* silencieux — ne jamais bloquer la session */ })
+      }).catch(() => { /* silencieux - ne jamais bloquer la session */ })
     },
     onError: (err: any) => {
       const message = err?.response?.data?.message ?? t('auth.login.errorCredentials')

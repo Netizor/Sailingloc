@@ -63,7 +63,7 @@ export const useAuthStore = create<AuthState>()(
         // Nettoyage des flags de session
         localStorage.removeItem(REMEMBER_KEY)
         sessionStorage.removeItem(SESSION_FLAG)
-        // RGPD — suppression des données comportementales stockées localement à la déconnexion
+        // RGPD - suppression des données comportementales stockées localement à la déconnexion
         localStorage.removeItem('sailingloc_saved_searches')
         localStorage.removeItem('sailingloc_owner_onboarded')
         set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false })

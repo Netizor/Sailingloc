@@ -237,7 +237,7 @@ const BookingDetail: React.FC = () => {
                     {booking.owner.firstName} {booking.owner.lastName}
                   </p>
                 </div>
-                {/* A6 — Lien vers la messagerie */}
+                {/* A6 - Lien vers la messagerie */}
                 <Link
                   to={`/mon-espace/messages?to=${booking.ownerId}`}
                   className="flex items-center gap-1.5 text-sm text-ocean-700 dark:text-ocean-400 hover:text-ocean-900 font-medium transition-colors"
