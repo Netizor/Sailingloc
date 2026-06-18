@@ -113,10 +113,22 @@ export const getDestinationSummary = async (): Promise<DestinationCountrySummary
   return data.countries
 }
 
+export interface LocationSuggestion {
+  label: string
+  type: 'city' | 'port' | 'country'
+}
+
+export const autocompleteLocation = async (q: string): Promise<LocationSuggestion[]> => {
+  if (q.trim().length < 2) return []
+  const { data } = await api.get<{ suggestions: LocationSuggestion[] }>(`/boats/autocomplete?q=${encodeURIComponent(q)}`)
+  return data.suggestions ?? []
+}
+
 export const boatsApi = {
   list: listBoats,
   search: listBoats,
   getDestinationSummary,
+  autocomplete: autocompleteLocation,
   getById: getBoat,
   getMyBoats,
   create: createBoat,

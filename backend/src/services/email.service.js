@@ -58,6 +58,45 @@ export async function sendPasswordReset(to, firstName, token) {
   })
 }
 
+export async function sendCancellationEmail({
+  to, firstName, boatTitle, startDate, endDate, reason, refundAmount, cancelledByOwner, isRenter,
+}) {
+  let intro, refundMsg
+
+  if (isRenter) {
+    intro = cancelledByOwner
+      ? 'Le propriétaire a annulé votre réservation.'
+      : 'Votre annulation a bien été prise en compte.'
+    refundMsg = refundAmount > 0
+      ? `<p><strong>Remboursement :</strong> ${refundAmount.toFixed(2)} € seront remboursés sous 5 à 10 jours ouvrés.</p>`
+      : `<p>Selon nos conditions d'annulation, aucun remboursement n'est applicable pour cette date.</p>`
+  } else {
+    intro = cancelledByOwner
+      ? 'Vous avez annulé la réservation suivante. Le locataire sera intégralement remboursé.'
+      : 'Un locataire a annulé sa réservation.'
+    refundMsg = refundAmount > 0 && cancelledByOwner
+      ? `<p><strong>Remboursement locataire :</strong> ${refundAmount.toFixed(2)} € ont été remboursés automatiquement.</p>`
+      : ''
+  }
+
+  await sendMail({
+    to,
+    subject: 'Réservation annulée – SailingLoc',
+    html: `
+      <h2>Bonjour ${firstName},</h2>
+      <p>${intro}</p>
+      <ul>
+        <li><strong>Bateau :</strong> ${boatTitle}</li>
+        <li><strong>Du :</strong> ${startDate}</li>
+        <li><strong>Au :</strong> ${endDate}</li>
+        <li><strong>Motif :</strong> ${reason}</li>
+      </ul>
+      ${refundMsg}
+      <p><a href="${FRONTEND_URL}/mon-espace/reservations" style="background:#0ea5e9;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;">Mes réservations</a></p>
+    `,
+  })
+}
+
 export async function sendBookingNotification(to, firstName, { type, boatTitle, startDate, endDate }) {
   const messages = {
     confirmed: { subject: 'Réservation confirmée – SailingLoc', intro: 'Votre réservation a été confirmée !' },

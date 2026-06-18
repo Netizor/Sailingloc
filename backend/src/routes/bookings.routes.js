@@ -2,9 +2,14 @@ import { Router } from 'express'
 import Stripe from 'stripe'
 import supabase from '../lib/supabase.js'
 import { authenticate, requireRole } from '../middleware/auth.middleware.js'
+import { sendCancellationEmail } from '../services/email.service.js'
 
 const router = Router()
-const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null
+// Valide uniquement les vraies clés (sk_test_XXX ou sk_live_XXX avec ≥20 chars)
+const stripeKey = process.env.STRIPE_SECRET_KEY
+const stripe = stripeKey && /^sk_(test|live)_[a-zA-Z0-9]{20,}$/.test(stripeKey)
+  ? new Stripe(stripeKey)
+  : null
 const PLATFORM_FEE_PERCENT = parseFloat(process.env.STRIPE_PLATFORM_FEE_PERCENT || '10')
 
 function formatBooking(b) {
@@ -173,37 +178,111 @@ router.patch('/:id/status', authenticate, async (req, res) => {
 })
 
 // ─── POST /bookings/:id/cancel ─────────────────────────────
-router.post('/:id/cancel', authenticate, async (req, res) => {
-  const { cancellationReason } = req.body
-  const { data: booking } = await supabase.from('bookings').select('*, boats(owner_id)').eq('id', req.params.id).single()
-  if (!booking) return res.status(404).json({ message: 'Réservation introuvable' })
+router.post('/:id/cancel', authenticate, async (req, res, next) => {
+  try {
+    const { cancellationReason } = req.body
+    if (!cancellationReason?.trim()) return res.status(400).json({ message: 'Le motif d\'annulation est requis' })
 
-  const isRenter = booking.renter_id === req.user.id
-  const isOwner  = booking.boats?.owner_id === req.user.id
-  if (!isRenter && !isOwner && req.user.role !== 'ADMIN') return res.status(403).json({ message: 'Accès refusé' })
+    const { data: booking } = await supabase
+      .from('bookings')
+      .select('*, boats(id, title, owner_id, users(id, email, first_name)), renters:users!renter_id(id, email, first_name)')
+      .eq('id', req.params.id)
+      .single()
 
-  const { data: updated, error } = await supabase.from('bookings').update({ status: 'CANCELLED', cancellation_reason: cancellationReason, updated_at: new Date().toISOString() }).eq('id', req.params.id).select('*, boats(id, title, images, city, port, price_per_day)').single()
-  if (error) return res.status(500).json({ message: error.message })
-  return res.json(formatBooking(updated))
+    if (!booking) return res.status(404).json({ message: 'Réservation introuvable' })
+
+    const isRenter = booking.renter_id === req.user.id
+    const isOwner  = booking.boats?.owner_id === req.user.id
+    if (!isRenter && !isOwner && req.user.role !== 'ADMIN') return res.status(403).json({ message: 'Accès refusé' })
+
+    if (['CANCELLED', 'COMPLETED'].includes(booking.status)) {
+      return res.status(400).json({ message: 'Cette réservation ne peut plus être annulée' })
+    }
+
+    const now = new Date()
+    const startDate = new Date(booking.start_date)
+    if (startDate <= now) {
+      return res.status(400).json({ message: 'Impossible d\'annuler une réservation déjà commencée' })
+    }
+
+    // ── Politique de remboursement ──────────────────────────
+    const daysUntilStart = Math.ceil((startDate - now) / (1000 * 60 * 60 * 24))
+    let refundPercent = 0
+    if (isOwner || req.user.role === 'ADMIN') {
+      refundPercent = 100 // Propriétaire annule → remboursement total
+    } else if (daysUntilStart > 7) {
+      refundPercent = 100
+    } else if (daysUntilStart >= 2) {
+      refundPercent = 50
+    }
+    const refundAmount = Math.round(booking.total_price * refundPercent) / 100
+
+    // ── Remboursement Stripe ────────────────────────────────
+    if (stripe && booking.stripe_payment_intent_id && refundAmount > 0) {
+      try {
+        await stripe.refunds.create({
+          payment_intent: booking.stripe_payment_intent_id,
+          amount: Math.round(refundAmount * 100),
+        })
+      } catch (stripeErr) {
+        console.error('[Stripe] Erreur remboursement:', stripeErr.message)
+      }
+    }
+
+    // ── Mise à jour BDD ─────────────────────────────────────
+    const { data: updated, error } = await supabase
+      .from('bookings')
+      .update({ status: 'CANCELLED', cancellation_reason: cancellationReason.trim(), updated_at: now.toISOString() })
+      .eq('id', req.params.id)
+      .select('*, boats(id, title, images, city, port, price_per_day)')
+      .single()
+
+    if (error) return res.status(500).json({ message: error.message })
+
+    // ── Notifications email ─────────────────────────────────
+    const boatTitle   = booking.boats?.title ?? 'Bateau'
+    const fmtDate     = (d) => new Date(d).toLocaleDateString('fr-FR')
+    const emailData   = { boatTitle, startDate: fmtDate(booking.start_date), endDate: fmtDate(booking.end_date), reason: cancellationReason, refundAmount, cancelledByOwner: isOwner }
+
+    try {
+      const renterEmail = booking.renters?.email
+      const ownerEmail  = booking.boats?.users?.email
+      if (renterEmail) await sendCancellationEmail({ to: renterEmail, firstName: booking.renters?.first_name ?? 'Locataire', ...emailData, isRenter: true })
+      if (ownerEmail)  await sendCancellationEmail({ to: ownerEmail,  firstName: booking.boats?.users?.first_name ?? 'Propriétaire', ...emailData, isRenter: false })
+    } catch (emailErr) {
+      console.error('[Email] Erreur envoi annulation:', emailErr.message)
+    }
+
+    return res.json({ ...formatBooking(updated), refundAmount, refundPercent })
+  } catch (err) {
+    next(err)
+  }
 })
 
 // ─── POST /bookings/:id/payment-intent ────────────────────
-router.post('/:id/payment-intent', authenticate, async (req, res) => {
-  if (!stripe) return res.status(503).json({ message: 'Stripe non configuré' })
+router.post('/:id/payment-intent', authenticate, async (req, res, next) => {
+  try {
+    if (!stripe) return res.status(503).json({ message: 'Paiement en ligne non disponible — Stripe non configuré (ajoutez STRIPE_SECRET_KEY dans .env)' })
 
-  const { data: booking } = await supabase.from('bookings').select('*, boats(title)').eq('id', req.params.id).single()
-  if (!booking) return res.status(404).json({ message: 'Réservation introuvable' })
-  if (booking.renter_id !== req.user.id) return res.status(403).json({ message: 'Accès refusé' })
-  if (booking.status !== 'PENDING') return res.status(400).json({ message: 'Statut invalide pour le paiement' })
+    const { data: booking } = await supabase.from('bookings').select('*, boats(title)').eq('id', req.params.id).single()
+    if (!booking) return res.status(404).json({ message: 'Réservation introuvable' })
+    if (booking.renter_id !== req.user.id) return res.status(403).json({ message: 'Accès refusé' })
+    if (booking.status !== 'PENDING') return res.status(400).json({ message: 'Statut invalide pour le paiement' })
 
-  const intent = await stripe.paymentIntents.create({
-    amount: Math.round(booking.total_price * 100),
-    currency: 'eur',
-    metadata: { bookingId: String(booking.id) },
-    description: `SailingLoc – ${booking.boats?.title || 'Réservation'}`,
-  })
+    const intent = await stripe.paymentIntents.create({
+      amount: Math.round(booking.total_price * 100),
+      currency: 'eur',
+      metadata: { bookingId: String(booking.id) },
+      description: `SailingLoc – ${booking.boats?.title || 'Réservation'}`,
+    })
 
-  return res.json({ clientSecret: intent.client_secret, bookingId: booking.id, amount: booking.total_price })
+    return res.json({ clientSecret: intent.client_secret, bookingId: booking.id, amount: booking.total_price })
+  } catch (err) {
+    if (err?.type === 'StripeAuthenticationError') {
+      return res.status(503).json({ message: 'Clé Stripe invalide — vérifiez STRIPE_SECRET_KEY dans .env' })
+    }
+    next(err)
+  }
 })
 
 // ─── POST /bookings/confirm-payment ───────────────────────

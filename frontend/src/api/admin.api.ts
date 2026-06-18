@@ -11,6 +11,7 @@ import type {
 interface PaginationParams {
   page?: number
   limit?: number
+  status?: string
 }
 
 interface AdminUserListParams extends PaginationParams {
@@ -102,6 +103,15 @@ export const deleteReview = async (reviewId: number): Promise<void> => {
   await api.delete(`/reviews/admin/${reviewId}`)
 }
 
+export const moderateReview = async (
+  reviewId: number,
+  isPublished: boolean,
+  adminNote?: string,
+): Promise<Review> => {
+  const { data } = await api.patch<Review>(`/reviews/admin/${reviewId}`, { isPublished, adminNote })
+  return data
+}
+
 export const adminApi = {
   getStats: getDashboardStats,
   getBookings: listBookings,
@@ -128,4 +138,5 @@ export const adminApi = {
   deleteBoat,
   listReviews,
   deleteReview,
+  moderateReview,
 }

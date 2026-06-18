@@ -175,8 +175,9 @@ const BoatDetail: React.FC = () => {
       setStripePayment(pi)
       setBookingPanelOpen(false)
     },
-    onError: (err: { message?: string }) => {
-      toast.error(err?.message ?? 'Erreur lors de la réservation')
+    onError: (err: any) => {
+      const msg = err?.response?.data?.message ?? err?.message ?? 'Erreur lors de la réservation'
+      toast.error(msg)
     },
   })
 

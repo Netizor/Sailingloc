@@ -158,6 +158,8 @@ export interface Review {
   rating: number
   comment: string
   isPublished: boolean
+  adminNote?: string | null
+  boatTitle?: string | null
   createdAt: string
   updatedAt?: string
 }

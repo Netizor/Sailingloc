@@ -38,12 +38,12 @@ export const adminListReviews = async (
 }
 
 /**
- * Admin - approuve ou rejette un avis.
+ * Admin - publie ou masque un avis.
  */
 export const adminUpdateReview = async (
   id: number,
-  moderationStatus: 'APPROVED' | 'REJECTED',
+  payload: { isPublished: boolean; adminNote?: string },
 ): Promise<Review> => {
-  const { data } = await api.patch<Review>(`/reviews/admin/${id}`, { moderationStatus })
+  const { data } = await api.patch<Review>(`/reviews/admin/${id}`, payload)
   return data
 }

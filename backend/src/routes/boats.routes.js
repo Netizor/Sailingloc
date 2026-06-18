@@ -176,6 +176,46 @@ router.get('/destinations/summary', async (req, res) => {
   return res.json({ countries: [...byCountry.values()] })
 })
 
+// ─── GET /boats/autocomplete ───────────────────────────────
+router.get('/autocomplete', async (req, res, next) => {
+  try {
+    const q = (req.query.q || '').trim()
+    if (q.length < 2) return res.json({ suggestions: [] })
+
+    const [{ data: cities }, { data: ports }, { data: countries }] = await Promise.all([
+      supabase.from('boats').select('city').eq('status', 'active').ilike('city', `%${q}%`).not('city', 'is', null).limit(20),
+      supabase.from('boats').select('port').eq('status', 'active').ilike('port', `%${q}%`).not('port', 'is', null).limit(20),
+      supabase.from('boats').select('country').eq('status', 'active').ilike('country', `%${q}%`).not('country', 'is', null).limit(10),
+    ])
+
+    const seen = new Set()
+    const suggestions = []
+
+    for (const row of (cities || [])) {
+      if (row.city && !seen.has(row.city.toLowerCase())) {
+        seen.add(row.city.toLowerCase())
+        suggestions.push({ label: row.city, type: 'city' })
+      }
+    }
+    for (const row of (ports || [])) {
+      if (row.port && !seen.has(row.port.toLowerCase())) {
+        seen.add(row.port.toLowerCase())
+        suggestions.push({ label: row.port, type: 'port' })
+      }
+    }
+    for (const row of (countries || [])) {
+      if (row.country && !seen.has(row.country.toLowerCase())) {
+        seen.add(row.country.toLowerCase())
+        suggestions.push({ label: row.country, type: 'country' })
+      }
+    }
+
+    return res.json({ suggestions: suggestions.slice(0, 8) })
+  } catch (err) {
+    next(err)
+  }
+})
+
 // ─── GET /boats/:id ────────────────────────────────────────
 router.get('/:id', optionalAuth, async (req, res) => {
   const { data: boat, error } = await supabase

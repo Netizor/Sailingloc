@@ -58,12 +58,13 @@ reviewsRouter.post('/', authenticate, async (req, res) => {
     author_id: req.user.id,
     target_user_id: type === 'OWNER_TO_RENTER' ? booking.renter_id : null,
     type, rating, comment: comment.trim(),
+    is_published: true,
   }).select('*, users!author_id(id, first_name, last_name, avatar)').single()
 
   if (error) return res.status(500).json({ message: error.message })
 
   if (type === 'RENTER_TO_BOAT' && booking.boat_id) {
-    const { data: allReviews } = await supabase.from('reviews').select('rating').eq('boat_id', booking.boat_id).eq('type', 'RENTER_TO_BOAT')
+    const { data: allReviews } = await supabase.from('reviews').select('rating').eq('boat_id', booking.boat_id).eq('type', 'RENTER_TO_BOAT').eq('is_published', true)
     if (allReviews?.length) {
       const avg = allReviews.reduce((s, r) => s + r.rating, 0) / allReviews.length
       await supabase.from('boats').update({ average_rating: Math.round(avg * 10) / 10, review_count: allReviews.length }).eq('id', booking.boat_id)
@@ -73,21 +74,12 @@ reviewsRouter.post('/', authenticate, async (req, res) => {
 })
 
 reviewsRouter.get('/boat/:boatId', async (req, res) => {
-  const { data, count } = await supabase.from('reviews').select('*, users!author_id(id, first_name, last_name, avatar)', { count: 'exact' }).eq('boat_id', req.params.boatId).eq('type', 'RENTER_TO_BOAT').order('created_at', { ascending: false }).limit(20)
+  const { data, count } = await supabase.from('reviews').select('*, users!author_id(id, first_name, last_name, avatar)', { count: 'exact' }).eq('boat_id', req.params.boatId).eq('type', 'RENTER_TO_BOAT').eq('is_published', true).order('created_at', { ascending: false }).limit(20)
   return res.json({ data: data || [], total: count || 0 })
 })
 
-reviewsRouter.get('/admin', authenticate, requireRole('ADMIN'), async (req, res) => {
-  const page  = Math.max(1, parseInt(req.query.page) || 1)
-  const limit = Math.min(100, parseInt(req.query.limit) || 15)
-
-  const { data, count } = await supabase
-    .from('reviews')
-    .select('*, author:users!author_id(id, first_name, last_name, avatar), boats(id, title)', { count: 'exact' })
-    .order('created_at', { ascending: false })
-    .range((page - 1) * limit, page * limit - 1)
-
-  const formatted = (data || []).map((r) => ({
+function formatAdminReview(r) {
+  return {
     id: r.id,
     bookingId: r.booking_id,
     boatId: r.boat_id,
@@ -95,6 +87,8 @@ reviewsRouter.get('/admin', authenticate, requireRole('ADMIN'), async (req, res)
     rating: r.rating,
     comment: r.comment,
     type: r.type,
+    isPublished: r.is_published ?? true,
+    adminNote: r.admin_note ?? null,
     createdAt: r.created_at,
     reviewer: r.author ? {
       id: r.author.id,
@@ -102,11 +96,51 @@ reviewsRouter.get('/admin', authenticate, requireRole('ADMIN'), async (req, res)
       lastName: r.author.last_name,
       avatar: r.author.avatar,
     } : null,
-    boatTitle: r.boats?.title,
+    boatTitle: r.boats?.title ?? null,
     boat: r.boats ? { id: r.boats.id, title: r.boats.title } : null,
-  }))
+  }
+}
 
-  return res.json({ data: formatted, total: count || 0, page, limit, totalPages: Math.ceil((count || 0) / limit) })
+reviewsRouter.get('/admin', authenticate, requireRole('ADMIN'), async (req, res) => {
+  const page  = Math.max(1, parseInt(req.query.page) || 1)
+  const limit = Math.min(100, parseInt(req.query.limit) || 15)
+  const status = req.query.status // 'published' | 'hidden'
+
+  let query = supabase
+    .from('reviews')
+    .select('*, author:users!author_id(id, first_name, last_name, avatar), boats(id, title)', { count: 'exact' })
+    .order('created_at', { ascending: false })
+    .range((page - 1) * limit, page * limit - 1)
+
+  if (status === 'published') query = query.eq('is_published', true)
+  else if (status === 'hidden') query = query.eq('is_published', false)
+
+  const { data, count } = await query
+  return res.json({ data: (data || []).map(formatAdminReview), total: count || 0, page, limit, totalPages: Math.ceil((count || 0) / limit) })
+})
+
+reviewsRouter.patch('/admin/:id', authenticate, requireRole('ADMIN'), async (req, res) => {
+  const { isPublished, adminNote } = req.body
+  if (typeof isPublished !== 'boolean') return res.status(400).json({ message: 'isPublished (boolean) requis' })
+
+  const { data: existing } = await supabase.from('reviews').select('boat_id, type, is_published').eq('id', req.params.id).single()
+  if (!existing) return res.status(404).json({ message: 'Avis introuvable' })
+
+  const updates = { is_published: isPublished, updated_at: new Date().toISOString() }
+  if (adminNote !== undefined) updates.admin_note = adminNote || null
+
+  const { data, error } = await supabase.from('reviews').update(updates).eq('id', req.params.id)
+    .select('*, author:users!author_id(id, first_name, last_name, avatar), boats(id, title)').single()
+  if (error) return res.status(500).json({ message: error.message })
+
+  // Recalculer la note du bateau si l'état de publication change
+  if (existing.boat_id && existing.type === 'RENTER_TO_BOAT' && existing.is_published !== isPublished) {
+    const { data: allReviews } = await supabase.from('reviews').select('rating').eq('boat_id', existing.boat_id).eq('type', 'RENTER_TO_BOAT').eq('is_published', true)
+    const avg = allReviews?.length ? allReviews.reduce((s, r) => s + r.rating, 0) / allReviews.length : 0
+    await supabase.from('boats').update({ average_rating: Math.round(avg * 10) / 10, review_count: allReviews?.length || 0 }).eq('id', existing.boat_id)
+  }
+
+  return res.json(formatAdminReview(data))
 })
 
 reviewsRouter.delete('/admin/:id', authenticate, requireRole('ADMIN'), async (req, res) => {
@@ -117,7 +151,7 @@ reviewsRouter.delete('/admin/:id', authenticate, requireRole('ADMIN'), async (re
   if (error) return res.status(500).json({ message: error.message })
 
   if (review.boat_id && review.type === 'RENTER_TO_BOAT') {
-    const { data: allReviews } = await supabase.from('reviews').select('rating').eq('boat_id', review.boat_id).eq('type', 'RENTER_TO_BOAT')
+    const { data: allReviews } = await supabase.from('reviews').select('rating').eq('boat_id', review.boat_id).eq('type', 'RENTER_TO_BOAT').eq('is_published', true)
     const avg = allReviews?.length
       ? allReviews.reduce((s, r) => s + r.rating, 0) / allReviews.length
       : 0

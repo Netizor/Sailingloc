@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react'
-import { MapPin, Calendar, Users, Search, Ship } from 'lucide-react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { MapPin, Calendar, Users, Search, Ship, Anchor, Globe2 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import Button from '../ui/Button'
 import { BoatType } from '../../types'
 import { BOAT_TYPE_LABELS } from '../../lib/labels'
+import { autocompleteLocation, type LocationSuggestion } from '../../api/boats.api'
 
 export interface SearchParams {
   location: string
@@ -24,6 +25,18 @@ interface SearchBarProps {
 
 const BOAT_TYPE_OPTIONS = Object.values(BoatType)
 
+const SUGGESTION_TYPE_LABELS: Record<string, string> = {
+  city: 'Ville',
+  port: 'Port',
+  country: 'Pays',
+}
+
+const SuggestionIcon: React.FC<{ type: string }> = ({ type }) => {
+  if (type === 'port') return <Anchor size={14} className="text-gray-400 flex-shrink-0" />
+  if (type === 'country') return <Globe2 size={14} className="text-gray-400 flex-shrink-0" />
+  return <MapPin size={14} className="text-gray-400 flex-shrink-0" />
+}
+
 const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,
   defaultValues = {},
@@ -37,6 +50,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [endDate, setEndDate] = useState(defaultValues.endDate ?? '')
   const [capacity, setCapacity] = useState<number | ''>(defaultValues.capacity ?? '')
   const [boatType, setBoatType] = useState(defaultValues.boatType ?? '')
+
+  const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [highlightIndex, setHighlightIndex] = useState(-1)
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>()
 
   useEffect(() => {
     setLocation(defaultValues.location ?? '')
@@ -52,10 +70,91 @@ const SearchBar: React.FC<SearchBarProps> = ({
     defaultValues.boatType,
   ])
 
+  const fetchSuggestions = useCallback((value: string) => {
+    clearTimeout(debounceRef.current)
+    if (value.trim().length < 2) {
+      setSuggestions([])
+      setShowSuggestions(false)
+      return
+    }
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const results = await autocompleteLocation(value)
+        setSuggestions(results)
+        setShowSuggestions(results.length > 0)
+        setHighlightIndex(-1)
+      } catch {
+        // silent fail
+      }
+    }, 300)
+  }, [])
+
+  const handleLocationChange = (value: string) => {
+    setLocation(value)
+    fetchSuggestions(value)
+  }
+
+  const selectSuggestion = (label: string) => {
+    setLocation(label)
+    setSuggestions([])
+    setShowSuggestions(false)
+    setHighlightIndex(-1)
+  }
+
+  const handleLocationKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setHighlightIndex(i => Math.min(i + 1, suggestions.length - 1))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setHighlightIndex(i => Math.max(i - 1, -1))
+    } else if (e.key === 'Enter' && highlightIndex >= 0 && showSuggestions) {
+      e.preventDefault()
+      selectSuggestion(suggestions[highlightIndex].label)
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false)
+    }
+  }
+
+  const SuggestionDropdown: React.FC<{ dark?: boolean }> = ({ dark }) =>
+    showSuggestions && suggestions.length > 0 ? (
+      <ul
+        role="listbox"
+        className={cn(
+          'absolute top-full left-0 right-0 z-50 mt-1 rounded-xl shadow-lg border overflow-hidden',
+          dark
+            ? 'bg-gray-800 border-gray-700'
+            : 'bg-white border-gray-200'
+        )}
+      >
+        {suggestions.map((s, i) => (
+          <li
+            key={`${s.label}-${i}`}
+            role="option"
+            aria-selected={i === highlightIndex}
+            onMouseDown={() => selectSuggestion(s.label)}
+            className={cn(
+              'flex items-center gap-2.5 px-4 py-2.5 cursor-pointer text-sm select-none',
+              i === highlightIndex
+                ? 'bg-blue-50 dark:bg-gray-700 text-blue-700 dark:text-blue-300'
+                : dark
+                  ? 'text-gray-300 hover:bg-gray-700'
+                  : 'text-gray-700 hover:bg-gray-50'
+            )}
+          >
+            <SuggestionIcon type={s.type} />
+            <span className="flex-1">{s.label}</span>
+            <span className="text-xs text-gray-400">{SUGGESTION_TYPE_LABELS[s.type] ?? s.type}</span>
+          </li>
+        ))}
+      </ul>
+    ) : null
+
   const today = new Date().toISOString().split('T')[0]
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    setShowSuggestions(false)
     onSearch({ location, startDate, endDate, capacity, boatType: boatType || undefined })
   }
 
@@ -70,7 +169,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         aria-label="Rechercher un bateau"
       >
         <div className="flex flex-col md:flex-row md:items-center">
-          <div className="flex-1 flex items-center gap-3 px-4 py-3 md:py-2.5 border-b md:border-b-0 md:border-r border-gray-100">
+          <div className="relative flex-1 flex items-center gap-3 px-4 py-3 md:py-2.5 border-b md:border-b-0 md:border-r border-gray-100">
             <MapPin size={18} className="text-[#8A94A6] flex-shrink-0" strokeWidth={1.5} />
             <div className="flex-1 min-w-0 text-left">
               <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[#8A94A6] mb-0.5">
@@ -80,10 +179,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 type="text"
                 placeholder="Où naviguez-vous ?"
                 value={location}
-                onChange={(e) => setLocation(e.target.value)}
+                onChange={(e) => handleLocationChange(e.target.value)}
+                onKeyDown={handleLocationKeyDown}
+                onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                autoComplete="off"
                 className="w-full text-sm text-[#334155] placeholder:text-[#8A94A6] bg-transparent border-none outline-none"
               />
             </div>
+            <SuggestionDropdown />
           </div>
 
           <div className="flex-1 flex items-center gap-3 px-4 py-3 md:py-2.5 border-b md:border-b-0 md:border-r border-gray-100">
@@ -181,6 +285,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             placeholder="Port ou ville"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
+            autoComplete="off"
             className="text-sm text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 bg-transparent border-none outline-none w-full min-w-0"
           />
         </div>
@@ -202,7 +307,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         aria-label="Rechercher un bateau"
       >
         <div className="flex flex-col md:flex-row md:items-center">
-          <div className="flex-1 flex items-center gap-3 px-5 py-3 md:py-2.5 border-b md:border-b-0 md:border-r border-gray-200">
+          <div className="relative flex-1 flex items-center gap-3 px-5 py-3 md:py-2.5 border-b md:border-b-0 md:border-r border-gray-200">
             <MapPin size={18} className="text-gray-400 flex-shrink-0" strokeWidth={1.5} />
             <div className="flex-1 min-w-0 text-left">
               <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400 mb-0.5">
@@ -212,10 +317,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 type="text"
                 placeholder="Où allez-vous ?"
                 value={location}
-                onChange={(e) => setLocation(e.target.value)}
+                onChange={(e) => handleLocationChange(e.target.value)}
+                onKeyDown={handleLocationKeyDown}
+                onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                autoComplete="off"
                 className="w-full text-sm text-brand-slate placeholder:text-gray-400 bg-transparent border-none outline-none"
               />
             </div>
+            <SuggestionDropdown />
           </div>
 
           <div className="flex-1 flex items-center gap-3 px-5 py-3 md:py-2.5 border-b md:border-b-0 md:border-r border-gray-200">
@@ -291,7 +401,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       aria-label="Rechercher un bateau"
     >
       <div className="flex flex-col sm:flex-row items-stretch gap-1">
-        <div className="flex-1 flex items-center gap-2.5 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors cursor-text group">
+        <div className="relative flex-1 flex items-center gap-2.5 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors cursor-text group">
           <MapPin size={18} className="text-brand-blue flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">
@@ -301,10 +411,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
               type="text"
               placeholder="Ex: Marseille, La Rochelle…"
               value={location}
-              onChange={(e) => setLocation(e.target.value)}
+              onChange={(e) => handleLocationChange(e.target.value)}
+              onKeyDown={handleLocationKeyDown}
+              onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+              onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+              autoComplete="off"
               className="w-full text-sm text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 bg-transparent border-none outline-none"
             />
           </div>
+          <SuggestionDropdown dark />
         </div>
 
         <Divider />
