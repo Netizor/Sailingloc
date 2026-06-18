@@ -166,7 +166,7 @@ export default function App() {
                 <Route path="reservations/:id/avis" element={<LeaveReview />} />
                 <Route path="favoris" element={<MyFavorites />} />
                 <Route path="messages" element={<Messages />} />
-                <Route path="messages/:conversationId" element={<Conversation />} />
+                <Route path="messages/:conversationId" element={<Messages />} />
                 <Route path="notifications" element={<Notifications />} />
                 <Route path="notifications/:id" element={<NotificationDetail />} />
                 <Route path="profil" element={<UserProfile />} />

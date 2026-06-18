@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import jwt from 'jsonwebtoken'
 import supabase from '../lib/supabase.js'
 import { authenticate, requireRole } from '../middleware/auth.middleware.js'
 
@@ -169,46 +170,199 @@ reviewsRouter.delete('/admin/:id', authenticate, requireRole('ADMIN'), async (re
 // ═══════════════════════════════════════════════════════════
 export const messagesRouter = Router()
 
+// ─ Helpers ───────────────────────────────────────────────────────────────────
+
+function convKey(u1, u2) {
+  return `${Math.min(u1, u2)}-${Math.max(u1, u2)}`
+}
+
+function parseKey(key) {
+  const parts = (key || '').split('-').map(Number)
+  if (parts.length !== 2 || !parts[0] || !parts[1] || isNaN(parts[0]) || isNaN(parts[1])) return null
+  return parts
+}
+
+function fmtMsg(msg, key) {
+  const out = {
+    id: msg.id,
+    conversationId: key,
+    senderId: msg.sender_id,
+    content: msg.content,
+    isRead: msg.is_read ?? true,
+    createdAt: msg.created_at,
+  }
+  if ('boat_id' in msg) out.boatId = msg.boat_id ?? null
+  return out
+}
+
+// ─ GET /messages/unread-count ─────────────────────────────────────────────────
+
 messagesRouter.get('/unread-count', authenticate, async (req, res) => {
   const { count } = await supabase.from('messages').select('id', { count: 'exact', head: true }).eq('recipient_id', req.user.id).eq('is_read', false)
   return res.json({ count: count || 0 })
 })
 
+// ─ GET /messages/conversations ────────────────────────────────────────────────
+
 messagesRouter.get('/conversations', authenticate, async (req, res) => {
+  const userId = req.user.id
+
   const { data: msgs } = await supabase.from('messages')
     .select('*, sender:users!sender_id(id, first_name, last_name, avatar), recipient:users!recipient_id(id, first_name, last_name, avatar)')
-    .or(`sender_id.eq.${req.user.id},recipient_id.eq.${req.user.id}`)
+    .or(`sender_id.eq.${userId},recipient_id.eq.${userId}`)
     .order('created_at', { ascending: false })
 
-  const seen = new Map()
+  const convMap = new Map()
   for (const msg of (msgs || [])) {
-    const otherId = msg.sender_id === req.user.id ? msg.recipient_id : msg.sender_id
-    const key = [req.user.id, otherId].sort().join('-')
-    if (!seen.has(key)) seen.set(key, msg)
+    const otherId = msg.sender_id === userId ? msg.recipient_id : msg.sender_id
+    const key = convKey(userId, otherId)
+    if (!convMap.has(key)) {
+      const other = msg.sender_id === userId ? msg.recipient : msg.sender
+      convMap.set(key, { key, other, lastMsg: msg, allMsgs: [msg] })
+    } else {
+      convMap.get(key).allMsgs.push(msg)
+    }
   }
-  return res.json({ conversations: Array.from(seen.values()) })
+
+  const conversations = []
+  for (const [key, conv] of convMap) {
+    const unreadCount = conv.allMsgs.filter(m => m.recipient_id === userId && !m.is_read).length
+    const o = conv.other
+    conversations.push({
+      id: key,
+      participants: [
+        { id: userId },
+        o ? { id: o.id, firstName: o.first_name, lastName: o.last_name, avatar: o.avatar } : null,
+      ].filter(Boolean),
+      lastMessage: {
+        id: conv.lastMsg.id,
+        conversationId: key,
+        senderId: conv.lastMsg.sender_id,
+        content: conv.lastMsg.content,
+        isRead: conv.lastMsg.is_read,
+        boatId: conv.lastMsg.boat_id ?? null,
+        createdAt: conv.lastMsg.created_at,
+      },
+      unreadCount,
+      createdAt: conv.lastMsg.created_at,
+      updatedAt: conv.lastMsg.created_at,
+    })
+  }
+
+  conversations.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+  return res.json({ conversations })
 })
 
-messagesRouter.get('/:otherId', authenticate, async (req, res) => {
-  const { data: msgs } = await supabase.from('messages')
-    .select('*, sender:users!sender_id(id, first_name, last_name, avatar)')
-    .or(`and(sender_id.eq.${req.user.id},recipient_id.eq.${req.params.otherId}),and(sender_id.eq.${req.params.otherId},recipient_id.eq.${req.user.id})`)
+// ─ GET /messages/conversation/:key ───────────────────────────────────────────
+
+messagesRouter.get('/conversation/:key', authenticate, async (req, res) => {
+  const users = parseKey(req.params.key)
+  if (!users) return res.status(400).json({ message: 'Clé de conversation invalide' })
+  const [u1, u2] = users
+  if (req.user.id !== u1 && req.user.id !== u2) return res.status(403).json({ message: 'Accès refusé' })
+
+  const page  = Math.max(1, parseInt(req.query.page) || 1)
+  const limit = Math.min(100, parseInt(req.query.limit) || 30)
+
+  const { data, count } = await supabase.from('messages')
+    .select('*', { count: 'exact' })
+    .or(`and(sender_id.eq.${u1},recipient_id.eq.${u2}),and(sender_id.eq.${u2},recipient_id.eq.${u1})`)
     .order('created_at', { ascending: true })
-  await supabase.from('messages').update({ is_read: true }).eq('sender_id', req.params.otherId).eq('recipient_id', req.user.id)
-  return res.json({ messages: msgs || [] })
+    .range((page - 1) * limit, page * limit - 1)
+
+  // Mark incoming messages as read
+  const otherId = req.user.id === u1 ? u2 : u1
+  await supabase.from('messages').update({ is_read: true })
+    .eq('sender_id', otherId).eq('recipient_id', req.user.id).eq('is_read', false)
+
+  const key = req.params.key
+  const total = count || 0
+  return res.json({ data: (data || []).map(m => fmtMsg(m, key)), page, limit, total, totalPages: Math.ceil(total / limit) })
 })
+
+// ─ GET /messages/stream/:key (SSE temps réel) ────────────────────────────────
+
+messagesRouter.get('/stream/:key', async (req, res) => {
+  const token = req.query.token
+  if (!token) return res.status(401).end()
+
+  let userId
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    userId = decoded.sub ?? decoded.id ?? decoded.userId
+    if (!userId) throw new Error('no id in token')
+  } catch {
+    return res.status(401).end()
+  }
+
+  const users = parseKey(req.params.key)
+  if (!users) return res.status(400).end()
+  const [u1, u2] = users
+  if (userId !== u1 && userId !== u2) return res.status(403).end()
+
+  let lastId = parseInt(req.query.lastId || '0')
+  let closed = false
+
+  res.setHeader('Content-Type', 'text/event-stream')
+  res.setHeader('Cache-Control', 'no-cache')
+  res.setHeader('Connection', 'keep-alive')
+  res.setHeader('X-Accel-Buffering', 'no')
+  res.flushHeaders()
+  res.write(': connected\n\n')
+
+  req.on('close', () => { closed = true })
+
+  const POLL_MS  = 2000
+  const MAX_MS   = 28000
+  let elapsed    = 0
+  const key      = req.params.key
+
+  const poll = async () => {
+    if (closed || res.writableEnded) return
+    try {
+      const { data } = await supabase.from('messages')
+        .select('*')
+        .or(`and(sender_id.eq.${u1},recipient_id.eq.${u2}),and(sender_id.eq.${u2},recipient_id.eq.${u1})`)
+        .gt('id', lastId)
+        .order('id', { ascending: true })
+
+      if (data?.length) {
+        lastId = Math.max(...data.map(m => m.id))
+        res.write(`data: ${JSON.stringify(data.map(m => fmtMsg(m, key)))}\n\n`)
+      }
+    } catch { /* poll error silencieux */ }
+
+    elapsed += POLL_MS
+    if (!closed && elapsed < MAX_MS) {
+      setTimeout(poll, POLL_MS)
+    } else if (!res.writableEnded) {
+      res.end()
+    }
+  }
+
+  setTimeout(poll, POLL_MS)
+})
+
+// ─ POST /messages/conversations/:key/archive ─────────────────────────────────
+
+
+// ─ POST /messages ────────────────────────────────────────────────────────────
 
 messagesRouter.post('/', authenticate, async (req, res) => {
-  const { recipientId, content } = req.body
-  if (!recipientId || !content?.trim()) return res.status(400).json({ message: 'recipientId et content requis' })
-  if (String(recipientId) === String(req.user.id)) return res.status(400).json({ message: 'Impossible de vous envoyer un message' })
+  const { recipientId, receiverId, content, boatId } = req.body
+  const targetId = recipientId ?? receiverId
+  if (!targetId || !content?.trim()) return res.status(400).json({ message: 'recipientId et content requis' })
+  if (String(targetId) === String(req.user.id)) return res.status(400).json({ message: 'Impossible de vous envoyer un message' })
 
-  const { data: msg, error } = await supabase.from('messages').insert({
-    sender_id: req.user.id, recipient_id: recipientId, content: content.trim(),
-  }).select('*, sender:users!sender_id(id, first_name, last_name, avatar)').single()
+  const insertData = { sender_id: req.user.id, recipient_id: targetId, content: content.trim() }
+  if (boatId != null) insertData.boat_id = boatId
+
+  const { data: msg, error } = await supabase.from('messages').insert(insertData).select().single()
 
   if (error) return res.status(500).json({ message: error.message })
-  return res.status(201).json(msg)
+
+  const key = convKey(req.user.id, Number(targetId))
+  return res.status(201).json(fmtMsg(msg, key))
 })
 
 // ═══════════════════════════════════════════════════════════
