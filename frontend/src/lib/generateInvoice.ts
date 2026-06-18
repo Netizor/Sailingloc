@@ -26,7 +26,7 @@ export function generateInvoice(booking: Booking, renterName: string): void {
   const invoiceDate = fmtDate(booking.createdAt)
   const boat        = booking.boat
   const boatLabel   = boat?.title ?? `Bateau #${booking.boatId}`
-  const portLabel   = [boat?.port, boat?.city].filter(Boolean).join(', ') || '—'
+  const portLabel   = [boat?.port, boat?.city].filter(Boolean).join(', ') || '-'
   const statusLabel = booking.status === 'CONFIRMED' || booking.status === 'COMPLETED'
     ? 'Payée'
     : 'En attente'
@@ -35,7 +35,7 @@ export function generateInvoice(booking: Booking, renterName: string): void {
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Facture ${invoiceNo} — SailingLoc</title>
+  <title>Facture ${invoiceNo} - SailingLoc</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -317,7 +317,7 @@ export function generateInvoice(booking: Booking, renterName: string): void {
     </thead>
     <tbody>
       <tr>
-        <td>Location du bateau — ${boatLabel}</td>
+        <td>Location du bateau - ${boatLabel}</td>
         <td>${booking.totalDays} j.</td>
         <td>${fmt(booking.dailyRate)} / j.</td>
         <td>${fmt(booking.subtotal ?? 0)}</td>
@@ -325,14 +325,14 @@ export function generateInvoice(booking: Booking, renterName: string): void {
       ${booking.withSkipper ? `
       <tr>
         <td>Services du skipper</td>
-        <td>—</td>
-        <td>—</td>
+        <td>-</td>
+        <td>-</td>
         <td>inclus</td>
       </tr>` : ''}
       <tr>
         <td>Frais de service SailingLoc</td>
-        <td>—</td>
-        <td>—</td>
+        <td>-</td>
+        <td>-</td>
         <td>${fmt(booking.platformFee ?? 0)}</td>
       </tr>
     </tbody>
@@ -360,7 +360,7 @@ export function generateInvoice(booking: Booking, renterName: string): void {
 
   <!-- Footer -->
   <footer>
-    <p>SailingLoc — Projet étudiant DSP4 O24 — Aucune transaction réelle</p>
+    <p>SailingLoc - Projet étudiant DSP4 O24 - Aucune transaction réelle</p>
     <p style="margin-top:4px">
       Cette facture est générée automatiquement et ne constitue pas un document comptable officiel.
     </p>

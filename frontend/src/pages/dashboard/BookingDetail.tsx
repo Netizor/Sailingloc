@@ -55,12 +55,15 @@ const BookingDetail: React.FC = () => {
   const cancelMutation = useMutation({
     mutationFn: (reason: string) => bookingsApi.cancel(Number(id!), { cancellationReason: reason }),
     onSuccess: () => {
-      toast.success('Réservation annulée')
+      toast.success('Réservation annulée', { id: 'cancel-booking' })
       setCancelOpen(false)
       qc.invalidateQueries({ queryKey: ['booking', id] })
       qc.invalidateQueries({ queryKey: ['bookings'] })
     },
-    onError: () => toast.error("Impossible d'annuler la réservation"),
+    onError: (err: any) => toast.error(
+      err?.response?.data?.message ?? "Impossible d'annuler la réservation",
+      { id: 'cancel-booking' },
+    ),
   })
 
   const handleConfirmCancel = () => {
@@ -92,7 +95,13 @@ const BookingDetail: React.FC = () => {
   // Le locataire peut annuler si la réservation est encore active
   const canCancel =
     user?.id === booking.renterId &&
-    (booking.status === BookingStatus.PENDING || booking.status === BookingStatus.CONFIRMED)
+    (booking.status === BookingStatus.PENDING ||
+     (booking.status === BookingStatus.CONFIRMED && new Date(booking.startDate) > new Date()))
+
+  const daysUntilStart = booking.startDate
+    ? Math.ceil((new Date(booking.startDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    : 0
+  const refundPercent = daysUntilStart > 7 ? 100 : daysUntilStart >= 2 ? 50 : 0
 
   // La facture n'est disponible que lorsque le paiement est confirmé ou terminé
   const canDownloadInvoice =
@@ -237,7 +246,7 @@ const BookingDetail: React.FC = () => {
                     {booking.owner.firstName} {booking.owner.lastName}
                   </p>
                 </div>
-                {/* A6 — Lien vers la messagerie */}
+                {/* A6 - Lien vers la messagerie */}
                 <Link
                   to={`/mon-espace/messages?to=${booking.ownerId}`}
                   className="flex items-center gap-1.5 text-sm text-ocean-700 dark:text-ocean-400 hover:text-ocean-900 font-medium transition-colors"
@@ -308,10 +317,19 @@ const BookingDetail: React.FC = () => {
         <div className="p-6 space-y-5">
           <div className="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-xl p-4">
             <AlertTriangle size={18} className="text-amber-500 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-amber-700">
-              Cette action est irréversible. Le remboursement dépend des conditions
-              d'annulation en vigueur.
-            </p>
+            <div className="text-sm text-amber-700 space-y-1">
+              <p className="font-medium">Cette action est irréversible.</p>
+              {refundPercent > 0 ? (
+                <p>
+                  Remboursement applicable : <strong>{refundPercent}%</strong>
+                  {booking.totalAmount
+                    ? ` (${formatPrice(booking.totalAmount * refundPercent / 100)})`
+                    : ''}
+                </p>
+              ) : (
+                <p>Aucun remboursement — annulation à moins de 48h du départ.</p>
+              )}
+            </div>
           </div>
 
           <div>
@@ -358,6 +376,7 @@ const BookingDetail: React.FC = () => {
               fullWidth
               onClick={handleConfirmCancel}
               loading={cancelMutation.isPending}
+              disabled={cancelMutation.isPending}
             >
               Confirmer l'annulation
             </Button>

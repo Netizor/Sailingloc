@@ -46,9 +46,9 @@ const OwnerProfile: React.FC = () => {
   return (
     <>
     <Helmet>
-      <title>{ownerName} — Propriétaire SailingLoc</title>
+      <title>{ownerName} - Propriétaire SailingLoc</title>
       <meta name="description" content={`Découvrez les bateaux de ${ownerName} sur SailingLoc. ${boats.length} annonce(s) disponible(s).`} />
-      <meta property="og:title" content={`${ownerName} — Propriétaire SailingLoc`} />
+      <meta property="og:title" content={`${ownerName} - Propriétaire SailingLoc`} />
       <meta property="og:description" content={`Louez un bateau chez ${ownerName} sur SailingLoc.`} />
       <meta property="og:type" content="profile" />
     </Helmet>

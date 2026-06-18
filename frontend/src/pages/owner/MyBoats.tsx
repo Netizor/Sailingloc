@@ -20,6 +20,8 @@ import Badge from '../../components/ui/Badge'
 import Stars from '../../components/ui/Stars'
 import Spinner from '../../components/ui/Spinner'
 import type { BadgeVariant } from '../../components/ui/Badge'
+import { useAuthStore } from '../../store/auth.store'
+import { UserRole } from '../../types'
 
 // Clés alignées sur les valeurs renvoyées par le backend (BoatStatus)
 const statusConfig: Record<string, { label: string; variant: BadgeVariant }> = {
@@ -33,7 +35,9 @@ const statusConfig: Record<string, { label: string; variant: BadgeVariant }> = {
 
 const MyBoats: React.FC = () => {
   const navigate = useNavigate()
+  const { user } = useAuthStore()
   const { canManageBoat, issues } = useProfileCompletion()
+  const isAdmin = user?.role === UserRole.ADMIN
 
   // Message synthétique pour le tooltip des boutons bloqués
   const blockedTooltip = issues.map((i) => i.title).join(' · ')
@@ -48,10 +52,9 @@ const MyBoats: React.FC = () => {
   const boats: Boat[] = data?.data ?? []
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div>
         {/* Header */}
-        <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
+        <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Mes bateaux</h1>
             <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
@@ -59,14 +62,15 @@ const MyBoats: React.FC = () => {
             </p>
           </div>
           <DisabledTooltip disabled={!canManageBoat} tooltip={blockedTooltip}>
-            <Button
-              variant="primary"
-              size="md"
+            <button
+              type="button"
+              disabled={!canManageBoat}
               onClick={() => navigate('/proprietaire/bateaux/nouveau')}
-              leftIcon={<Plus size={16} />}
+              className="flex items-center gap-2 bg-brand-teal hover:bg-brand-teal/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-sm px-5 py-3 rounded-xl shadow-lg shadow-brand-teal/25 transition-all"
             >
+              <Plus size={16} strokeWidth={2.5} />
               Ajouter un bateau
-            </Button>
+            </button>
           </DisabledTooltip>
         </div>
 
@@ -88,19 +92,27 @@ const MyBoats: React.FC = () => {
             <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
               Aucun bateau pour le moment
             </h2>
-            <p className="text-gray-400 dark:text-gray-500 text-sm max-w-xs mx-auto mb-8">
-              Publiez votre premier bateau et commencez à générer des revenus dès aujourd&apos;hui.
+            <p className="text-gray-400 dark:text-gray-500 text-sm max-w-md mx-auto mb-6">
+              {isAdmin
+                ? 'Cette page liste uniquement les bateaux dont vous êtes propriétaire. Les annonces créées par d’autres utilisateurs sont visibles dans l’espace administration.'
+                : 'Publiez votre premier bateau et commencez à générer des revenus dès aujourd&apos;hui.'}
             </p>
-            <DisabledTooltip disabled={!canManageBoat} tooltip={blockedTooltip}>
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={() => navigate('/proprietaire/bateaux/nouveau')}
-                leftIcon={<Plus size={18} />}
-              >
-                Ajouter mon premier bateau
+            {isAdmin ? (
+              <Button variant="primary" size="lg" onClick={() => navigate('/admin/bateaux')}>
+                Voir tous les bateaux (admin)
               </Button>
-            </DisabledTooltip>
+            ) : (
+              <DisabledTooltip disabled={!canManageBoat} tooltip={blockedTooltip}>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  onClick={() => navigate('/proprietaire/bateaux/nouveau')}
+                  leftIcon={<Plus size={18} />}
+                >
+                  Ajouter mon premier bateau
+                </Button>
+              </DisabledTooltip>
+            )}
           </div>
         ) : (
           <div className="space-y-4">
@@ -109,7 +121,6 @@ const MyBoats: React.FC = () => {
             ))}
           </div>
         )}
-      </div>
     </div>
   )
 }

@@ -19,7 +19,7 @@ import { usePageTitle } from '../../hooks/usePageTitle'
 const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY as string | undefined
 const stripePromise = stripePublicKey ? loadStripe(stripePublicKey) : null
 if (!stripePublicKey) {
-  console.error('[Stripe] VITE_STRIPE_PUBLIC_KEY manquant — D6 PaymentMethods désactivé.')
+  console.error('[Stripe] VITE_STRIPE_PUBLIC_KEY manquant - D6 PaymentMethods désactivé.')
 }
 
 // Libellés lisibles par marque de carte
@@ -42,7 +42,7 @@ const PaymentMethods: React.FC = () => {
   const [setupClientSecret, setSetupClientSecret] = useState<string | null>(null)
   const [searchParams, setSearchParams] = useSearchParams()
 
-  // Gestion du retour 3DS Stripe (redirection SCA — obligatoire pour les cartes européennes)
+  // Gestion du retour 3DS Stripe (redirection SCA - obligatoire pour les cartes européennes)
   useEffect(() => {
     const setupIntent = searchParams.get('setup_intent')
     const redirectStatus = searchParams.get('redirect_status')
@@ -164,7 +164,7 @@ const PaymentMethods: React.FC = () => {
         {/* Info carte de test en dev */}
         {import.meta.env.DEV && (
           <p className="mt-4 text-xs text-gray-400 dark:text-gray-500">
-            Mode test — utilisez <code className="font-mono">4242 4242 4242 4242</code>, date future,
+            Mode test - utilisez <code className="font-mono">4242 4242 4242 4242</code>, date future,
             CVC quelconque.
           </p>
         )}
@@ -196,7 +196,7 @@ const AddCardForm: React.FC<AddCardFormProps> = ({ onSuccess, onCancel }) => {
     const { error: stripeError } = await stripe.confirmSetup({
       elements,
       confirmParams: {
-        // Retour URL en cas de redirection 3DS — redirige vers la même page
+        // Retour URL en cas de redirection 3DS - redirige vers la même page
         return_url: window.location.href,
       },
       // Évite la redirection si le navigateur supporte la confirmation in-page

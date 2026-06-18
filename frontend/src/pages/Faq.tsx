@@ -257,7 +257,7 @@ const Faq: React.FC = () => {
 
       {/* Contenu principal */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Onglets de catégorie — même style que OwnerBookings, sémantique ARIA tablist */}
+        {/* Onglets de catégorie - même style que OwnerBookings, sémantique ARIA tablist */}
         <div
           role="tablist"
           aria-label="Catégories de questions"

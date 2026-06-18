@@ -19,7 +19,7 @@ interface DayStatus {
 /**
  * Fetch the availability calendar for a boat within a date range.
  * Returns an array of availability periods (blocked and open intervals).
- * This endpoint is public — it is used on the boat detail and booking pages.
+ * This endpoint is public - it is used on the boat detail and booking pages.
  */
 export const getAvailability = async (
   boatId: number,

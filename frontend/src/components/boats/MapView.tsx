@@ -21,21 +21,22 @@ L.Icon.Default.mergeOptions({
 // Icônes créées une seule fois par prix arrondi et réutilisées (style Airbnb).
 const priceIconCache = new Map<number, L.DivIcon>()
 
-const getPriceIcon = (dailyRate: number): L.DivIcon => {
+const getPriceIcon = (dailyRate: number, dark = false): L.DivIcon => {
   const rounded = Math.round(dailyRate)
-  let icon = priceIconCache.get(rounded)
+  const cacheKey = dark ? -rounded : rounded
+  let icon = priceIconCache.get(cacheKey)
   if (!icon) {
     icon = L.divIcon({
       html: `<div style="
-        background: #0c4a6e;
-        color: white;
+        background: ${dark ? '#ffffff' : '#0c4a6e'};
+        color: ${dark ? '#003366' : 'white'};
         font-size: 12px;
         font-weight: 700;
-        padding: 5px 10px;
+        padding: 6px 12px;
         border-radius: 20px;
         white-space: nowrap;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.30);
-        border: 2px solid white;
+        box-shadow: 0 2px 12px rgba(0,60,80,0.5);
+        border: 2px solid ${dark ? 'rgba(0,220,220,0.35)' : 'white'};
         cursor: pointer;
         user-select: none;
       ">${rounded}&nbsp;€</div>`,
@@ -44,12 +45,12 @@ const getPriceIcon = (dailyRate: number): L.DivIcon => {
       iconAnchor: [30, 14],
       popupAnchor: [0, -18],
     })
-    priceIconCache.set(rounded, icon)
+    priceIconCache.set(cacheKey, icon)
   }
   return icon
 }
 
-// ─── MapUpdater — recentre la carte quand les résultats changent ──────────────
+// ─── MapUpdater - recentre la carte quand les résultats changent ──────────────
 // MapContainer ne relit pas center/zoom après le premier rendu (react-leaflet v4).
 // Ce composant enfant force la mise à jour via l'API Leaflet directement.
 const MapUpdater: React.FC<{ center: [number, number]; zoom: number }> = ({
@@ -69,15 +70,17 @@ const MapUpdater: React.FC<{ center: [number, number]; zoom: number }> = ({
 interface MapViewProps {
   boats: Boat[]
   className?: string
+  dark?: boolean
+  fullHeight?: boolean
 }
 
-// Centre de la France métropolitaine — fallback si aucun bateau géolocalisé
+// Centre de la France métropolitaine - fallback si aucun bateau géolocalisé
 const DEFAULT_CENTER: [number, number] = [46.5, 2.5]
 const DEFAULT_ZOOM = 6
 
 // ─── Composant principal ──────────────────────────────────────────────────────
 
-const MapView: React.FC<MapViewProps> = ({ boats, className }) => {
+const MapView: React.FC<MapViewProps> = ({ boats, className, dark = false, fullHeight = false }) => {
   // Seuls les bateaux avec coordonnées GPS sont affichés
   const located = useMemo(
     () => boats.filter((b) => b.lat != null && b.lng != null),
@@ -99,7 +102,7 @@ const MapView: React.FC<MapViewProps> = ({ boats, className }) => {
   const zoom = located.length > 0 ? 8 : DEFAULT_ZOOM
 
   return (
-    <div className={className}>
+    <div className={dark ? `map-teal-blueprint ${className ?? ''}` : className}>
       {located.length === 0 && boats.length > 0 && (
         <p className="text-xs text-gray-400 mb-2 text-center">
           Aucun bateau dans ces résultats n'a de coordonnées GPS.
@@ -110,21 +113,29 @@ const MapView: React.FC<MapViewProps> = ({ boats, className }) => {
         center={center}
         zoom={zoom}
         scrollWheelZoom
-        style={{ height: '600px', width: '100%', borderRadius: '16px' }}
+        style={{
+          height: fullHeight ? '100%' : '600px',
+          width: '100%',
+          borderRadius: fullHeight ? '0' : '16px',
+        }}
       >
         {/* Recentrage dynamique quand les résultats changent */}
         <MapUpdater center={center} zoom={zoom} />
 
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
+          url={
+            dark
+              ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+              : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+          }
         />
 
         {located.map((boat) => (
           <Marker
             key={boat.id}
             position={[boat.lat!, boat.lng!]}
-            icon={getPriceIcon(boat.dailyRate)}
+            icon={getPriceIcon(boat.dailyRate, dark)}
           >
             <Popup minWidth={200}>
               <PopupContent boat={boat} />
@@ -168,7 +179,7 @@ const PopupContent: React.FC<{ boat: Boat }> = ({ boat }) => (
       {BOAT_TYPE_LABELS[boat.type] ?? boat.type} · {boat.port}
     </p>
 
-    {/* Prix — formatPrice pour la cohérence avec le reste de l'UI */}
+    {/* Prix - formatPrice pour la cohérence avec le reste de l'UI */}
     <p style={{ fontWeight: 700, fontSize: '16px', color: '#f97316', marginBottom: '8px' }}>
       {formatPrice(boat.dailyRate)}
       <span style={{ fontWeight: 400, fontSize: '12px', color: '#9ca3af' }}> /jour</span>

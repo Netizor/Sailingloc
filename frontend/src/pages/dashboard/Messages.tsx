@@ -228,7 +228,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
         )}
       </button>
 
-      {/* Bouton archive — visible au survol */}
+      {/* Bouton archive - visible au survol */}
       <button
         onClick={(e) => { e.stopPropagation(); onArchive() }}
         title={isArchived ? 'Désarchiver' : 'Archiver'}

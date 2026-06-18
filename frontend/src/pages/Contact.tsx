@@ -7,7 +7,7 @@ import { usePageTitle } from '../hooks/usePageTitle'
 
 // ─── Données de contact fictives ──────────────────────────────────────────────
 
-// #1 — Référence de composant au lieu de JSX pré-rendu dans les données
+// #1 - Référence de composant au lieu de JSX pré-rendu dans les données
 interface ContactInfo {
   icon: LucideIcon
   title: string
@@ -26,7 +26,7 @@ const CONTACT_INFO: ContactInfo[] = [
     icon: Phone,
     title: 'Téléphone',
     value: '+33 1 23 45 67 89',
-    detail: 'Lun–Ven, 9 h – 18 h',
+    detail: 'Lun-Ven, 9 h à 18 h',
   },
   {
     icon: MapPin,
@@ -37,7 +37,7 @@ const CONTACT_INFO: ContactInfo[] = [
   {
     icon: Clock,
     title: 'Disponibilité',
-    value: 'Lun–Ven, 9 h – 18 h',
+    value: 'Lun-Ven, 9 h à 18 h',
     detail: 'Hors jours fériés',
   },
 ]
@@ -55,10 +55,10 @@ const EMPTY_FORM = { name: '', email: '', subject: SUBJECTS[0], message: '' }
 // ─── Page Contact ─────────────────────────────────────────────────────────────
 
 const Contact: React.FC = () => {
-  // #6 — Titre de l'onglet pour le SEO et l'accessibilité
+  // #6 - Titre de l'onglet pour le SEO et l'accessibilité
   usePageTitle('Contactez-nous')
 
-  // État du formulaire — mock visuel, pas de backend
+  // État du formulaire - mock visuel, pas de backend
   const [form, setForm] = useState(EMPTY_FORM)
   const [sent, setSent] = useState(false)
 
@@ -68,11 +68,11 @@ const Contact: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Simulation d'envoi — pas de vrai backend dans ce prototype
+    // Simulation d'envoi - pas de vrai backend dans ce prototype
     setSent(true)
   }
 
-  // #4 — Réinitialise le formulaire pour permettre un second envoi
+  // #4 - Réinitialise le formulaire pour permettre un second envoi
   const handleReset = () => {
     setSent(false)
     setForm(EMPTY_FORM)
@@ -80,7 +80,7 @@ const Contact: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
-      {/* #2 — Hero extrait en composant partagé PageHero */}
+      {/* #2 - Hero extrait en composant partagé PageHero */}
       <PageHero
         icon={Mail}
         badge="Nous contacter"
@@ -98,7 +98,7 @@ const Contact: React.FC = () => {
                 className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 flex items-start gap-4"
               >
                 <div className="shrink-0 bg-ocean-50 dark:bg-ocean-900/30 rounded-xl p-2.5">
-                  {/* #1 — Instanciation à la volée depuis la référence de composant */}
+                  {/* #1 - Instanciation à la volée depuis la référence de composant */}
                   <info.icon size={22} className="text-ocean-600 dark:text-ocean-400" />
                 </div>
                 <div>
@@ -136,7 +136,7 @@ const Contact: React.FC = () => {
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Merci de nous avoir contactés. Nous vous répondrons dans les 24 h ouvrées.
                 </p>
-                {/* #4 — Bouton de réinitialisation pour envoyer un autre message */}
+                {/* #4 - Bouton de réinitialisation pour envoyer un autre message */}
                 <button
                   onClick={handleReset}
                   className="mt-5 text-sm text-ocean-700 dark:text-ocean-400 hover:text-ocean-900 underline underline-offset-2 transition-colors"
@@ -207,7 +207,7 @@ const Contact: React.FC = () => {
                   <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     Message
                   </label>
-                  {/* #4 — minLength pour éviter les soumissions triviales */}
+                  {/* #4 - minLength pour éviter les soumissions triviales */}
                   <textarea
                     id="message"
                     name="message"

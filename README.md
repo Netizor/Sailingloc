@@ -280,6 +280,14 @@ Après `php bin/console doctrine:fixtures:load` :
 | Propriétaire | `owner@demo.fr` | `Owner@Sail2026!` |
 | Locataire | `renter@demo.fr` | `Renter@Sail2026!` |
 
+Créer / réinitialiser ces comptes dans Supabase :
+
+```bash
+cd backend
+npm run db:seed          # crée seulement si absents
+npm run db:seed:force    # réinitialise aussi les mots de passe
+```
+
 > Les mots de passe respectent la politique CNIL 2022 : 12 caractères minimum, majuscule, minuscule, chiffre, caractère spécial.
 
 ---

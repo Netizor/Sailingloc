@@ -28,7 +28,7 @@ export const createReview = async (reviewData: ReviewCreateData): Promise<Review
 }
 
 /**
- * Admin — liste paginée de tous les avis avec filtre optionnel sur moderationStatus.
+ * Admin - liste paginée de tous les avis avec filtre optionnel sur moderationStatus.
  */
 export const adminListReviews = async (
   params: { page?: number; limit?: number; status?: ReviewModerationStatus } = {},
@@ -38,12 +38,12 @@ export const adminListReviews = async (
 }
 
 /**
- * Admin — approuve ou rejette un avis.
+ * Admin - publie ou masque un avis.
  */
 export const adminUpdateReview = async (
   id: number,
-  moderationStatus: 'APPROVED' | 'REJECTED',
+  payload: { isPublished: boolean; adminNote?: string },
 ): Promise<Review> => {
-  const { data } = await api.patch<Review>(`/reviews/admin/${id}`, { moderationStatus })
+  const { data } = await api.patch<Review>(`/reviews/admin/${id}`, payload)
   return data
 }

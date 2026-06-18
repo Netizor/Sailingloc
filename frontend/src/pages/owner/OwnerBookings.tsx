@@ -2,14 +2,23 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import { Anchor, ChevronLeft, ChevronRight, Star } from 'lucide-react'
+import { Anchor, ChevronLeft, ChevronRight, Star, XCircle, AlertTriangle } from 'lucide-react'
 import { bookingsApi } from '../../api/bookings.api'
 import type { Booking } from '../../types'
 import { BookingStatus } from '../../types'
 import BookingStatusBadge from '../../components/bookings/BookingStatusBadge'
 import Button from '../../components/ui/Button'
+import Modal from '../../components/ui/Modal'
 import Spinner from '../../components/ui/Spinner'
 import { formatDate, formatPrice } from '../../lib/utils'
+
+const OWNER_CANCEL_REASONS = [
+  'Problème technique sur le bateau',
+  'Indisponibilité personnelle',
+  'Conditions météo extrêmes',
+  'Raison de sécurité',
+  'Autre',
+]
 
 // ─── Onglets de filtrage ──────────────────────────────────────────────────────
 
@@ -150,9 +159,13 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
   const renter = booking.renter
   const mainImage = boat?.images?.[0]
   const isPending   = booking.status === BookingStatus.PENDING
+  const isConfirmed = booking.status === BookingStatus.CONFIRMED
   const isCompleted = booking.status === BookingStatus.COMPLETED
-  // Calcul unique pour éviter la duplication du libellé de durée
   const daysLabel = `${booking.totalDays} jour${booking.totalDays !== 1 ? 's' : ''}`
+
+  const [cancelOpen, setCancelOpen]   = useState(false)
+  const [cancelReason, setCancelReason] = useState(OWNER_CANCEL_REASONS[0])
+  const [cancelOther, setCancelOther]  = useState('')
 
   const { mutate: accept, isPending: isAccepting } = useMutation({
     mutationFn: () => bookingsApi.accept(booking.id),
@@ -171,6 +184,24 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
     },
     onError: () => toast.error('Erreur lors du refus'),
   })
+
+  const { mutate: cancel, isPending: isCancelling } = useMutation({
+    mutationFn: (reason: string) => bookingsApi.cancel(booking.id, { cancellationReason: reason }),
+    onSuccess: () => {
+      toast.success('Réservation annulée — le locataire sera intégralement remboursé', { id: 'cancel-booking' })
+      setCancelOpen(false)
+      queryClient.invalidateQueries({ queryKey: ['owner', 'bookings'] })
+    },
+    onError: (err: any) => toast.error(
+      err?.response?.data?.message ?? "Erreur lors de l'annulation",
+      { id: 'cancel-booking' },
+    ),
+  })
+
+  const handleConfirmCancel = () => {
+    const reason = cancelReason === 'Autre' ? (cancelOther.trim() || 'Autre') : cancelReason
+    cancel(reason)
+  }
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col sm:flex-row shadow-sm hover:shadow-md transition-shadow">
@@ -194,7 +225,7 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
               <BookingStatusBadge status={booking.status} />
             </div>
             <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-lg leading-tight">
-              {boat?.title ?? '—'}
+              {boat?.title ?? ''}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
               {formatDate(booking.startDate)} → {formatDate(booking.endDate)}
@@ -239,7 +270,22 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
           </div>
         )}
 
-        {/* D1 — Évaluer le locataire pour les réservations terminées */}
+        {/* Annulation pour les réservations confirmées */}
+        {isConfirmed && new Date(booking.startDate) > new Date() && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button
+              variant="danger"
+              size="sm"
+              leftIcon={<XCircle size={14} />}
+              onClick={() => setCancelOpen(true)}
+              disabled={isCancelling}
+            >
+              Annuler
+            </Button>
+          </div>
+        )}
+
+        {/* Évaluer le locataire pour les réservations terminées */}
         {isCompleted && (
           <div className="flex items-center gap-2 flex-wrap">
             <Link
@@ -252,6 +298,74 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
           </div>
         )}
       </div>
+
+      {/* Modal annulation propriétaire */}
+      <Modal
+        isOpen={cancelOpen}
+        onClose={() => setCancelOpen(false)}
+        title="Annuler la réservation"
+        size="sm"
+      >
+        <div className="p-6 space-y-5">
+          <div className="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-xl p-4">
+            <AlertTriangle size={18} className="text-amber-500 flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-amber-700 space-y-1">
+              <p className="font-medium">Cette action est irréversible.</p>
+              <p>En tant que propriétaire, le locataire sera <strong>intégralement remboursé</strong>.</p>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Motif d'annulation
+            </label>
+            <select
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-white dark:bg-gray-800"
+            >
+              {OWNER_CANCEL_REASONS.map((r) => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </select>
+          </div>
+
+          {cancelReason === 'Autre' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Précisez
+              </label>
+              <textarea
+                value={cancelOther}
+                onChange={(e) => setCancelOther(e.target.value)}
+                rows={3}
+                placeholder="Décrivez votre motif d'annulation…"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 resize-none dark:bg-gray-800"
+              />
+            </div>
+          )}
+
+          <div className="flex gap-3">
+            <Button
+              variant="secondary"
+              fullWidth
+              onClick={() => setCancelOpen(false)}
+              disabled={isCancelling}
+            >
+              Conserver
+            </Button>
+            <Button
+              variant="danger"
+              fullWidth
+              onClick={handleConfirmCancel}
+              loading={isCancelling}
+              disabled={isCancelling}
+            >
+              Confirmer l'annulation
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

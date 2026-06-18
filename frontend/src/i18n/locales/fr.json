@@ -34,10 +34,15 @@
   },
   "nav": {
     "home": "Accueil",
-    "boats": "Bateaux",
+    "destinations": "Nos destinations",
+    "destinationsShort": "Destinations",
+    "boats": "Nos bateaux",
+    "aboutUs": "Qui sommes-nous ?",
+    "aboutShort": "À propos",
+    "services": "Nos services",
     "howItWorks": "Comment ça marche",
     "login": "Connexion",
-    "becomeOwner": "Devenir propriétaire",
+    "becomeOwner": "Devenir Propriétaire",
     "mySpace": "Mon espace",
     "ownerSpace": "Espace propriétaire",
     "admin": "Administration",
@@ -52,8 +57,31 @@
     "language": "Langue",
     "comingSoon": "Prochainement"
   },
+  "accessibility": {
+    "display": "Affichage",
+    "colorBlind": "Mode daltonien",
+    "colorBlindOn": "Activer le mode daltonien (jaune)",
+    "colorBlindOff": "Désactiver le mode daltonien",
+    "french": "Français",
+    "english": "Anglais"
+  },
   "footer": {
     "tagline": "La plateforme de location de bateaux entre particuliers. Naviguez en toute confiance, louez ou proposez votre bateau en quelques clics.",
+    "taglineShort": "La plateforme premium de location de bateaux entre particuliers. Naviguez en toute confiance.",
+    "taglineListing": "Découvrez la liberté de naviguer avec notre sélection de bateaux d'exception.",
+    "navigation": "Navigation",
+    "support": "Support",
+    "legalCol": "Légal",
+    "rentBoat": "Louer un bateau",
+    "helpSupport": "Aide & Support",
+    "editorial": "L'Horizon Éditorial.",
+    "platform": "Plateforme",
+    "destinationsCol": "Destinations",
+    "newsletter": "Newsletter",
+    "newsletterDesc": "Recevez nos offres exclusives et inspirations nautiques.",
+    "emailPlaceholder": "Votre email",
+    "subscribe": "S'inscrire",
+    "rights": "Tous droits réservés.",
     "renters": "Pour les locataires",
     "owners": "Pour les propriétaires",
     "about": "À propos",
@@ -74,34 +102,90 @@
     "careers": "Carrières",
     "legal": {
       "cgu": "CGU",
+      "cguFull": "Conditions Générales",
+      "privacy": "Politique de Confidentialité",
       "mentions": "Mentions légales",
       "rgpd": "RGPD",
       "cookies": "Politique de cookies"
     },
-    "copyright": "Projet étudiant DSP4 O24 — Aucune transaction réelle"
+    "copyright": "Projet étudiant DSP4 O24. Aucune transaction réelle"
+  },
+  "legal": {
+    "documentation": "Documentation",
+    "nav": {
+      "mentions": "Mentions Légales",
+      "cgu": "Conditions Générales",
+      "privacy": "Confidentialité",
+      "cookies": "Politique Cookies"
+    }
+  },
+  "studentNotice": {
+    "title": "Projet étudiant — aucun paiement accepté",
+    "message": "SailingLoc est un projet pédagogique (DSP4 O24). Aucun paiement réel n'est accepté sur ce site : les fonctionnalités de réservation et de paiement sont simulées.",
+    "dismiss": "Fermer ce message",
+    "footerTitle": "Projet étudiant DSP4 O24 — démonstration uniquement",
+    "footerMessage": "Aucun paiement réel est accepté sur ce site. Les réservations et transactions sont fictives, à des fins pédagogiques."
+  },
+  "cookies": {
+    "manage": "Gérer les cookies",
+    "banner": {
+      "ariaLabel": "Bandeau de consentement aux cookies",
+      "title": "Nous utilisons des cookies",
+      "description": "Les cookies essentiels assurent le fonctionnement du site (session, préférences). Les cookies analytiques et marketing ne sont activés qu'avec votre accord. Consultez notre",
+      "customize": "Personnaliser",
+      "essentialOnly": "Essentiels uniquement",
+      "acceptAll": "Tout accepter",
+      "customizeTitle": "Personnaliser mes préférences",
+      "back": "Retour",
+      "save": "Enregistrer mes choix",
+      "essentialLabel": "Cookies essentiels",
+      "essentialDesc": "Authentification, sécurité, préférences de session. Ne peuvent pas être désactivés.",
+      "analyticalLabel": "Cookies analytiques",
+      "analyticalDesc": "Mesure d'audience anonymisée pour améliorer nos pages. Durée : 13 mois.",
+      "marketingLabel": "Cookies marketing",
+      "marketingDesc": "Personnalisation des publicités et retargeting. Durée : 30 jours."
+    }
   },
   "home": {
     "badge": "Location de bateaux entre particuliers",
-    "heroTitle": "Louez un bateau entre particuliers",
-    "heroSubtitle": "Voiliers, catamarans, bateaux à moteur — naviguez sans posséder. Directement entre propriétaires et locataires, en toute confiance.",
+    "heroTitle": "L'élégance de la mer à votre portée",
+    "heroSubtitle": "Vivez des moments d'exception à bord de nos yachts et voiliers d'exception. Une navigation sans compromis.",
     "statsBoats": "bateaux disponibles",
     "statsPorts": "ports couverts",
     "statsRenters": "locataires satisfaits",
-    "howTitle": "Comment ça marche ?",
-    "howSubtitle": "En 3 étapes simples, vivez votre aventure nautique.",
-    "step1Title": "Recherchez",
-    "step1Desc": "Trouvez le bateau idéal parmi notre catalogue. Filtrez par type, port, dates et budget.",
-    "step2Title": "Réservez",
-    "step2Desc": "Envoyez votre demande au propriétaire. Paiement sécurisé, annulation flexible.",
-    "step3Title": "Naviguez",
-    "step3Desc": "Profitez de votre expérience en mer. Partagez votre avis à votre retour.",
-    "popularBoats": "Bateaux populaires",
-    "popularSubtitle": "Les plus appréciés de notre communauté",
+    "howTitle": "Réservez en trois étapes",
+    "howSubtitle": "Une expérience fluide, de la recherche à la navigation.",
+    "conceptLabel": "Simplicité",
+    "step1Title": "Cherchez votre bateau",
+    "step1Desc": "Explorez notre sélection de bateaux d'exception dans les plus beaux ports.",
+    "step2Title": "Réservez en ligne",
+    "step2Desc": "Réservez en toute sécurité avec paiement protégé et confirmation instantanée.",
+    "step3Title": "Partez à l'aventure",
+    "step3Desc": "Embarquez et vivez une expérience nautique inoubliable.",
+    "popularBoats": "Bateaux Populaires",
+    "popularSubtitle": "Les coups de cœur de nos voyageurs cette saison.",
     "seeAllBoats": "Voir tous les bateaux",
-    "exploreBoats": "Explorer tous les bateaux",
+    "exploreBoats": "Trouver un bateau",
     "noBoats": "Aucun bateau disponible pour le moment.",
-    "testimonialsTitle": "Ce que disent nos navigateurs",
+    "destinationsTitle": "Destinations les plus populaires",
+    "destinationsSubtitle": "Explorez les plus beaux coins de navigation",
+    "seeAllDestinations": "Voir toutes les destinations",
+    "featuresTitle": "Naviguez l'esprit libre",
+    "featuresLabel": "Engagement",
+    "feature1Title": "Assurance Premium Incluse",
+    "feature1Desc": "Chaque location est couverte par notre partenaire AXA Marine, vous protégeant contre tous les imprévus.",
+    "feature2Title": "Assistance 24/7",
+    "feature2Desc": "Une équipe d'experts maritimes à votre écoute, que vous soyez au port ou au milieu de l'océan.",
+    "feature3Title": "Bateaux Vérifiés",
+    "feature3Desc": "Plus de 50 points de contrôle effectués sur chaque navire pour garantir votre sécurité et votre confort.",
+    "milesStat": "15k+",
+    "milesStatLabel": "Milles marins parcourus",
+    "testimonialsTitle": "Ils ont navigué avec nous",
     "testimonialsRating": "4.9 / 5 en moyenne",
+    "ctaTitle": "Prête à explorer la mer ?",
+    "ctaSubtitle": "Rejoignez des milliers de navigateurs qui ont choisi SailingLoc pour leurs aventures nautiques.",
+    "ctaRentBoat": "Louer un bateau",
+    "ctaFindBoat": "Trouver un bateau",
     "ownerBadge": "Pour les propriétaires",
     "ownerTitle": "Rentabilisez votre bateau",
     "ownerDesc": "Mettez votre bateau en location et générez des revenus quand vous ne l'utilisez pas. Inscription gratuite, vous décidez de vos disponibilités.",
@@ -116,6 +200,11 @@
     "estimationNote": "*Estimation indicative basée sur la moyenne des propriétaires actifs."
   },
   "search": {
+    "adventures_one": "{{count}} aventure maritime disponible",
+    "adventures_other": "{{count}} aventures maritimes disponibles",
+    "subtitle": "Découvrez les meilleures locations à travers le monde.",
+    "showMore": "Afficher plus de résultats",
+    "viewAll": "Tout voir",
     "title_one": "{{count}} bateau trouvé",
     "title_other": "{{count}} bateaux trouvés",
     "noResults": "Aucun bateau trouvé",
@@ -170,7 +259,7 @@
       "errorEmail": "L'email est requis",
       "errorEmailInvalid": "Email invalide",
       "errorPassword": "Le mot de passe est requis",
-      "demo": "Projet étudiant DSP4 O24 — Aucune transaction réelle"
+      "demo": "Projet étudiant DSP4 O24. Aucune transaction réelle"
     },
     "forgotPassword": {
       "title": "Mot de passe oublié",
@@ -217,7 +306,7 @@
       "emailPlaceholder": "vous@exemple.fr",
       "phone": "Téléphone",
       "phonePlaceholder": "+33 6 12 34 56 78",
-      "phoneHint": "Optionnel — utile pour les propriétaires",
+      "phoneHint": "Optionnel, utile pour les propriétaires",
       "password": "Mot de passe",
       "passwordPlaceholder": "Minimum 12 caractères",
       "confirmPassword": "Confirmer le mot de passe",
@@ -252,7 +341,7 @@
       "errorConfirmPassword": "Confirmez le mot de passe",
       "errorPasswordMatch": "Les mots de passe ne correspondent pas",
       "errorTerms": "Vous devez accepter les conditions",
-      "demo": "Projet étudiant DSP4 O24 — Aucune transaction réelle"
+      "demo": "Projet étudiant DSP4 O24. Aucune transaction réelle"
     }
   },
   "boat": {
@@ -386,7 +475,7 @@
     "approved": "Identité vérifiée",
     "rejected": "Vérification refusée",
     "submit": "Soumettre votre pièce d'identité",
-    "formats": "Formats acceptés : JPEG, PNG, PDF — max. 10 Mo par fichier.",
+    "formats": "Formats acceptés : JPEG, PNG, PDF (max. 10 Mo par fichier).",
     "front": "Recto (face avant)",
     "back": "Verso (face arrière)",
     "sendDocs": "Envoyer les documents",
@@ -406,9 +495,14 @@
   },
   "destinations": {
     "title": "Destinations",
-    "subtitle": "Explorez les plus beaux ports de France et de Méditerranée.",
+    "heroTitle": "Explorez nos destinations",
+    "subtitle": "Des horizons infinis, du Méditerranée aux Caraïbes, d'Asie à l'Océanie.",
     "boats": "{{count}} bateau disponible",
     "boats_other": "{{count}} bateaux disponibles",
+    "noBoats": "Aucun bateau disponible pour {{name}} pour le moment.",
+    "emptyRegion": "Aucune destination dans cette région pour le moment.",
+    "seasonPick": "La sélection de la saison",
+    "seeSelection": "Voir la sélection",
     "explore": "Explorer",
     "backToDestinations": "Retour aux destinations"
   },
@@ -422,8 +516,10 @@
     "error": "Erreur lors de la publication"
   },
   "notFound": {
-    "title": "Page introuvable",
-    "subtitle": "La page que vous cherchez n'existe pas ou a été déplacée.",
-    "backHome": "Retour à l'accueil"
+    "pageTitle": "Page introuvable",
+    "title": "Vous êtes en eaux inconnues.",
+    "subtitle": "La page que vous cherchez n'existe pas ou a été déplacée vers un autre port.",
+    "backHome": "Retour à l'accueil",
+    "seeFleet": "Voir la flotte"
   }
 }

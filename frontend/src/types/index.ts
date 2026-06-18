@@ -158,6 +158,8 @@ export interface Review {
   rating: number
   comment: string
   isPublished: boolean
+  adminNote?: string | null
+  boatTitle?: string | null
   createdAt: string
   updatedAt?: string
 }
@@ -250,6 +252,9 @@ export interface AuthResponse {
 
 export interface BoatListParams {
   location?: string
+  country?: string
+  countries?: string[]
+  locations?: string[]
   types?: BoatType[]
   startDate?: string
   endDate?: string
@@ -299,13 +304,15 @@ export interface AdminDashboardStats {
   activeBookings?: number
   confirmedBookings?: number
   completedBookings?: number
-  /** Taux de conversion (%) — (confirmées + terminées) / total (F1) */
+  /** Taux de conversion (%) - (confirmées + terminées) / total (F1) */
   conversionRate?: number
   /** Nombre d'avis en attente de modération (F4) */
   pendingReviews?: number
   recentBookings?: Partial<Booking>[]
   recentUsers?: Partial<User>[]
   revenueByMonth?: { month: string; revenue: number }[]
+  bookingsByMonth?: { month: string; bookings: number }[]
+  activeBoats?: number
 }
 
 // ─── Owner Revenues ───────────────────────────────────────────────────────────

@@ -65,23 +65,38 @@ const OwnerDashboard: React.FC = () => {
 
   return (
     <>
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-start justify-between flex-wrap gap-4 mb-8">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
-              Espace propriétaire
-            </h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">Bonjour, {user?.firstName} !</p>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+            Espace propriétaire
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Bonjour, {user?.firstName} !</p>
+        </div>
+
+        {/* CTA Ajouter un bateau - mis en avant */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-teal to-brand-navy p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 shadow-lg shadow-brand-teal/20">
+          <div className="relative z-10">
+            <p className="text-white/70 text-xs font-semibold tracking-wider uppercase mb-1">
+              Publiez votre annonce
+            </p>
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">
+              Ajoutez votre bateau dès maintenant
+            </h2>
+            <p className="text-white/80 text-sm max-w-md">
+              Mettez votre unité en location en quelques minutes et commencez à générer des revenus.
+            </p>
           </div>
-          <Button
-            variant="primary"
+          <button
+            type="button"
             onClick={() => navigate('/proprietaire/bateaux/nouveau')}
-            leftIcon={<Ship size={16} />}
+            className="relative z-10 flex-shrink-0 flex items-center gap-2.5 bg-white text-brand-navy hover:bg-gray-50 font-semibold text-sm px-6 py-3.5 rounded-xl shadow-md transition-all hover:shadow-lg active:scale-[0.98]"
           >
+            <Ship size={18} />
             Ajouter un bateau
-          </Button>
+          </button>
+          <div className="absolute -right-8 -bottom-8 h-40 w-40 rounded-full bg-white/5 pointer-events-none" />
+          <div className="absolute -right-4 top-4 h-24 w-24 rounded-full bg-white/5 pointer-events-none" />
         </div>
 
         {/* Earnings cards */}
@@ -209,10 +224,9 @@ const OwnerDashboard: React.FC = () => {
             </div>
           </section>
         </div>
-      </div>
     </div>
 
-    {/* Onboarding — affiché une seule fois après l'inscription */}
+    {/* Onboarding - affiché une seule fois après l'inscription */}
     {showOnboarding && (
       <OnboardingModal onClose={() => setShowOnboarding(false)} />
     )}
@@ -250,7 +264,7 @@ const PendingBookingCard: React.FC<{
         <p className="font-medium text-gray-900 dark:text-gray-100 text-sm">{booking.boat?.title ?? 'Bateau'}</p>
         <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1 mt-0.5">
           <Clock size={11} />
-          {formatDate(booking.startDate)} — {formatDate(booking.endDate)}
+          {formatDate(booking.startDate)} au {formatDate(booking.endDate)}
         </p>
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           Locataire : {booking.renter?.firstName} {booking.renter?.lastName}

@@ -77,7 +77,7 @@ export function useProfileCompletion(): ProfileCompletion {
     }
   }
 
-  // Un locataire peut toujours réserver — seuls les propriétaires ont des pré-requis
+  // Un locataire peut toujours réserver - seuls les propriétaires ont des pré-requis
   const canBook        = true
   const canManageBoat  = isOwner ? (isEmailVerified && hasPhone) : true
   const isComplete     = issues.length === 0

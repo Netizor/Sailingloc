@@ -10,9 +10,9 @@ const __dirname  = path.dirname(__filename)
  * Comptes de démonstration créés par `php bin/console doctrine:fixtures:load`.
  */
 export const DEMO_ACCOUNTS = {
-  renter: { email: 'renter@demo.fr',       password: 'Renter123!' },
-  owner:  { email: 'owner@demo.fr',        password: 'Owner123!'  },
-  admin:  { email: 'admin@sailingloc.fr',  password: 'Admin123!'  },
+  renter: { email: 'renter@demo.fr',       password: 'Renter@Sail2026!' },
+  owner:  { email: 'owner@demo.fr',        password: 'Owner@Sail2026!'  },
+  admin:  { email: 'admin@sailingloc.fr',  password: 'Admin@Sail2026!'  },
 } as const
 
 const AUTH_DIR = path.join(__dirname, '../.auth')

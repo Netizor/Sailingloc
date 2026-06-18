@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
-import { AlertTriangle, CheckCircle, XCircle, X } from 'lucide-react'
+import { AlertTriangle, CheckCircle, XCircle, X, Eye } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { adminApi } from '../../api/admin.api'
-import type { ResolveDisputePayload } from '../../api/admin.api'
-import { formatDate, formatPrice } from '../../lib/utils'
+import { formatDate, formatPrice, getBookingStatusLabel } from '../../lib/utils'
 import { BookingStatus } from '../../types'
 import type { Booking } from '../../types'
 import BookingStatusBadge from '../../components/bookings/BookingStatusBadge'
@@ -37,7 +36,7 @@ const ResolveDisputeModal: React.FC<ResolveModalProps> = ({ booking, onClose, on
   const [adminNote, setAdminNote] = useState('')
 
   const mutation = useMutation({
-    mutationFn: (payload: ResolveDisputePayload) => adminApi.resolveDispute(booking.id, payload),
+    mutationFn: (status: BookingStatus) => adminApi.updateBookingStatus(booking.id, status),
     onSuccess: () => {
       toast.success('Litige résolu avec succès')
       onResolved()
@@ -64,15 +63,11 @@ const ResolveDisputeModal: React.FC<ResolveModalProps> = ({ booking, onClose, on
 
   const handleConfirm = () => {
     if (!resolution) return
-    mutation.mutate({
-      resolution,
-      refund: resolution === 'cancel' ? refund : undefined,
-      adminNote: adminNote.trim() || undefined,
-    })
+    mutation.mutate(resolution === 'complete' ? BookingStatus.COMPLETED : BookingStatus.CANCELLED)
   }
 
   return (
-    /* Overlay — désactivé pendant le traitement pour éviter une fermeture accidentelle */
+    /* Overlay - désactivé pendant le traitement pour éviter une fermeture accidentelle */
     <div
       role="dialog"
       aria-modal="true"
@@ -104,10 +99,10 @@ const ResolveDisputeModal: React.FC<ResolveModalProps> = ({ booking, onClose, on
         {/* Résumé réservation */}
         <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 mb-5 text-sm text-gray-600 dark:text-gray-300">
           <p className="font-medium text-gray-800 dark:text-gray-200 mb-0.5">
-            {booking.boat?.title ?? '—'}
+            {booking.boat?.title ?? ''}
           </p>
           <p>
-            {booking.renter?.firstName} {booking.renter?.lastName} —{' '}
+            {booking.renter?.firstName} {booking.renter?.lastName},{' '}
             {formatDate(booking.startDate)} au {formatDate(booking.endDate)}
           </p>
           <p className="font-semibold text-gray-900 dark:text-gray-100 mt-1">
@@ -201,10 +196,29 @@ const ResolveDisputeModal: React.FC<ResolveModalProps> = ({ booking, onClose, on
 
 // ─── Page principale ──────────────────────────────────────────────────────────
 
+const ALL_STATUSES = [
+  BookingStatus.PENDING,
+  BookingStatus.CONFIRMED,
+  BookingStatus.COMPLETED,
+  BookingStatus.CANCELLED,
+  BookingStatus.DISPUTED,
+]
+
 const AdminBookings: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<BookingStatusFilter>('ALL')
   const [selectedDispute, setSelectedDispute] = useState<Booking | null>(null)
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
   const queryClient = useQueryClient()
+
+  const statusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: number; status: BookingStatus }) =>
+      adminApi.updateBookingStatus(id, status),
+    onSuccess: () => {
+      toast.success('Statut mis à jour')
+      queryClient.invalidateQueries({ queryKey: ['admin', 'bookings'] })
+    },
+    onError: () => toast.error('Erreur lors de la mise à jour'),
+  })
 
   const { data, isLoading, isError, isPlaceholderData } = useQuery({
     queryKey: ['admin', 'bookings', { statusFilter }],
@@ -229,9 +243,8 @@ const AdminBookings: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="mb-8">
+    <div>
+        <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Gestion des réservations</h1>
           <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
             {data?.total ?? 0} réservation(s)
@@ -312,7 +325,7 @@ const AdminBookings: React.FC = () => {
                           </div>
                           <div className="max-w-[160px]">
                             <p className="font-medium text-gray-900 dark:text-gray-100 truncate">
-                              {booking.boat?.title ?? '—'}
+                              {booking.boat?.title ?? ''}
                             </p>
                           </div>
                         </div>
@@ -330,7 +343,7 @@ const AdminBookings: React.FC = () => {
 
                       {/* Dates */}
                       <td className="px-5 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                        {formatDate(booking.startDate)} — {formatDate(booking.endDate)}
+                        {formatDate(booking.startDate)} au {formatDate(booking.endDate)}
                       </td>
 
                       {/* Jours */}
@@ -348,18 +361,36 @@ const AdminBookings: React.FC = () => {
                         <BookingStatusBadge status={booking.status} />
                       </td>
 
-                      {/* Actions — bouton de résolution uniquement pour les litiges */}
                       <td className="px-5 py-4">
-                        {booking.status === BookingStatus.DISPUTED && (
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <select
+                            value={booking.status}
+                            onChange={(e) =>
+                              statusMutation.mutate({ id: booking.id, status: e.target.value as BookingStatus })
+                            }
+                            className="text-xs border border-gray-200 dark:border-gray-600 rounded-lg px-2 py-1.5 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                          >
+                            {ALL_STATUSES.map((s) => (
+                              <option key={s} value={s}>{getBookingStatusLabel(s)}</option>
+                            ))}
+                          </select>
                           <button
                             type="button"
-                            onClick={() => setSelectedDispute(booking)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 text-xs font-medium hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors whitespace-nowrap"
+                            onClick={() => setSelectedBooking(booking)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                           >
-                            <AlertTriangle size={13} />
-                            Résoudre
+                            <Eye size={13} /> Détail
                           </button>
-                        )}
+                          {booking.status === BookingStatus.DISPUTED && (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedDispute(booking)}
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-50 text-amber-700 text-xs font-medium hover:bg-amber-100"
+                            >
+                              <AlertTriangle size={13} /> Litige
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -368,7 +399,25 @@ const AdminBookings: React.FC = () => {
             </div>
           )}
         </div>
-      </div>
+
+      {selectedBooking && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setSelectedBooking(null)}>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start justify-between mb-5">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">Réservation #{selectedBooking.id}</h2>
+              <button onClick={() => setSelectedBooking(null)} className="text-gray-400"><X size={18} /></button>
+            </div>
+            <div className="space-y-2 text-sm">
+              <p><span className="text-gray-500">Bateau :</span> <strong>{selectedBooking.boat?.title}</strong></p>
+              <p><span className="text-gray-500">Locataire :</span> {selectedBooking.renter?.firstName} {selectedBooking.renter?.lastName}</p>
+              <p><span className="text-gray-500">Propriétaire :</span> {selectedBooking.owner?.firstName} {selectedBooking.owner?.lastName}</p>
+              <p><span className="text-gray-500">Dates :</span> {formatDate(selectedBooking.startDate)} au {formatDate(selectedBooking.endDate)}</p>
+              <p><span className="text-gray-500">Montant :</span> <strong>{formatPrice(selectedBooking.totalAmount)}</strong></p>
+              <p><span className="text-gray-500">Statut :</span> <BookingStatusBadge status={selectedBooking.status} /></p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal de résolution de litige */}
       {selectedDispute && (
@@ -381,5 +430,6 @@ const AdminBookings: React.FC = () => {
     </div>
   )
 }
+
 
 export default AdminBookings
