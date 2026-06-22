@@ -92,6 +92,17 @@ export const updateBookingStatus = async (
   return data
 }
 
+interface ReviewAdminStats {
+  total: number
+  hiddenCount: number
+  avgRating: number | null
+}
+
+export const getReviewStats = async (): Promise<ReviewAdminStats> => {
+  const { data } = await api.get<ReviewAdminStats>('/reviews/admin/stats')
+  return data
+}
+
 export const listReviews = async (
   params: PaginationParams = {},
 ): Promise<PaginatedResponse<Review>> => {
@@ -136,6 +147,7 @@ export const adminApi = {
   },
   setBoatStatus,
   deleteBoat,
+  getReviewStats,
   listReviews,
   deleteReview,
   moderateReview,

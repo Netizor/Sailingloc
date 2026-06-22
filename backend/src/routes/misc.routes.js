@@ -42,7 +42,7 @@ export const reviewsRouter = Router()
 
 reviewsRouter.post('/', authenticate, async (req, res) => {
   const { bookingId, type, rating, comment } = req.body
-  if (!bookingId || !type || !rating || !comment) return res.status(400).json({ message: 'bookingId, type, rating et comment requis' })
+  if (!bookingId || !type || !rating) return res.status(400).json({ message: 'bookingId, type et rating requis' })
   if (!['RENTER_TO_BOAT','OWNER_TO_RENTER'].includes(type)) return res.status(400).json({ message: 'Type invalide' })
   if (rating < 1 || rating > 5) return res.status(400).json({ message: 'Note entre 1 et 5' })
 
@@ -58,11 +58,10 @@ reviewsRouter.post('/', authenticate, async (req, res) => {
     boat_id: type === 'RENTER_TO_BOAT' ? booking.boat_id : null,
     author_id: req.user.id,
     target_user_id: type === 'OWNER_TO_RENTER' ? booking.renter_id : null,
-    type, rating, comment: comment.trim(),
-    is_published: true,
-  }).select('*, users!author_id(id, first_name, last_name, avatar)').single()
+    type, rating, comment: comment?.trim() ?? '',
+  }).select().single()
 
-  if (error) return res.status(500).json({ message: error.message })
+  if (error) { console.error('[reviews insert]', error.message, error.details); return res.status(500).json({ message: error.message }) }
 
   if (type === 'RENTER_TO_BOAT' && booking.boat_id) {
     const { data: allReviews } = await supabase.from('reviews').select('rating').eq('boat_id', booking.boat_id).eq('type', 'RENTER_TO_BOAT').eq('is_published', true)
@@ -72,6 +71,22 @@ reviewsRouter.post('/', authenticate, async (req, res) => {
     }
   }
   return res.status(201).json(review)
+})
+
+reviewsRouter.get('/mine', authenticate, async (req, res) => {
+  const { data } = await supabase
+    .from('reviews')
+    .select('id, rating, booking_id')
+    .eq('author_id', req.user.id)
+  const reviews = data || []
+  const avgRating = reviews.length
+    ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
+    : null
+  return res.json({
+    count: reviews.length,
+    avgRating: avgRating ? Math.round(avgRating * 10) / 10 : null,
+    bookingIds: reviews.map((r) => r.booking_id),
+  })
 })
 
 reviewsRouter.get('/boat/:boatId', async (req, res) => {
@@ -102,6 +117,21 @@ function formatAdminReview(r) {
   }
 }
 
+reviewsRouter.get('/admin/stats', authenticate, requireRole('ADMIN'), async (req, res) => {
+  const [total, hidden, published] = await Promise.all([
+    supabase.from('reviews').select('id', { count: 'exact', head: true }),
+    supabase.from('reviews').select('id', { count: 'exact', head: true }).eq('is_published', false),
+    supabase.from('reviews').select('rating').eq('is_published', true),
+  ])
+  const ratings = (published.data || []).map((r) => r.rating)
+  const avgRating = ratings.length ? Math.round((ratings.reduce((s, r) => s + r, 0) / ratings.length) * 10) / 10 : null
+  return res.json({
+    total: total.count || 0,
+    hiddenCount: hidden.count || 0,
+    avgRating,
+  })
+})
+
 reviewsRouter.get('/admin', authenticate, requireRole('ADMIN'), async (req, res) => {
   const page  = Math.max(1, parseInt(req.query.page) || 1)
   const limit = Math.min(100, parseInt(req.query.limit) || 15)
@@ -127,12 +157,11 @@ reviewsRouter.patch('/admin/:id', authenticate, requireRole('ADMIN'), async (req
   const { data: existing } = await supabase.from('reviews').select('boat_id, type, is_published').eq('id', req.params.id).single()
   if (!existing) return res.status(404).json({ message: 'Avis introuvable' })
 
-  const updates = { is_published: isPublished, updated_at: new Date().toISOString() }
+  const updates = { is_published: isPublished }
   if (adminNote !== undefined) updates.admin_note = adminNote || null
 
-  const { data, error } = await supabase.from('reviews').update(updates).eq('id', req.params.id)
-    .select('*, author:users!author_id(id, first_name, last_name, avatar), boats(id, title)').single()
-  if (error) return res.status(500).json({ message: error.message })
+  const { data, error } = await supabase.from('reviews').update(updates).eq('id', req.params.id).select().single()
+  if (error) { console.error('[reviews patch]', error.message); return res.status(500).json({ message: error.message }) }
 
   // Recalculer la note du bateau si l'état de publication change
   if (existing.boat_id && existing.type === 'RENTER_TO_BOAT' && existing.is_published !== isPublished) {
@@ -170,8 +199,6 @@ reviewsRouter.delete('/admin/:id', authenticate, requireRole('ADMIN'), async (re
 // ═══════════════════════════════════════════════════════════
 export const messagesRouter = Router()
 
-// ─ Helpers ───────────────────────────────────────────────────────────────────
-
 function convKey(u1, u2) {
   return `${Math.min(u1, u2)}-${Math.max(u1, u2)}`
 }
@@ -195,14 +222,10 @@ function fmtMsg(msg, key) {
   return out
 }
 
-// ─ GET /messages/unread-count ─────────────────────────────────────────────────
-
 messagesRouter.get('/unread-count', authenticate, async (req, res) => {
   const { count } = await supabase.from('messages').select('id', { count: 'exact', head: true }).eq('recipient_id', req.user.id).eq('is_read', false)
   return res.json({ count: count || 0 })
 })
-
-// ─ GET /messages/conversations ────────────────────────────────────────────────
 
 messagesRouter.get('/conversations', authenticate, async (req, res) => {
   const userId = req.user.id
@@ -253,8 +276,6 @@ messagesRouter.get('/conversations', authenticate, async (req, res) => {
   return res.json({ conversations })
 })
 
-// ─ GET /messages/conversation/:key ───────────────────────────────────────────
-
 messagesRouter.get('/conversation/:key', authenticate, async (req, res) => {
   const users = parseKey(req.params.key)
   if (!users) return res.status(400).json({ message: 'Clé de conversation invalide' })
@@ -279,8 +300,6 @@ messagesRouter.get('/conversation/:key', authenticate, async (req, res) => {
   const total = count || 0
   return res.json({ data: (data || []).map(m => fmtMsg(m, key)), page, limit, total, totalPages: Math.ceil(total / limit) })
 })
-
-// ─ GET /messages/stream/:key (SSE temps réel) ────────────────────────────────
 
 messagesRouter.get('/stream/:key', async (req, res) => {
   const token = req.query.token
@@ -342,11 +361,6 @@ messagesRouter.get('/stream/:key', async (req, res) => {
 
   setTimeout(poll, POLL_MS)
 })
-
-// ─ POST /messages/conversations/:key/archive ─────────────────────────────────
-
-
-// ─ POST /messages ────────────────────────────────────────────────────────────
 
 messagesRouter.post('/', authenticate, async (req, res) => {
   const { recipientId, receiverId, content, boatId } = req.body
@@ -600,7 +614,6 @@ adminRouter.get('/stats', async (req, res) => {
   return res.json(await buildDashboardStats())
 })
 
-// ─── Utilisateurs ───────────────────────────────────────────
 adminRouter.get('/users', async (req, res) => {
   const page  = Math.max(1, parseInt(req.query.page) || 1)
   const limit = Math.min(100, parseInt(req.query.limit) || 20)
@@ -669,7 +682,6 @@ adminRouter.patch('/users/:id/role', async (req, res) => {
   return res.json({ message: 'Rôle mis à jour' })
 })
 
-// ─── Bateaux ────────────────────────────────────────────────
 adminRouter.get('/boats', async (req, res) => {
   const page  = Math.max(1, parseInt(req.query.page) || 1)
   const limit = Math.min(100, parseInt(req.query.limit) || 20)
@@ -716,7 +728,6 @@ adminRouter.delete('/boats/:id', async (req, res) => {
   return res.json({ message: 'Annonce supprimée' })
 })
 
-// ─── Réservations ───────────────────────────────────────────
 adminRouter.get('/bookings', async (req, res) => {
   const page  = Math.max(1, parseInt(req.query.page) || 1)
   const limit = Math.min(100, parseInt(req.query.limit) || 20)
@@ -766,14 +777,16 @@ adminRouter.patch('/bookings/:id/status', async (req, res) => {
   return res.json(formatAdminBooking({ ...updated, owners: updated.boats?.users }))
 })
 
-// ─── Signalements ───────────────────────────────────────────
+const TO_DB_STATUS   = { PENDING: 'pending', PROCESSED: 'resolved', DISMISSED: 'dismissed' }
+const FROM_DB_STATUS = { pending: 'PENDING', resolved: 'PROCESSED', dismissed: 'DISMISSED' }
+
 adminRouter.get('/reports', async (req, res) => {
   const page  = Math.max(1, parseInt(req.query.page) || 1)
   const limit = Math.min(100, parseInt(req.query.limit) || 15)
   const status = req.query.status
 
   let query = supabase.from('reports').select('*', { count: 'exact' })
-  if (status) query = query.eq('status', status)
+  if (status) query = query.eq('status', TO_DB_STATUS[status] || status.toLowerCase())
 
   const { data, count } = await query
     .order('created_at', { ascending: false })
@@ -799,7 +812,7 @@ adminRouter.get('/reports', async (req, res) => {
       reporterName,
       reason: r.reason,
       details: r.description,
-      status: r.status || 'PENDING',
+      status: FROM_DB_STATUS[r.status] || 'PENDING',
       adminNote: r.admin_note,
       createdAt: r.created_at,
       processedAt: r.processed_at,
@@ -811,13 +824,13 @@ adminRouter.get('/reports', async (req, res) => {
 
 adminRouter.patch('/reports/:id', async (req, res) => {
   const { status, adminNote } = req.body
-  const updates = { processed_at: new Date().toISOString() }
-  if (status) updates.status = status
+  const updates = {}
+  if (status) updates.status = TO_DB_STATUS[status] || status.toLowerCase()
   if (adminNote !== undefined) updates.admin_note = adminNote
 
-  const { data, error } = await supabase.from('reports').update(updates).eq('id', req.params.id).select().single()
+  const { error } = await supabase.from('reports').update(updates).eq('id', req.params.id)
   if (error) return res.status(500).json({ message: error.message })
-  return res.json({ message: 'Signalement mis à jour', id: data.id })
+  return res.json({ message: 'Signalement mis à jour' })
 })
 
 // ═══════════════════════════════════════════════════════════
@@ -828,9 +841,16 @@ export const reportsRouter = Router()
 reportsRouter.post('/', authenticate, async (req, res) => {
   const { targetType, targetId, reason, description } = req.body
   if (!targetType || !targetId || !reason) return res.status(400).json({ message: 'targetType, targetId et reason requis' })
-  const { data, error } = await supabase.from('reports').insert({ reporter_id: req.user.id, target_type: targetType, target_id: String(targetId), reason, description }).select().single()
+  const { error } = await supabase.from('reports').insert({
+    reporter_id: req.user.id,
+    target_type: targetType.toLowerCase(),
+    target_id: String(targetId),
+    reason,
+    description: description ?? null,
+    status: 'pending',
+  })
   if (error) return res.status(500).json({ message: error.message })
-  return res.status(201).json(data)
+  return res.status(201).json({ message: 'Signalement créé' })
 })
 
 // ═══════════════════════════════════════════════════════════
