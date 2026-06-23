@@ -416,20 +416,62 @@ favoritesRouter.delete('/:boatId', authenticate, async (req, res) => {
 export const availabilityRouter = Router()
 
 availabilityRouter.get('/:boatId', async (req, res) => {
-  const { data } = await supabase.from('availabilities').select('*').eq('boat_id', req.params.boatId).gte('end_date', new Date().toISOString().slice(0, 10))
-  return res.json({ data: data || [] })
+  const { boatId } = req.params
+  const from = req.query.from || new Date().toISOString().slice(0, 10)
+  const to   = req.query.to   || new Date(Date.now() + 6 * 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+
+  const [{ data: periods }, { data: bookings }] = await Promise.all([
+    supabase.from('availabilities').select('start_date, end_date')
+      .eq('boat_id', boatId).lte('start_date', to).gte('end_date', from),
+    supabase.from('bookings').select('id, start_date, end_date')
+      .eq('boat_id', boatId).in('status', ['CONFIRMED', 'PENDING'])
+      .lte('start_date', to).gte('end_date', from),
+  ])
+
+  const dateMap = new Map()
+
+  for (const p of (periods || [])) {
+    const end = new Date(p.end_date)
+    for (let d = new Date(p.start_date); d <= end; d.setDate(d.getDate() + 1)) {
+      const key = d.toISOString().slice(0, 10)
+      if (key >= from && key <= to) dateMap.set(key, { isAvailable: false, bookingId: null })
+    }
+  }
+
+  for (const b of (bookings || [])) {
+    const end = new Date(b.end_date)
+    for (let d = new Date(b.start_date); d <= end; d.setDate(d.getDate() + 1)) {
+      const key = d.toISOString().slice(0, 10)
+      if (key >= from && key <= to) dateMap.set(key, { isAvailable: false, bookingId: String(b.id) })
+    }
+  }
+
+  return res.json({
+    availability: Array.from(dateMap, ([date, info]) => ({ date, ...info })),
+  })
 })
 
-availabilityRouter.post('/', authenticate, async (req, res) => {
-  const { boatId, startDate, endDate, type } = req.body
-  if (!boatId || !startDate || !endDate) return res.status(400).json({ message: 'boatId, startDate et endDate requis' })
+availabilityRouter.post('/:boatId', authenticate, async (req, res) => {
+  const { boatId } = req.params
+  const { dates, isAvailable } = req.body
+  if (!Array.isArray(dates) || dates.length === 0) {
+    return res.status(400).json({ message: 'dates requis' })
+  }
 
   const { data: boat } = await supabase.from('boats').select('owner_id').eq('id', boatId).single()
-  if (!boat || (boat.owner_id !== req.user.id && req.user.role !== 'ADMIN')) return res.status(403).json({ message: 'Accès refusé' })
+  if (!boat || (boat.owner_id !== req.user.id && req.user.role !== 'ADMIN')) {
+    return res.status(403).json({ message: 'Accès refusé' })
+  }
 
-  const { data, error } = await supabase.from('availabilities').insert({ boat_id: boatId, start_date: startDate, end_date: endDate, type: type || 'BLOCKED' }).select().single()
-  if (error) return res.status(500).json({ message: error.message })
-  return res.status(201).json(data)
+  await supabase.from('availabilities').delete().eq('boat_id', boatId).in('start_date', dates)
+
+  if (!isAvailable) {
+    const records = dates.map((date) => ({ boat_id: Number(boatId), start_date: date, end_date: date, type: 'BLOCKED' }))
+    const { error } = await supabase.from('availabilities').insert(records)
+    if (error) return res.status(500).json({ message: error.message })
+  }
+
+  return res.json({ message: 'Disponibilités mises à jour' })
 })
 
 availabilityRouter.delete('/:id', authenticate, async (req, res) => {
