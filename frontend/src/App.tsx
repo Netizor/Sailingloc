@@ -41,13 +41,13 @@ const MyFavorites = React.lazy(() => import('./pages/dashboard/MyFavorites'))
 const BookingDetail = React.lazy(() => import('./pages/dashboard/BookingDetail'))
 const LeaveReview = React.lazy(() => import('./pages/dashboard/LeaveReview'))
 const Messages = React.lazy(() => import('./pages/dashboard/Messages'))
-const Conversation = React.lazy(() => import('./pages/dashboard/Conversation'))
 const NotFound = React.lazy(() => import('./pages/NotFound'))
 
 // ── Nouvelles pages ────────────────────────────────────────────────────────────
 const MyPayments = React.lazy(() => import('./pages/dashboard/MyPayments'))
 const PaymentMethods = React.lazy(() => import('./pages/dashboard/PaymentMethods'))
 const KycVerification = React.lazy(() => import('./pages/dashboard/KycVerification'))
+const MyDocuments = React.lazy(() => import('./pages/dashboard/MyDocuments'))
 const SavedSearches = React.lazy(() => import('./pages/dashboard/SavedSearches'))
 const OwnerProfile = React.lazy(() => import('./pages/OwnerProfile'))
 const Destination = React.lazy(() => import('./pages/Destination'))
@@ -176,6 +176,8 @@ export default function App() {
                 <Route path="cartes" element={<PaymentMethods />} />
                 {/* C1 - KYC */}
                 <Route path="verification" element={<KycVerification />} />
+                {/* Upload de documents contractuels */}
+                <Route path="documents" element={<MyDocuments />} />
                 {/* C9 - Recherches sauvegardées */}
                 <Route path="alertes" element={<SavedSearches />} />
                 </Route>

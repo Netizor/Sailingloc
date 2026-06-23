@@ -1,7 +1,11 @@
 import { Router } from 'express'
 import jwt from 'jsonwebtoken'
+import { v2 as cloudinary } from 'cloudinary'
+import multer from 'multer'
 import supabase from '../lib/supabase.js'
 import { authenticate, requireRole } from '../middleware/auth.middleware.js'
+
+const docUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } })
 
 // ═══════════════════════════════════════════════════════════
 // NOTIFICATIONS
@@ -920,6 +924,57 @@ seoRouter.get('/robots.txt', (req, res) => {
   const frontUrl = process.env.FRONTEND_URL || 'https://sailingloc.fr'
   res.header('Content-Type', 'text/plain')
   res.send(`User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /dashboard\nSitemap: ${frontUrl}/sitemap.xml`)
+})
+
+// ═══════════════════════════════════════════════════════════
+// DOCUMENTS
+// ═══════════════════════════════════════════════════════════
+export const documentsRouter = Router()
+
+documentsRouter.get('/', authenticate, async (req, res) => {
+  const { data: user } = await supabase.from('users').select('documents').eq('id', req.user.id).single()
+  return res.json({ documents: user?.documents || {} })
+})
+
+documentsRouter.patch('/', authenticate, async (req, res) => {
+  const { section, data } = req.body
+  if (!section || !data) return res.status(400).json({ message: 'section et data requis' })
+  const { data: user } = await supabase.from('users').select('documents').eq('id', req.user.id).single()
+  const current = user?.documents || {}
+  const updated = { ...current, [section]: { ...(current[section] || {}), ...data } }
+  const { error } = await supabase.from('users').update({ documents: updated }).eq('id', req.user.id)
+  if (error) return res.status(500).json({ message: error.message })
+  return res.json({ documents: updated })
+})
+
+documentsRouter.post('/upload', authenticate, docUpload.single('file'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ message: 'Aucun fichier fourni' })
+  const { section, field } = req.body
+  if (!section || !field) return res.status(400).json({ message: 'section et field requis' })
+  try {
+    const ext = (req.file.originalname.split('.').pop() || 'bin').toLowerCase()
+    const storagePath = `${req.user.id}/${section}/${field}.${ext}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('documents')
+      .upload(storagePath, req.file.buffer, { contentType: req.file.mimetype, upsert: true })
+
+    if (uploadError) return res.status(500).json({ message: uploadError.message })
+
+    const { data: { publicUrl } } = supabase.storage.from('documents').getPublicUrl(storagePath)
+
+    const { data: user } = await supabase.from('users').select('documents').eq('id', req.user.id).single()
+    const current = user?.documents || {}
+    const updated = { ...current, [section]: { ...(current[section] || {}), [field]: publicUrl } }
+
+    const { error } = await supabase.from('users').update({ documents: updated }).eq('id', req.user.id)
+    if (error) return res.status(500).json({ message: error.message })
+
+    return res.json({ url: publicUrl, documents: updated })
+  } catch (err) {
+    console.error('[documents/upload]', err.message)
+    return res.status(500).json({ message: err.message || 'Erreur upload' })
+  }
 })
 
 // ═══════════════════════════════════════════════════════════
