@@ -8,7 +8,7 @@ import { useAuthStore } from '../../store/auth.store'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import toast from 'react-hot-toast'
-import loginBoat from '../../assets/images/login-boat.png'
+
 interface LoginForm {
   email: string
   password: string
@@ -81,96 +81,122 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
     loginMutation.mutate()
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-ocean-950 via-ocean-800 to-ocean-600 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        {/* Card */}
-        <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden">
-          {/* Header banner */}
-          <div className="bg-ocean-700 px-8 py-8 text-center">
-            <Link to="/" className="inline-flex items-center gap-2 justify-center mb-3">
-              <div className="bg-white/20 p-2 rounded-xl">
-                <Anchor size={24} className="text-white" />
-              </div>
-              <span className="text-2xl font-bold text-white tracking-tight">SailingLoc</span>
+  const card = (
+    <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden">
+      <div className="bg-ocean-700 px-8 py-8 text-center">
+        <Link to="/" className="inline-flex items-center gap-2 justify-center mb-3">
+          <div className="bg-white/20 p-2 rounded-xl">
+            <Anchor size={24} className="text-white" />
+          </div>
+          <span className="text-2xl font-bold text-white tracking-tight">SailingLoc</span>
+        </Link>
+        <h1 className="text-xl font-bold text-white">{t('auth.login.title')}</h1>
+        <p className="text-ocean-200 text-sm mt-1">{t('auth.login.subtitle')}</p>
+      </div>
+
+      <div className="px-8 py-8">
+        <form onSubmit={handleSubmit} noValidate className="space-y-5">
+          {globalError && (
+            <div className="flex items-center gap-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 rounded-xl px-4 py-3" role="alert">
+              <AlertCircle size={16} className="text-red-500 flex-shrink-0" />
+              <p className="text-sm text-red-700">{globalError}</p>
+            </div>
+          )}
+
+          <Input
+            label={t('auth.login.email')}
+            type="email"
+            autoComplete="email"
+            placeholder={t('auth.login.emailPlaceholder')}
+            value={form.email}
+            onChange={handleChange('email')}
+            error={errors.email}
+            leftIcon={<Mail size={16} />}
+            required
+          />
+
+          <Input
+            label={t('auth.login.password')}
+            type={showPassword ? 'text' : 'password'}
+            autoComplete="current-password"
+            placeholder={t('auth.login.passwordPlaceholder')}
+            value={form.password}
+            onChange={handleChange('password')}
+            error={errors.password}
+            leftIcon={<Lock size={16} />}
+            rightIcon={showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            onRightIconClick={() => setShowPassword((v) => !v)}
+            required
+          />
+
+          <div className="flex items-center justify-between -mt-1">
+            <label className="flex items-center gap-2 cursor-pointer select-none group">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-ocean-600 focus:ring-ocean-500 cursor-pointer"
+              />
+              <span className="text-sm text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200">
+                {t('auth.login.rememberMe')}
+              </span>
+            </label>
+
+            <Link
+              to="/mot-de-passe-oublie"
+              className="text-sm text-ocean-600 hover:text-ocean-800 font-medium"
+            >
+              {t('auth.login.forgotPassword')}
             </Link>
           </div>
 
-          <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-5">
-            {globalError && (
-              <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
-                <AlertCircle size={16} className="text-red-500" />
-                <p className="text-sm text-red-700">{globalError}</p>
-              </div>
-            )}
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            fullWidth
+            loading={loginMutation.isPending}
+          >
+            {t('auth.login.submit')}
+          </Button>
+        </form>
 
-            <Input
-              label={t('auth.login.email')}
-              type="email"
-              autoComplete="email"
-              placeholder="nom@exemple.com"
-              value={form.email}
-              onChange={handleChange('email')}
-              error={errors.email}
-              required
-            />
-
-            <Input
-              label={t('auth.login.password')}
-              type={showPassword ? 'text' : 'password'}
-              autoComplete="current-password"
-              placeholder="••••••••"
-              value={form.password}
-              onChange={handleChange('password')}
-              error={errors.password}
-              rightIcon={showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              onRightIconClick={() => setShowPassword((v) => !v)}
-              required
-            />
-
-            <div className="flex justify-end">
-              <Link to="/mot-de-passe-oublie" className="text-xs text-blue-600">
-                Mot de passe oublié ?
-              </Link>
-            </div>
-
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              fullWidth
-              loading={loginMutation.isPending}
+        {!embedded && (
+          <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
+            {t('auth.login.noAccount')}{' '}
+            <Link
+              to="/inscription"
+              className="text-ocean-700 font-semibold hover:text-ocean-900"
             >
-              Se connecter
-            </Button>
-          </form>
+              {t('auth.login.register')}
+            </Link>
+          </p>
+        )}
 
-            {/* Register link */}
-            <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
-              {t('auth.login.noAccount')}{' '}
-              <Link
-                to="/inscription"
-                className="text-ocean-700 font-semibold hover:text-ocean-900"
-              >
-                {t('auth.login.register')}
-              </Link>
+        {!embedded && (
+          <div className="mt-6 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-center">
+            <p className="text-xs text-amber-700 font-medium">
+              {t('auth.login.demo')}
             </p>
-
-            <div className="mt-6 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-center">
-              <p className="text-xs text-amber-700 font-medium">
-                {t('auth.login.demo')}
-              </p>
-            </div>
           </div>
-        </div>
+        )}
+      </div>
+    </div>
+  )
 
+  if (embedded) {
+    return <div className="w-full">{card}</div>
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-ocean-950 via-ocean-800 to-ocean-600 flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md">
+        {card}
         <p className="text-center text-ocean-200/60 text-xs mt-6">
           © {new Date().getFullYear()} SailingLoc
         </p>
       </div>
-    </footer>
-  </div>
-
+    </div>
   )
 }
 
