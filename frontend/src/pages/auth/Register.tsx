@@ -10,8 +10,9 @@ import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import { cn } from '../../lib/utils'
 import toast from 'react-hot-toast'
-import loginBoat from '../../assets/images/login-boat.png'
-import logo from '../../assets/images/logo-sailingloc.png'
+
+const LOGIN_HERO_IMAGE = '/login-boat.png'
+const LOGO_IMAGE = '/logo.jpeg'
 
 type RegistrationRole = UserRole.RENTER | UserRole.OWNER
 
@@ -159,7 +160,7 @@ const Register: React.FC<RegisterProps> = ({
   const formContent = (
     <div className="w-full max-w-[620px]">
       <Link to="/" className="inline-block mb-12">
-        <img src={logo} alt="SailingLoc" className="h-11 w-auto" />
+        <img src={LOGO_IMAGE} alt="SailingLoc" className="h-11 w-auto" />
       </Link>
 
       <Link to="/" className="text-sm font-medium text-gray-500 hover:text-gray-700">
@@ -384,7 +385,7 @@ const Register: React.FC<RegisterProps> = ({
         <section
           className="hidden lg:flex items-end bg-cover bg-center px-16 py-20 text-white"
           style={{
-            backgroundImage: `linear-gradient(rgba(3,18,50,0.15), rgba(3,18,50,0.85)), url(${loginBoat})`,
+            backgroundImage: `linear-gradient(rgba(3,18,50,0.15), rgba(3,18,50,0.85)), url(${LOGIN_HERO_IMAGE})`,
           }}
         >
           <div className="max-w-xl">

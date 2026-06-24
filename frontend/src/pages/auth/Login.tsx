@@ -8,8 +8,8 @@ import { useAuthStore } from '../../store/auth.store'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import toast from 'react-hot-toast'
-import loginBoat from '../../assets/images/login-boat.png'
-import logo from '../../assets/images/logo-sailingloc.png'
+
+const LOGIN_HERO_IMAGE = '/login-boat.png'
 
 interface LoginForm {
   email: string
@@ -150,7 +150,7 @@ const Login: React.FC = () => {
         <section
           className="hidden lg:flex items-end px-20 py-24 bg-cover bg-center relative"
           style={{
-            backgroundImage: `linear-gradient(rgba(5,20,50,0.25), rgba(5,20,50,0.80)), url(${loginBoat})`,
+            backgroundImage: `linear-gradient(rgba(5,20,50,0.25), rgba(5,20,50,0.80)), url(${LOGIN_HERO_IMAGE})`,
           }}
         >
           <div className="text-white max-w-md mb-8">
