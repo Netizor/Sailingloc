@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { Eye, EyeOff, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, AlertCircle, Ship } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { authApi } from '../../api/auth.api'
@@ -9,7 +9,8 @@ import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import toast from 'react-hot-toast'
 
-const LOGIN_HERO_IMAGE = '/login-boat.png'
+
+const LOGIN_HERO_IMAGE = '/login-boat.jpg'
 
 interface LoginForm {
   email: string
@@ -148,11 +149,16 @@ const Login: React.FC = () => {
         </section>
 
         <section
+        
           className="hidden lg:flex items-end px-20 py-24 bg-cover bg-center relative"
           style={{
             backgroundImage: `linear-gradient(rgba(5,20,50,0.25), rgba(5,20,50,0.80)), url(${LOGIN_HERO_IMAGE})`,
           }}
         >
+          <Ship
+  size={130}
+  className="absolute right-20 top-16 text-white/25"
+/>
           <div className="text-white max-w-md mb-8">
             <p className="text-2xl font-serif font-bold leading-relaxed">
               “La mer est un espace de liberté infinie, nous en sommes les gardiens pour vos plus beaux souvenirs.”

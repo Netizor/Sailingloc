@@ -7,8 +7,8 @@ import toast from 'react-hot-toast'
 import { authApi } from '../../api/auth.api'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
-import loginBoat from '../../assets/images/login-boat.png'
-import logo from '../../assets/images/logo-sailingloc.png'
+const loginBoat = '/login-boat.jpg'
+const logo = '/logo.jpeg'
 
 interface ResetForm {
   password: string

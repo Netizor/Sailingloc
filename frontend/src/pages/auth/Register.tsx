@@ -10,10 +10,10 @@ import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import { cn } from '../../lib/utils'
 import toast from 'react-hot-toast'
+import { Ship } from 'lucide-react'
 
-const LOGIN_HERO_IMAGE = '/login-boat.png'
+const LOGIN_HERO_IMAGE = '/login-boat.jpg'
 const LOGO_IMAGE = '/logo.jpeg'
-
 type RegistrationRole = UserRole.RENTER | UserRole.OWNER
 
 interface RegisterForm {
@@ -167,9 +167,9 @@ const Register: React.FC<RegisterProps> = ({
         ← Retour d’accueil
       </Link>
 
-      <h1 className="mt-5 text-5xl font-bold tracking-tight text-[#071d49]">
-        Créer un compte
-      </h1>
+      <h1 className="mt-10 text-5xl font-serif font-bold leading-tight text-[#071d49]">
+  Créer un compte
+</h1>
 
       <p className="mt-3 text-lg text-gray-500">
         Rejoignez la communauté SailingLoc.
@@ -378,7 +378,7 @@ const Register: React.FC<RegisterProps> = ({
   return (
     <div className="min-h-screen bg-white">
       <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
-        <section className="flex items-center justify-center px-8 py-12 lg:px-16">
+        <section className="flex items-center justify-center bg-[#f8f7ff] px-8 py-12 lg:px-16">
           {formContent}
         </section>
 
@@ -388,21 +388,28 @@ const Register: React.FC<RegisterProps> = ({
             backgroundImage: `linear-gradient(rgba(3,18,50,0.15), rgba(3,18,50,0.85)), url(${LOGIN_HERO_IMAGE})`,
           }}
         >
+          <Ship
+  size={130}
+  className="absolute right-20 top-16 text-white/25"
+/>
           <div className="max-w-xl">
-            <h2 className="text-4xl font-serif font-bold leading-tight">
+            <h2 className="text-2xl font-serif font-bold leading-tight">
               La mer est un espace de liberté infinie,
               <br />
               nous en sommes les gardiens pour vos plus beaux souvenirs.
             </h2>
 
-            <p className="mt-8 text-xs font-bold tracking-[0.35em]">
+            <p className="mt-6 text-xs font-bold tracking-widest">
               CAPITAINE MARC L, SAILINGLOC EXPERT
             </p>
 
             <div className="my-10 h-px w-16 bg-white/60" />
 
-            <p className="text-3xl font-bold">+1,200 Propriétaires</p>
-            <p className="mt-2 text-lg text-white/85">Nous font confiance chaque jour</p>
+            <p className="mt-6 text-sm">
+              <span className="font-bold">+1,200 Propriétaires</span>
+              <br />
+              Nous font confiance chaque jour
+            </p>
           </div>
         </section>
       </div>
