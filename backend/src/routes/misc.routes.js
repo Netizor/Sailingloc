@@ -709,11 +709,69 @@ adminRouter.patch('/users/:id/block', async (req, res) => {
   return res.json({ message: `Utilisateur ${blocked ? 'bloqué' : 'débloqué'}` })
 })
 
+const ROLE_HIERARCHY = { RENTER: 0, OWNER: 1, ADMIN: 2 }
+
+// ── Rôles (CRUD) ───────────────────────────────────────────
+adminRouter.get('/roles', async (req, res) => {
+  const { data, error } = await supabase
+    .from('roles').select('*')
+    .order('is_system', { ascending: false })
+    .order('created_at')
+  if (error) return res.status(500).json({ message: error.message })
+  return res.json({ data: data || [] })
+})
+
+adminRouter.post('/roles', async (req, res) => {
+  const { name, label, description, color } = req.body
+  if (!name || !label) return res.status(400).json({ message: 'name et label requis' })
+  const normalized = name.toUpperCase().replace(/[^A-Z0-9_]/g, '_')
+  const { data, error } = await supabase.from('roles').insert({
+    name: normalized, label, description: description || '', color: color || 'gray', is_system: false,
+  }).select().single()
+  if (error) return res.status(error.code === '23505' ? 409 : 500).json({ message: error.message })
+  return res.status(201).json(data)
+})
+
+adminRouter.patch('/roles/:id', async (req, res) => {
+  const { label, description, color } = req.body
+  const updates = {}
+  if (label !== undefined) updates.label = label
+  if (description !== undefined) updates.description = description
+  if (color !== undefined) updates.color = color
+  if (!Object.keys(updates).length) return res.status(400).json({ message: 'Aucune modification' })
+  const { data, error } = await supabase.from('roles').update(updates).eq('id', req.params.id).select().single()
+  if (error) return res.status(500).json({ message: error.message })
+  return res.json(data)
+})
+
+adminRouter.delete('/roles/:id', async (req, res) => {
+  const { data: role } = await supabase.from('roles').select('is_system, name').eq('id', req.params.id).single()
+  if (!role) return res.status(404).json({ message: 'Rôle introuvable' })
+  if (role.is_system) return res.status(403).json({ message: 'Les rôles système ne peuvent pas être supprimés' })
+  const { count } = await supabase.from('users').select('id', { count: 'exact', head: true }).eq('role', role.name)
+  if (count > 0) return res.status(409).json({ message: `${count} utilisateur(s) ont ce rôle — réattribuez-les d'abord` })
+  await supabase.from('roles').delete().eq('id', req.params.id)
+  return res.json({ message: 'Rôle supprimé' })
+})
+
+adminRouter.get('/role-stats', async (req, res) => {
+  const [renters, owners, admins] = await Promise.all([
+    supabase.from('users').select('id', { count: 'exact', head: true }).eq('role', 'RENTER'),
+    supabase.from('users').select('id', { count: 'exact', head: true }).eq('role', 'OWNER'),
+    supabase.from('users').select('id', { count: 'exact', head: true }).eq('role', 'ADMIN'),
+  ])
+  return res.json({ RENTER: renters.count || 0, OWNER: owners.count || 0, ADMIN: admins.count || 0 })
+})
+
 adminRouter.patch('/users/:id', async (req, res) => {
   const updates = {}
   if (req.body.isActive !== undefined) updates.is_blocked = !req.body.isActive
   if (req.body.role) {
     if (!['RENTER', 'OWNER', 'ADMIN'].includes(req.body.role)) return res.status(400).json({ message: 'Rôle invalide' })
+    if (String(req.params.id) === String(req.user.id) &&
+        (ROLE_HIERARCHY[req.body.role] ?? 0) < (ROLE_HIERARCHY[req.user.role] ?? 0)) {
+      return res.status(403).json({ message: 'Vous ne pouvez pas vous attribuer un rôle inférieur au vôtre' })
+    }
     updates.role = req.body.role
   }
   if (!Object.keys(updates).length) return res.status(400).json({ message: 'Aucune modification' })
@@ -724,6 +782,10 @@ adminRouter.patch('/users/:id', async (req, res) => {
 adminRouter.patch('/users/:id/role', async (req, res) => {
   const { role } = req.body
   if (!['RENTER', 'OWNER', 'ADMIN'].includes(role)) return res.status(400).json({ message: 'Rôle invalide' })
+  if (String(req.params.id) === String(req.user.id) &&
+      (ROLE_HIERARCHY[role] ?? 0) < (ROLE_HIERARCHY[req.user.role] ?? 0)) {
+    return res.status(403).json({ message: 'Vous ne pouvez pas vous attribuer un rôle inférieur au vôtre' })
+  }
   await supabase.from('users').update({ role }).eq('id', req.params.id)
   return res.json({ message: 'Rôle mis à jour' })
 })

@@ -33,6 +33,40 @@ export const getDashboardStats = async (): Promise<AdminDashboardStats> => {
   return data
 }
 
+export const getRoleStats = async (): Promise<Record<string, number>> => {
+  const { data } = await api.get('/admin/role-stats')
+  return data
+}
+
+export interface RoleDefinition {
+  id: number
+  name: string
+  label: string
+  description: string
+  color: string
+  is_system: boolean
+  created_at: string
+}
+
+export const listRoles = async (): Promise<RoleDefinition[]> => {
+  const { data } = await api.get<{ data: RoleDefinition[] }>('/admin/roles')
+  return data.data
+}
+
+export const createRole = async (payload: { name: string; label: string; description?: string; color?: string }): Promise<RoleDefinition> => {
+  const { data } = await api.post<RoleDefinition>('/admin/roles', payload)
+  return data
+}
+
+export const updateRole = async (id: number, payload: { label?: string; description?: string; color?: string }): Promise<RoleDefinition> => {
+  const { data } = await api.patch<RoleDefinition>(`/admin/roles/${id}`, payload)
+  return data
+}
+
+export const deleteRole = async (id: number): Promise<void> => {
+  await api.delete(`/admin/roles/${id}`)
+}
+
 export const listUsers = async (
   params: AdminUserListParams = {},
 ): Promise<PaginatedResponse<User>> => {
@@ -125,6 +159,11 @@ export const moderateReview = async (
 
 export const adminApi = {
   getStats: getDashboardStats,
+  getRoleStats,
+  listRoles,
+  createRole,
+  updateRole,
+  deleteRole,
   getBookings: listBookings,
   getBooking,
   updateBookingStatus,
