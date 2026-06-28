@@ -26,6 +26,9 @@ interface AdminBoatListParams extends PaginationParams {
 
 interface AdminBookingListParams extends PaginationParams {
   status?: string
+  search?: string
+  startDate?: string
+  endDate?: string
 }
 
 export const getDashboardStats = async (): Promise<AdminDashboardStats> => {

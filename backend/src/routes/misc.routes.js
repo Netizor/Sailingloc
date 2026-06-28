@@ -915,15 +915,33 @@ adminRouter.delete('/boats/:id', async (req, res) => {
 })
 
 adminRouter.get('/bookings', async (req, res) => {
-  const page  = Math.max(1, parseInt(req.query.page) || 1)
-  const limit = Math.min(100, parseInt(req.query.limit) || 20)
-  const status = req.query.status
+  const page      = Math.max(1, parseInt(req.query.page) || 1)
+  const limit     = Math.min(100, parseInt(req.query.limit) || 20)
+  const status    = req.query.status
+  const search    = (req.query.search || '').trim()
+  const startDate = req.query.startDate
+  const endDate   = req.query.endDate
 
   let query = supabase
     .from('bookings')
     .select('*, boats(id, title, images, city, port, owner_id, users!owner_id(id, first_name, last_name)), renters:users!renter_id(id, first_name, last_name, email)', { count: 'exact' })
 
-  if (status) query = query.eq('status', status)
+  if (status)    query = query.eq('status', status)
+  if (startDate) query = query.gte('start_date', startDate)
+  if (endDate)   query = query.lte('end_date', endDate)
+
+  if (search) {
+    if (/^\d+$/.test(search)) {
+      query = query.eq('id', parseInt(search))
+    } else {
+      const { data: matched } = await supabase
+        .from('users').select('id')
+        .or(`email.ilike.%${search}%,first_name.ilike.%${search}%,last_name.ilike.%${search}%`)
+      const ids = (matched || []).map(u => u.id)
+      if (!ids.length) return res.json({ data: [], total: 0, page, limit, totalPages: 0 })
+      query = query.in('renter_id', ids)
+    }
+  }
 
   const { data, count } = await query
     .order('created_at', { ascending: false })
