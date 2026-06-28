@@ -8,6 +8,7 @@ import {
   Flag,
   Star,
   Shield,
+  ShieldCheck,
 } from 'lucide-react'
 import { useAuthStore } from '../../store/auth.store'
 import { cn } from '../../lib/utils'
@@ -19,6 +20,7 @@ const navItems = [
   { to: '/admin/reservations', label: 'Réservations', icon: <CalendarCheck size={18} /> },
   { to: '/admin/signalements', label: 'Signalements', icon: <Flag size={18} /> },
   { to: '/admin/avis', label: 'Avis', icon: <Star size={18} /> },
+  { to: '/admin/roles', label: 'Rôles', icon: <ShieldCheck size={18} /> },
 ]
 
 const AdminDashboardLayout: React.FC = () => {
