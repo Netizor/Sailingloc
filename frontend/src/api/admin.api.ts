@@ -79,6 +79,34 @@ export const getUser = async (userId: number): Promise<User> => {
   return data
 }
 
+export const createAdminUser = async (payload: {
+  firstName: string
+  lastName: string
+  email: string
+  password?: string
+  role?: string
+  phone?: string
+}): Promise<User> => {
+  const { data } = await api.post<User>('/admin/users', payload)
+  return data
+}
+
+export const updateAdminUser = async (
+  userId: number,
+  payload: { firstName?: string; lastName?: string; email?: string; phone?: string; role?: string; isActive?: boolean },
+): Promise<User> => {
+  const { data } = await api.patch<User>(`/admin/users/${userId}`, payload)
+  return data
+}
+
+export const deleteAdminUser = async (userId: number): Promise<void> => {
+  await api.delete(`/admin/users/${userId}`)
+}
+
+export const verifyAdminUserEmail = async (userId: number): Promise<void> => {
+  await api.patch(`/admin/users/${userId}/verify-email`)
+}
+
 export const updateUserStatus = async (
   userId: number,
   payload: { isActive?: boolean; role?: string },
@@ -176,6 +204,10 @@ export const adminApi = {
     return { ...result, users: result.data }
   },
   getUser,
+  createUser: createAdminUser,
+  updateUser: updateAdminUser,
+  deleteUser: deleteAdminUser,
+  verifyUserEmail: verifyAdminUserEmail,
   setUserActive: (userId: number, isActive: boolean) =>
     updateUserStatus(userId, { isActive }),
   setUserRole: (userId: number, role: string) =>

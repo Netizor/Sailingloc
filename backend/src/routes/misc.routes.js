@@ -1,9 +1,12 @@
 import { Router } from 'express'
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcryptjs'
+import { v4 as uuidv4 } from 'uuid'
 import { v2 as cloudinary } from 'cloudinary'
 import multer from 'multer'
 import supabase from '../lib/supabase.js'
 import { authenticate, requireRole } from '../middleware/auth.middleware.js'
+import { sendEmailVerification } from '../services/email.service.js'
 
 const docUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } })
 
@@ -763,6 +766,42 @@ adminRouter.get('/role-stats', async (req, res) => {
   return res.json({ RENTER: renters.count || 0, OWNER: owners.count || 0, ADMIN: admins.count || 0 })
 })
 
+adminRouter.post('/users', async (req, res) => {
+  const { firstName, lastName, email, password, role, phone } = req.body
+  if (!firstName || !lastName || !email)
+    return res.status(400).json({ message: 'Prénom, nom et email requis' })
+
+  const normalizedEmail = email.toLowerCase().trim()
+  const { count } = await supabase.from('users').select('id', { count: 'exact', head: true }).eq('email', normalizedEmail)
+  if (count > 0) return res.status(409).json({ message: 'Email déjà utilisé' })
+
+  const assignedRole = ['RENTER', 'OWNER', 'ADMIN'].includes(role) ? role : 'RENTER'
+  const rawPwd = (password || '').trim() || `Sail${Math.random().toString(36).slice(2, 8)}A1!`
+  const hashedPassword = await bcrypt.hash(rawPwd, 12)
+
+  const { data: newUser, error } = await supabase.from('users').insert({
+    email: normalizedEmail,
+    password: hashedPassword,
+    first_name: firstName,
+    last_name: lastName,
+    role: assignedRole,
+    phone: phone || null,
+    terms_accepted_at: new Date().toISOString(),
+  }).select('id, email, role, first_name, last_name, phone, avatar, bio, is_blocked, email_verified_at, created_at').single()
+
+  if (error) return res.status(500).json({ message: error.message })
+
+  const verifToken = uuidv4()
+  await supabase.from('email_verification_tokens').insert({
+    token: verifToken,
+    user_id: newUser.id,
+    expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+  })
+  try { await sendEmailVerification(newUser.email, newUser.first_name, verifToken) } catch {}
+
+  return res.status(201).json(formatAdminUser({ ...newUser, boats_count: 0 }))
+})
+
 adminRouter.patch('/users/:id', async (req, res) => {
   const updates = {}
   if (req.body.isActive !== undefined) updates.is_blocked = !req.body.isActive
@@ -774,9 +813,48 @@ adminRouter.patch('/users/:id', async (req, res) => {
     }
     updates.role = req.body.role
   }
+  if (req.body.firstName !== undefined) updates.first_name = req.body.firstName
+  if (req.body.lastName !== undefined) updates.last_name = req.body.lastName
+  if (req.body.phone !== undefined) updates.phone = req.body.phone || null
+  if (req.body.email !== undefined) {
+    const normalizedEmail = req.body.email.toLowerCase().trim()
+    const { count } = await supabase.from('users').select('id', { count: 'exact', head: true })
+      .eq('email', normalizedEmail).neq('id', req.params.id)
+    if (count > 0) return res.status(409).json({ message: 'Email déjà utilisé' })
+    updates.email = normalizedEmail
+  }
   if (!Object.keys(updates).length) return res.status(400).json({ message: 'Aucune modification' })
-  await supabase.from('users').update(updates).eq('id', req.params.id)
-  return res.json({ message: 'Utilisateur mis à jour' })
+  const { data, error } = await supabase.from('users').update(updates)
+    .eq('id', req.params.id)
+    .select('id, email, role, first_name, last_name, phone, avatar, bio, is_blocked, email_verified_at, created_at')
+    .single()
+  if (error) return res.status(500).json({ message: error.message })
+  return res.json(formatAdminUser({ ...data, boats_count: 0 }))
+})
+
+adminRouter.patch('/users/:id/verify-email', async (req, res) => {
+  const { data: user } = await supabase.from('users').select('id, email_verified_at').eq('id', req.params.id).single()
+  if (!user) return res.status(404).json({ message: 'Utilisateur introuvable' })
+  if (user.email_verified_at) return res.status(409).json({ message: 'Email déjà vérifié' })
+  await supabase.from('users').update({ email_verified_at: new Date().toISOString() }).eq('id', req.params.id)
+  await supabase.from('email_verification_tokens').delete().eq('user_id', req.params.id)
+  return res.json({ message: 'Email marqué comme vérifié' })
+})
+
+adminRouter.delete('/users/:id', async (req, res) => {
+  if (String(req.params.id) === String(req.user.id))
+    return res.status(403).json({ message: 'Vous ne pouvez pas supprimer votre propre compte' })
+
+  const { count: activeBookings } = await supabase.from('bookings')
+    .select('id', { count: 'exact', head: true })
+    .eq('renter_id', req.params.id)
+    .in('status', ['pending', 'confirmed'])
+  if (activeBookings > 0)
+    return res.status(409).json({ message: `${activeBookings} réservation(s) active(s) — annulez-les d'abord` })
+
+  const { error } = await supabase.from('users').delete().eq('id', req.params.id)
+  if (error) return res.status(500).json({ message: error.message })
+  return res.json({ message: 'Utilisateur supprimé' })
 })
 
 adminRouter.patch('/users/:id/role', async (req, res) => {
