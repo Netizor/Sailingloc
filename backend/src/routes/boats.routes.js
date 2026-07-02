@@ -148,8 +148,7 @@ router.get('/my', authenticate, async (req, res) => {
     .order('created_at', { ascending: false })
     .range(from, from + limit - 1)
 
-    console.error('ERREUR SUPABASE:', error)
-    if (error) return res.status(500).json({ message: error.message })
+  if (error) return res.status(500).json({ message: error.message })
   return res.json({ data: (data || []).map(b => formatBoat(b, true)), total: count || 0, page, limit })
 })
 
