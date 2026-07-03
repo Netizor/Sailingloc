@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Search, UserCheck, UserX, Shield, User as UserIcon, Ship, Eye, X } from 'lucide-react'
+import { Search, UserCheck, UserX, Shield, User as UserIcon, Ship, Eye, X, FileCheck } from 'lucide-react'
 import { adminApi } from '../../api/admin.api'
 import { formatDate } from '../../lib/utils'
 import Badge from '../../components/ui/Badge'
@@ -26,6 +26,7 @@ const AdminUsers: React.FC = () => {
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState<string>('ALL')
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
+  const [sailorCvRejectionReason, setSailorCvRejectionReason] = useState('')
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin', 'users', { search, roleFilter }],
@@ -51,6 +52,18 @@ const AdminUsers: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
     },
     onError: () => toast.error('Erreur'),
+  })
+
+  const reviewSailorCvMutation = useMutation({
+    mutationFn: ({ userId, status, rejectionReason }: { userId: number; status: 'APPROVED' | 'REJECTED'; rejectionReason?: string }) =>
+      adminApi.reviewSailorCv(userId, { status, rejectionReason }),
+    onSuccess: () => {
+      toast.success('Statut du CV marin mis à jour')
+      setSailorCvRejectionReason('')
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'user', selectedUserId] })
+    },
+    onError: () => toast.error('Erreur lors de la validation du CV marin'),
   })
 
   const { data: userDetail } = useQuery({
@@ -107,7 +120,7 @@ const AdminUsers: React.FC = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-gray-50/60 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700">
-                    {['Utilisateur', 'Email', 'Rôle', 'Statut', 'Bateaux', 'Membre depuis', 'Actions'].map((h) => (
+                    {['Utilisateur', 'Email', 'Rôle', 'Statut', 'CV marin', 'Bateaux', 'Membre depuis', 'Actions'].map((h) => (
                       <th
                         key={h}
                         className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap"
@@ -168,6 +181,16 @@ const AdminUsers: React.FC = () => {
                           </Badge>
                         </td>
 
+                        <td className="px-5 py-4">
+                          <Badge
+                            variant={user.sailorCvStatus === 'APPROVED' ? 'success' : user.sailorCvStatus === 'PENDING' ? 'warning' : user.sailorCvStatus === 'REJECTED' ? 'danger' : 'default'}
+                            size="sm"
+                          >
+                            <FileCheck size={11} />
+                            {user.sailorCvStatus === 'APPROVED' ? 'Vérifié' : user.sailorCvStatus === 'PENDING' ? 'À vérifier' : user.sailorCvStatus === 'REJECTED' ? 'Refusé' : 'Non soumis'}
+                          </Badge>
+                        </td>
+
                         <td className="px-5 py-4 text-gray-600 dark:text-gray-400 text-center">
                           {user.boatsCount ?? 0}
                         </td>
@@ -225,6 +248,74 @@ const AdminUsers: React.FC = () => {
               <p><span className="text-gray-500">Inscrit le :</span> {formatDate(userDetail.createdAt)}</p>
               {(userDetail as AdminUser).boatsCount != null && (
                 <p><span className="text-gray-500">Bateaux :</span> {(userDetail as AdminUser).boatsCount}</p>
+              )}
+              {(userDetail.role === 'OWNER' || userDetail.role === 'ADMIN') && (
+                <div className="pt-4 mt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="font-semibold text-gray-900 dark:text-gray-100">CV de marin</p>
+                    <Badge
+                      variant={userDetail.sailorCvStatus === 'APPROVED' ? 'success' : userDetail.sailorCvStatus === 'PENDING' ? 'warning' : userDetail.sailorCvStatus === 'REJECTED' ? 'danger' : 'default'}
+                      size="sm"
+                    >
+                      {userDetail.sailorCvStatus === 'APPROVED' ? 'Vérifié' : userDetail.sailorCvStatus === 'PENDING' ? 'À vérifier' : userDetail.sailorCvStatus === 'REJECTED' ? 'Refusé' : 'Non soumis'}
+                    </Badge>
+                  </div>
+                  {userDetail.sailorBio && (
+                    <p><span className="text-gray-500">Présentation :</span> {userDetail.sailorBio}</p>
+                  )}
+                  {userDetail.sailingQualifications && (
+                    <p><span className="text-gray-500">Qualifications :</span> {userDetail.sailingQualifications}</p>
+                  )}
+                  {userDetail.sailingAreas && (
+                    <p><span className="text-gray-500">Zones :</span> {userDetail.sailingAreas}</p>
+                  )}
+                  {userDetail.sailorCvDoc ? (
+                    <a
+                      href={userDetail.sailorCvDoc}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex text-ocean-700 dark:text-ocean-400 text-sm font-medium hover:underline"
+                    >
+                      Voir le justificatif
+                    </a>
+                  ) : (
+                    <p className="text-gray-500">Aucun justificatif envoyé.</p>
+                  )}
+                  {userDetail.sailorCvRejectionReason && (
+                    <p className="text-red-600 dark:text-red-400">Motif : {userDetail.sailorCvRejectionReason}</p>
+                  )}
+                  {userDetail.sailorCvStatus === 'PENDING' && (
+                    <div className="space-y-3">
+                      <textarea
+                        value={sailorCvRejectionReason}
+                        onChange={(e) => setSailorCvRejectionReason(e.target.value)}
+                        placeholder="Motif si refus..."
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        rows={2}
+                      />
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          size="sm"
+                          leftIcon={<UserCheck size={13} />}
+                          loading={reviewSailorCvMutation.isPending}
+                          onClick={() => reviewSailorCvMutation.mutate({ userId: userDetail.id, status: 'APPROVED' })}
+                        >
+                          Approuver
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          leftIcon={<UserX size={13} />}
+                          loading={reviewSailorCvMutation.isPending}
+                          disabled={!sailorCvRejectionReason.trim()}
+                          onClick={() => reviewSailorCvMutation.mutate({ userId: userDetail.id, status: 'REJECTED', rejectionReason: sailorCvRejectionReason.trim() })}
+                        >
+                          Refuser
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>

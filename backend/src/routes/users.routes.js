@@ -21,6 +21,15 @@ function formatUser(user) {
     bio: user.bio,
     kycVerified: Boolean(user.kyc_verified_at || user.kyc_status === 'APPROVED'),
     isActive: !user.is_blocked,
+    sailingExperienceYears: user.sailing_experience_years,
+    sailingQualifications: user.sailing_qualifications,
+    sailingAreas: user.sailing_areas,
+    sailorBio: user.sailor_bio,
+    sailorCvStatus: user.sailor_cv_status || 'NOT_SUBMITTED',
+    sailorCvDoc: user.sailor_cv_doc,
+    sailorCvSubmittedAt: user.sailor_cv_submitted_at,
+    sailorCvReviewedAt: user.sailor_cv_reviewed_at,
+    sailorCvRejectionReason: user.sailor_cv_rejection_reason,
     emailVerifiedAt: user.email_verified_at,
     createdAt: user.created_at,
     updatedAt: user.updated_at,
@@ -74,7 +83,10 @@ function formatReview(review) {
 // ─── PATCH /users/profile ──────────────────────────────────
 router.patch('/profile', authenticate, async (req, res, next) => {
   try {
-    const { firstName, lastName, phone, bio } = req.body
+    const {
+      firstName, lastName, phone, bio,
+      sailingExperienceYears, sailingQualifications, sailingAreas, sailorBio,
+    } = req.body
     const updates = {}
 
     if (firstName !== undefined) {
@@ -93,12 +105,74 @@ router.patch('/profile', authenticate, async (req, res, next) => {
       if (bio.length > 2000) return res.status(400).json({ message: 'bio trop longue (2000 max)' })
       updates.bio = bio.trim()
     }
+    if (sailingExperienceYears !== undefined) {
+      if (sailingExperienceYears === null || sailingExperienceYears === '') {
+        updates.sailing_experience_years = null
+      } else {
+        const years = Number(sailingExperienceYears)
+        if (!Number.isInteger(years) || years < 0 || years > 100) {
+          return res.status(400).json({ message: "Années d'expérience invalides (0 à 100)" })
+        }
+        updates.sailing_experience_years = years
+      }
+    }
+    if (sailingQualifications !== undefined) {
+      if (sailingQualifications && sailingQualifications.length > 2000) return res.status(400).json({ message: 'Qualifications trop longues (2000 max)' })
+      updates.sailing_qualifications = sailingQualifications ? sailingQualifications.trim() : null
+    }
+    if (sailingAreas !== undefined) {
+      if (sailingAreas && sailingAreas.length > 2000) return res.status(400).json({ message: 'Zones de navigation trop longues (2000 max)' })
+      updates.sailing_areas = sailingAreas ? sailingAreas.trim() : null
+    }
+    if (sailorBio !== undefined) {
+      if (sailorBio && sailorBio.length > 4000) return res.status(400).json({ message: 'CV de marin trop long (4000 max)' })
+      updates.sailor_bio = sailorBio ? sailorBio.trim() : null
+    }
 
     updates.updated_at = new Date().toISOString()
     const { data: user, error } = await supabase.from('users').update(updates).eq('id', req.user.id).select().single()
     if (error) return res.status(500).json({ message: error.message })
 
     return res.json({ user: formatUser(user) })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// ─── POST /users/sailor-cv/document ────────────────────────
+router.post('/sailor-cv/document', authenticate, upload.single('document'), async (req, res, next) => {
+  try {
+    if (!['OWNER', 'ADMIN'].includes(req.user.role)) return res.status(403).json({ message: 'Réservé aux propriétaires' })
+    if (!req.file) return res.status(400).json({ message: 'Aucun justificatif fourni' })
+
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png']
+    if (!allowedTypes.includes(req.file.mimetype)) return res.status(400).json({ message: 'Format accepté : PDF, JPG ou PNG' })
+
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'sailingloc/sailor-cv', resource_type: 'auto' },
+        (err, r) => err ? reject(err) : resolve(r)
+      )
+      stream.end(req.file.buffer)
+    })
+
+    const submittedAt = new Date().toISOString()
+    const { data: user, error } = await supabase
+      .from('users')
+      .update({
+        sailor_cv_doc: result.secure_url,
+        sailor_cv_status: 'PENDING',
+        sailor_cv_submitted_at: submittedAt,
+        sailor_cv_reviewed_at: null,
+        sailor_cv_rejection_reason: null,
+        updated_at: submittedAt,
+      })
+      .eq('id', req.user.id)
+      .select()
+      .single()
+
+    if (error) return res.status(500).json({ message: error.message })
+    return res.status(201).json({ user: formatUser(user) })
   } catch (err) {
     next(err)
   }
@@ -171,7 +245,7 @@ router.get('/me/export', authenticate, async (req, res, next) => {
     ] = await Promise.all([
       supabase
         .from('users')
-        .select('id, email, role, first_name, last_name, phone, avatar, bio, kyc_status, kyc_front_doc, kyc_back_doc, kyc_submitted_at, kyc_reviewed_at, kyc_verified_at, kyc_rejection_reason, is_blocked, email_verified_at, created_at, updated_at')
+        .select('id, email, role, first_name, last_name, phone, avatar, bio, kyc_status, kyc_front_doc, kyc_back_doc, kyc_submitted_at, kyc_reviewed_at, kyc_verified_at, kyc_rejection_reason, sailing_experience_years, sailing_qualifications, sailing_areas, sailor_bio, sailor_cv_status, sailor_cv_doc, sailor_cv_submitted_at, sailor_cv_reviewed_at, sailor_cv_rejection_reason, is_blocked, email_verified_at, created_at, updated_at')
         .eq('id', userId)
         .single(),
       supabase
@@ -256,7 +330,7 @@ router.get('/:id/profile', async (req, res, next) => {
   try {
     const { data: user, error: userError } = await supabase
       .from('users')
-      .select('id, role, first_name, last_name, avatar, bio, is_blocked, created_at, updated_at')
+      .select('id, role, first_name, last_name, avatar, bio, sailing_experience_years, sailing_qualifications, sailing_areas, sailor_bio, sailor_cv_status, sailor_cv_doc, sailor_cv_submitted_at, sailor_cv_reviewed_at, sailor_cv_rejection_reason, is_blocked, created_at, updated_at')
       .eq('id', req.params.id)
       .single()
 

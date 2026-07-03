@@ -411,6 +411,15 @@ function formatAdminUser(u) {
     phone: u.phone,
     avatar: u.avatar,
     bio: u.bio,
+    sailingExperienceYears: u.sailing_experience_years,
+    sailingQualifications: u.sailing_qualifications,
+    sailingAreas: u.sailing_areas,
+    sailorBio: u.sailor_bio,
+    sailorCvStatus: u.sailor_cv_status || 'NOT_SUBMITTED',
+    sailorCvDoc: u.sailor_cv_doc,
+    sailorCvSubmittedAt: u.sailor_cv_submitted_at,
+    sailorCvReviewedAt: u.sailor_cv_reviewed_at,
+    sailorCvRejectionReason: u.sailor_cv_rejection_reason,
     isActive: !u.is_blocked,
     emailVerifiedAt: u.email_verified_at,
     createdAt: u.created_at,
@@ -553,7 +562,7 @@ adminRouter.get('/users', async (req, res) => {
 
   let query = supabase
     .from('users')
-    .select('id, email, role, first_name, last_name, phone, avatar, bio, is_blocked, email_verified_at, created_at', { count: 'exact' })
+    .select('id, email, role, first_name, last_name, phone, avatar, bio, sailing_experience_years, sailing_qualifications, sailing_areas, sailor_bio, sailor_cv_status, sailor_cv_doc, sailor_cv_submitted_at, sailor_cv_reviewed_at, sailor_cv_rejection_reason, is_blocked, email_verified_at, created_at', { count: 'exact' })
 
   if (search) {
     query = query.or(`email.ilike.%${search}%,first_name.ilike.%${search}%,last_name.ilike.%${search}%`)
@@ -575,7 +584,7 @@ adminRouter.get('/users', async (req, res) => {
 adminRouter.get('/users/:id', async (req, res) => {
   const { data: user } = await supabase
     .from('users')
-    .select('id, email, role, first_name, last_name, phone, avatar, bio, is_blocked, email_verified_at, created_at')
+    .select('id, email, role, first_name, last_name, phone, avatar, bio, sailing_experience_years, sailing_qualifications, sailing_areas, sailor_bio, sailor_cv_status, sailor_cv_doc, sailor_cv_submitted_at, sailor_cv_reviewed_at, sailor_cv_rejection_reason, is_blocked, email_verified_at, created_at')
     .eq('id', req.params.id)
     .single()
   if (!user) return res.status(404).json({ message: 'Utilisateur introuvable' })
@@ -611,6 +620,26 @@ adminRouter.patch('/users/:id/role', async (req, res) => {
   if (!['RENTER', 'OWNER', 'ADMIN'].includes(role)) return res.status(400).json({ message: 'Rôle invalide' })
   await supabase.from('users').update({ role }).eq('id', req.params.id)
   return res.json({ message: 'Rôle mis à jour' })
+})
+
+adminRouter.patch('/users/:id/sailor-cv', async (req, res) => {
+  const { status, rejectionReason } = req.body
+  if (!['APPROVED', 'REJECTED'].includes(status)) return res.status(400).json({ message: 'Statut invalide' })
+  if (status === 'REJECTED' && !rejectionReason?.trim()) return res.status(400).json({ message: 'Motif de refus requis' })
+
+  const reviewedAt = new Date().toISOString()
+  const { error } = await supabase
+    .from('users')
+    .update({
+      sailor_cv_status: status,
+      sailor_cv_reviewed_at: reviewedAt,
+      sailor_cv_rejection_reason: status === 'REJECTED' ? rejectionReason.trim() : null,
+      updated_at: reviewedAt,
+    })
+    .eq('id', req.params.id)
+
+  if (error) return res.status(500).json({ message: error.message })
+  return res.json({ message: status === 'APPROVED' ? 'CV marin approuvé' : 'CV marin refusé' })
 })
 
 // ─── Bateaux ────────────────────────────────────────────────

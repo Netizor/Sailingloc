@@ -84,13 +84,13 @@ export const uploadBoatImages = async (id: number, imageUrls: string[]): Promise
 }
 
 /**
- * Attach a document URL to a boat (registrationDoc | insuranceDoc | licenseScanDoc).
+ * Attach a document URL to a boat (registrationDoc | insuranceDoc | licenseScanDoc | contractDoc).
  * documentType must match one of the accepted field names on the Boat model.
  */
 /** Upload d'un document officiel via multipart (E5). */
 export const uploadBoatDocument = async (
   id: number,
-  docType: 'insurance' | 'registration' | 'license',
+  docType: 'insurance' | 'registration' | 'license' | 'contract',
   file: File,
 ): Promise<Boat> => {
   const formData = new FormData()

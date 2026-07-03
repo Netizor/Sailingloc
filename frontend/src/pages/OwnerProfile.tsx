@@ -2,7 +2,7 @@ import React from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Ship, MapPin, Star, Calendar, MessageCircle } from 'lucide-react'
+import { Ship, MapPin, Star, Calendar, MessageCircle, Anchor, Compass, ShieldCheck } from 'lucide-react'
 import { getPublicProfile } from '../api/users.api'
 import { formatDate } from '../lib/utils'
 import { useAuthStore } from '../store/auth.store'
@@ -119,6 +119,67 @@ const OwnerProfile: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* CV de marin */}
+        {(user.sailorBio || user.sailingQualifications || user.sailingAreas || user.sailingExperienceYears != null) && (
+          <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 sm:p-8">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+              <Anchor size={18} className="text-ocean-700 dark:text-ocean-400" />
+              CV de marin
+            </h2>
+
+            <div className="mb-4">
+              {user.sailorCvStatus === 'APPROVED' ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-sm font-medium px-3 py-1 border border-green-200 dark:border-green-800">
+                  <ShieldCheck size={14} />
+                  CV vérifié par SailingLoc
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 dark:bg-gray-900/40 text-gray-600 dark:text-gray-300 text-sm font-medium px-3 py-1 border border-gray-200 dark:border-gray-700">
+                  Informations déclarées par le propriétaire
+                </span>
+              )}
+            </div>
+
+            {user.sailingExperienceYears != null && (
+              <div className="mb-4">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-ocean-50 dark:bg-ocean-900/30 text-ocean-700 dark:text-ocean-300 text-sm font-medium px-3 py-1">
+                  <Compass size={14} />
+                  {user.sailingExperienceYears} an{user.sailingExperienceYears > 1 ? 's' : ''} d'expérience
+                </span>
+              </div>
+            )}
+
+            {user.sailorBio && (
+              <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-4 whitespace-pre-line">
+                {user.sailorBio}
+              </p>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {user.sailingQualifications && (
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1">
+                    Permis & qualifications
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line">
+                    {user.sailingQualifications}
+                  </p>
+                </div>
+              )}
+              {user.sailingAreas && (
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1">
+                    Zones de navigation
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line">
+                    {user.sailingAreas}
+                  </p>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* Bateaux du propriétaire */}
         {boats.length > 0 && (
