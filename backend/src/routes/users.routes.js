@@ -154,7 +154,7 @@ router.get('/me/export', authenticate, async (req, res) => {
   ] = await Promise.all([
     supabase
       .from('users')
-      .select('id, email, role, first_name, last_name, phone, avatar, bio, is_blocked, email_verified_at, created_at, updated_at')
+      .select('id, email, role, first_name, last_name, phone, avatar, bio, kyc_status, kyc_front_doc, kyc_back_doc, kyc_submitted_at, kyc_reviewed_at, kyc_verified_at, kyc_rejection_reason, is_blocked, email_verified_at, created_at, updated_at')
       .eq('id', userId)
       .single(),
     supabase
