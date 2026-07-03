@@ -25,8 +25,64 @@ const IMAGE_POOL = [
   '/ai-generated-boat-picture.jpg',
 ]
 
-const DESCRIPTION =
-  'Bateau de démonstration SailingLoc. Idéal pour explorer les eaux locales avec confort et sécurité.'
+const TYPE_LABEL = {
+  SAILBOAT: 'voilier',
+  CATAMARAN: 'catamaran',
+  MOTORBOAT: 'bateau à moteur',
+  YACHT: 'yacht',
+}
+
+// Équipements de base présents sur tous les bateaux
+const BASE_AMENITIES = [
+  'GPS & traceur de cartes',
+  'VHF',
+  'Pilote automatique',
+  'Gilets de sauvetage',
+  'Radeau de survie',
+  'Cuisine équipée',
+  'Réfrigérateur',
+  'Eau chaude & douche',
+  'Literie et linge fournis',
+  'Wi-Fi à bord',
+  'Sonorisation Bluetooth',
+  'Bimini / taud de soleil',
+  'Kit snorkeling',
+  'Paddle (SUP)',
+  'Annexe + moteur hors-bord',
+]
+
+// Équipements supplémentaires selon le type de bateau
+const TYPE_AMENITIES = {
+  SAILBOAT: ['Enrouleur de génois', 'Lazy bag', 'Panneaux solaires'],
+  CATAMARAN: ['Trampolines', 'Panneaux solaires', 'Climatisation'],
+  MOTORBOAT: ['Climatisation', 'Coussins de bain de soleil', 'Convertisseur 220V'],
+  YACHT: ['Climatisation', 'Flybridge', 'Générateur', 'Jouets nautiques'],
+}
+
+/** Génère une description détaillée et professionnelle par bateau */
+function buildDescription(boat) {
+  const kind = TYPE_LABEL[boat.type] || 'bateau'
+  const cabins = Math.max(2, Math.floor(boat.capacity / 3))
+  const skipperLine = boat.withSkipper
+    ? `L'option skipper est idéale pour profiter pleinement de la sortie : le skipper prépare l'itinéraire selon la météo, gère les manoeuvres au port, sécurise les mouillages et vous conseille sur les meilleures criques, pauses baignade et restaurants accessibles par la mer. C'est la formule la plus confortable si vous n'avez pas de permis, si vous découvrez la zone ou si vous voulez vous concentrer uniquement sur vos invités.`
+    : `Ce bateau est proposé sans skipper, en location autonome. Il convient aux plaisanciers titulaires du permis adapté et disposant d'une expérience suffisante pour gérer navigation, accostage, météo et sécurité à bord. Un briefing complet est assuré avant le départ : fonctionnement du bateau, équipements de sécurité, zone de navigation conseillée, carburant et procédure de retour.`
+
+  return `Embarquez à bord de ce magnifique ${kind} au départ de ${boat.port}, ${boat.country}, et vivez une expérience nautique inoubliable. Entretenu avec le plus grand soin, il allie performance, confort et sécurité pour naviguer en famille ou entre amis.
+
+À bord, ${cabins} cabines et ${boat.capacity} couchages permettent d'accueillir confortablement votre groupe pour une journée, un week-end ou une croisière plus longue. Le cockpit, les espaces de détente extérieurs, la cuisine équipée et les rangements facilitent la vie à bord. Literie soignée, eau douce, douche, réfrigérateur, sonorisation et prises USB rendent l'expérience agréable même pour les passagers qui découvrent la navigation.
+
+Ce bateau est particulièrement adapté pour explorer les plus belles criques et mouillages autour de ${boat.city}. Selon la durée de location, vous pouvez prévoir une sortie baignade, un coucher de soleil, une navigation sportive, une croisière familiale ou plusieurs nuits au mouillage. Le propriétaire pourra vous aider à ajuster le programme selon la météo, la saison et le niveau d'expérience de l'équipage.
+
+${skipperLine}
+
+La fiche détaille les équipements essentiels pour réserver en confiance : GPS, VHF, pilote automatique, matériel de sécurité, cuisine, confort à bord et loisirs nautiques. Avant la confirmation, vous pouvez contacter le propriétaire pour préciser le nombre de passagers, votre projet de navigation, les horaires souhaités et les options éventuelles.
+
+Tout est pensé pour rendre la réservation claire et professionnelle : disponibilités visibles sur le calendrier, photos du bateau, informations techniques, capacité, type de location avec ou sans skipper, caution et tarif journalier. Vous pouvez ainsi comparer facilement les bateaux et choisir celui qui correspond vraiment à votre sortie en mer.`
+}
+
+function buildAmenities(boat) {
+  return [...BASE_AMENITIES, ...(TYPE_AMENITIES[boat.type] || [])]
+}
 
 const DEMO_BOATS = [
   { title: "Cyclades Dream", country: 'Grèce', city: 'Mykonos', port: 'Mykonos', type: 'SAILBOAT', capacity: 8, dailyRate: 890, lat: 37.4467, lng: 25.3289 },
@@ -109,16 +165,28 @@ async function seedBoats(ownerId) {
       await supabase.from('boats').delete().eq('id', existing.id)
     }
 
+<<<<<<< Updated upstream
+=======
+    process.stdout.write(`📷 ${title}… `)
+    const pexelsImages = await pickBoatPhotos(pexelsKey, imageQueries(boat), 3, usedPhotoIds)
+    const images = pexelsImages.length ? pexelsImages : [FALLBACK_IMAGE]
+    console.log(pexelsImages.length ? `${images.length} photos Pexels` : 'repli local')
+
+    // 2 bateaux sur 3 sont proposés avec skipper, le reste en location seule
+    const withSkipper = i % 3 !== 0
+    const boatMeta = { ...boat, withSkipper }
+
+>>>>>>> Stashed changes
     const row = {
       owner_id: ownerId,
       title,
-      description: DESCRIPTION,
+      description: buildDescription(boatMeta),
       type: boat.type,
       capacity: boat.capacity,
       cabins: Math.max(2, Math.floor(boat.capacity / 3)),
       motorization_type: boat.type === 'SAILBOAT' ? 'SAIL' : 'INBOARD',
-      with_skipper: true,
-      skipper_price: 150,
+      with_skipper: withSkipper,
+      skipper_price: withSkipper ? 120 + (i % 4) * 40 : null,
       price_per_day: boat.dailyRate,
       deposit: boat.dailyRate * 2,
       city: boat.city,
@@ -127,7 +195,7 @@ async function seedBoats(ownerId) {
       latitude: boat.lat,
       longitude: boat.lng,
       images,
-      amenities: ['GPS', 'Wi-Fi', 'Douche'],
+      amenities: buildAmenities(boat),
       status: 'active',
       average_rating: 4.5 + (i % 5) * 0.1,
       review_count: 5 + (i % 12),
