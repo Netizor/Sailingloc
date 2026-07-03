@@ -123,6 +123,7 @@ export interface Boat {
   registrationDoc?: string
   insuranceDoc?: string
   licenseScanDoc?: string
+  contractDoc?: string
   status: BoatStatus
   rating: number
   reviewCount: number

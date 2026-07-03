@@ -84,6 +84,10 @@ function formatBoat(b, withOwner = false) {
     rules: b.rules,
     welcomeMessage: b.welcome_message,
     requiredLicense: b.required_license,
+    insuranceDoc: b.insurance_doc,
+    registrationDoc: b.registration_doc,
+    licenseScanDoc: b.license_scan_doc,
+    contractDoc: b.contract_doc,
     status: b.status,
     rating: b.average_rating || 0,
     reviewCount: b.review_count || 0,
@@ -338,7 +342,15 @@ router.post('/:id/upload-document', authenticate, upload.single('file'), async (
 
   if (!req.file) return res.status(400).json({ message: 'Fichier requis' })
 
-  const docType = req.body.type || 'document'
+  const docType = req.body.docType || req.body.type || 'document'
+  const fieldMap = {
+    insurance: 'insurance_doc',
+    registration: 'registration_doc',
+    license: 'license_scan_doc',
+    contract: 'contract_doc',
+  }
+  const field = fieldMap[docType]
+  if (!field) return res.status(400).json({ message: 'Type de document invalide' })
 
   const result = await new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
@@ -348,12 +360,6 @@ router.post('/:id/upload-document', authenticate, upload.single('file'), async (
     stream.end(req.file.buffer)
   })
 
-  const fieldMap = {
-    insurance: 'insurance_doc',
-    registration: 'registration_doc',
-    license: 'license_scan_doc',
-  }
-  const field = fieldMap[docType] || 'registration_doc'
   const updates = { [field]: result.secure_url, updated_at: new Date().toISOString() }
 
   const { data: updated, error } = await supabase.from('boats').update(updates).eq('id', req.params.id).select('*, users(id, first_name, last_name, avatar)').single()
