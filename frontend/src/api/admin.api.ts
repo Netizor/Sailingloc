@@ -56,6 +56,13 @@ export const updateUserStatus = async (
   }
 }
 
+export const reviewSailorCv = async (
+  userId: number,
+  payload: { status: 'APPROVED' | 'REJECTED'; rejectionReason?: string },
+): Promise<void> => {
+  await api.patch(`/admin/users/${userId}/sailor-cv`, payload)
+}
+
 export const listBoats = async (
   params: AdminBoatListParams = {},
 ): Promise<PaginatedResponse<Boat>> => {
@@ -120,6 +127,7 @@ export const adminApi = {
     updateUserStatus(userId, { isActive }),
   setUserRole: (userId: number, role: string) =>
     updateUserStatus(userId, { role }),
+  reviewSailorCv,
   getBoats: async (params: AdminBoatListParams = {}) => {
     const result = await listBoats(params)
     return { ...result, boats: result.data }

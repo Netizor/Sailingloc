@@ -8,6 +8,7 @@ import {
   Settings,
   Plus,
   Shield,
+  ShieldCheck,
 } from 'lucide-react'
 import { useAuthStore } from '../../store/auth.store'
 import { getInitials, cn } from '../../lib/utils'
@@ -27,6 +28,7 @@ const renterNavItems: NavItem[] = [
   { to: '/mon-espace/reservations', label: 'Mes Réservations', icon: <CalendarCheck size={18} /> },
   { to: '/proprietaire/bateaux', label: 'Mon Bateaux', icon: <Ship size={18} />, ownerOnly: true },
   { to: '/mon-espace/messages', label: 'Messages', icon: <MessageCircle size={18} /> },
+  { to: '/mon-espace/verification', label: "Vérification d'identité", icon: <ShieldCheck size={18} /> },
   { to: '/mon-espace/profil', label: 'Paramètres', icon: <Settings size={18} /> },
 ]
 
@@ -35,6 +37,7 @@ const ownerNavItems: NavItem[] = [
   { to: '/proprietaire/reservations', label: 'Mes Réservations', icon: <CalendarCheck size={18} /> },
   { to: '/proprietaire/bateaux', label: 'Mon Bateaux', icon: <Ship size={18} /> },
   { to: '/mon-espace/messages', label: 'Messages', icon: <MessageCircle size={18} /> },
+  { to: '/mon-espace/verification', label: "Vérification d'identité", icon: <ShieldCheck size={18} /> },
   { to: '/mon-espace/profil', label: 'Paramètres', icon: <Settings size={18} /> },
 ]
 
