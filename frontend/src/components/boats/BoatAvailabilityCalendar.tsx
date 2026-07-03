@@ -58,13 +58,11 @@ const BoatAvailabilityCalendar: React.FC<BoatAvailabilityCalendarProps> = ({ boa
 
   return (
     <div>
-      {variant !== 'detail' && (
-        <div className="flex flex-wrap items-center gap-4 mb-5 text-xs text-gray-500">
-          <LegendDot color="bg-white border border-gray-200" label="Disponible" />
-          <LegendDot color="bg-orange-100" label="Réservé" />
-          <LegendDot color="bg-gray-100" label="Indisponible" />
-        </div>
-      )}
+      <div className={cn('flex flex-wrap items-center gap-4 mb-5 text-xs', variant === 'detail' ? 'text-[#8A94A6]' : 'text-gray-500')}>
+        <LegendDot color={variant === 'detail' ? 'bg-white border border-gray-200' : 'bg-white border border-gray-200'} label="Disponible" />
+        <LegendDot color={variant === 'detail' ? 'bg-[#2563FF]' : 'bg-orange-100'} label="Réservé" />
+        <LegendDot color={variant === 'detail' ? 'bg-[#003366]' : 'bg-gray-100'} label="Indisponible" />
+      </div>
 
       {isLoading ? (
         <div className={cn('grid gap-6', variant === 'detail' ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2')}>

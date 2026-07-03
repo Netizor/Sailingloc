@@ -280,9 +280,9 @@ const Home: React.FC = () => {
       </section>
 
       {/* Concept */}
-      <section id="comment-ca-marche" className="pt-24 pb-24 bg-white" aria-labelledby="how-it-works-title">
+      <section id="comment-ca-marche" className="pt-20 pb-14 bg-white" aria-labelledby="how-it-works-title">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <p className="text-[#2563FF] text-sm font-medium mb-4">{t('home.conceptLabel')}</p>
             <h2 id="how-it-works-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy">
               {t('home.howTitle')}
@@ -302,7 +302,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Popular boats */}
-      <section className="py-24 bg-white" aria-labelledby="featured-boats-title">
+      <section className="py-14 bg-white" aria-labelledby="featured-boats-title">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-start justify-between gap-4 mb-10">
             <div>
@@ -346,7 +346,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Destinations bento */}
-      <section className="py-24 bg-white" aria-labelledby="destinations-title">
+      <section className="py-14 bg-white" aria-labelledby="destinations-title">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10">
             <h2 id="destinations-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy mb-2">
@@ -385,9 +385,9 @@ const Home: React.FC = () => {
       <EngagementSection />
 
       {/* Testimonials */}
-      <section className="py-24 bg-[#f8f9fa]" aria-labelledby="testimonials-title">
+      <section className="py-14 bg-[#f8f9fa]" aria-labelledby="testimonials-title">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 id="testimonials-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy text-center mb-14">
+          <h2 id="testimonials-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy text-center mb-10">
             {t('home.testimonialsTitle')}
           </h2>
 

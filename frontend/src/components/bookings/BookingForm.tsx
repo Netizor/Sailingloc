@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MessageSquare, User, AlertCircle } from 'lucide-react'
-import { differenceInDays, parseISO, format } from 'date-fns'
+import { differenceInDays, parseISO, format, addDays, isBefore } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { DayPicker } from 'react-day-picker'
 import type { DateRange } from 'react-day-picker'
@@ -26,6 +26,10 @@ interface BookingFormProps {
   className?: string
   /** Dates indisponibles (réservées ou bloquées) au format YYYY-MM-DD */
   disabledDates?: string[]
+  /** Dates déjà réservées (affichées en bleu sur le calendrier) */
+  bookedDates?: string[]
+  /** Dates bloquées par le propriétaire (affichées en bleu marine) */
+  unavailableDates?: string[]
   /** Style fiche bateau (sidebar maquette) */
   variant?: 'default' | 'detail'
 }
@@ -39,6 +43,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
   loading = false,
   className,
   disabledDates = [],
+  bookedDates = [],
+  unavailableDates = [],
   variant = 'default',
 }) => {
   const navigate = useNavigate()
@@ -56,11 +62,42 @@ const BookingForm: React.FC<BookingFormProps> = ({
   const [dateError, setDateError] = useState<string | undefined>()
   const [passengers, setPassengers] = useState(Math.min(2, boat.capacity))
 
+  const disabledSet = useMemo(() => new Set(disabledDates), [disabledDates])
+
   // Jours désactivés : passé + dates réservées/bloquées
   const disabledDays = useMemo(() => {
     const blocked = disabledDates.map((d) => parseISO(d))
     return [{ before: today }, ...blocked]
   }, [disabledDates, today])
+
+  // Modificateurs pour colorer le calendrier (dispo / réservé / indisponible)
+  const bookedDays = useMemo(() => bookedDates.map((d) => parseISO(d)), [bookedDates])
+  const unavailableDays = useMemo(() => unavailableDates.map((d) => parseISO(d)), [unavailableDates])
+  const calendarModifiers = useMemo(
+    () => ({ booked: bookedDays, indispo: unavailableDays }),
+    [bookedDays, unavailableDays],
+  )
+  const calendarModifiersStyles = useMemo(
+    () => ({
+      booked: { backgroundColor: '#2563FF', color: '#fff', borderRadius: '8px' },
+      indispo: {
+        backgroundColor: '#003366',
+        color: '#fff',
+        borderRadius: '8px',
+        textDecoration: 'line-through' as const,
+      },
+    }),
+    [],
+  )
+
+  const rangeHasBlockedDays = (from: Date, to: Date) => {
+    let cur = from
+    while (isBefore(cur, to)) {
+      if (disabledSet.has(format(cur, 'yyyy-MM-dd'))) return true
+      cur = addDays(cur, 1)
+    }
+    return false
+  }
 
   // Dérive les chaînes YYYY-MM-DD depuis le DateRange sélectionné
   const startDate = range?.from ? format(range.from, 'yyyy-MM-dd') : ''
@@ -95,6 +132,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
     }
     if (range.to <= range.from) {
       setDateError('La date de retour doit être après la date de départ')
+      return false
+    }
+    if (rangeHasBlockedDays(range.from, range.to)) {
+      setDateError('Certaines dates sélectionnées ne sont pas disponibles')
       return false
     }
     setDateError(undefined)
@@ -136,51 +177,76 @@ const BookingForm: React.FC<BookingFormProps> = ({
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
         {isDetail ? (
           <div className="space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <label className="block">
-                <span className="block text-[10px] font-bold uppercase tracking-wider text-[#8A94A6] mb-1.5">Départ</span>
-                <input
-                  type="date"
-                  value={startDate}
-                  min={format(today, 'yyyy-MM-dd')}
-                  onChange={(e) => {
-                    const d = e.target.value ? parseISO(e.target.value) : undefined
-                    setRange({ from: d, to: range?.to })
-                    setDateError(undefined)
-                  }}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-[#003366] focus:outline-none focus:ring-2 focus:ring-[#2563FF]/30"
-                />
-              </label>
-              <label className="block">
-                <span className="block text-[10px] font-bold uppercase tracking-wider text-[#8A94A6] mb-1.5">Retour</span>
-                <input
-                  type="date"
-                  value={endDate}
-                  min={startDate || format(today, 'yyyy-MM-dd')}
-                  onChange={(e) => {
-                    const d = e.target.value ? parseISO(e.target.value) : undefined
-                    setRange({ from: range?.from, to: d })
-                    setDateError(undefined)
-                  }}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-[#003366] focus:outline-none focus:ring-2 focus:ring-[#2563FF]/30"
-                />
-              </label>
-              <label className="block">
-                <span className="block text-[10px] font-bold uppercase tracking-wider text-[#8A94A6] mb-1.5">Passagers</span>
-                <select
-                  value={passengers}
-                  onChange={(e) => setPassengers(Number(e.target.value))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-[#003366] focus:outline-none focus:ring-2 focus:ring-[#2563FF]/30"
-                >
-                  {Array.from({ length: boat.capacity }, (_, i) => i + 1).map((n) => (
-                    <option key={n} value={n}>
-                      {n} {n === 1 ? 'personne' : 'personnes'}
-                    </option>
-                  ))}
-                </select>
-              </label>
+            <p className="text-xs font-medium text-[#8A94A6]">Sélectionnez vos dates de disponibilité</p>
+            <div
+              className="flex justify-center rounded-xl border border-gray-100 p-2"
+              style={{
+                '--rdp-accent-color': '#2563FF',
+                '--rdp-background-color': '#eef3fb',
+                '--rdp-selected-color': '#fff',
+              } as React.CSSProperties}
+            >
+              <DayPicker
+                mode="range"
+                selected={range}
+                onSelect={(newRange) => {
+                  setRange(newRange)
+                  setDateError(undefined)
+                }}
+                disabled={disabledDays}
+                modifiers={calendarModifiers}
+                modifiersStyles={calendarModifiersStyles}
+                locale={fr}
+                fromDate={today}
+                numberOfMonths={1}
+                showOutsideDays={false}
+              />
             </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className={cn(
+                'rounded-lg border px-3 py-2 text-sm',
+                startDate ? 'border-[#2563FF]/40 bg-[#eef3fb] text-[#003366]' : 'border-gray-200 text-gray-400'
+              )}>
+                <p className="text-[10px] font-bold uppercase tracking-wider mb-0.5">Départ</p>
+                <p className="font-medium">
+                  {range?.from ? format(range.from, 'd MMM yyyy', { locale: fr }) : '—'}
+                </p>
+              </div>
+              <div className={cn(
+                'rounded-lg border px-3 py-2 text-sm',
+                endDate ? 'border-[#2563FF]/40 bg-[#eef3fb] text-[#003366]' : 'border-gray-200 text-gray-400'
+              )}>
+                <p className="text-[10px] font-bold uppercase tracking-wider mb-0.5">Retour</p>
+                <p className="font-medium">
+                  {range?.to ? format(range.to, 'd MMM yyyy', { locale: fr }) : '—'}
+                </p>
+              </div>
+            </div>
+            <label className="block">
+              <span className="block text-[10px] font-bold uppercase tracking-wider text-[#8A94A6] mb-1.5">Passagers</span>
+              <select
+                value={passengers}
+                onChange={(e) => setPassengers(Number(e.target.value))}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-[#003366] focus:outline-none focus:ring-2 focus:ring-[#2563FF]/30"
+              >
+                {Array.from({ length: boat.capacity }, (_, i) => i + 1).map((n) => (
+                  <option key={n} value={n}>
+                    {n} {n === 1 ? 'personne' : 'personnes'}
+                  </option>
+                ))}
+              </select>
+            </label>
             {dateError && <p className="text-xs text-red-600">{dateError}</p>}
+            <div className="flex items-center gap-4 text-[10px] text-[#8A94A6]">
+              <span className="flex items-center gap-1">
+                <span className="h-2.5 w-2.5 rounded-sm bg-[#2563FF] inline-block" />
+                Réservé
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="h-2.5 w-2.5 rounded-sm bg-[#003366] inline-block" />
+                Indisponible
+              </span>
+            </div>
           </div>
         ) : (
         <div>
@@ -201,6 +267,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
                 setDateError(undefined)
               }}
               disabled={disabledDays}
+              modifiers={calendarModifiers}
+              modifiersStyles={calendarModifiersStyles}
               locale={fr}
               fromDate={today}
               showOutsideDays={false}
