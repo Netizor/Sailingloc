@@ -28,9 +28,12 @@ function formatUser(u) {
     phone: u.phone,
     avatar: u.avatar,
     bio: u.bio,
+    kycVerified: Boolean(u.kyc_verified_at || u.kyc_status === 'APPROVED'),
+    isActive: !u.is_blocked,
     emailVerifiedAt: u.email_verified_at,
     termsAcceptedAt: u.terms_accepted_at,
     createdAt: u.created_at,
+    updatedAt: u.updated_at,
   }
 }
 

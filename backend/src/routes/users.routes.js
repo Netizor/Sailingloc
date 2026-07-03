@@ -8,18 +8,66 @@ import { authenticate } from '../middleware/auth.middleware.js'
 const router = Router()
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } })
 
-function formatUser(u) {
+function formatUser(user) {
+  if (!user) return null
   return {
-    id: u.id,
-    email: u.email,
-    role: u.role,
-    firstName: u.first_name,
-    lastName: u.last_name,
-    phone: u.phone,
-    avatar: u.avatar,
-    bio: u.bio,
-    emailVerifiedAt: u.email_verified_at,
-    createdAt: u.created_at,
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    firstName: user.first_name,
+    lastName: user.last_name,
+    phone: user.phone,
+    avatar: user.avatar,
+    bio: user.bio,
+    kycVerified: Boolean(user.kyc_verified_at || user.kyc_status === 'APPROVED'),
+    isActive: !user.is_blocked,
+    emailVerifiedAt: user.email_verified_at,
+    createdAt: user.created_at,
+    updatedAt: user.updated_at,
+  }
+}
+
+function formatBoatSummary(boat) {
+  return {
+    id: boat.id,
+    ownerId: boat.owner_id,
+    title: boat.title,
+    description: boat.description,
+    type: boat.type,
+    images: boat.images || [],
+    city: boat.city,
+    port: boat.port,
+    country: boat.country,
+    dailyRate: boat.price_per_day,
+    rating: boat.average_rating || 0,
+    reviewCount: boat.review_count || 0,
+    status: boat.status,
+    createdAt: boat.created_at,
+  }
+}
+
+function formatReview(review) {
+  return {
+    id: review.id,
+    bookingId: review.booking_id,
+    boatId: review.boat_id,
+    reviewerId: review.author_id,
+    revieweeId: review.target_user_id,
+    type: review.type,
+    rating: review.rating,
+    comment: review.comment,
+    isPublished: true,
+    createdAt: review.created_at,
+    reviewer: review.author ? {
+      id: review.author.id,
+      firstName: review.author.first_name,
+      lastName: review.author.last_name,
+      avatar: review.author.avatar,
+    } : null,
+    boat: review.boats ? {
+      id: review.boats.id,
+      title: review.boats.title,
+    } : null,
   }
 }
 
@@ -92,10 +140,14 @@ router.post('/avatar', authenticate, upload.single('avatar'), async (req, res, n
     })
 
     const { data: user, error } = await supabase
-      .from('users').update({ avatar: result.secure_url }).eq('id', req.user.id).select().single()
-    if (error) return res.status(500).json({ message: error.message })
+      .from('users')
+      .update({ avatar: result.secure_url })
+      .eq('id', req.user.id)
+      .select()
+      .single()
 
-    return res.json({ user: formatUser(user) })
+    if (error) return res.status(500).json({ message: error.message })
+    return res.json({ avatar: result.secure_url, user: formatUser(user) })
   } catch (err) {
     next(err)
   }
@@ -108,26 +160,91 @@ router.get('/me/export', authenticate, async (req, res, next) => {
     const userId = req.user.id
 
     const [
-      { data: user },
-      { data: bookings },
-      { data: reviews },
-      { data: boats },
-      { data: messages },
+      userResult,
+      boatsResult,
+      renterBookingsResult,
+      reviewsAuthoredResult,
+      reviewsReceivedResult,
+      sentMessagesResult,
+      receivedMessagesResult,
+      favoritesResult,
     ] = await Promise.all([
-      supabase.from('users').select('id, email, first_name, last_name, phone, bio, avatar, role, created_at, updated_at').eq('id', userId).single(),
-      supabase.from('bookings').select('id, boat_id, start_date, end_date, total_amount, status, created_at').eq('renter_id', userId),
-      supabase.from('reviews').select('id, boat_id, rating, comment, type, created_at').eq('reviewer_id', userId),
-      supabase.from('boats').select('id, title, city, status, created_at').eq('owner_id', userId),
-      supabase.from('messages').select('id, content, created_at, conversation_id').eq('sender_id', userId),
+      supabase
+        .from('users')
+        .select('id, email, role, first_name, last_name, phone, avatar, bio, kyc_status, kyc_front_doc, kyc_back_doc, kyc_submitted_at, kyc_reviewed_at, kyc_verified_at, kyc_rejection_reason, is_blocked, email_verified_at, created_at, updated_at')
+        .eq('id', userId)
+        .single(),
+      supabase
+        .from('boats')
+        .select('id, title, description, type, city, port, country, price_per_day, status, created_at')
+        .eq('owner_id', userId),
+      supabase
+        .from('bookings')
+        .select('id, boat_id, renter_id, start_date, end_date, with_skipper, skipper_fee, service_fee, total_price, status, cancellation_reason, created_at, updated_at')
+        .eq('renter_id', userId),
+      supabase
+        .from('reviews')
+        .select('id, booking_id, boat_id, author_id, target_user_id, type, rating, comment, created_at')
+        .eq('author_id', userId),
+      supabase
+        .from('reviews')
+        .select('id, booking_id, boat_id, author_id, target_user_id, type, rating, comment, created_at')
+        .eq('target_user_id', userId),
+      supabase
+        .from('messages')
+        .select('id, sender_id, recipient_id, content, is_read, created_at')
+        .eq('sender_id', userId),
+      supabase
+        .from('messages')
+        .select('id, sender_id, recipient_id, content, is_read, created_at')
+        .eq('recipient_id', userId),
+      supabase
+        .from('favorites')
+        .select('id, user_id, boat_id, created_at')
+        .eq('user_id', userId),
     ])
+
+    if (userResult.error) return res.status(500).json({ message: userResult.error.message })
+
+    const exportErrors = [
+      boatsResult.error,
+      renterBookingsResult.error,
+      reviewsAuthoredResult.error,
+      reviewsReceivedResult.error,
+      sentMessagesResult.error,
+      receivedMessagesResult.error,
+      favoritesResult.error,
+    ].filter(Boolean)
+
+    if (exportErrors.length) return res.status(500).json({ message: exportErrors[0].message })
+
+    const boatIds = (boatsResult.data || []).map((boat) => boat.id)
+    const ownerBookingsResult = boatIds.length
+      ? await supabase
+        .from('bookings')
+        .select('id, boat_id, renter_id, start_date, end_date, with_skipper, skipper_fee, service_fee, total_price, status, cancellation_reason, created_at, updated_at')
+        .in('boat_id', boatIds)
+      : { data: [] }
+
+    if (ownerBookingsResult.error) return res.status(500).json({ message: ownerBookingsResult.error.message })
 
     return res.json({
       exportedAt: new Date().toISOString(),
-      profile: user,
-      bookings: bookings || [],
-      reviews: reviews || [],
-      boats: boats || [],
-      messages: messages || [],
+      user: formatUser(userResult.data),
+      boats: boatsResult.data || [],
+      bookings: {
+        asRenter: renterBookingsResult.data || [],
+        asOwner: ownerBookingsResult.data || [],
+      },
+      reviews: {
+        authored: reviewsAuthoredResult.data || [],
+        received: reviewsReceivedResult.data || [],
+      },
+      messages: {
+        sent: sentMessagesResult.data || [],
+        received: receivedMessagesResult.data || [],
+      },
+      favorites: favoritesResult.data || [],
     })
   } catch (err) {
     next(err)
@@ -137,61 +254,56 @@ router.get('/me/export', authenticate, async (req, res, next) => {
 // ─── GET /users/:id/profile ────────────────────────────────
 router.get('/:id/profile', async (req, res, next) => {
   try {
-    const { data: user } = await supabase
+    const { data: user, error: userError } = await supabase
       .from('users')
-      .select('id, first_name, last_name, avatar, bio, created_at, role')
+      .select('id, role, first_name, last_name, avatar, bio, is_blocked, created_at, updated_at')
       .eq('id', req.params.id)
       .single()
 
-    if (!user) return res.status(404).json({ message: 'Utilisateur introuvable' })
+    if (userError || !user) return res.status(404).json({ message: 'Utilisateur introuvable' })
 
-    const { data: boats, count: totalBoats } = await supabase
+    const { data: boats, error: boatsError } = await supabase
       .from('boats')
-      .select('id, title, images, city, price_per_day, average_rating', { count: 'exact' })
+      .select('id, owner_id, title, description, type, images, city, port, country, price_per_day, average_rating, review_count, status, created_at')
       .eq('owner_id', req.params.id)
       .eq('status', 'active')
-      .limit(6)
-
-    const { data: reviews } = await supabase
-      .from('reviews')
-      .select('id, rating, comment, created_at, reviewer:users!reviewer_id(id, first_name, last_name, avatar)')
-      .eq('reviewee_id', req.params.id)
-      .eq('type', 'OWNER')
-      .eq('is_published', true)
       .order('created_at', { ascending: false })
-      .limit(20)
 
-    const publishedReviews = reviews || []
-    const rating = publishedReviews.length
-      ? publishedReviews.reduce((sum, r) => sum + r.rating, 0) / publishedReviews.length
+    if (boatsError) return res.status(500).json({ message: boatsError.message })
+
+    const boatIds = (boats || []).map((boat) => boat.id)
+    const [reviewsQuery, ratingQuery] = boatIds.length
+      ? await Promise.all([
+        supabase
+          .from('reviews')
+          .select('*, author:users!author_id(id, first_name, last_name, avatar), boats(id, title)', { count: 'exact' })
+          .in('boat_id', boatIds)
+          .eq('type', 'RENTER_TO_BOAT')
+          .order('created_at', { ascending: false })
+          .limit(20),
+        supabase
+          .from('reviews')
+          .select('rating')
+          .in('boat_id', boatIds)
+          .eq('type', 'RENTER_TO_BOAT'),
+      ])
+      : [{ data: [], count: 0, error: null }, { data: [], error: null }]
+
+    if (reviewsQuery.error) return res.status(500).json({ message: reviewsQuery.error.message })
+    if (ratingQuery.error) return res.status(500).json({ message: ratingQuery.error.message })
+
+    const reviews = reviewsQuery.data || []
+    const allRatings = ratingQuery.data || []
+    const rating = allRatings.length
+      ? Math.round((allRatings.reduce((sum, review) => sum + review.rating, 0) / allRatings.length) * 10) / 10
       : 0
 
     return res.json({
-      user: {
-        id: user.id,
-        firstName: user.first_name,
-        lastName: user.last_name,
-        avatar: user.avatar,
-        bio: user.bio,
-        createdAt: user.created_at,
-        role: user.role,
-      },
-      boats: boats || [],
-      totalBoats: totalBoats || 0,
-      reviews: publishedReviews.map(r => ({
-        id: r.id,
-        rating: r.rating,
-        comment: r.comment,
-        createdAt: r.created_at,
-        reviewer: r.reviewer ? {
-          id: r.reviewer.id,
-          firstName: r.reviewer.first_name,
-          lastName: r.reviewer.last_name,
-          avatar: r.reviewer.avatar,
-        } : null,
-      })),
-      rating: Math.round(rating * 10) / 10,
-      reviewCount: publishedReviews.length,
+      user: formatUser(user),
+      boats: (boats || []).map(formatBoatSummary),
+      reviews: reviews.map(formatReview),
+      rating,
+      reviewCount: reviewsQuery.count || allRatings.length,
     })
   } catch (err) {
     next(err)
