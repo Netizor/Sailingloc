@@ -1,6 +1,8 @@
 /**
  * Catalogue des destinations (pays et spots) aligné sur les champs `country` / `city` / `port` en BDD.
  */
+import destinationPexelsImages from './destination-pexels-images.json'
+
 export type DestinationRegion =
   | 'europe'
   | 'americas'
@@ -53,9 +55,6 @@ export const DESTINATIONS: DestinationDef[] = [
     country: 'France',
     image: '/view-luxurious-yacht-water.jpg',
     badge: 'PREMIUM',
-    popularFeatured: true,
-    popularDescription:
-      "Des yachts d'exception pour une navigation inoubliable le long de la Riviera et des côtes françaises.",
   },
   {
     slug: 'italie',
@@ -87,6 +86,8 @@ export const DESTINATIONS: DestinationDef[] = [
     country: 'Croatie',
     image: '/view-luxurious-cruise-ship (2).jpg',
     badge: 'NOUVEAU',
+    homeFeatured: true,
+    homeGridClass: 'col-span-12 sm:col-span-5',
   },
   {
     slug: 'grece',
@@ -98,7 +99,8 @@ export const DESTINATIONS: DestinationDef[] = [
     country: 'Grèce',
     image: '/view-luxurious-cruise-ship (3).jpg',
     homeFeatured: true,
-    homeGridClass: 'col-span-12 sm:col-span-2 sm:col-start-8 row-span-1',
+    homeGridClass: 'col-span-12 sm:col-span-4',
+    popularFeatured: true,
   },
   {
     slug: 'portugal',
@@ -171,7 +173,7 @@ export const DESTINATIONS: DestinationDef[] = [
     country: 'Thaïlande',
     image: '/ai-generated-boat-picture.jpg',
     homeFeatured: true,
-    homeGridClass: 'col-span-12 sm:col-span-3 sm:col-start-10 sm:row-span-2 row-span-1 min-h-[420px] sm:min-h-0',
+    homeGridClass: 'col-span-12 sm:col-span-3',
   },
   {
     slug: 'indonesie',
@@ -204,6 +206,133 @@ export const DESTINATIONS: DestinationDef[] = [
     image: '/view-luxurious-yacht-water.jpg',
   },
   {
+    slug: 'malte',
+    name: 'Malte',
+    nameEn: 'Malta',
+    subregions: 'La Valette, Gozo, Comino',
+    subregionsEn: 'Valletta, Gozo, Comino',
+    region: 'europe',
+    country: 'Malte',
+    image: '/view-luxurious-yacht-water.jpg',
+    badge: 'NOUVEAU',
+  },
+  {
+    slug: 'maldives',
+    name: 'Maldives',
+    nameEn: 'Maldives',
+    subregions: 'Malé, Ari Atoll, Baa Atoll',
+    subregionsEn: 'Malé, Ari Atoll, Baa Atoll',
+    region: 'asia',
+    country: 'Maldives',
+    image: '/view-luxurious-yacht-water.jpg',
+    badge: 'PREMIUM',
+    homeFeatured: true,
+    homeGridClass: 'col-span-12 sm:col-span-3',
+    popularFeatured: true,
+    popularDescription:
+      "Lagons turquoise et yachts d'exception au cœur de l'océan Indien.",
+  },
+  {
+    slug: 'seychelles',
+    name: 'Seychelles',
+    nameEn: 'Seychelles',
+    subregions: 'Mahé, Praslin, La Digue',
+    subregionsEn: 'Mahé, Praslin, La Digue',
+    region: 'africa',
+    country: 'Seychelles',
+    image: '/view-luxurious-yacht-water.jpg',
+    badge: 'PREMIUM',
+  },
+  {
+    slug: 'emirats-arabes-unis',
+    name: 'Émirats arabes unis',
+    nameEn: 'United Arab Emirates',
+    subregions: 'Dubaï, Abu Dhabi',
+    subregionsEn: 'Dubai, Abu Dhabi',
+    region: 'asia',
+    country: 'Émirats arabes unis',
+    image: '/view-luxurious-yacht-water.jpg',
+    badge: 'PREMIUM',
+  },
+  {
+    slug: 'monaco',
+    name: 'Monaco',
+    nameEn: 'Monaco',
+    subregions: 'Port Hercule, Monte-Carlo',
+    subregionsEn: 'Port Hercule, Monte Carlo',
+    region: 'europe',
+    country: 'Monaco',
+    image: '/view-luxurious-yacht-water.jpg',
+    badge: 'PREMIUM',
+  },
+  {
+    slug: 'costa-rica',
+    name: 'Costa Rica',
+    nameEn: 'Costa Rica',
+    subregions: 'Guanacaste, Papagayo',
+    subregionsEn: 'Guanacaste, Papagayo',
+    region: 'americas',
+    country: 'Costa Rica',
+    image: '/view-luxurious-yacht-water.jpg',
+    badge: 'NOUVEAU',
+  },
+  {
+    slug: 'republique-dominicaine',
+    name: 'République dominicaine',
+    nameEn: 'Dominican Republic',
+    subregions: 'Punta Cana, Samaná',
+    subregionsEn: 'Punta Cana, Samaná',
+    region: 'caribbean',
+    country: 'République dominicaine',
+    image: '/view-luxurious-yacht-water.jpg',
+  },
+  {
+    slug: 'maurice',
+    name: 'Maurice',
+    nameEn: 'Mauritius',
+    subregions: 'Grand Baie, Île aux Cerfs',
+    subregionsEn: 'Grand Baie, Île aux Cerfs',
+    region: 'africa',
+    country: 'Maurice',
+    image: '/view-luxurious-yacht-water.jpg',
+    badge: 'NOUVEAU',
+  },
+  {
+    slug: 'polynesie-francaise',
+    name: 'Polynésie française',
+    nameEn: 'French Polynesia',
+    subregions: 'Bora Bora, Tahiti, Moorea',
+    subregionsEn: 'Bora Bora, Tahiti, Moorea',
+    region: 'oceania',
+    country: 'Polynésie française',
+    image: '/view-luxurious-yacht-water.jpg',
+    badge: 'PREMIUM',
+    homeFeatured: true,
+    homeGridClass: 'col-span-12 sm:col-span-4',
+    popularFeatured: true,
+  },
+  {
+    slug: 'cap-vert',
+    name: 'Cap-Vert',
+    nameEn: 'Cape Verde',
+    subregions: 'Sal, São Vicente',
+    subregionsEn: 'Sal, São Vicente',
+    region: 'africa',
+    country: 'Cap-Vert',
+    image: '/view-luxurious-yacht-water.jpg',
+    badge: 'NOUVEAU',
+  },
+  {
+    slug: 'sri-lanka',
+    name: 'Sri Lanka',
+    nameEn: 'Sri Lanka',
+    subregions: 'Mirissa, Galle, Trincomalee',
+    subregionsEn: 'Mirissa, Galle, Trincomalee',
+    region: 'asia',
+    country: 'Sri Lanka',
+    image: '/view-luxurious-yacht-water.jpg',
+  },
+  {
     slug: 'saint-tropez',
     name: 'Saint-Tropez',
     nameEn: 'Saint-Tropez',
@@ -212,9 +341,6 @@ export const DESTINATIONS: DestinationDef[] = [
     region: 'europe',
     locations: ['Saint-Tropez', 'Grimaud'],
     image: '/marcin-ciszewski-Zexjl0v3MRU-unsplash.jpg',
-    homeFeatured: true,
-    homeGridClass: 'col-span-12 sm:col-span-7 row-span-1',
-    popularFeatured: true,
   },
   {
     slug: 'corse',
@@ -225,7 +351,6 @@ export const DESTINATIONS: DestinationDef[] = [
     region: 'europe',
     locations: ['Ajaccio', 'Corse', 'Bonifacio', 'Calvi', 'Bastia'],
     image: '/andrii-denysenko-kcWrmRUOMc8-unsplash.jpg',
-    popularFeatured: true,
   },
   {
     slug: 'cote-azur',
@@ -237,7 +362,7 @@ export const DESTINATIONS: DestinationDef[] = [
     locations: ['Nice', 'Cannes', 'Antibes', 'Marseille', 'Saint-Tropez'],
     image: '/view-luxurious-cruise-ship (1).jpg',
     homeFeatured: true,
-    homeGridClass: 'col-span-12 sm:col-span-7 sm:row-start-2 row-span-1',
+    homeGridClass: 'col-span-12 sm:col-span-5',
   },
   {
     slug: 'bretagne',
@@ -248,8 +373,6 @@ export const DESTINATIONS: DestinationDef[] = [
     region: 'europe',
     locations: ['Brest', 'Lorient', 'La Rochelle', 'Vannes'],
     image: '/boat-navigating-through-canyon.jpg',
-    homeFeatured: true,
-    homeGridClass: 'col-span-12 sm:col-span-2 sm:col-start-8 sm:row-start-2 row-span-1',
   },
   {
     slug: 'mediterranee',
@@ -271,12 +394,19 @@ export const DESTINATIONS: DestinationDef[] = [
     region: 'caribbean',
     countries: ['Bahamas', 'Martinique', 'Mexique', 'République dominicaine'],
     image: '/miami-bayside-landscape.jpg',
+    popularFeatured: true,
   },
 ]
 
 export function getDestinationBySlug(slug: string): DestinationDef | undefined {
   const normalized = slug.toLowerCase().trim()
   return DESTINATIONS.find((d) => d.slug === normalized)
+}
+
+/** Photo Pexels curatée (1 bateau, sans personnes) ou repli sur l'image statique */
+export function getDestinationImage(def: DestinationDef): string {
+  const curated = destinationPexelsImages[def.slug as keyof typeof destinationPexelsImages]
+  return curated?.url ?? def.image
 }
 
 /** Paramètres de recherche API pour une destination */

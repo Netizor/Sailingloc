@@ -1,0 +1,258 @@
+{
+  "france": {
+    "id": 16513593,
+    "url": "https://images.pexels.com/photos/16513593/pexels-photo-16513593.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Cynrar",
+    "pexelsUrl": "https://www.pexels.com/photo/white-yacht-in-bay-in-france-16513593/",
+    "alt": "Breathtaking view of Cassis coast featuring a white yacht and lush greenery under a clear blue sky.",
+    "query": "luxury yacht french riviera sea"
+  },
+  "italie": {
+    "id": 35493341,
+    "url": "https://images.pexels.com/photos/35493341/pexels-photo-35493341.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Magda Ehlers",
+    "pexelsUrl": "https://www.pexels.com/photo/scenic-view-of-amalfi-coast-with-yacht-35493341/",
+    "alt": "Yacht sailing near the picturesque Amalfi Coast, showcasing Mediterranean charm.",
+    "query": "yacht amalfi coast italy"
+  },
+  "espagne": {
+    "id": 38009036,
+    "url": "https://images.pexels.com/photos/38009036/pexels-photo-38009036.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Joerg Mangelsen",
+    "pexelsUrl": "https://www.pexels.com/photo/elegant-yacht-cruising-in-spanish-waters-38009036/",
+    "alt": "Luxury yacht in serene blue sea with scenic Spanish islands in background.",
+    "query": "yacht ibiza mediterranean"
+  },
+  "croatie": {
+    "id": 17600190,
+    "url": "https://images.pexels.com/photos/17600190/pexels-photo-17600190.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Mehdi Souai",
+    "pexelsUrl": "https://www.pexels.com/photo/view-of-the-waterfront-of-split-croatia-and-a-yacht-on-the-sea-17600190/",
+    "alt": "Beautiful Split coastline with sailboat and mountains in Croatia.",
+    "query": "yacht split croatia adriatic"
+  },
+  "grece": {
+    "id": 11566994,
+    "url": "https://images.pexels.com/photos/11566994/pexels-photo-11566994.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Frank J",
+    "pexelsUrl": "https://www.pexels.com/photo/white-yacht-on-beautiful-blue-sea-11566994/",
+    "alt": "A serene view of Santorini's blue sea, terraces with flowers, and a distant yacht.",
+    "query": "yacht cyclades greece"
+  },
+  "portugal": {
+    "id": 33849222,
+    "url": "https://images.pexels.com/photos/33849222/pexels-photo-33849222.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Davide Comunian",
+    "pexelsUrl": "https://www.pexels.com/photo/scenic-view-of-algarve-coastline-with-rock-formations-33849222/",
+    "alt": "Stunning Algarve coast with rocks in turquoise waters, perfect for travel and nature content.",
+    "query": "yacht algarve portugal"
+  },
+  "turquie": {
+    "id": 33432434,
+    "url": "https://images.pexels.com/photos/33432434/pexels-photo-33432434.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Muzin Kahraman",
+    "pexelsUrl": "https://www.pexels.com/photo/scenic-view-of-bodrum-castle-with-sailboats-33432434/",
+    "alt": "Stunning view of Bodrum Castle in Turkey with sailboats on a clear summer day.",
+    "query": "yacht bodrum turkey"
+  },
+  "etats-unis": {
+    "id": 5488927,
+    "url": "https://images.pexels.com/photos/5488927/pexels-photo-5488927.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Be The Observer",
+    "pexelsUrl": "https://www.pexels.com/photo/a-yacht-on-a-sea-5488927/",
+    "alt": "A sleek luxury yacht cruising through the ocean under a clear blue sky near Miami, Florida.",
+    "query": "yacht miami florida ocean"
+  },
+  "mexique": {
+    "id": 20210506,
+    "url": "https://images.pexels.com/photos/20210506/pexels-photo-20210506.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Israel Torres",
+    "pexelsUrl": "https://www.pexels.com/photo/hotels-on-foreland-on-sea-coast-in-cancun-in-mexico-20210506/",
+    "alt": "Stunning aerial view of Cancun's coastline with turquoise waters and city hotels under a clear sky.",
+    "query": "yacht cancun caribbean"
+  },
+  "bahamas": {
+    "id": 4166305,
+    "url": "https://images.pexels.com/photos/4166305/pexels-photo-4166305.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Cam Green",
+    "pexelsUrl": "https://www.pexels.com/photo/aerial-shot-of-a-boat-on-the-sea-4166305/",
+    "alt": "Aerial shot of a boat floating in the turquoise waters of the Bahamas, showcasing vibrant coral reefs.",
+    "query": "yacht bahamas turquoise water"
+  },
+  "martinique": {
+    "id": 4599685,
+    "url": "https://images.pexels.com/photos/4599685/pexels-photo-4599685.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Roberto Lee Cortes",
+    "pexelsUrl": "https://www.pexels.com/photo/a-sailboat-on-the-beach-shore-4599685/",
+    "alt": "Serene catamaran anchored along a Puerto Rican beach with clear turquoise waters and a blue sky.",
+    "query": "catamaran caribbean island"
+  },
+  "thailande": {
+    "id": 18198495,
+    "url": "https://images.pexels.com/photos/18198495/pexels-photo-18198495.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Kirandeep Singh Walia",
+    "pexelsUrl": "https://www.pexels.com/photo/sailing-sailboat-in-black-and-white-18198495/",
+    "alt": "Black and white photo of a sailboat and ship on the calm sea near Phuket, Thailand.",
+    "query": "yacht phuket thailand"
+  },
+  "indonesie": {
+    "id": 19512224,
+    "url": "https://images.pexels.com/photos/19512224/pexels-photo-19512224.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Yousef salah",
+    "pexelsUrl": "https://www.pexels.com/photo/rocks-on-shore-near-blue-ocean-19512224/",
+    "alt": "Stunning coastal cliffs and vibrant blue ocean at Nusa Penida, Bali, Indonesia.",
+    "query": "yacht bali indonesia sea"
+  },
+  "maroc": {
+    "id": 6655418,
+    "url": "https://images.pexels.com/photos/6655418/pexels-photo-6655418.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Tom D'Arby",
+    "pexelsUrl": "https://www.pexels.com/photo/ancient-building-walls-and-fortress-under-a-clear-sky-6655418/",
+    "alt": "Scenic view of historic architecture and coastal fortress walls in Essaouira, Morocco.",
+    "query": "yacht essaouira morocco"
+  },
+  "australie": {
+    "id": 5584968,
+    "url": "https://images.pexels.com/photos/5584968/pexels-photo-5584968.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Alexandra May",
+    "pexelsUrl": "https://www.pexels.com/photo/sailboats-in-bay-5584968/",
+    "alt": "A scenic aerial view of sailboats anchored in a serene bay surrounded by lush islands under a clear sky.",
+    "query": "yacht whitsundays australia"
+  },
+  "malte": {
+    "id": 16373205,
+    "url": "https://images.pexels.com/photos/16373205/pexels-photo-16373205.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Incze Sándor Zoltán",
+    "pexelsUrl": "https://www.pexels.com/photo/anchored-yacht-with-waterfront-apartments-in-the-background-16373205/",
+    "alt": "A luxurious yacht anchored on Valletta's beautiful waterfront, showcasing the vibrant cityscape.",
+    "query": "yacht malta mediterranean"
+  },
+  "maldives": {
+    "id": 4701630,
+    "url": "https://images.pexels.com/photos/4701630/pexels-photo-4701630.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Maahid Photos",
+    "pexelsUrl": "https://www.pexels.com/photo/drone-view-motorboats-moored-on-azure-seawater-near-coastal-settlement-4701630/",
+    "alt": "Aerial top view motorboats moored on turquoise seawater near long pier and coastal settlement on sunny day",
+    "query": "yacht maldives turquoise lagoon"
+  },
+  "seychelles": {
+    "id": 5048621,
+    "url": "https://images.pexels.com/photos/5048621/pexels-photo-5048621.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Moritz Feldmann",
+    "pexelsUrl": "https://www.pexels.com/photo/turquoise-sea-and-green-plants-5048621/",
+    "alt": "Stunning tropical beach in Seychelles with crystal-clear turquoise water and lush greenery.",
+    "query": "yacht seychelles indian ocean"
+  },
+  "emirats-arabes-unis": {
+    "id": 29212679,
+    "url": "https://images.pexels.com/photos/29212679/pexels-photo-29212679.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Nelemson G",
+    "pexelsUrl": "https://www.pexels.com/photo/scenic-view-of-dubai-coastline-with-burj-al-arab-29212679/",
+    "alt": "Breathtaking view of the Burj Al Arab from Dubai's coastline featuring serene waters and palm trees.",
+    "query": "yacht dubai palm jumeirah"
+  },
+  "monaco": {
+    "id": 11892579,
+    "url": "https://images.pexels.com/photos/11892579/pexels-photo-11892579.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "SlimMars 13",
+    "pexelsUrl": "https://www.pexels.com/photo/aerial-view-of-a-coastal-city-11892579/",
+    "alt": "Scenic aerial view of Monaco's coastal cityscape with harbors and Mediterranean Sea.",
+    "query": "luxury yacht monaco riviera"
+  },
+  "costa-rica": {
+    "id": 15365637,
+    "url": "https://images.pexels.com/photos/15365637/pexels-photo-15365637.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Jean Paul  Montanaro",
+    "pexelsUrl": "https://www.pexels.com/photo/bay-on-sea-shore-15365637/",
+    "alt": "A breathtaking aerial view of the lush coastline and blue waters in Guanacaste, Costa Rica.",
+    "query": "yacht costa rica pacific"
+  },
+  "republique-dominicaine": {
+    "id": 5850782,
+    "url": "https://images.pexels.com/photos/5850782/pexels-photo-5850782.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Leonardo Rossatti",
+    "pexelsUrl": "https://www.pexels.com/photo/watercrafts-on-beach-shore-5850782/",
+    "alt": "Bright summer day on Punta Cana beach with colorful sailboats and flags.",
+    "query": "yacht punta cana caribbean"
+  },
+  "maurice": {
+    "id": 7425278,
+    "url": "https://images.pexels.com/photos/7425278/pexels-photo-7425278.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Dominik Ruhl",
+    "pexelsUrl": "https://www.pexels.com/photo/aerial-view-of-a-tropical-island-7425278/",
+    "alt": "Stunning aerial view of turquoise waters and sandy beaches around Saint Brandon, Mauritius. Perfect tropical escape.",
+    "query": "catamaran mauritius lagoon"
+  },
+  "polynesie-francaise": {
+    "id": 15420532,
+    "url": "https://images.pexels.com/photos/15420532/pexels-photo-15420532.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Franco Solari",
+    "pexelsUrl": "https://www.pexels.com/photo/palm-trees-beside-the-beach-15420532/",
+    "alt": "Discover the serene beauty of a tropical beach in Bora Bora, featuring iconic palm trees and crystal-clear water.",
+    "query": "yacht bora bora lagoon"
+  },
+  "cap-vert": {
+    "id": 17430307,
+    "url": "https://images.pexels.com/photos/17430307/pexels-photo-17430307.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "José Barbosa",
+    "pexelsUrl": "https://www.pexels.com/photo/sailing-sailboat-in-black-and-white-17430307/",
+    "alt": "A scenic black and white aerial view of a sailboat navigating the waters near Lisbon, Portugal.",
+    "query": "sailboat cape verde atlantic"
+  },
+  "sri-lanka": {
+    "id": 35511619,
+    "url": "https://images.pexels.com/photos/35511619/pexels-photo-35511619.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Shakir Mohamed",
+    "pexelsUrl": "https://www.pexels.com/photo/sailboat-on-serene-waters-in-sri-lanka-35511619/",
+    "alt": "A beautiful sailboat floating peacefully on the calm blue ocean off Sri Lanka's coast.",
+    "query": "yacht sri lanka indian ocean"
+  },
+  "saint-tropez": {
+    "id": 32601097,
+    "url": "https://images.pexels.com/photos/32601097/pexels-photo-32601097.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Nathan Van Mullem",
+    "pexelsUrl": "https://www.pexels.com/photo/aerial-view-of-boat-on-turquoise-sea-in-saint-tropez-32601097/",
+    "alt": "Explore a serene aerial view of a boat cruising through turquoise waters in Saint-Tropez.",
+    "query": "luxury yacht saint tropez"
+  },
+  "corse": {
+    "id": 35624540,
+    "url": "https://images.pexels.com/photos/35624540/pexels-photo-35624540.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "arnaud audoin",
+    "pexelsUrl": "https://www.pexels.com/photo/scenic-coastal-view-with-sailboats-and-mountains-35624540/",
+    "alt": "Tranquil scene of sailboats on a clear day near rocky shore and mountains.",
+    "query": "yacht corsica mediterranean"
+  },
+  "cote-azur": {
+    "id": 36202503,
+    "url": "https://images.pexels.com/photos/36202503/pexels-photo-36202503.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "x360o",
+    "pexelsUrl": "https://www.pexels.com/photo/scenic-view-of-villefranche-sur-mer-in-france-36202503/",
+    "alt": "Picturesque coastal view of Villefranche-sur-Mer in the French Riviera, showcasing colorful buildings and calm waters.",
+    "query": "yacht nice french riviera"
+  },
+  "bretagne": {
+    "id": 18495935,
+    "url": "https://images.pexels.com/photos/18495935/pexels-photo-18495935.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Jean-Paul Wettstein",
+    "pexelsUrl": "https://www.pexels.com/photo/a-boat-on-sea-18495935/",
+    "alt": "A traditional sailboat rests near a stone pier in Cancale, Bretagne, under a clear blue sky.",
+    "query": "sailboat brittany atlantic france"
+  },
+  "mediterranee": {
+    "id": 13574596,
+    "url": "https://images.pexels.com/photos/13574596/pexels-photo-13574596.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Murat Halıcı",
+    "pexelsUrl": "https://www.pexels.com/photo/a-yacht-at-the-sea-13574596/",
+    "alt": "Elegant yacht sailing on calm blue ocean with a scenic mountain backdrop.",
+    "query": "luxury yacht mediterranean sea"
+  },
+  "caraibes": {
+    "id": 32330651,
+    "url": "https://images.pexels.com/photos/32330651/pexels-photo-32330651.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "photographer": "Wijs (Wise)",
+    "pexelsUrl": "https://www.pexels.com/photo/catamaran-sailing-in-the-turquoise-waters-of-curacao-32330651/",
+    "alt": "Catamaran sails on clear turquoise waters under a vibrant sky in Curaçao, showcasing leisure and tropical beauty.",
+    "query": "catamaran caribbean turquoise"
+  }
+}

@@ -19,7 +19,7 @@ import type { SearchParams } from '../components/boats/SearchBar'
 import type { Boat } from '../types'
 import { BoatStatus, BoatType, MotorizationType } from '../types'
 import { boatsApi } from '../api/boats.api'
-import { HOME_DESTINATIONS } from '../data/destinations'
+import { getDestinationImage, HOME_DESTINATIONS } from '../data/destinations'
 
 type PopularBoatItem = {
   boat: Boat
@@ -232,13 +232,6 @@ const Home: React.FC = () => {
     retry: false,
   })
 
-  const { data: destinationSummary } = useQuery({
-    queryKey: ['destinations', 'summary'],
-    queryFn: () => boatsApi.getDestinationSummary(),
-    staleTime: 5 * 60 * 1000,
-    retry: false,
-  })
-
   const popularBoats: PopularBoatItem[] =
     featuredBoats && featuredBoats.length > 0
       ? featuredBoats.map((boat) => ({
@@ -364,9 +357,7 @@ const Home: React.FC = () => {
 
           <div className="grid grid-cols-12 auto-rows-[200px] sm:auto-rows-[220px] gap-4">
             {HOME_DESTINATIONS.map((dest) => {
-              const cover =
-                dest.country && destinationSummary?.find((s) => s.country === dest.country)?.image
-              const image = cover || dest.image
+              const image = getDestinationImage(dest)
               const label = i18n.language.startsWith('en') ? dest.nameEn : dest.name
               return (
                 <Link

@@ -11,6 +11,7 @@ import MapView from '../components/boats/MapView'
 import Pagination from '../components/ui/Pagination'
 import Spinner from '../components/ui/Spinner'
 import {
+  getDestinationImage,
   getDestinationSearchParams,
   resolveDestinationSlug,
   type DestinationDef,
@@ -27,7 +28,7 @@ function destinationSubregions(def: DestinationDef, lang: string): string {
 }
 
 function destinationImage(def: DestinationDef): string {
-  return def.image
+  return getDestinationImage(def)
 }
 
 const Destination: React.FC = () => {
