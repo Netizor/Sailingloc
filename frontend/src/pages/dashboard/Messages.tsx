@@ -45,7 +45,7 @@ const Messages: React.FC = () => {
 
   const sendMutation = useMutation({
     mutationFn: (content: string) =>
-      sendMessage({ receiverId: toId!, content }),
+      sendMessage({ recipientId: toId!, content }),
     onSuccess: async (msg) => {
       await qc.invalidateQueries({ queryKey: ['conversations'] })
       // Le backend retourne le message avec conversationId
@@ -59,7 +59,7 @@ const Messages: React.FC = () => {
   useEffect(() => {
     if (!toId || !conversations || redirectedRef.current) return
     const existing = conversations.find((c) =>
-      c.participants.some((p) => p.id === toId)
+      c.participants?.some((p) => p.id === toId)
     )
     if (existing) {
       redirectedRef.current = true
@@ -96,7 +96,7 @@ const Messages: React.FC = () => {
         </div>
 
         {/* Formulaire de démarrage de conversation depuis ?to= */}
-        {toId && !isLoading && !conversations?.some((c) => c.participants.some((p) => p.id === toId)) && (
+        {toId && !isLoading && !conversations?.some((c) => c.participants?.some((p) => p.id === toId)) && (
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-ocean-100 dark:border-ocean-800 p-6 mb-6 shadow-sm">
             <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
               Démarrer une conversation avec ce propriétaire
@@ -177,7 +177,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
   onArchive,
 }) => {
   // L'interlocuteur est le participant qui n'est pas l'utilisateur courant
-  const other = conversation.participants.find((p) => p.id !== currentUserId)
+  const other = conversation.participants?.find((p) => p.id !== currentUserId)
   const name = other ? `${other.firstName ?? ''} ${other.lastName ?? ''}`.trim() : 'Inconnu'
   const initials = other
     ? `${other.firstName?.[0] ?? ''}${other.lastName?.[0] ?? ''}`.toUpperCase()
