@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard,
@@ -10,7 +10,9 @@ import {
   Shield,
   ShieldCheck,
 } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '../../store/auth.store'
+import { resolveApiBaseUrl } from '../../lib/axios'
 import { getInitials, cn } from '../../lib/utils'
 import { UserRole } from '../../types'
 
@@ -42,9 +44,48 @@ const ownerNavItems: NavItem[] = [
 ]
 
 const UserDashboardLayout: React.FC = () => {
-  const { user } = useAuthStore()
+  const { user, accessToken } = useAuthStore()
   const navigate = useNavigate()
   const { pathname } = useLocation()
+  const qc = useQueryClient()
+  const lastMsgIdRef = useRef(0)
+
+  // SSE global : notifie le destinataire dès qu'un nouveau message arrive
+  useEffect(() => {
+    if (!accessToken) return
+    let es: EventSource | null = null
+    let active = true
+
+    const connect = () => {
+      if (!active) return
+      const token = useAuthStore.getState().accessToken
+      if (!token) return
+      const url =
+        `${resolveApiBaseUrl()}/messages/stream` +
+        `?token=${encodeURIComponent(token)}&lastId=${lastMsgIdRef.current}`
+      es = new EventSource(url)
+
+      es.onmessage = (event: MessageEvent<string>) => {
+        try {
+          const newMsgs: Array<{ id: number }> = JSON.parse(event.data)
+          if (!newMsgs.length) return
+          const maxId = Math.max(...newMsgs.map((m) => m.id))
+          if (maxId > lastMsgIdRef.current) lastMsgIdRef.current = maxId
+          qc.invalidateQueries({ queryKey: ['conversations'] })
+          qc.invalidateQueries({ queryKey: ['unread-messages-count'] })
+        } catch { /* parse error silencieux */ }
+      }
+
+      es.onerror = () => {
+        es?.close()
+        es = null
+        if (active) setTimeout(connect, 3_000)
+      }
+    }
+
+    connect()
+    return () => { active = false; es?.close() }
+  }, [accessToken, qc])
   const isAdmin = user?.role === UserRole.ADMIN
   const isOwner = user?.role === UserRole.OWNER || isAdmin
   const isOwnerSpace = pathname.startsWith('/proprietaire')

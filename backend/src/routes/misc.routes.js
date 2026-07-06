@@ -259,7 +259,50 @@ messagesRouter.get('/conversation/:conversationId', authenticate, async (req, re
   })
 })
 
-// SSE — EventSource ne peut pas envoyer d'en-têtes, auth via ?token=
+// SSE global — notifie le destinataire de tout nouveau message reçu (toutes conversations)
+messagesRouter.get('/stream', async (req, res) => {
+  const token = req.query.token
+  if (!token) return res.status(401).json({ message: 'Token manquant' })
+  let userId
+  try {
+    const payload = verifyAccessToken(token)
+    const { data: u } = await supabase.from('users').select('id').eq('id', payload.sub).single()
+    if (!u) return res.status(401).json({ message: 'Utilisateur introuvable' })
+    userId = u.id
+  } catch {
+    return res.status(401).json({ message: 'Token invalide' })
+  }
+
+  // Initialise lastId au max existant pour n'envoyer que les nouveaux messages
+  let lastId = parseInt(req.query.lastId) || 0
+  if (lastId === 0) {
+    const { data: lastMsg } = await supabase.from('messages')
+      .select('id').eq('recipient_id', userId)
+      .order('id', { ascending: false }).limit(1).maybeSingle()
+    lastId = lastMsg?.id ?? 0
+  }
+
+  res.setHeader('Content-Type', 'text/event-stream')
+  res.setHeader('Cache-Control', 'no-cache')
+  res.setHeader('Connection', 'keep-alive')
+  res.flushHeaders()
+
+  const interval = setInterval(async () => {
+    const { data: newMsgs } = await supabase.from('messages')
+      .select('*')
+      .eq('recipient_id', userId)
+      .gt('id', lastId)
+      .order('id', { ascending: true })
+    if (newMsgs?.length) {
+      lastId = Math.max(...newMsgs.map(m => m.id))
+      res.write(`data: ${JSON.stringify(newMsgs.map(formatMsg))}\n\n`)
+    }
+  }, 2000)
+
+  req.on('close', () => clearInterval(interval))
+})
+
+// SSE par conversation — EventSource ne peut pas envoyer d'en-têtes, auth via ?token=
 messagesRouter.get('/stream/:conversationId', async (req, res) => {
   const token = req.query.token
   if (!token) return res.status(401).json({ message: 'Token manquant' })
