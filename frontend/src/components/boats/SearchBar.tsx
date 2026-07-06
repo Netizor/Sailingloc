@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { MapPin, Calendar, Users, Search, Ship } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import Button from '../ui/Button'
@@ -32,6 +33,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   listing = false,
   className,
 }) => {
+  const { t } = useTranslation()
   const [location, setLocation] = useState(defaultValues.location ?? '')
   const [startDate, setStartDate] = useState(defaultValues.startDate ?? '')
   const [endDate, setEndDate] = useState(defaultValues.endDate ?? '')
@@ -67,18 +69,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
           'bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,51,102,0.10)] border border-gray-100 p-2',
           className
         )}
-        aria-label="Rechercher un bateau"
+        aria-label={t('searchBar.searchBoat')}
       >
         <div className="flex flex-col md:flex-row md:items-center">
           <div className="flex-1 flex items-center gap-3 px-4 py-3 md:py-2.5 border-b md:border-b-0 md:border-r border-gray-100">
             <MapPin size={18} className="text-[#8A94A6] flex-shrink-0" strokeWidth={1.5} />
             <div className="flex-1 min-w-0 text-left">
               <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[#8A94A6] mb-0.5">
-                Lieu
+                {t('searchBar.location')}
               </span>
               <input
                 type="text"
-                placeholder="Où naviguez-vous ?"
+                placeholder={t('searchBar.locationPlaceholderListing')}
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 className="w-full text-sm text-[#334155] placeholder:text-[#8A94A6] bg-transparent border-none outline-none"
@@ -91,7 +93,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             <div className="flex-1 min-w-0 grid grid-cols-2 gap-2">
               <div className="relative text-left">
                 <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[#8A94A6] mb-0.5">
-                  Départ
+                  {t('searchBar.departure')}
                 </span>
                 <input
                   type="date"
@@ -109,7 +111,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               </div>
               <div className="relative text-left">
                 <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[#8A94A6] mb-0.5">
-                  Retour
+                  {t('searchBar.return')}
                 </span>
                 <input
                   type="date"
@@ -129,7 +131,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             <Ship size={18} className="text-[#8A94A6] flex-shrink-0" strokeWidth={1.5} />
             <div className="flex-1 min-w-0 text-left">
               <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[#8A94A6] mb-0.5">
-                Type
+                {t('searchBar.type')}
               </span>
               <select
                 value={boatType}
@@ -139,7 +141,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                   boatType ? 'text-[#334155]' : 'text-[#8A94A6]'
                 )}
               >
-                <option value="">Catamaran, Voilier...</option>
+                <option value="">{t('searchBar.typePlaceholderListing')}</option>
                 {BOAT_TYPE_OPTIONS.map((type) => (
                   <option key={type} value={type}>
                     {BOAT_TYPE_LABELS[type]}
@@ -153,7 +155,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             <button
               type="submit"
               className="sl-btn-navy w-12 h-12 flex items-center justify-center rounded-full shadow-md transition-colors flex-shrink-0"
-              aria-label="Rechercher"
+              aria-label={t('common.search')}
             >
               <Search size={20} strokeWidth={2.5} color="#ffffff" />
             </button>
@@ -172,13 +174,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
           'dark:bg-gray-800 dark:border-gray-700',
           className
         )}
-        aria-label="Recherche rapide"
+        aria-label={t('searchBar.quickSearch')}
       >
         <div className="flex items-center gap-2 flex-1 min-w-0 px-2">
           <MapPin size={15} className="text-gray-400 flex-shrink-0" />
           <input
             type="text"
-            placeholder="Port ou ville"
+            placeholder={t('searchBar.portOrCity')}
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             className="text-sm text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 bg-transparent border-none outline-none w-full min-w-0"
@@ -199,18 +201,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
           'bg-white rounded-full shadow-[0_8px_40px_rgba(0,0,0,0.14)] p-1.5 max-w-5xl mx-auto',
           className
         )}
-        aria-label="Rechercher un bateau"
+        aria-label={t('searchBar.searchBoat')}
       >
         <div className="flex flex-col md:flex-row md:items-center">
           <div className="flex-1 flex items-center gap-3 px-5 py-3 md:py-2.5 border-b md:border-b-0 md:border-r border-gray-200">
             <MapPin size={18} className="text-gray-400 flex-shrink-0" strokeWidth={1.5} />
             <div className="flex-1 min-w-0 text-left">
               <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400 mb-0.5">
-                Destinations
+                {t('searchBar.destinations')}
               </span>
               <input
                 type="text"
-                placeholder="Où allez-vous ?"
+                placeholder={t('searchBar.whereGoing')}
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 className="w-full text-sm text-brand-slate placeholder:text-gray-400 bg-transparent border-none outline-none"
@@ -222,7 +224,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             <Calendar size={18} className="text-gray-400 flex-shrink-0" strokeWidth={1.5} />
             <div className="flex-1 min-w-0 text-left relative">
               <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400 mb-0.5">
-                Dates
+                {t('searchBar.dates')}
               </span>
               <input
                 type="date"
@@ -236,7 +238,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               />
               {!startDate && (
                 <span className="absolute left-0 bottom-0 text-sm text-gray-400 pointer-events-none">
-                  Quand partir ?
+                  {t('searchBar.whenLeaving')}
                 </span>
               )}
             </div>
@@ -246,7 +248,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             <Ship size={18} className="text-gray-400 flex-shrink-0" strokeWidth={1.5} />
             <div className="flex-1 min-w-0 text-left">
               <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400 mb-0.5">
-                Type
+                {t('searchBar.type')}
               </span>
               <select
                 value={boatType}
@@ -256,7 +258,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                   boatType ? 'text-brand-slate' : 'text-gray-400'
                 )}
               >
-                <option value="">Tous les bateaux</option>
+                <option value="">{t('searchBar.allBoats')}</option>
                 {BOAT_TYPE_OPTIONS.map((type) => (
                   <option key={type} value={type}>
                     {BOAT_TYPE_LABELS[type]}
@@ -272,7 +274,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 bg-[#003366] text-white font-medium rounded-full whitespace-nowrap text-sm"
             >
               <Search size={16} strokeWidth={2} />
-              explorer
+              {t('searchBar.explore')}
             </button>
           </div>
         </div>
@@ -288,18 +290,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
         'dark:bg-gray-800 dark:border-gray-700',
         className
       )}
-      aria-label="Rechercher un bateau"
+      aria-label={t('searchBar.searchBoat')}
     >
       <div className="flex flex-col sm:flex-row items-stretch gap-1">
         <div className="flex-1 flex items-center gap-2.5 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors cursor-text group">
           <MapPin size={18} className="text-brand-blue flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">
-              Port / Ville
+              {t('searchBar.portCity')}
             </label>
             <input
               type="text"
-              placeholder="Ex: Marseille, La Rochelle…"
+              placeholder={t('searchBar.portCityPlaceholder')}
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               className="w-full text-sm text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 bg-transparent border-none outline-none"
@@ -313,7 +315,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           <Calendar size={18} className="text-brand-blue flex-shrink-0" />
           <div className="flex-1">
             <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">
-              Départ
+              {t('searchBar.departure')}
             </label>
             <input
               type="date"
@@ -334,7 +336,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           <Calendar size={18} className="text-brand-blue flex-shrink-0" />
           <div className="flex-1">
             <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">
-              Retour
+              {t('searchBar.return')}
             </label>
             <input
               type="date"
@@ -352,7 +354,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           <Users size={18} className="text-brand-blue flex-shrink-0" />
           <div className="flex-1">
             <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">
-              Personnes
+              {t('searchBar.people')}
             </label>
             <select
               value={capacity}
@@ -361,10 +363,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
               }
               className="w-full text-sm text-gray-800 bg-transparent border-none outline-none cursor-pointer appearance-none"
             >
-              <option value="">Tous</option>
+              <option value="">{t('searchBar.all')}</option>
               {[1, 2, 3, 4, 5, 6, 8, 10, 12].map((n) => (
                 <option key={n} value={n}>
-                  {n}+ pers.
+                  {t('searchBar.peopleCount', { count: n })}
                 </option>
               ))}
             </select>
@@ -379,7 +381,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             className="whitespace-nowrap rounded-xl px-6 bg-brand-navy hover:bg-ocean-800"
             leftIcon={<Search size={18} />}
           >
-            Rechercher
+            {t('common.search')}
           </Button>
         </div>
       </div>

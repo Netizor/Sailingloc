@@ -3,10 +3,16 @@ import { Eye, EyeOff, Moon, Sun } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/utils'
 import { usePreferencesStore } from '../../store/preferences.store'
+import FlagIcon from '../ui/FlagIcon'
 
 interface SiteSettingsMenuProps {
   variant?: 'header' | 'mobile'
 }
+
+const LANG_FLAG_CODE = {
+  fr: 'fr',
+  en: 'gb',
+} as const
 
 const SiteSettingsMenu: React.FC<SiteSettingsMenuProps> = ({ variant = 'header' }) => {
   const { t, i18n } = useTranslation()
@@ -34,8 +40,20 @@ const SiteSettingsMenu: React.FC<SiteSettingsMenuProps> = ({ variant = 'header' 
             {t('nav.language')}
           </p>
           <div className="flex gap-2">
-            <LangButton lang="fr" current={currentLang} onClick={() => switchLanguage('fr')} label={t('accessibility.french')} />
-            <LangButton lang="en" current={currentLang} onClick={() => switchLanguage('en')} label={t('accessibility.english')} />
+            <LangFlagButton
+              lang="fr"
+              current={currentLang}
+              onClick={() => switchLanguage('fr')}
+              label={t('accessibility.french')}
+              showLabel
+            />
+            <LangFlagButton
+              lang="en"
+              current={currentLang}
+              onClick={() => switchLanguage('en')}
+              label={t('accessibility.english')}
+              showLabel
+            />
           </div>
         </div>
 
@@ -72,36 +90,22 @@ const SiteSettingsMenu: React.FC<SiteSettingsMenuProps> = ({ variant = 'header' 
   return (
     <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
       <div
-        className="flex items-center rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden"
+        className="flex items-center gap-1 rounded-lg border border-gray-200 dark:border-gray-600 p-0.5"
         role="group"
         aria-label={t('nav.language')}
       >
-        <button
-          type="button"
+        <LangFlagButton
+          lang="fr"
+          current={currentLang}
           onClick={() => switchLanguage('fr')}
-          className={cn(
-            'px-2.5 py-1.5 text-xs font-bold transition-colors',
-            currentLang === 'fr'
-              ? 'bg-[#2563FF] text-white'
-              : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
-          )}
-          aria-pressed={currentLang === 'fr'}
-        >
-          FR
-        </button>
-        <button
-          type="button"
+          label={t('accessibility.french')}
+        />
+        <LangFlagButton
+          lang="en"
+          current={currentLang}
           onClick={() => switchLanguage('en')}
-          className={cn(
-            'px-2.5 py-1.5 text-xs font-bold transition-colors',
-            currentLang === 'en'
-              ? 'bg-[#2563FF] text-white'
-              : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
-          )}
-          aria-pressed={currentLang === 'en'}
-        >
-          EN
-        </button>
+          label={t('accessibility.english')}
+        />
       </div>
 
       <button
@@ -126,27 +130,52 @@ const SiteSettingsMenu: React.FC<SiteSettingsMenuProps> = ({ variant = 'header' 
   )
 }
 
-interface LangButtonProps {
+interface LangFlagButtonProps {
   lang: 'fr' | 'en'
   current: string
   onClick: () => void
   label: string
+  showLabel?: boolean
 }
 
-const LangButton: React.FC<LangButtonProps> = ({ lang, current, onClick, label }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className={cn(
-      'flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-      current === lang
-        ? 'bg-[#2563FF] text-white'
-        : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300'
-    )}
-    aria-pressed={current === lang}
-  >
-    {label}
-  </button>
-)
+const LangFlagButton: React.FC<LangFlagButtonProps> = ({
+  lang,
+  current,
+  onClick,
+  label,
+  showLabel = false,
+}) => {
+  const isActive = current === lang
+  const flagCode = LANG_FLAG_CODE[lang]
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      aria-pressed={isActive}
+      title={label}
+      className={cn(
+        'inline-flex items-center justify-center gap-2 transition-all rounded-md',
+        showLabel
+          ? cn(
+              'flex-1 px-3 py-2 text-sm font-medium',
+              isActive
+                ? 'bg-[#2563FF] text-white'
+                : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300',
+            )
+          : cn(
+              'p-1.5',
+              isActive
+                ? 'bg-[#2563FF]/15 ring-2 ring-[#2563FF]'
+                : 'hover:bg-gray-50 dark:hover:bg-gray-800 opacity-70 hover:opacity-100',
+            ),
+      )}
+    >
+      <FlagIcon code={flagCode} className={cn(showLabel ? 'h-4 w-6' : 'h-3.5 w-5')} />
+      {showLabel && <span>{label}</span>}
+    </button>
+  )
+}
 
 export default SiteSettingsMenu

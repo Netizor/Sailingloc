@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import {
   Anchor,
@@ -33,15 +34,16 @@ interface BookingWithReview extends Booking {
 
 type HistoryFilter = 'ALL' | 'UPCOMING' | 'COMPLETED' | 'PENDING' | 'CANCELLED'
 
-const filterLabels: Record<HistoryFilter, string> = {
-  ALL: 'Toutes',
-  UPCOMING: 'À venir',
-  COMPLETED: 'Terminées',
-  PENDING: 'En attente',
-  CANCELLED: 'Annulées',
+const FILTER_KEYS: Record<HistoryFilter, string> = {
+  ALL: 'booking.myBookings.filterAll',
+  UPCOMING: 'booking.myBookings.filterUpcoming',
+  COMPLETED: 'booking.myBookings.filterCompleted',
+  PENDING: 'booking.myBookings.filterPending',
+  CANCELLED: 'booking.myBookings.filterCancelled',
 }
 
 const MyBookings: React.FC = () => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [historyFilter, setHistoryFilter] = useState<HistoryFilter>('ALL')
   const [filterOpen, setFilterOpen] = useState(false)
@@ -136,59 +138,56 @@ const MyBookings: React.FC = () => {
   if (isError) {
     return (
       <div className="text-center py-24 text-red-500">
-        Erreur lors du chargement de vos réservations.
+        {t('booking.myBookings.loadError')}
       </div>
     )
   }
 
   return (
     <div className="space-y-8">
-      {/* En-tête */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
-          Mes Réservations
+          {t('booking.myBookings.title')}
         </h1>
         <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-          Gérez vos escapades maritimes et l'historique de vos locations.
+          {t('booking.myBookings.subtitle')}
         </p>
       </div>
 
-      {/* Statistiques */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           icon={<Calendar size={20} />}
           value={totalBookings}
-          label="Total Réservations"
+          label={t('booking.myBookings.totalBookings')}
           sub={
             bookingsThisMonth > 0
-              ? `+${bookingsThisMonth} ce mois-ci`
-              : 'Aucune ce mois-ci'
+              ? t('booking.myBookings.thisMonth', { count: bookingsThisMonth })
+              : t('booking.myBookings.noneThisMonth')
           }
         />
         <StatCard
           icon={<Star size={20} />}
           value={reviewsGiven}
-          label="Avis Donnés"
+          label={t('booking.myBookings.reviewsGiven')}
           sub={
             avgReviewRating
-              ? `Moyenne de ${avgReviewRating.toFixed(1)}/5`
+              ? t('booking.myBookings.avgRating', { rating: avgReviewRating.toFixed(1) })
               : reviewsGiven > 0
-                ? 'Avis publiés'
-                : "Aucun avis pour l'instant"
+                ? t('booking.myBookings.reviewsPublished')
+                : t('booking.myBookings.noReviewsYet')
           }
         />
         <StatCard
           icon={<Heart size={20} />}
           value={favorites?.length ?? 0}
-          label="Favoris"
-          sub="Bateaux enregistrés"
+          label={t('booking.myBookings.favorites')}
+          sub={t('booking.myBookings.savedBoats')}
         />
       </div>
 
-      {/* Prochaine escapade - toujours visible */}
       <section>
         <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3">
-          Prochaine escapade
+          {t('booking.myBookings.nextTrip')}
         </h2>
         {nextBooking ? (
           <NextTripHero
@@ -198,22 +197,21 @@ const MyBookings: React.FC = () => {
         ) : (
           <div className="relative w-full h-56 sm:h-64 rounded-2xl overflow-hidden bg-gradient-to-br from-ocean-600 to-brand-navy flex flex-col items-center justify-center text-center px-6">
             <Anchor size={40} className="text-white/40 mb-3" />
-            <p className="text-white font-semibold text-lg">Aucune escapade prévue</p>
+            <p className="text-white font-semibold text-lg">{t('booking.myBookings.noTripPlanned')}</p>
             <p className="text-white/70 text-sm mt-1 mb-5 max-w-sm">
-              Réservez votre prochain bateau et retrouvez ici les détails de votre prochain départ.
+              {t('booking.myBookings.noTripHint')}
             </p>
             <Button variant="primary" onClick={() => navigate('/bateaux')}>
-              Explorer les bateaux
+              {t('booking.myBookings.exploreBoats')}
             </Button>
           </div>
         )}
       </section>
 
-      {/* Historique */}
       <section ref={tableRef} className="print:block">
         <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
           <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
-            Historique des réservations
+            {t('booking.myBookings.history')}
           </h2>
           <div className="flex items-center gap-2 print:hidden">
             <div className="relative">
@@ -222,14 +220,14 @@ const MyBookings: React.FC = () => {
                 className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-gray-300 transition-colors"
               >
                 <Filter size={15} />
-                Filtrer
+                {t('common.filter')}
                 <ChevronDown size={14} className={`transition-transform ${filterOpen ? 'rotate-180' : ''}`} />
               </button>
               {filterOpen && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setFilterOpen(false)} />
                   <div className="absolute right-0 top-full mt-1 z-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg py-1 min-w-[160px]">
-                    {(Object.keys(filterLabels) as HistoryFilter[]).map((key) => (
+                    {(Object.keys(FILTER_KEYS) as HistoryFilter[]).map((key) => (
                       <button
                         key={key}
                         onClick={() => {
@@ -242,7 +240,7 @@ const MyBookings: React.FC = () => {
                             : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
                         }`}
                       >
-                        {filterLabels[key]}
+                        {t(FILTER_KEYS[key])}
                       </button>
                     ))}
                   </div>
@@ -254,7 +252,7 @@ const MyBookings: React.FC = () => {
               className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-gray-300 transition-colors"
             >
               <Download size={15} />
-              Exporter PDF
+              {t('booking.myBookings.exportPdf')}
             </button>
           </div>
         </div>
@@ -262,14 +260,14 @@ const MyBookings: React.FC = () => {
         {filteredHistory.length === 0 ? (
           <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-12 text-center">
             <Anchor size={36} className="text-gray-200 dark:text-gray-700 mx-auto mb-3" />
-            <p className="text-gray-500 dark:text-gray-400 font-medium">Aucune réservation trouvée</p>
+            <p className="text-gray-500 dark:text-gray-400 font-medium">{t('booking.myBookings.noBookingsFound')}</p>
             <p className="text-gray-400 dark:text-gray-500 text-sm mt-1 mb-5">
               {historyFilter === 'ALL'
-                ? "Vous n'avez pas encore fait de réservation."
-                : 'Aucune réservation dans cette catégorie.'}
+                ? t('booking.noBookingsHint')
+                : t('booking.myBookings.noBookingsCategory')}
             </p>
             <Button variant="primary" onClick={() => navigate('/bateaux')}>
-              Explorer les bateaux
+              {t('booking.myBookings.exploreBoats')}
             </Button>
           </div>
         ) : (
@@ -278,11 +276,11 @@ const MyBookings: React.FC = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-100 dark:border-gray-700 text-left bg-gray-50/50 dark:bg-gray-800/50">
-                    <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">Bateau</th>
-                    <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">Dates</th>
-                    <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">Lieu</th>
-                    <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">Statut</th>
-                    <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase text-right">Montant</th>
+                    <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">{t('booking.myBookings.tableBoat')}</th>
+                    <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">{t('booking.myBookings.tableDates')}</th>
+                    <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">{t('booking.myBookings.tableLocation')}</th>
+                    <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">{t('booking.myBookings.tableStatus')}</th>
+                    <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase text-right">{t('booking.myBookings.tableAmount')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -296,7 +294,7 @@ const MyBookings: React.FC = () => {
                         <div className="flex items-center gap-3">
                           <BoatThumbnail booking={booking} />
                           <span className="font-medium text-gray-900 dark:text-gray-100">
-                            {booking.boat?.title ?? 'Bateau'}
+                            {booking.boat?.title ?? t('booking.myBookings.boatFallback')}
                           </span>
                         </div>
                       </td>
@@ -342,21 +340,24 @@ const StatCard: React.FC<{
   </div>
 )
 
-const BoatThumbnail: React.FC<{ booking: BookingWithReview }> = ({ booking }) => (
-  <div className="h-10 w-14 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex-shrink-0">
-    {booking.boat?.images?.[0] ? (
-      <img
-        src={booking.boat.images[0]}
-        alt={booking.boat.title ?? 'Bateau'}
-        className="h-full w-full object-cover"
-      />
-    ) : (
-      <div className="h-full w-full flex items-center justify-center bg-ocean-50 dark:bg-ocean-900/30">
-        <Anchor size={14} className="text-ocean-300" />
-      </div>
-    )}
-  </div>
-)
+const BoatThumbnail: React.FC<{ booking: BookingWithReview }> = ({ booking }) => {
+  const { t } = useTranslation()
+  return (
+    <div className="h-10 w-14 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex-shrink-0">
+      {booking.boat?.images?.[0] ? (
+        <img
+          src={booking.boat.images[0]}
+          alt={booking.boat.title ?? t('booking.myBookings.boatFallback')}
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <div className="h-full w-full flex items-center justify-center bg-ocean-50 dark:bg-ocean-900/30">
+          <Anchor size={14} className="text-ocean-300" />
+        </div>
+      )}
+    </div>
+  )
+}
 
 const StatusPill: React.FC<{ status: BookingStatus }> = ({ status }) => {
   const color = getBookingStatusColor(status)
@@ -373,14 +374,15 @@ const NextTripHero: React.FC<{
   booking: BookingWithReview
   onClick: () => void
 }> = ({ booking, onClick }) => {
+  const { t } = useTranslation()
   const daysLeft = daysUntil(booking.startDate)
   const location = [booking.boat?.city, booking.boat?.country].filter(Boolean).join(', ') || ''
   const departureLabel =
     daysLeft > 0
-      ? `Départ dans ${daysLeft} Jour${daysLeft > 1 ? 's' : ''}`
+      ? t('booking.myBookings.departureIn', { count: daysLeft })
       : daysLeft === 0
-        ? "Départ aujourd'hui"
-        : 'En cours'
+        ? t('booking.myBookings.departureToday')
+        : t('booking.myBookings.inProgress')
 
   return (
     <button
@@ -390,7 +392,7 @@ const NextTripHero: React.FC<{
       {booking.boat?.images?.[0] ? (
         <img
           src={booking.boat.images[0]}
-          alt={booking.boat.title ?? 'Bateau'}
+          alt={booking.boat.title ?? t('booking.myBookings.boatFallback')}
           className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
       ) : (
@@ -407,10 +409,12 @@ const NextTripHero: React.FC<{
                 : 'bg-yellow-500'
             }`}
           >
-            {booking.status === BookingStatus.CONFIRMED ? 'Confirmée' : 'En attente'}
+            {booking.status === BookingStatus.CONFIRMED
+              ? t('booking.myBookings.statusConfirmed')
+              : t('booking.myBookings.statusPending')}
           </span>
           <h3 className="text-lg sm:text-xl font-bold text-white leading-tight">
-            {booking.boat?.title ?? 'Bateau'}
+            {booking.boat?.title ?? t('booking.myBookings.boatFallback')}
           </h3>
           <p className="text-sm text-white/80 flex items-center gap-1.5">
             <MapPin size={14} />

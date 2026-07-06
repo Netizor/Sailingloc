@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { Outlet, Navigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import Header from './Header'
 import Footer from './Footer'
 import VerificationBanner from '../ui/VerificationBanner'
@@ -47,11 +48,12 @@ const Layout: React.FC = () => {
 // ─── Protected Route (requires any authenticated user) ───────────────────────
 
 export const ProtectedRoute: React.FC = () => {
+  const { t } = useTranslation()
   const { isAuthenticated, isLoading } = useAuthStore()
   const location = useLocation()
 
   if (isLoading) {
-    return <FullPageSpinner label="Vérification de la session…" />
+    return <FullPageSpinner label={t('layout.checkingSession')} />
   }
 
   if (!isAuthenticated) {
@@ -64,11 +66,12 @@ export const ProtectedRoute: React.FC = () => {
 // ─── Owner Route (requires OWNER or ADMIN role) ──────────────────────────────
 
 export const OwnerRoute: React.FC = () => {
+  const { t } = useTranslation()
   const { isAuthenticated, isLoading, user } = useAuthStore()
   const location = useLocation()
 
   if (isLoading) {
-    return <FullPageSpinner label="Vérification des droits…" />
+    return <FullPageSpinner label={t('layout.checkingRights')} />
   }
 
   if (!isAuthenticated) {
@@ -85,11 +88,12 @@ export const OwnerRoute: React.FC = () => {
 // ─── Admin Route (requires ADMIN role only) ──────────────────────────────────
 
 export const AdminRoute: React.FC = () => {
+  const { t } = useTranslation()
   const { isAuthenticated, isLoading, user } = useAuthStore()
   const location = useLocation()
 
   if (isLoading) {
-    return <FullPageSpinner label="Vérification des droits d'administration…" />
+    return <FullPageSpinner label={t('layout.checkingAdminRights')} />
   }
 
   if (!isAuthenticated) {

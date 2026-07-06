@@ -1,5 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import {
   Plus,
@@ -15,7 +16,7 @@ import type { Boat } from '../../types'
 import Button from '../../components/ui/Button'
 import DisabledTooltip from '../../components/ui/DisabledTooltip'
 import { useProfileCompletion } from '../../hooks/useProfileCompletion'
-import { formatPrice } from '../../lib/utils'
+import { formatPrice, getBoatStatusLabel } from '../../lib/utils'
 import Badge from '../../components/ui/Badge'
 import Stars from '../../components/ui/Stars'
 import Spinner from '../../components/ui/Spinner'
@@ -23,17 +24,17 @@ import type { BadgeVariant } from '../../components/ui/Badge'
 import { useAuthStore } from '../../store/auth.store'
 import { UserRole } from '../../types'
 
-// Clés alignées sur les valeurs renvoyées par le backend (BoatStatus)
-const statusConfig: Record<string, { label: string; variant: BadgeVariant }> = {
-  ACTIVE: { label: 'Publié', variant: 'success' },
-  DRAFT: { label: 'Brouillon', variant: 'default' },
-  INACTIVE: { label: 'Inactif', variant: 'default' },
-  SUSPENDED: { label: 'Suspendu', variant: 'danger' },
-  PENDING_REVIEW: { label: 'En révision', variant: 'warning' },
-  REJECTED: { label: 'Rejeté', variant: 'danger' },
+const statusVariants: Record<string, BadgeVariant> = {
+  ACTIVE: 'success',
+  DRAFT: 'default',
+  INACTIVE: 'default',
+  SUSPENDED: 'danger',
+  PENDING_REVIEW: 'warning',
+  REJECTED: 'danger',
 }
 
 const MyBoats: React.FC = () => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { user } = useAuthStore()
   const { canManageBoat, issues } = useProfileCompletion()
@@ -56,9 +57,9 @@ const MyBoats: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Mes bateaux</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('myBoats.title')}</h1>
             <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-              {boats.length} annonce{boats.length !== 1 ? 's' : ''}
+              {t('myBoats.listing', { count: boats.length })}
             </p>
           </div>
           <DisabledTooltip disabled={!canManageBoat} tooltip={blockedTooltip}>
@@ -69,7 +70,7 @@ const MyBoats: React.FC = () => {
               className="flex items-center gap-2 bg-brand-teal hover:bg-brand-teal/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-sm px-5 py-3 rounded-xl shadow-lg shadow-brand-teal/25 transition-all"
             >
               <Plus size={16} strokeWidth={2.5} />
-              Ajouter un bateau
+              {t('layout.addBoat')}
             </button>
           </DisabledTooltip>
         </div>
@@ -81,7 +82,7 @@ const MyBoats: React.FC = () => {
           </div>
         ) : isError ? (
           <div className="text-center py-20 text-red-500">
-            Erreur lors du chargement de vos bateaux.
+            {t('myBoats.loadError')}
           </div>
         ) : boats.length === 0 ? (
           /* Empty state */
@@ -90,16 +91,14 @@ const MyBoats: React.FC = () => {
               <Anchor size={36} className="text-ocean-300" />
             </div>
             <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
-              Aucun bateau pour le moment
+              {t('owner.noBoats')}
             </h2>
             <p className="text-gray-400 dark:text-gray-500 text-sm max-w-md mx-auto mb-6">
-              {isAdmin
-                ? 'Cette page liste uniquement les bateaux dont vous êtes propriétaire. Les annonces créées par d’autres utilisateurs sont visibles dans l’espace administration.'
-                : 'Publiez votre premier bateau et commencez à générer des revenus dès aujourd&apos;hui.'}
+              {isAdmin ? t('myBoats.emptyAdmin') : t('owner.noBoatsHint')}
             </p>
             {isAdmin ? (
               <Button variant="primary" size="lg" onClick={() => navigate('/admin/bateaux')}>
-                Voir tous les bateaux (admin)
+                {t('myBoats.viewAllBoatsAdmin')}
               </Button>
             ) : (
               <DisabledTooltip disabled={!canManageBoat} tooltip={blockedTooltip}>
@@ -109,7 +108,7 @@ const MyBoats: React.FC = () => {
                   onClick={() => navigate('/proprietaire/bateaux/nouveau')}
                   leftIcon={<Plus size={18} />}
                 >
-                  Ajouter mon premier bateau
+                  {t('owner.addFirstBoat')}
                 </Button>
               </DisabledTooltip>
             )}
@@ -126,8 +125,10 @@ const MyBoats: React.FC = () => {
 }
 
 const BoatManagementCard: React.FC<{ boat: Boat }> = ({ boat }) => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
-  const status = statusConfig[boat.status ?? 'DRAFT'] ?? statusConfig['DRAFT']
+  const statusKey = boat.status ?? 'DRAFT'
+  const statusVariant = statusVariants[statusKey] ?? statusVariants.DRAFT
   const mainImage = boat.images?.[0]
 
   return (
@@ -143,7 +144,7 @@ const BoatManagementCard: React.FC<{ boat: Boat }> = ({ boat }) => {
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-ocean-50 dark:bg-ocean-900/30 gap-2">
             <Anchor size={28} className="text-ocean-300" />
-            <span className="text-xs text-ocean-400">Pas de photo</span>
+            <span className="text-xs text-ocean-400">{t('myBoats.noPhoto')}</span>
           </div>
         )}
       </div>
@@ -153,8 +154,8 @@ const BoatManagementCard: React.FC<{ boat: Boat }> = ({ boat }) => {
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <Badge variant={status.variant} size="sm" dot>
-                {status.label}
+              <Badge variant={statusVariant} size="sm" dot>
+                {getBoatStatusLabel(statusKey)}
               </Badge>
             </div>
             <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-lg leading-tight">{boat.title}</h3>
@@ -167,7 +168,7 @@ const BoatManagementCard: React.FC<{ boat: Boat }> = ({ boat }) => {
             <p className="text-lg font-bold text-orange-500">
               {formatPrice(boat.dailyRate)}
             </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500">/ jour</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">{t('myBoats.perDay')}</p>
           </div>
         </div>
 
@@ -183,7 +184,7 @@ const BoatManagementCard: React.FC<{ boat: Boat }> = ({ boat }) => {
             ) : (
               <span className="text-xs text-gray-400 dark:text-gray-500 italic flex items-center gap-1">
                 <Star size={12} className="text-gray-300 dark:text-gray-600" />
-                Pas encore noté
+                {t('myBoats.notRatedYet')}
               </span>
             )}
           </div>
@@ -195,7 +196,7 @@ const BoatManagementCard: React.FC<{ boat: Boat }> = ({ boat }) => {
               leftIcon={<ExternalLink size={13} />}
               onClick={() => navigate(`/bateaux/${boat.id}`)}
             >
-              Voir annonce
+              {t('myBoats.viewListing')}
             </Button>
             <Button
               variant="secondary"
@@ -203,7 +204,7 @@ const BoatManagementCard: React.FC<{ boat: Boat }> = ({ boat }) => {
               leftIcon={<CalendarDays size={13} />}
               onClick={() => navigate(`/proprietaire/bateaux/${boat.id}/disponibilites`)}
             >
-              Dispo.
+              {t('myBoats.availability')}
             </Button>
             <Button
               variant="secondary"
@@ -211,7 +212,7 @@ const BoatManagementCard: React.FC<{ boat: Boat }> = ({ boat }) => {
               leftIcon={<Tag size={13} />}
               onClick={() => navigate(`/proprietaire/bateaux/${boat.id}/tarifs`)}
             >
-              Tarifs
+              {t('myBoats.prices')}
             </Button>
             <Button
               variant="primary"
@@ -219,7 +220,7 @@ const BoatManagementCard: React.FC<{ boat: Boat }> = ({ boat }) => {
               leftIcon={<Edit2 size={13} />}
               onClick={() => navigate(`/proprietaire/bateaux/${boat.id}/editer`)}
             >
-              Modifier
+              {t('myBoats.edit')}
             </Button>
           </div>
         </div>

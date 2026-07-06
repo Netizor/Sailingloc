@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import type { Boat } from '../../types'
 
 interface BoatOwnerCardProps {
@@ -8,6 +9,7 @@ interface BoatOwnerCardProps {
 }
 
 const BoatOwnerCard: React.FC<BoatOwnerCardProps> = ({ boat, onContact }) => {
+  const { t } = useTranslation()
   const owner = boat.owner
   if (!owner) return null
 
@@ -16,7 +18,7 @@ const BoatOwnerCard: React.FC<BoatOwnerCardProps> = ({ boat, onContact }) => {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-      <h3 className="text-sm font-bold text-[#003366] mb-5">Le Propriétaire</h3>
+      <h3 className="text-sm font-bold text-[#003366] mb-5">{t('boatOwnerCard.title')}</h3>
 
       <div className="flex items-center gap-4 mb-5">
         <Link to={`/proprietaires/${boat.ownerId}`} className="relative flex-shrink-0">
@@ -36,17 +38,17 @@ const BoatOwnerCard: React.FC<BoatOwnerCardProps> = ({ boat, onContact }) => {
           >
             {fullName}
           </Link>
-          <p className="text-xs text-[#8A94A6] mt-0.5">Loueur professionnel depuis 5 ans</p>
+          <p className="text-xs text-[#8A94A6] mt-0.5">{t('boatOwnerCard.professionalSince')}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 mb-5">
         <div className="bg-[#f8f9fa] rounded-xl px-4 py-3 text-center">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A94A6] mb-1">Avis</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A94A6] mb-1">{t('boatOwnerCard.reviews')}</p>
           <p className="text-lg font-bold text-[#003366]">{boat.reviewCount > 0 ? boat.reviewCount + 100 : 152}</p>
         </div>
         <div className="bg-[#f8f9fa] rounded-xl px-4 py-3 text-center">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A94A6] mb-1">Réponse</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A94A6] mb-1">{t('boatOwnerCard.response')}</p>
           <p className="text-lg font-bold text-[#003366]">1h</p>
         </div>
       </div>
@@ -56,7 +58,7 @@ const BoatOwnerCard: React.FC<BoatOwnerCardProps> = ({ boat, onContact }) => {
         onClick={onContact}
         className="w-full py-3 text-sm font-semibold text-[#003366] bg-white border border-gray-200 rounded-xl hover:border-[#2563FF] hover:text-[#2563FF] transition-colors"
       >
-        Contacter {owner.firstName}
+        {t('boatOwnerCard.contact', { name: owner.firstName })}
       </button>
     </div>
   )

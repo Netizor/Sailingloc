@@ -1,0 +1,16 @@
+# Variables d'environnement — NE JAMAIS VERSIONNER
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Dépendances
+node_modules/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
