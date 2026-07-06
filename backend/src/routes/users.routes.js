@@ -6,7 +6,21 @@ import supabase from '../lib/supabase.js'
 import { authenticate } from '../middleware/auth.middleware.js'
 
 const router = Router()
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } })
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    const allowed = ['image/jpeg', 'image/png', 'image/webp']
+    if (!allowed.includes(file.mimetype)) return cb(new Error('Format accepté : JPG, PNG ou WebP'))
+    cb(null, true)
+  },
+})
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
 
 function formatUser(user) {
   if (!user) return null
@@ -205,13 +219,13 @@ router.post('/avatar', authenticate, upload.single('avatar'), async (req, res, n
   try {
     if (!req.file) return res.status(400).json({ message: 'Aucun fichier fourni' })
 
-    const result = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        { folder: 'sailingloc/avatars', resource_type: 'image', transformation: [{ width: 400, height: 400, crop: 'fill' }] },
-        (err, r) => err ? reject(err) : resolve(r)
-      )
-      stream.end(req.file.buffer)
-    })
+  const result = await new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: 'sailingloc/avatars', resource_type: 'image', transformation: [{ width: 400, height: 400, crop: 'fill' }] },
+      (err, r) => err ? reject(err) : resolve(r)
+    )
+    stream.end(req.file.buffer)
+  })
 
     const { data: user, error } = await supabase
       .from('users')
@@ -220,11 +234,8 @@ router.post('/avatar', authenticate, upload.single('avatar'), async (req, res, n
       .select()
       .single()
 
-    if (error) return res.status(500).json({ message: error.message })
-    return res.json({ avatar: result.secure_url, user: formatUser(user) })
-  } catch (err) {
-    next(err)
-  }
+  if (error) return res.status(500).json({ message: error.message })
+  return res.json({ avatar: result.secure_url, user: formatUser(user) })
 })
 
 // ─── GET /users/me/export ──────────────────────────────────
