@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import supabase from '../lib/supabase.js'
 import { authenticate, requireRole } from '../middleware/auth.middleware.js'
+import { verifyAccessToken } from '../lib/jwt.js'
 
 // ═══════════════════════════════════════════════════════════
 // NOTIFICATIONS
@@ -169,6 +170,32 @@ reviewsRouter.delete('/admin/:id', authenticate, requireRole('ADMIN'), async (re
 // ═══════════════════════════════════════════════════════════
 export const messagesRouter = Router()
 
+// Conversation ID = "${minUserId}-${maxUserId}" — stable, no separate table needed
+function buildConvId(a, b) {
+  return `${Math.min(Number(a), Number(b))}-${Math.max(Number(a), Number(b))}`
+}
+
+function parseConvId(convId, myId) {
+  const parts = String(convId).split('-').map(Number)
+  if (parts.length !== 2 || parts.some(isNaN)) return null
+  const [a, b] = parts
+  if (a === myId) return b
+  if (b === myId) return a
+  return null
+}
+
+function formatMsg(msg) {
+  return {
+    id: msg.id,
+    conversationId: buildConvId(msg.sender_id, msg.recipient_id),
+    senderId: msg.sender_id,
+    content: msg.content,
+    isRead: msg.is_read ?? false,
+    boatId: msg.boat_id ?? null,
+    createdAt: msg.created_at,
+  }
+}
+
 messagesRouter.get('/unread-count', authenticate, async (req, res) => {
   const { count } = await supabase.from('messages').select('id', { count: 'exact', head: true }).eq('recipient_id', req.user.id).eq('is_read', false)
   return res.json({ count: count || 0 })
@@ -180,35 +207,105 @@ messagesRouter.get('/conversations', authenticate, async (req, res) => {
     .or(`sender_id.eq.${req.user.id},recipient_id.eq.${req.user.id}`)
     .order('created_at', { ascending: false })
 
-  const seen = new Map()
+  const convMap = new Map()
   for (const msg of (msgs || [])) {
     const otherId = msg.sender_id === req.user.id ? msg.recipient_id : msg.sender_id
-    const key = [req.user.id, otherId].sort().join('-')
-    if (!seen.has(key)) seen.set(key, msg)
+    const convId = buildConvId(req.user.id, otherId)
+    if (!convMap.has(convId)) {
+      const other = msg.sender_id === req.user.id ? msg.recipient : msg.sender
+      convMap.set(convId, {
+        id: convId,
+        participants: [
+          { id: req.user.id },
+          { id: other?.id, firstName: other?.first_name, lastName: other?.last_name, avatar: other?.avatar },
+        ],
+        lastMessage: formatMsg(msg),
+        unreadCount: 0,
+        createdAt: msg.created_at,
+        updatedAt: msg.created_at,
+      })
+    }
   }
-  return res.json({ conversations: Array.from(seen.values()) })
+
+  const { data: unread } = await supabase.from('messages')
+    .select('sender_id')
+    .eq('recipient_id', req.user.id)
+    .eq('is_read', false)
+  for (const u of (unread || [])) {
+    const convId = buildConvId(req.user.id, u.sender_id)
+    if (convMap.has(convId)) convMap.get(convId).unreadCount++
+  }
+
+  return res.json({ conversations: Array.from(convMap.values()) })
 })
 
-messagesRouter.get('/:otherId', authenticate, async (req, res) => {
-  const { data: msgs } = await supabase.from('messages')
-    .select('*, sender:users!sender_id(id, first_name, last_name, avatar)')
-    .or(`and(sender_id.eq.${req.user.id},recipient_id.eq.${req.params.otherId}),and(sender_id.eq.${req.params.otherId},recipient_id.eq.${req.user.id})`)
+messagesRouter.get('/conversation/:conversationId', authenticate, async (req, res) => {
+  const otherId = parseConvId(req.params.conversationId, req.user.id)
+  if (!otherId) return res.status(400).json({ message: 'conversationId invalide' })
+  const page  = Math.max(1, parseInt(req.query.page) || 1)
+  const limit = Math.min(50, parseInt(req.query.limit) || 30)
+  const { data: msgs, count } = await supabase.from('messages')
+    .select('*', { count: 'exact' })
+    .or(`and(sender_id.eq.${req.user.id},recipient_id.eq.${otherId}),and(sender_id.eq.${otherId},recipient_id.eq.${req.user.id})`)
     .order('created_at', { ascending: true })
-  await supabase.from('messages').update({ is_read: true }).eq('sender_id', req.params.otherId).eq('recipient_id', req.user.id)
-  return res.json({ messages: msgs || [] })
+    .range((page - 1) * limit, page * limit - 1)
+  await supabase.from('messages').update({ is_read: true })
+    .eq('sender_id', otherId).eq('recipient_id', req.user.id)
+  return res.json({
+    data: (msgs || []).map(formatMsg),
+    page,
+    totalPages: Math.ceil((count || 0) / limit),
+  })
+})
+
+// SSE — EventSource ne peut pas envoyer d'en-têtes, auth via ?token=
+messagesRouter.get('/stream/:conversationId', async (req, res) => {
+  const token = req.query.token
+  if (!token) return res.status(401).json({ message: 'Token manquant' })
+  let userId
+  try {
+    const payload = verifyAccessToken(token)
+    const { data: u } = await supabase.from('users').select('id').eq('id', payload.sub).single()
+    if (!u) return res.status(401).json({ message: 'Utilisateur introuvable' })
+    userId = u.id
+  } catch {
+    return res.status(401).json({ message: 'Token invalide' })
+  }
+
+  const otherId = parseConvId(req.params.conversationId, userId)
+  if (!otherId) return res.status(400).json({ message: 'conversationId invalide' })
+
+  let lastId = parseInt(req.query.lastId) || 0
+
+  res.setHeader('Content-Type', 'text/event-stream')
+  res.setHeader('Cache-Control', 'no-cache')
+  res.setHeader('Connection', 'keep-alive')
+  res.flushHeaders()
+
+  const interval = setInterval(async () => {
+    const { data: newMsgs } = await supabase.from('messages')
+      .select('*')
+      .or(`and(sender_id.eq.${userId},recipient_id.eq.${otherId}),and(sender_id.eq.${otherId},recipient_id.eq.${userId})`)
+      .gt('id', lastId)
+      .order('created_at', { ascending: true })
+    if (newMsgs?.length) {
+      lastId = Math.max(...newMsgs.map(m => m.id))
+      res.write(`data: ${JSON.stringify(newMsgs.map(formatMsg))}\n\n`)
+    }
+  }, 2000)
+
+  req.on('close', () => clearInterval(interval))
 })
 
 messagesRouter.post('/', authenticate, async (req, res) => {
   const { recipientId, content } = req.body
   if (!recipientId || !content?.trim()) return res.status(400).json({ message: 'recipientId et content requis' })
   if (String(recipientId) === String(req.user.id)) return res.status(400).json({ message: 'Impossible de vous envoyer un message' })
-
   const { data: msg, error } = await supabase.from('messages').insert({
-    sender_id: req.user.id, recipient_id: recipientId, content: content.trim(),
-  }).select('*, sender:users!sender_id(id, first_name, last_name, avatar)').single()
-
+    sender_id: req.user.id, recipient_id: Number(recipientId), content: content.trim(),
+  }).select('*').single()
   if (error) return res.status(500).json({ message: error.message })
-  return res.status(201).json(msg)
+  return res.status(201).json(formatMsg(msg))
 })
 
 // ═══════════════════════════════════════════════════════════
