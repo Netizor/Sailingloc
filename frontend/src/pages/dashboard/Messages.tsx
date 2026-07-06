@@ -59,7 +59,7 @@ const Messages: React.FC = () => {
   // Redirect if existing conversation with ?to= user
   useEffect(() => {
     if (!toId || !conversations || redirectedRef.current) return
-    const existing = conversations.find(c => c.participants.some(p => p.id === toId))
+    const existing = conversations.find(c => c.participants?.some(p => p.id === toId))
     if (existing) {
       redirectedRef.current = true
       navigate(`/mon-espace/messages/${existing.id}`, { replace: true })
@@ -182,7 +182,7 @@ const Messages: React.FC = () => {
   })
 
   const showCompose = toId && !convLoading &&
-    !conversations?.some(c => c.participants.some(p => p.id === toId))
+    !conversations?.some(c => c.participants?.some(p => p.id === toId))
   const hasConv = !!conversationId
   const effectiveBoatId = convBoatId ?? boatParam
 
