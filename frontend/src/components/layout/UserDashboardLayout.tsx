@@ -9,9 +9,11 @@ import {
   Plus,
   Shield,
   ShieldCheck,
+  UserCircle,
 } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '../../store/auth.store'
+import { MY_PUBLIC_PROFILE_ROUTE, SETTINGS_ROUTE, getPublicProfilePath } from '../../lib/profilePaths'
 import { resolveApiBaseUrl } from '../../lib/axios'
 import { getInitials, cn } from '../../lib/utils'
 import { UserRole } from '../../types'
@@ -31,7 +33,7 @@ const renterNavItems: NavItem[] = [
   { to: '/proprietaire/bateaux', label: 'Mon Bateaux', icon: <Ship size={18} />, ownerOnly: true },
   { to: '/mon-espace/messages', label: 'Messages', icon: <MessageCircle size={18} /> },
   { to: '/mon-espace/verification', label: "Vérification d'identité", icon: <ShieldCheck size={18} /> },
-  { to: '/mon-espace/profil', label: 'Paramètres', icon: <Settings size={18} /> },
+  { to: SETTINGS_ROUTE, label: 'Paramètres', icon: <Settings size={18} /> },
 ]
 
 const ownerNavItems: NavItem[] = [
@@ -40,7 +42,8 @@ const ownerNavItems: NavItem[] = [
   { to: '/proprietaire/bateaux', label: 'Mon Bateaux', icon: <Ship size={18} /> },
   { to: '/mon-espace/messages', label: 'Messages', icon: <MessageCircle size={18} /> },
   { to: '/mon-espace/verification', label: "Vérification d'identité", icon: <ShieldCheck size={18} /> },
-  { to: '/mon-espace/profil', label: 'Paramètres', icon: <Settings size={18} /> },
+  { to: MY_PUBLIC_PROFILE_ROUTE, label: 'Mon profil', icon: <UserCircle size={18} /> },
+  { to: SETTINGS_ROUTE, label: 'Paramètres', icon: <Settings size={18} /> },
 ]
 
 const UserDashboardLayout: React.FC = () => {
@@ -112,22 +115,53 @@ const UserDashboardLayout: React.FC = () => {
             <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 sticky top-24 flex flex-col">
               {/* Profil */}
               <div className="flex flex-col items-center text-center pb-5 border-b border-gray-100 dark:border-gray-700">
-                <div className="h-20 w-20 rounded-full overflow-hidden bg-ocean-100 dark:bg-ocean-800/40 flex items-center justify-center mb-3 ring-2 ring-ocean-50 dark:ring-ocean-900">
-                  {user?.avatar ? (
-                    <img
-                      src={user.avatar}
-                      alt={`${user.firstName} ${user.lastName}`}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-xl font-semibold text-ocean-700 dark:text-ocean-400">
-                      {user ? getInitials(user.firstName, user.lastName) : '?'}
-                    </span>
-                  )}
-                </div>
-                <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
-                  {displayName}
-                </p>
+                {user && getPublicProfilePath(user) ? (
+                  <button
+                    type="button"
+                    onClick={() => navigate(MY_PUBLIC_PROFILE_ROUTE)}
+                    className="group flex flex-col items-center w-full rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors p-2 -m-2"
+                    title="Voir mon profil public"
+                  >
+                    <div className="h-20 w-20 rounded-full overflow-hidden bg-ocean-100 dark:bg-ocean-800/40 flex items-center justify-center mb-3 ring-2 ring-ocean-50 dark:ring-ocean-900 group-hover:ring-ocean-200 dark:group-hover:ring-ocean-700 transition-all">
+                      {user?.avatar ? (
+                        <img
+                          src={user.avatar}
+                          alt={`${user.firstName} ${user.lastName}`}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-xl font-semibold text-ocean-700 dark:text-ocean-400">
+                          {user ? getInitials(user.firstName, user.lastName) : '?'}
+                        </span>
+                      )}
+                    </div>
+                    <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm group-hover:text-brand-blue transition-colors">
+                      {displayName}
+                    </p>
+                    <p className="text-xs text-brand-blue dark:text-ocean-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      Voir mon profil public
+                    </p>
+                  </button>
+                ) : (
+                  <>
+                    <div className="h-20 w-20 rounded-full overflow-hidden bg-ocean-100 dark:bg-ocean-800/40 flex items-center justify-center mb-3 ring-2 ring-ocean-50 dark:ring-ocean-900">
+                      {user?.avatar ? (
+                        <img
+                          src={user.avatar}
+                          alt={`${user.firstName} ${user.lastName}`}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-xl font-semibold text-ocean-700 dark:text-ocean-400">
+                          {user ? getInitials(user.firstName, user.lastName) : '?'}
+                        </span>
+                      )}
+                    </div>
+                    <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+                      {displayName}
+                    </p>
+                  </>
+                )}
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                   {roleLabel}
                 </p>

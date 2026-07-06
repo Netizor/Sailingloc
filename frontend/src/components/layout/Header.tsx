@@ -18,6 +18,7 @@ import { cn } from '../../lib/utils'
 import { useAuthStore } from '../../store/auth.store'
 import { getUnreadCount } from '../../api/notifications.api'
 import { getUnreadMessagesCount } from '../../api/messages.api'
+import { MY_PUBLIC_PROFILE_ROUTE, SETTINGS_ROUTE } from '../../lib/profilePaths'
 import NotificationPanel from '../notifications/NotificationPanel'
 import SiteSettingsMenu from './SiteSettingsMenu'
 
@@ -207,7 +208,8 @@ const Header: React.FC = () => {
                       {user.role === 'ADMIN' && (
                         <DropdownItem icon={<Settings size={15} />} label={t('nav.admin')} to="/admin" onClick={() => setDropdownOpen(false)} />
                       )}
-                      <DropdownItem icon={<User size={15} />} label={t('nav.myProfile')} to="/mon-espace/profil" onClick={() => setDropdownOpen(false)} />
+                      <DropdownItem icon={<User size={15} />} label={t('nav.myProfile')} to={MY_PUBLIC_PROFILE_ROUTE} onClick={() => setDropdownOpen(false)} />
+                      <DropdownItem icon={<Settings size={15} />} label="Paramètres" to={SETTINGS_ROUTE} onClick={() => setDropdownOpen(false)} />
                       <div className="border-t border-gray-50 dark:border-gray-700 mt-1 pt-1">
                         <button onClick={handleLogout} className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700/50">
                           <LogOut size={15} />

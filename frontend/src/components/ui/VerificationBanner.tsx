@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import { useAuthStore } from '../../store/auth.store'
 import { authApi } from '../../api/auth.api'
 import { UserRole } from '../../types'
+import { SETTINGS_ROUTE, MY_PUBLIC_PROFILE_ROUTE, getPublicProfilePath } from '../../lib/profilePaths'
 
 /**
  * Bandeau persistant affiché quand :
@@ -69,7 +70,7 @@ const VerificationBanner: React.FC = () => {
               {' '}En tant que propriétaire, votre numéro de téléphone est obligatoire pour publier un bateau.
             </p>
             <Link
-              to="/mon-espace/profil"
+              to={SETTINGS_ROUTE}
               className="text-xs font-medium text-blue-700 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-100 underline underline-offset-2 flex-shrink-0 transition-colors"
             >
               Compléter mon profil

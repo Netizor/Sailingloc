@@ -37,6 +37,8 @@ const AdminReviews  = React.lazy(() => import('./pages/admin/AdminReviews'))
 const AdminRoles    = React.lazy(() => import('./pages/admin/AdminRoles'))
 const Notifications = React.lazy(() => import('./pages/dashboard/Notifications'))
 const UserProfile = React.lazy(() => import('./pages/dashboard/UserProfile'))
+const MyPublicProfileRedirect = React.lazy(() => import('./pages/dashboard/MyPublicProfileRedirect'))
+const LegacyProfileRedirect = React.lazy(() => import('./pages/dashboard/LegacyProfileRedirect'))
 const NotificationDetail = React.lazy(() => import('./pages/dashboard/NotificationDetail'))
 const MyFavorites = React.lazy(() => import('./pages/dashboard/MyFavorites'))
 const BookingDetail = React.lazy(() => import('./pages/dashboard/BookingDetail'))
@@ -170,7 +172,9 @@ export default function App() {
                 <Route path="messages/:conversationId" element={<Messages />} />
                 <Route path="notifications" element={<Notifications />} />
                 <Route path="notifications/:id" element={<NotificationDetail />} />
-                <Route path="profil" element={<UserProfile />} />
+                <Route path="profil" element={<LegacyProfileRedirect />} />
+                <Route path="parametres" element={<UserProfile />} />
+                <Route path="mon-profil" element={<MyPublicProfileRedirect />} />
                 {/* D3 - Historique des paiements */}
                 <Route path="paiements" element={<MyPayments />} />
                 {/* D6 - Cartes de paiement sauvegardées */}

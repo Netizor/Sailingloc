@@ -11,7 +11,9 @@
     "db:seed": "node scripts/seed-demo-users.js",
     "db:seed:force": "node scripts/seed-demo-users.js --force",
     "db:seed:boats": "node scripts/seed-demo-boats.js",
-    "db:seed:boats:force": "node scripts/seed-demo-boats.js --force"
+    "db:seed:boats:force": "node scripts/seed-demo-boats.js --force",
+    "db:seed:reviews": "node scripts/seed-demo-reviews.js",
+    "db:seed:reviews:force": "node scripts/seed-demo-reviews.js --force"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.43.4",

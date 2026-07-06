@@ -72,7 +72,7 @@ export function useProfileCompletion(): ProfileCompletion {
         description: 'Un numéro de téléphone est obligatoire pour publier une annonce de bateau.',
         actionLabel: 'Compléter mon profil',
         actionType:  'navigate',
-        actionTo:    '/mon-espace/profil',
+        actionTo:    SETTINGS_ROUTE,
       })
     }
   }

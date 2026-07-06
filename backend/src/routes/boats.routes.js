@@ -101,6 +101,12 @@ function formatBoat(b, withOwner = false) {
       lastName: b.users.last_name,
       avatar: b.users.avatar,
       bio: b.users.bio,
+      sailingExperienceYears: b.users.sailing_experience_years,
+      sailingQualifications: b.users.sailing_qualifications,
+      sailingAreas: b.users.sailing_areas,
+      sailorBio: b.users.sailor_bio,
+      sailorCvStatus: b.users.sailor_cv_status || 'NOT_SUBMITTED',
+      createdAt: b.users.created_at,
     }
   }
   return base
@@ -114,7 +120,7 @@ router.get('/', optionalAuth, async (req, res) => {
 
   let query = supabase
     .from('boats')
-    .select('*, users(id, first_name, last_name, avatar)', { count: 'exact' })
+    .select('*, users(id, first_name, last_name, avatar, bio, sailing_experience_years, sailing_qualifications, sailing_areas, sailor_bio, sailor_cv_status, created_at)', { count: 'exact' })
     .eq('status', 'active')
 
   query = applyBoatSearchFilters(query, req.query)
@@ -147,7 +153,7 @@ router.get('/my', authenticate, async (req, res) => {
 
   const { data, error, count } = await supabase
     .from('boats')
-    .select('*, users(id, first_name, last_name, avatar)', { count: 'exact' })
+    .select('*, users(id, first_name, last_name, avatar, bio, sailing_experience_years, sailing_qualifications, sailing_areas, sailor_bio, sailor_cv_status, created_at)', { count: 'exact' })
     .eq('owner_id', req.user.id)
     .order('created_at', { ascending: false })
     .range(from, from + limit - 1)
@@ -223,7 +229,7 @@ router.get('/autocomplete', async (req, res, next) => {
 router.get('/:id', optionalAuth, async (req, res) => {
   const { data: boat, error } = await supabase
     .from('boats')
-    .select('*, users(id, first_name, last_name, avatar, bio, created_at)')
+    .select('*, users(id, first_name, last_name, avatar, bio, sailing_experience_years, sailing_qualifications, sailing_areas, sailor_bio, sailor_cv_status, created_at)')
     .eq('id', req.params.id)
     .single()
 

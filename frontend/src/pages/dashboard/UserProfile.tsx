@@ -1,7 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
-import { Anchor, Camera, Download, Eye, EyeOff, FileCheck, Lock, ShieldAlert, Trash2, Upload, UserCircle } from 'lucide-react'
-import { useMutation } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
+import {
+  Anchor, Camera, Download, Eye, EyeOff, FileCheck, Lock, ShieldAlert,
+  Trash2, Upload, UserCircle, Settings, Shield, ExternalLink, ChevronRight,
+} from 'lucide-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 
@@ -11,8 +15,11 @@ import Input from '../../components/ui/Input'
 import Textarea from '../../components/ui/Textarea'
 import Button from '../../components/ui/Button'
 import Spinner from '../../components/ui/Spinner'
-import { getInitials } from '../../lib/utils'
+import { getInitials, cn } from '../../lib/utils'
 import { UserRole } from '../../types'
+import { MY_PUBLIC_PROFILE_ROUTE, getPublicProfilePath } from '../../lib/profilePaths'
+
+type SettingsTab = 'compte' | 'marin' | 'securite' | 'donnees'
 
 // ─── Constantes partagées entre sections ─────────────────────────────────────
 
@@ -233,25 +240,28 @@ interface SailorCvForm {
   sailorBio:              string
 }
 
+function sailorCvToForm(user: {
+  sailingExperienceYears?: number | null
+  sailingQualifications?: string | null
+  sailingAreas?: string | null
+  sailorBio?: string | null
+}): SailorCvForm {
+  return {
+    sailingExperienceYears: user.sailingExperienceYears != null ? String(user.sailingExperienceYears) : '',
+    sailingQualifications:  user.sailingQualifications ?? '',
+    sailingAreas:           user.sailingAreas ?? '',
+    sailorBio:              user.sailorBio ?? '',
+  }
+}
+
 const SailorCvSection: React.FC = () => {
   const { user, updateUser } = useAuthStore()
+  const queryClient = useQueryClient()
   const documentInputRef = useRef<HTMLInputElement>(null)
-  const [form, setForm] = useState<SailorCvForm>({
-    sailingExperienceYears: user?.sailingExperienceYears != null ? String(user.sailingExperienceYears) : '',
-    sailingQualifications:  user?.sailingQualifications ?? '',
-    sailingAreas:           user?.sailingAreas ?? '',
-    sailorBio:              user?.sailorBio ?? '',
-  })
+  const [form, setForm] = useState<SailorCvForm>(() => sailorCvToForm(user ?? {}))
 
   useEffect(() => {
-    if (user) {
-      setForm({
-        sailingExperienceYears: user.sailingExperienceYears != null ? String(user.sailingExperienceYears) : '',
-        sailingQualifications:  user.sailingQualifications ?? '',
-        sailingAreas:           user.sailingAreas ?? '',
-        sailorBio:              user.sailorBio ?? '',
-      })
-    }
+    if (user) setForm(sailorCvToForm(user))
   }, [user?.id])
 
   const mutation = useMutation({
@@ -263,7 +273,10 @@ const SailorCvSection: React.FC = () => {
         sailingAreas:           updated.sailingAreas,
         sailorBio:              updated.sailorBio,
       })
-      toast.success('CV de marin mis à jour')
+      setForm(sailorCvToForm(updated))
+      queryClient.invalidateQueries({ queryKey: ['owner-profile', String(user?.id)] })
+      queryClient.invalidateQueries({ queryKey: ['boat'] })
+      toast.success('Informations enregistrées sur votre profil public.')
     },
     onError: () => {
       toast.error('Erreur lors de la mise à jour du CV de marin')
@@ -345,9 +358,17 @@ const SailorCvSection: React.FC = () => {
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
         Ces informations sont affichées sur votre profil public et rassurent les locataires.
       </p>
-      <div className={`mb-5 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${statusClass}`}>
-        <FileCheck size={14} />
-        {statusLabel}
+      <div className="mb-5 space-y-2">
+        <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${statusClass}`}>
+          <FileCheck size={14} />
+          {statusLabel}
+        </div>
+        {status === 'NOT_SUBMITTED' && (
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Enregistrer le formulaire sauvegarde vos informations sur votre profil public.
+            Le statut « Vérifié » nécessite l&apos;envoi d&apos;un justificatif (permis, diplôme…) validé par SailingLoc.
+          </p>
+        )}
       </div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Input
@@ -700,29 +721,93 @@ const DataPrivacySection: React.FC = () => {
 
 const UserProfile: React.FC = () => {
   const { user } = useAuthStore()
+  const [activeTab, setActiveTab] = useState<SettingsTab>('compte')
 
   if (!user) return null
 
   const isOwner = user.role === UserRole.OWNER || user.role === UserRole.ADMIN
+  const publicProfilePath = getPublicProfilePath(user)
+
+  const tabs: { id: SettingsTab; label: string; icon: React.ReactNode; ownerOnly?: boolean }[] = [
+    { id: 'compte', label: 'Mon compte', icon: <UserCircle size={18} /> },
+    { id: 'marin', label: 'CV de marin', icon: <Anchor size={18} />, ownerOnly: true },
+    { id: 'securite', label: 'Sécurité', icon: <Shield size={18} /> },
+    { id: 'donnees', label: 'Confidentialité', icon: <Lock size={18} /> },
+  ]
+
+  const visibleTabs = tabs.filter((t) => !t.ownerOnly || isOwner)
 
   return (
-    <div className="max-w-2xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-          <UserCircle size={22} className="text-ocean-700 dark:text-ocean-400" />
-          Paramètres
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-          Gérez vos informations personnelles et votre sécurité
-        </p>
+    <div className="max-w-4xl">
+      {/* En-tête */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-ocean-700 via-brand-blue to-ocean-600 text-white p-6 sm:p-8 mb-6 shadow-lg shadow-ocean-700/20">
+        <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+        <div className="absolute -left-6 bottom-0 h-28 w-28 rounded-full bg-white/5 blur-xl" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center gap-5">
+          <div className="h-16 w-16 rounded-2xl overflow-hidden bg-white/20 flex items-center justify-center flex-shrink-0 ring-2 ring-white/30">
+            {user.avatar ? (
+              <img src={user.avatar} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <span className="text-xl font-bold">{getInitials(user.firstName, user.lastName)}</span>
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <Settings size={18} className="opacity-80" />
+              <h1 className="text-xl sm:text-2xl font-bold">Paramètres</h1>
+            </div>
+            <p className="text-sm text-white/80">
+              {user.firstName} {user.lastName} · {user.email}
+            </p>
+          </div>
+          {publicProfilePath && (
+            <Link
+              to={MY_PUBLIC_PROFILE_ROUTE}
+              className="inline-flex items-center justify-center gap-2 text-sm font-semibold bg-white text-ocean-700 hover:bg-white/90 rounded-xl px-4 py-2.5 transition-colors flex-shrink-0 shadow-sm"
+            >
+              <ExternalLink size={15} />
+              Voir mon profil public
+            </Link>
+          )}
+        </div>
       </div>
 
-      <div className="flex flex-col gap-4">
-        <AvatarSection />
-        <PersonalInfoSection />
-        {isOwner && <SailorCvSection />}
-        <SecuritySection />
-        <DataPrivacySection />
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Navigation onglets */}
+        <nav className="lg:w-52 flex-shrink-0">
+          <div className="flex lg:flex-col gap-1 overflow-x-auto pb-1 lg:pb-0 -mx-1 px-1">
+            {visibleTabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  'flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex-shrink-0',
+                  activeTab === tab.id
+                    ? 'bg-white dark:bg-gray-800 text-brand-blue dark:text-ocean-400 shadow-sm border border-gray-100 dark:border-gray-700'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-white/70 dark:hover:bg-gray-800/50',
+                )}
+              >
+                {tab.icon}
+                {tab.label}
+                {activeTab === tab.id && <ChevronRight size={14} className="ml-auto hidden lg:block opacity-50" />}
+              </button>
+            ))}
+          </div>
+        </nav>
+
+        {/* Contenu */}
+        <div className="flex-1 min-w-0 space-y-4">
+          {activeTab === 'compte' && (
+            <>
+              <AvatarSection />
+              <PersonalInfoSection />
+            </>
+          )}
+          {activeTab === 'marin' && isOwner && <SailorCvSection />}
+          {activeTab === 'securite' && <SecuritySection />}
+          {activeTab === 'donnees' && <DataPrivacySection />}
+        </div>
       </div>
     </div>
   )
