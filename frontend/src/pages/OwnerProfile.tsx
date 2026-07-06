@@ -161,6 +161,7 @@ const OwnerProfile: React.FC = () => {
           rating={rating}
           reviewCount={reviewCount}
         />
+
         {/* CV de marin */}
         {(owner.sailorBio || owner.sailingQualifications || owner.sailingAreas || owner.sailingExperienceYears != null) && (
           <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 sm:p-8">

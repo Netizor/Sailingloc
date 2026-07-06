@@ -231,3 +231,11 @@ const OwnerReviewsSection: React.FC<OwnerReviewsSectionProps> = ({
 }
 
 export default OwnerReviewsSection
+
+
+
+
+
+
+
+
