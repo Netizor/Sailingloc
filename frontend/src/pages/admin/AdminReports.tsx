@@ -17,10 +17,11 @@ const REASON_LABELS: Record<string, string> = {
   OTHER:                 'Autre',
 }
 
-const STATUS_CONFIG: Record<ReportStatus, { label: string; icon: React.ReactNode; variant: 'warning' | 'success' | 'default' }> = {
+const STATUS_CONFIG: Record<string, { label: string; icon: React.ReactNode; variant: 'warning' | 'success' | 'default' }> = {
   PENDING:   { label: 'En attente', icon: <Clock size={12} />,       variant: 'warning' },
   PROCESSED: { label: 'Traité',     icon: <CheckCircle size={12} />, variant: 'success' },
   DISMISSED: { label: 'Ignoré',     icon: <XCircle size={12} />,     variant: 'default' },
+  RESOLVED:  { label: 'Traité',     icon: <CheckCircle size={12} />, variant: 'success' },
 }
 
 const PAGE_SIZE = 15
@@ -122,7 +123,7 @@ const AdminReports: React.FC = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
                   {reports.map((report) => {
-                    const sc = STATUS_CONFIG[report.status]
+                    const sc = STATUS_CONFIG[report.status] ?? STATUS_CONFIG['PENDING']
                     return (
                       <tr key={report.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
                         <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100 max-w-[160px] truncate">

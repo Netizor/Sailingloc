@@ -18,7 +18,7 @@ import {
   notificationsRouter,
   adminRouter,
   reportsRouter,
-  documentsRouter,
+  //documentsRouter,
   stripeWebhookRouter,
   seoRouter,
   healthRouter,
@@ -65,7 +65,7 @@ app.use('/api/seasonal-prices',   seasonalPricesRouter)
 app.use('/api/notifications',     notificationsRouter)
 app.use('/api/admin',             adminRouter)
 app.use('/api/reports',           reportsRouter)
-app.use('/api/documents',         documentsRouter)
+//app.use('/api/documents',         documentsRouter)
 app.use('/api',                   seoRouter)
 app.use('/api/health',            healthRouter)
 

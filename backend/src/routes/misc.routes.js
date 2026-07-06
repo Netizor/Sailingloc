@@ -1,6 +1,9 @@
 import { Router } from 'express'
+import bcrypt from 'bcryptjs'
+import { v4 as uuidv4 } from 'uuid'
 import supabase from '../lib/supabase.js'
 import { authenticate, requireRole } from '../middleware/auth.middleware.js'
+import { sendEmailVerification } from '../services/email.service.js'
 
 // ═══════════════════════════════════════════════════════════
 // NOTIFICATIONS
@@ -562,16 +565,18 @@ adminRouter.get('/users', async (req, res) => {
 
   let query = supabase
     .from('users')
-    .select('id, email, role, first_name, last_name, phone, avatar, bio, sailing_experience_years, sailing_qualifications, sailing_areas, sailor_bio, sailor_cv_status, sailor_cv_doc, sailor_cv_submitted_at, sailor_cv_reviewed_at, sailor_cv_rejection_reason, is_blocked, email_verified_at, created_at', { count: 'exact' })
+    .select('*', { count: 'exact' })
 
   if (search) {
     query = query.or(`email.ilike.%${search}%,first_name.ilike.%${search}%,last_name.ilike.%${search}%`)
   }
   if (role) query = query.eq('role', role)
 
-  const { data, count } = await query
+  const { data, count, error } = await query
     .order('created_at', { ascending: false })
     .range((page - 1) * limit, page * limit - 1)
+
+  if (error) return res.status(500).json({ message: error.message })
 
   const users = await Promise.all((data || []).map(async (u) => {
     const { count: boatsCount } = await supabase.from('boats').select('id', { count: 'exact', head: true }).eq('owner_id', u.id)
@@ -584,7 +589,7 @@ adminRouter.get('/users', async (req, res) => {
 adminRouter.get('/users/:id', async (req, res) => {
   const { data: user } = await supabase
     .from('users')
-    .select('id, email, role, first_name, last_name, phone, avatar, bio, sailing_experience_years, sailing_qualifications, sailing_areas, sailor_bio, sailor_cv_status, sailor_cv_doc, sailor_cv_submitted_at, sailor_cv_reviewed_at, sailor_cv_rejection_reason, is_blocked, email_verified_at, created_at')
+    .select('*')
     .eq('id', req.params.id)
     .single()
   if (!user) return res.status(404).json({ message: 'Utilisateur introuvable' })
@@ -597,22 +602,141 @@ adminRouter.get('/users/:id', async (req, res) => {
   return res.json(formatAdminUser({ ...user, boats_count: boatsCount || 0, bookings_count: bookingsCount || 0 }))
 })
 
+adminRouter.post('/users', async (req, res) => {
+  const { firstName, lastName, email, password, role, phone } = req.body
+  if (!firstName || !lastName || !email) return res.status(400).json({ message: 'Prénom, nom et email requis' })
+  const normalizedEmail = email.toLowerCase().trim()
+  const { count } = await supabase.from('users').select('id', { count: 'exact', head: true }).eq('email', normalizedEmail)
+  if (count > 0) return res.status(409).json({ message: 'Email déjà utilisé' })
+  const assignedRole = ['RENTER', 'OWNER', 'ADMIN'].includes(role) ? role : 'RENTER'
+  const rawPwd = (password || '').trim() || `Sail${Math.random().toString(36).slice(2, 8)}A1!`
+  const hashedPassword = await bcrypt.hash(rawPwd, 12)
+  const { data: newUser, error } = await supabase.from('users').insert({
+    email: normalizedEmail, password: hashedPassword,
+    first_name: firstName, last_name: lastName,
+    role: assignedRole, phone: phone || null,
+    terms_accepted_at: new Date().toISOString(),
+  }).select('*').single()
+  if (error) return res.status(500).json({ message: error.message })
+  const verifToken = uuidv4()
+  await supabase.from('email_verification_tokens').insert({
+    token: verifToken, user_id: newUser.id,
+    expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+  })
+  try { await sendEmailVerification(newUser.email, newUser.first_name, verifToken) } catch {}
+  return res.status(201).json(formatAdminUser({ ...newUser, boats_count: 0 }))
+})
+
+adminRouter.patch('/users/:id/verify-email', async (req, res) => {
+  const { data: user } = await supabase.from('users').select('id, email_verified_at').eq('id', req.params.id).single()
+  if (!user) return res.status(404).json({ message: 'Utilisateur introuvable' })
+  if (user.email_verified_at) return res.status(409).json({ message: 'Email déjà vérifié' })
+  await supabase.from('users').update({ email_verified_at: new Date().toISOString() }).eq('id', req.params.id)
+  await supabase.from('email_verification_tokens').delete().eq('user_id', req.params.id)
+  return res.json({ message: 'Email vérifié' })
+})
+
+adminRouter.delete('/users/:id', async (req, res) => {
+  if (String(req.params.id) === String(req.user.id)) return res.status(403).json({ message: 'Vous ne pouvez pas supprimer votre propre compte' })
+  const { count } = await supabase.from('bookings').select('id', { count: 'exact', head: true })
+    .eq('renter_id', req.params.id).in('status', ['PENDING', 'CONFIRMED'])
+  if (count > 0) return res.status(409).json({ message: `${count} réservation(s) active(s) — annulez-les d'abord` })
+  const { error } = await supabase.from('users').delete().eq('id', req.params.id)
+  if (error) return res.status(500).json({ message: error.message })
+  return res.json({ message: 'Utilisateur supprimé' })
+})
+
 adminRouter.patch('/users/:id/block', async (req, res) => {
   const blocked = req.body.blocked ?? !req.body.isActive
   await supabase.from('users').update({ is_blocked: Boolean(blocked) }).eq('id', req.params.id)
   return res.json({ message: `Utilisateur ${blocked ? 'bloqué' : 'débloqué'}` })
 })
 
+const ROLE_HIERARCHY = { RENTER: 0, OWNER: 1, ADMIN: 2 }
+
+// ── Rôles (CRUD) ───────────────────────────────────────────
+adminRouter.get('/roles', async (req, res) => {
+  const { data, error } = await supabase
+    .from('roles').select('*')
+    .order('is_system', { ascending: false })
+    .order('created_at')
+  if (error) return res.status(500).json({ message: error.message })
+  return res.json({ data: data || [] })
+})
+
+adminRouter.post('/roles', async (req, res) => {
+  const { name, label, description, color } = req.body
+  if (!name || !label) return res.status(400).json({ message: 'name et label requis' })
+  const normalized = name.toUpperCase().replace(/[^A-Z0-9_]/g, '_')
+  const { data, error } = await supabase.from('roles').insert({
+    name: normalized, label, description: description || '', color: color || 'gray', is_system: false,
+  }).select().single()
+  if (error) return res.status(error.code === '23505' ? 409 : 500).json({ message: error.message })
+  return res.status(201).json(data)
+})
+
+adminRouter.patch('/roles/:id', async (req, res) => {
+  const { label, description, color } = req.body
+  const updates = {}
+  if (label !== undefined) updates.label = label
+  if (description !== undefined) updates.description = description
+  if (color !== undefined) updates.color = color
+  if (!Object.keys(updates).length) return res.status(400).json({ message: 'Aucune modification' })
+  const { data, error } = await supabase.from('roles').update(updates).eq('id', req.params.id).select().single()
+  if (error) return res.status(500).json({ message: error.message })
+  return res.json(data)
+})
+
+adminRouter.delete('/roles/:id', async (req, res) => {
+  const { data: role } = await supabase.from('roles').select('is_system, name').eq('id', req.params.id).single()
+  if (!role) return res.status(404).json({ message: 'Rôle introuvable' })
+  if (role.is_system) return res.status(403).json({ message: 'Les rôles système ne peuvent pas être supprimés' })
+  const { count } = await supabase.from('users').select('id', { count: 'exact', head: true }).eq('role', role.name)
+  if (count > 0) return res.status(409).json({ message: `${count} utilisateur(s) ont ce rôle — réattribuez-les d'abord` })
+  await supabase.from('roles').delete().eq('id', req.params.id)
+  return res.json({ message: 'Rôle supprimé' })
+})
+
+adminRouter.get('/role-stats', async (req, res) => {
+  const [renters, owners, admins] = await Promise.all([
+    supabase.from('users').select('id', { count: 'exact', head: true }).eq('role', 'RENTER'),
+    supabase.from('users').select('id', { count: 'exact', head: true }).eq('role', 'OWNER'),
+    supabase.from('users').select('id', { count: 'exact', head: true }).eq('role', 'ADMIN'),
+  ])
+  return res.json({ RENTER: renters.count || 0, OWNER: owners.count || 0, ADMIN: admins.count || 0 })
+})
+
 adminRouter.patch('/users/:id', async (req, res) => {
   const updates = {}
-  if (req.body.isActive !== undefined) updates.is_blocked = !req.body.isActive
-  if (req.body.role) {
-    if (!['RENTER', 'OWNER', 'ADMIN'].includes(req.body.role)) return res.status(400).json({ message: 'Rôle invalide' })
-    updates.role = req.body.role
+  const { firstName, lastName, email, phone, isActive, role } = req.body
+
+  if (firstName !== undefined) updates.first_name = firstName
+  if (lastName  !== undefined) updates.last_name  = lastName
+  if (phone     !== undefined) updates.phone      = phone || null
+  if (isActive  !== undefined) updates.is_blocked = !isActive
+
+  if (email !== undefined) {
+    const normalizedEmail = email.toLowerCase().trim()
+    const { count } = await supabase.from('users').select('id', { count: 'exact', head: true })
+      .eq('email', normalizedEmail).neq('id', req.params.id)
+    if (count > 0) return res.status(409).json({ message: 'Email déjà utilisé' })
+    updates.email = normalizedEmail
   }
+
+  if (role) {
+    if (!['RENTER', 'OWNER', 'ADMIN'].includes(role)) return res.status(400).json({ message: 'Rôle invalide' })
+    if (String(req.params.id) === String(req.user.id) &&
+        (ROLE_HIERARCHY[role] ?? 0) < (ROLE_HIERARCHY[req.user.role] ?? 0)) {
+      return res.status(403).json({ message: 'Vous ne pouvez pas vous attribuer un rôle inférieur au vôtre' })
+    }
+    updates.role = role
+  }
+
   if (!Object.keys(updates).length) return res.status(400).json({ message: 'Aucune modification' })
-  await supabase.from('users').update(updates).eq('id', req.params.id)
-  return res.json({ message: 'Utilisateur mis à jour' })
+  const { data: updated, error } = await supabase.from('users').update(updates).eq('id', req.params.id).select('*').single()
+  if (error) return res.status(500).json({ message: error.message })
+  const { count: boatsCount } = await supabase.from('boats').select('id', { count: 'exact', head: true }).eq('owner_id', req.params.id)
+  return res.json(formatAdminUser({ ...updated, boats_count: boatsCount || 0 }))
 })
 
 adminRouter.patch('/users/:id/role', async (req, res) => {
@@ -762,6 +886,11 @@ adminRouter.get('/reports', async (req, res) => {
     const { data: reporter } = await supabase.from('users').select('first_name, last_name').eq('id', r.reporter_id).single()
     if (reporter) reporterName = `${reporter.first_name} ${reporter.last_name}`
 
+    // Normalise les statuts legacy (resolved → PROCESSED, dismissed → DISMISSED, etc.)
+    const STATUS_MAP = { resolved: 'PROCESSED', dismissed: 'DISMISSED', pending: 'PENDING' }
+    const rawStatus = (r.status || '').toLowerCase()
+    const normalizedStatus = STATUS_MAP[rawStatus] || (r.status || 'PENDING').toUpperCase()
+
     return {
       id: r.id,
       boatId: r.target_type === 'boat' || r.target_type === 'BOAT' ? Number(r.target_id) : null,
@@ -772,7 +901,7 @@ adminRouter.get('/reports', async (req, res) => {
       reporterName,
       reason: r.reason,
       details: r.description,
-      status: r.status || 'PENDING',
+      status: normalizedStatus,
       adminNote: r.admin_note,
       createdAt: r.created_at,
       processedAt: r.processed_at,
