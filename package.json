@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "concurrently -n backend,frontend -c blue,green \"npm run dev:back\" \"npm run dev:front\"",
-    "dev:back": "cd backend && npm run dev",
-    "dev:front": "cd frontend && npm run dev",
-    "install:all": "cd frontend && npm install",
+    "dev:back": "npx --yes kill-port 3000 && cd backend && npm run dev",
+    "dev:front": "npx --yes kill-port 5173 && cd frontend && npm run dev",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
     "build:front": "cd frontend && npm run build"
   },
   "devDependencies": {

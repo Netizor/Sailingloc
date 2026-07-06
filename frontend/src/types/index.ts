@@ -181,6 +181,7 @@ export interface Message {
   sender?: Partial<User>
   content: string
   isRead: boolean
+  boatId?: number | null
   createdAt: string
 }
 

@@ -11,8 +11,9 @@ import {
   MapPin,
   Star,
 } from 'lucide-react'
-import { bookingsApi } from '../../api/bookings.api'
+import { getMyAllBookings } from '../../api/bookings.api'
 import { getFavorites } from '../../api/favorites.api'
+import { getMyReviewStats } from '../../api/reviews.api'
 import {
   daysUntil,
   formatDateRangeDash,
@@ -25,11 +26,6 @@ import { BookingStatus } from '../../types'
 import type { Booking } from '../../types'
 import Spinner from '../../components/ui/Spinner'
 import Button from '../../components/ui/Button'
-
-interface BookingWithReview extends Booking {
-  hasReview?: boolean
-  reviewRating?: number
-}
 
 type HistoryFilter = 'ALL' | 'UPCOMING' | 'COMPLETED' | 'PENDING' | 'CANCELLED'
 
@@ -47,10 +43,16 @@ const MyBookings: React.FC = () => {
   const [filterOpen, setFilterOpen] = useState(false)
   const tableRef = useRef<HTMLDivElement>(null)
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['bookings', 'my'],
-    queryFn: () => bookingsApi.getMyBookings(),
+  const { data: bookings = [], isLoading, isError } = useQuery({
+    queryKey: ['bookings', 'my', 'all'],
+    queryFn: getMyAllBookings,
     staleTime: 2 * 60 * 1000,
+  })
+
+  const { data: reviewStats } = useQuery({
+    queryKey: ['reviews', 'mine'],
+    queryFn: getMyReviewStats,
+    staleTime: 5 * 60 * 1000,
   })
 
   const { data: favorites } = useQuery({
@@ -59,32 +61,18 @@ const MyBookings: React.FC = () => {
     staleTime: 60 * 1000,
   })
 
-  const bookings: BookingWithReview[] = data?.data ?? []
+  const reviewedBookingIds = useMemo(
+    () => new Set(reviewStats?.bookingIds ?? []),
+    [reviewStats],
+  )
 
-  const {
-    totalBookings,
-    bookingsThisMonth,
-    reviewsGiven,
-    avgReviewRating,
-    nextBooking,
-    filteredHistory,
-  } = useMemo(() => {
+  const { bookingsThisMonth, nextBooking, filteredHistory } = useMemo(() => {
     const now = new Date()
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-    let reviewsGiven = 0
-    let ratingSum = 0
-    let ratingCount = 0
     let bookingsThisMonth = 0
 
     for (const b of bookings) {
       if (new Date(b.createdAt) >= monthStart) bookingsThisMonth++
-      if (b.hasReview) {
-        reviewsGiven++
-        if (b.reviewRating) {
-          ratingSum += b.reviewRating
-          ratingCount++
-        }
-      }
     }
 
     const nextBooking =
@@ -111,14 +99,7 @@ const MyBookings: React.FC = () => {
       return b.status === BookingStatus.COMPLETED
     })
 
-    return {
-      totalBookings: bookings.length,
-      bookingsThisMonth,
-      reviewsGiven,
-      avgReviewRating: ratingCount > 0 ? ratingSum / ratingCount : null,
-      nextBooking,
-      filteredHistory,
-    }
+    return { bookingsThisMonth, nextBooking, filteredHistory }
   }, [bookings, historyFilter])
 
   const handleExportPdf = () => {
@@ -157,7 +138,7 @@ const MyBookings: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           icon={<Calendar size={20} />}
-          value={totalBookings}
+          value={bookings.length}
           label="Total Réservations"
           sub={
             bookingsThisMonth > 0
@@ -167,12 +148,12 @@ const MyBookings: React.FC = () => {
         />
         <StatCard
           icon={<Star size={20} />}
-          value={reviewsGiven}
+          value={reviewStats?.count ?? 0}
           label="Avis Donnés"
           sub={
-            avgReviewRating
-              ? `Moyenne de ${avgReviewRating.toFixed(1)}/5`
-              : reviewsGiven > 0
+            reviewStats?.avgRating
+              ? `Moyenne de ${reviewStats.avgRating}/5`
+              : reviewStats?.count
                 ? 'Avis publiés'
                 : "Aucun avis pour l'instant"
           }
@@ -295,9 +276,17 @@ const MyBookings: React.FC = () => {
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           <BoatThumbnail booking={booking} />
-                          <span className="font-medium text-gray-900 dark:text-gray-100">
-                            {booking.boat?.title ?? 'Bateau'}
-                          </span>
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-medium text-gray-900 dark:text-gray-100">
+                              {booking.boat?.title ?? 'Bateau'}
+                            </span>
+                            {reviewedBookingIds.has(booking.id) && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+                                <Star size={10} fill="currentColor" />
+                                Avis laissé
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </td>
                       <td className="px-5 py-4 text-gray-600 dark:text-gray-400 whitespace-nowrap">
@@ -342,7 +331,7 @@ const StatCard: React.FC<{
   </div>
 )
 
-const BoatThumbnail: React.FC<{ booking: BookingWithReview }> = ({ booking }) => (
+const BoatThumbnail: React.FC<{ booking: Booking }> = ({ booking }) => (
   <div className="h-10 w-14 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex-shrink-0">
     {booking.boat?.images?.[0] ? (
       <img
@@ -370,7 +359,7 @@ const StatusPill: React.FC<{ status: BookingStatus }> = ({ status }) => {
 }
 
 const NextTripHero: React.FC<{
-  booking: BookingWithReview
+  booking: Booking
   onClick: () => void
 }> = ({ booking, onClick }) => {
   const daysLeft = daysUntil(booking.startDate)

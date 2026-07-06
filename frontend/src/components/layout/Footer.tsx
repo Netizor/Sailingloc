@@ -92,7 +92,7 @@ const FooterColumn: React.FC<FooterColumnProps> = ({ title, links }) => (
     <h3 className="text-xs font-bold uppercase tracking-wider text-brand-navy dark:text-gray-100 mb-4">{title}</h3>
     <ul className="space-y-2.5">
       {links.map((link) => (
-        <li key={link.to}>
+        <li key={link.label}>
           <Link to={link.to} className="text-sm text-brand-slate dark:text-gray-400 hover:text-brand-navy dark:hover:text-gray-200 transition-colors">
             {link.label}
           </Link>

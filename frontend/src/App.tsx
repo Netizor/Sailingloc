@@ -34,6 +34,7 @@ const AdminBoats = React.lazy(() => import('./pages/admin/AdminBoats'))
 const AdminBookings = React.lazy(() => import('./pages/admin/AdminBookings'))
 const AdminReports  = React.lazy(() => import('./pages/admin/AdminReports'))
 const AdminReviews  = React.lazy(() => import('./pages/admin/AdminReviews'))
+const AdminRoles    = React.lazy(() => import('./pages/admin/AdminRoles'))
 const Notifications = React.lazy(() => import('./pages/dashboard/Notifications'))
 const UserProfile = React.lazy(() => import('./pages/dashboard/UserProfile'))
 const NotificationDetail = React.lazy(() => import('./pages/dashboard/NotificationDetail'))
@@ -41,13 +42,13 @@ const MyFavorites = React.lazy(() => import('./pages/dashboard/MyFavorites'))
 const BookingDetail = React.lazy(() => import('./pages/dashboard/BookingDetail'))
 const LeaveReview = React.lazy(() => import('./pages/dashboard/LeaveReview'))
 const Messages = React.lazy(() => import('./pages/dashboard/Messages'))
-const Conversation = React.lazy(() => import('./pages/dashboard/Conversation'))
 const NotFound = React.lazy(() => import('./pages/NotFound'))
 
 // ── Nouvelles pages ────────────────────────────────────────────────────────────
 const MyPayments = React.lazy(() => import('./pages/dashboard/MyPayments'))
 const PaymentMethods = React.lazy(() => import('./pages/dashboard/PaymentMethods'))
 const KycVerification = React.lazy(() => import('./pages/dashboard/KycVerification'))
+const MyDocuments = React.lazy(() => import('./pages/dashboard/MyDocuments'))
 const SavedSearches = React.lazy(() => import('./pages/dashboard/SavedSearches'))
 const OwnerProfile = React.lazy(() => import('./pages/OwnerProfile'))
 const Destination = React.lazy(() => import('./pages/Destination'))
@@ -166,7 +167,7 @@ export default function App() {
                 <Route path="reservations/:id/avis" element={<LeaveReview />} />
                 <Route path="favoris" element={<MyFavorites />} />
                 <Route path="messages" element={<Messages />} />
-                <Route path="messages/:conversationId" element={<Conversation />} />
+                <Route path="messages/:conversationId" element={<Messages />} />
                 <Route path="notifications" element={<Notifications />} />
                 <Route path="notifications/:id" element={<NotificationDetail />} />
                 <Route path="profil" element={<UserProfile />} />
@@ -176,6 +177,8 @@ export default function App() {
                 <Route path="cartes" element={<PaymentMethods />} />
                 {/* C1 - KYC */}
                 <Route path="verification" element={<KycVerification />} />
+                {/* Upload de documents contractuels */}
+                <Route path="documents" element={<MyDocuments />} />
                 {/* C9 - Recherches sauvegardées */}
                 <Route path="alertes" element={<SavedSearches />} />
                 </Route>
@@ -206,6 +209,7 @@ export default function App() {
                 <Route path="reservations" element={<AdminBookings />} />
                 <Route path="signalements" element={<AdminReports />} />
                 <Route path="avis" element={<AdminReviews />} />
+                <Route path="roles" element={<AdminRoles />} />
                 </Route>
               </Route>
 
