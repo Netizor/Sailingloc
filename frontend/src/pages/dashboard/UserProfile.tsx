@@ -33,8 +33,11 @@ const AvatarSection: React.FC = () => {
       updateUser({ avatar: updated.avatar })
       toast.success('Photo de profil mise à jour')
     },
-    onError: () => {
-      toast.error('Erreur lors du téléchargement de la photo')
+    onError: (err: unknown) => {
+      const msg = axios.isAxiosError(err)
+        ? (err.response?.data as { message?: string })?.message
+        : undefined
+      toast.error(msg || 'Erreur lors du téléchargement de la photo')
     },
   })
 

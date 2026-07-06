@@ -6,7 +6,21 @@ import supabase from '../lib/supabase.js'
 import { authenticate, requireRole } from '../middleware/auth.middleware.js'
 
 const router = Router()
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } })
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    const allowed = ['image/jpeg', 'image/png', 'image/webp']
+    if (!allowed.includes(file.mimetype)) return cb(new Error('Format accepté : JPG, PNG ou WebP'))
+    cb(null, true)
+  },
+})
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
 
 function formatUser(user) {
   if (!user) return null
@@ -189,23 +203,28 @@ router.patch('/password', authenticate, async (req, res) => {
 router.post('/avatar', authenticate, upload.single('avatar'), async (req, res) => {
   if (!req.file) return res.status(400).json({ message: 'Aucun fichier fourni' })
 
-  const result = await new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      { folder: 'sailingloc/avatars', resource_type: 'image', transformation: [{ width: 400, height: 400, crop: 'fill' }] },
-      (err, r) => err ? reject(err) : resolve(r)
-    )
-    stream.end(req.file.buffer)
-  })
+  try {
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'sailingloc/avatars', resource_type: 'image', transformation: [{ width: 400, height: 400, crop: 'fill' }] },
+        (err, r) => err ? reject(err) : resolve(r)
+      )
+      stream.end(req.file.buffer)
+    })
 
-  const { data: user, error } = await supabase
-    .from('users')
-    .update({ avatar: result.secure_url })
-    .eq('id', req.user.id)
-    .select()
-    .single()
+    const { data: user, error } = await supabase
+      .from('users')
+      .update({ avatar: result.secure_url })
+      .eq('id', req.user.id)
+      .select()
+      .single()
 
-  if (error) return res.status(500).json({ message: error.message })
-  return res.json({ avatar: result.secure_url, user: formatUser(user) })
+    if (error) return res.status(500).json({ message: error.message })
+    return res.json({ avatar: result.secure_url, user: formatUser(user) })
+  } catch (err) {
+    console.error('Avatar upload failed:', err)
+    return res.status(500).json({ message: err.message || 'Échec de l\'upload vers Cloudinary' })
+  }
 })
 
 // ─── GET /users/me/export ──────────────────────────────────

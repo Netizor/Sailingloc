@@ -165,7 +165,7 @@ const OwnerReviewsSection: React.FC<OwnerReviewsSectionProps> = ({
             <div>
               <Stars rating={hasReviews ? rating : 0} size="sm" />
               <p className="text-xs text-amber-800/70 dark:text-amber-300/70 mt-0.5 font-medium">
-                {reviewCount} avis
+                {reviewCount} avis{reviewCount > 1 ? '' : ''}
               </p>
             </div>
           </div>
@@ -174,10 +174,10 @@ const OwnerReviewsSection: React.FC<OwnerReviewsSectionProps> = ({
         {hasReviews ? (
           <div className="relative -mx-2 sm:-mx-4">
             {marqueeReviews.length >= 4 && (
-              <>
-                <div className="pointer-events-none absolute inset-y-0 left-0 w-8 sm:w-12 bg-gradient-to-r from-white dark:from-gray-800 to-transparent z-10" />
-                <div className="pointer-events-none absolute inset-y-0 right-0 w-8 sm:w-12 bg-gradient-to-l from-white dark:from-gray-800 to-transparent z-10" />
-              </>
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-8 sm:w-12 bg-gradient-to-r from-white dark:from-gray-800 to-transparent z-10" />
+            )}
+            {marqueeReviews.length >= 4 && (
+              <div className="pointer-events-none absolute inset-y-0 right-0 w-8 sm:w-12 bg-gradient-to-l from-white dark:from-gray-800 to-transparent z-10" />
             )}
 
             <div
@@ -211,7 +211,7 @@ const OwnerReviewsSection: React.FC<OwnerReviewsSectionProps> = ({
               Aucun avis pour le moment
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-sm mx-auto">
-              Les locataires pourront laisser un avis après une location terminée.
+              Les locataires pourront laisser un avis après une location terminée sur l&apos;un de ses bateaux.
             </p>
             <div className="flex justify-center gap-1 mt-4 owner-reviews-empty-stars">
               {[1, 2, 3, 4, 5].map((i) => (
@@ -231,3 +231,11 @@ const OwnerReviewsSection: React.FC<OwnerReviewsSectionProps> = ({
 }
 
 export default OwnerReviewsSection
+
+
+
+
+
+
+
+
