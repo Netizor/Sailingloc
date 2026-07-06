@@ -5,6 +5,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { authApi } from '../../api/auth.api'
 import { useAuthStore } from '../../store/auth.store'
+import { UserRole } from '../../types'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import toast from 'react-hot-toast'
@@ -36,7 +37,11 @@ const Login: React.FC = () => {
     onSuccess: (data) => {
       setAuth(data.user, data.accessToken, data.refreshToken, rememberMe)
       toast.success(t('auth.login.welcome', { name: data.user.firstName }))
-      navigate(from, { replace: true })
+      const destination =
+        data.user.role === UserRole.ADMIN
+          ? '/admin'
+          : from
+      navigate(destination, { replace: true })
     },
     onError: (err: any) => {
       const message = err?.response?.data?.message ?? t('auth.login.errorCredentials')

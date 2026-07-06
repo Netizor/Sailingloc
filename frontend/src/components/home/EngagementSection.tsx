@@ -14,7 +14,7 @@ const EngagementSection: React.FC = () => {
   ]
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white" aria-labelledby="features-title">
+    <section className="py-14 px-4 sm:px-6 lg:px-8 bg-white" aria-labelledby="features-title">
       <div className="max-w-6xl mx-auto">
         <div
           className="rounded-[2.5rem] px-8 py-10 sm:px-12 sm:py-14 lg:px-16 lg:py-16"

@@ -13,7 +13,25 @@ import {
   AlertTriangle,
   Star,
   ArrowRight,
+  UserCheck,
+  Navigation,
+  Radio,
+  Compass,
+  LifeBuoy,
+  Waves,
+  Utensils,
+  Refrigerator,
+  ShowerHead,
+  BedDouble,
+  Wifi,
+  Music,
+  Sun,
+  Snowflake,
+  Zap,
+  Wind,
+  Check,
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { cn, formatDate } from '../lib/utils'
 import { boatsApi } from '../api/boats.api'
 import { bookingsApi } from '../api/bookings.api'
@@ -24,6 +42,7 @@ import { useAuthStore } from '../store/auth.store'
 import type { Boat, Review } from '../types'
 import { BoatType, UserRole } from '../types'
 import { BOAT_TYPE_LABELS } from '../lib/labels'
+import { getBoatEquipment, getEnrichedDescription } from '../lib/boatContent'
 import { reportBoat } from '../api/reports.api'
 import type { ReportReason } from '../api/reports.api'
 import { getDemoBoat } from '../data/demoBoats'
@@ -65,6 +84,31 @@ const getLuxuryTypeLabel = (type: BoatType) => {
   if (type === BoatType.YACHT || type === BoatType.SAILBOAT) return `${base} de Luxe`
   return base
 }
+
+const formatEuro = (amount: number) =>
+  new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(amount)
+
+// Associe chaque équipement à une icône pertinente (recherche par mot-clé)
+const EQUIPMENT_ICONS: { match: RegExp; icon: LucideIcon }[] = [
+  { match: /gps|traceur|cartes/i, icon: Navigation },
+  { match: /vhf|radio/i, icon: Radio },
+  { match: /pilote|guindeau|enrouleur|lazy|génois/i, icon: Compass },
+  { match: /gilet|radeau|extincteur|secours|sécurit/i, icon: LifeBuoy },
+  { match: /annexe|hors-bord|jet|jouets|nautiques|trampolines/i, icon: Waves },
+  { match: /cuisine|four|gazini|barbecue/i, icon: Utensils },
+  { match: /frigo|réfrig|glaci/i, icon: Refrigerator },
+  { match: /eau chaude|douche|dessalinisateur/i, icon: ShowerHead },
+  { match: /literie|linge|cabine/i, icon: BedDouble },
+  { match: /wi-fi|wifi/i, icon: Wifi },
+  { match: /son|bluetooth|musique/i, icon: Music },
+  { match: /solaire|soleil|bimini|taud|flybridge/i, icon: Sun },
+  { match: /clim/i, icon: Snowflake },
+  { match: /usb|220v|convertisseur|générateur|électr/i, icon: Zap },
+  { match: /paddle|sup|snorkeling|masque/i, icon: Wind },
+]
+
+const getEquipmentIcon = (name: string): LucideIcon =>
+  EQUIPMENT_ICONS.find((e) => e.match.test(name))?.icon ?? Check
 
 const BoatDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>()
@@ -205,15 +249,17 @@ const BoatDetail: React.FC = () => {
   }
 
   const locationLabel = boat.city ? `${boat.city}, ${boat.country}` : `${boat.port}, ${boat.country}`
-  const description = boat.description || ''
-  const shortDesc = description.length > 320 ? description.slice(0, 320) + '…' : description
+  const description = getEnrichedDescription(boat)
+  const shortDesc = description.length > 900 ? description.slice(0, 900) + '…' : description
+  const equipment = getBoatEquipment(boat)
+  const interestedCount = Math.max(48, boat.reviewCount * 14 + (boat.id % 37) * 3)
 
   const specs = [
     { label: 'Type', value: getTypeSpecLabel(boat.type) },
     { label: 'Longueur', value: boat.length ? `${boat.length} m` : '' },
     { label: 'Cabines', value: boat.cabins ? `${boat.cabins} Cabines` : '' },
     { label: 'Année', value: boat.year ? String(boat.year) : '' },
-  ]
+  ].filter((spec) => spec.value)
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] pb-24 lg:pb-12">
@@ -225,7 +271,7 @@ const BoatDetail: React.FC = () => {
 
       <div className="w-full px-[10%] py-8">
         {/* Galerie */}
-        <BoatDetailGallery images={boat.images ?? []} title={boat.title} />
+        <BoatDetailGallery images={boat.images ?? []} title={boat.title} interestedCount={interestedCount} />
 
         <div className="mt-8 flex flex-col lg:flex-row gap-10">
           {/* Colonne principale */}
@@ -273,6 +319,10 @@ const BoatDetail: React.FC = () => {
                   <Users size={15} className="text-[#2563FF]" />
                   Capacité {boat.capacity} pers.
                 </span>
+                <span className="flex items-center gap-1.5">
+                  <UserCheck size={15} className="text-[#2563FF]" />
+                  {boat.withSkipper ? 'Avec skipper (option)' : 'Sans skipper'}
+                </span>
               </div>
             </div>
 
@@ -293,7 +343,7 @@ const BoatDetail: React.FC = () => {
                 <p className="text-sm text-[#334155] leading-relaxed whitespace-pre-line">
                   {descExpanded ? description : shortDesc}
                 </p>
-                {description.length > 320 && (
+                {description.length > 900 && (
                   <button
                     type="button"
                     onClick={() => setDescExpanded((v) => !v)}
@@ -303,6 +353,49 @@ const BoatDetail: React.FC = () => {
                     <ArrowRight size={14} />
                   </button>
                 )}
+              </section>
+            )}
+
+            {/* Skipper & navigation */}
+            <section>
+              <h2 className="text-lg font-bold text-[#003366] mb-4">Skipper &amp; navigation</h2>
+              <div
+                className={cn(
+                  'flex items-start gap-3 rounded-2xl border p-5',
+                  boat.withSkipper ? 'bg-[#eef3fb] border-[#2563FF]/20' : 'bg-amber-50 border-amber-100',
+                )}
+              >
+                <UserCheck size={22} className={cn('flex-shrink-0 mt-0.5', boat.withSkipper ? 'text-[#2563FF]' : 'text-amber-500')} />
+                <div>
+                  <p className="text-sm font-semibold text-[#003366]">
+                    {boat.withSkipper ? 'Disponible avec skipper professionnel' : 'Location sans skipper (en autonomie)'}
+                  </p>
+                  <p className="text-sm text-[#334155] mt-1 leading-relaxed">
+                    {boat.withSkipper
+                      ? `Un skipper expérimenté peut vous accompagner${boat.skipperPrice ? ` pour ${formatEuro(boat.skipperPrice)} / jour` : ''} : il gère la navigation, les manœuvres et les mouillages en toute sécurité. Idéal si vous n'avez pas de permis ou souhaitez simplement profiter de la mer.`
+                      : `Ce bateau se loue en autonomie. Un permis bateau adapté et une expérience de la navigation sont requis. Un briefing complet et l'état des lieux sont assurés au départ.`}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* Équipements */}
+            {equipment.length > 0 && (
+              <section>
+                <h2 className="text-lg font-bold text-[#003366] mb-4">Équipements à bord</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                  {equipment.map((item) => {
+                    const Icon = getEquipmentIcon(item)
+                    return (
+                      <div key={item} className="flex items-center gap-3 text-sm text-[#334155]">
+                        <span className="flex-shrink-0 h-9 w-9 rounded-lg bg-[#eef3fb] flex items-center justify-center text-[#2563FF]">
+                          <Icon size={18} />
+                        </span>
+                        {item}
+                      </div>
+                    )
+                  })}
+                </div>
               </section>
             )}
 
@@ -370,6 +463,8 @@ const BoatDetail: React.FC = () => {
                 onSubmit={handleBookingSubmit}
                 loading={bookingMutation.isPending}
                 disabledDates={disabledDates}
+                bookedDates={availData?.booked ?? []}
+                unavailableDates={availData?.unavailable ?? []}
                 variant="detail"
               />
               <BoatOwnerCard
@@ -421,6 +516,8 @@ const BoatDetail: React.FC = () => {
                 }}
                 loading={bookingMutation.isPending}
                 disabledDates={disabledDates}
+                bookedDates={availData?.booked ?? []}
+                unavailableDates={availData?.unavailable ?? []}
                 variant="detail"
               />
             </div>

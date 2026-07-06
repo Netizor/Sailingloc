@@ -7,6 +7,7 @@ import rateLimit from 'express-rate-limit'
 import authRouter from './routes/auth.routes.js'
 import boatsRouter from './routes/boats.routes.js'
 import bookingsRouter from './routes/bookings.routes.js'
+import kycRouter from './routes/kyc.routes.js'
 import usersRouter from './routes/users.routes.js'
 import {
   reviewsRouter,
@@ -54,6 +55,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use('/api/auth',              authRouter)
 app.use('/api/boats',             boatsRouter)
 app.use('/api/bookings',          bookingsRouter)
+app.use('/api/kyc',               kycRouter)
 app.use('/api/users',             usersRouter)
 app.use('/api/reviews',           reviewsRouter)
 app.use('/api/messages',          messagesRouter)

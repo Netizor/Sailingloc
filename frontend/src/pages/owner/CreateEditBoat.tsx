@@ -108,10 +108,11 @@ const CreateEditBoat: React.FC = () => {
   const insuranceRef  = useRef<HTMLInputElement>(null)
   const registrationRef = useRef<HTMLInputElement>(null)
   const licenseRef    = useRef<HTMLInputElement>(null)
-  const [uploadingDoc, setUploadingDoc] = useState<'insurance' | 'registration' | 'license' | null>(null)
+  const contractRef   = useRef<HTMLInputElement>(null)
+  const [uploadingDoc, setUploadingDoc] = useState<'insurance' | 'registration' | 'license' | 'contract' | null>(null)
 
   const handleDocUpload = useCallback(async (
-    docType: 'insurance' | 'registration' | 'license',
+    docType: 'insurance' | 'registration' | 'license' | 'contract',
     file: File,
   ) => {
     if (!id) return
@@ -739,6 +740,7 @@ const CreateEditBoat: React.FC = () => {
                     { label: 'Assurance',        docType: 'insurance'    as const, ref: insuranceRef,    current: boatData?.insuranceDoc },
                     { label: 'Immatriculation',  docType: 'registration' as const, ref: registrationRef, current: boatData?.registrationDoc },
                     { label: 'Permis de navigation', docType: 'license'  as const, ref: licenseRef,      current: boatData?.licenseScanDoc },
+                    { label: 'Contrat de location',  docType: 'contract' as const, ref: contractRef,     current: boatData?.contractDoc },
                   ]).map(({ label, docType, ref, current }) => (
                     <div key={docType} className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50/50 dark:bg-gray-800/50">
                       <FileText size={18} className="text-gray-400 flex-shrink-0" />

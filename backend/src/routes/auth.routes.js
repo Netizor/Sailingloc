@@ -28,9 +28,21 @@ function formatUser(u) {
     phone: u.phone,
     avatar: u.avatar,
     bio: u.bio,
+    kycVerified: Boolean(u.kyc_verified_at || u.kyc_status === 'APPROVED'),
+    isActive: !u.is_blocked,
+    sailingExperienceYears: u.sailing_experience_years,
+    sailingQualifications: u.sailing_qualifications,
+    sailingAreas: u.sailing_areas,
+    sailorBio: u.sailor_bio,
+    sailorCvStatus: u.sailor_cv_status || 'NOT_SUBMITTED',
+    sailorCvDoc: u.sailor_cv_doc,
+    sailorCvSubmittedAt: u.sailor_cv_submitted_at,
+    sailorCvReviewedAt: u.sailor_cv_reviewed_at,
+    sailorCvRejectionReason: u.sailor_cv_rejection_reason,
     emailVerifiedAt: u.email_verified_at,
     termsAcceptedAt: u.terms_accepted_at,
     createdAt: u.created_at,
+    updatedAt: u.updated_at,
   }
 }
 

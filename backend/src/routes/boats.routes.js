@@ -84,6 +84,10 @@ function formatBoat(b, withOwner = false) {
     rules: b.rules,
     welcomeMessage: b.welcome_message,
     requiredLicense: b.required_license,
+    insuranceDoc: b.insurance_doc,
+    registrationDoc: b.registration_doc,
+    licenseScanDoc: b.license_scan_doc,
+    contractDoc: b.contract_doc,
     status: b.status,
     rating: b.average_rating || 0,
     reviewCount: b.review_count || 0,
@@ -148,7 +152,7 @@ router.get('/my', authenticate, async (req, res) => {
     .order('created_at', { ascending: false })
     .range(from, from + limit - 1)
 
-    if (error) return res.status(500).json({ message: error.message })
+  if (error) return res.status(500).json({ message: error.message })
   return res.json({ data: (data || []).map(b => formatBoat(b, true)), total: count || 0, page, limit })
 })
 
@@ -253,14 +257,14 @@ router.post('/', authenticate, requireRole('OWNER', 'ADMIN'), async (req, res) =
     pricePerDay, deposit, amenities, latitude, longitude,
   } = req.body
 
-  if (!title || !type || !capacity || !(dailyRate || pricePerDay) || !city) {
-    return res.status(400).json({ message: 'title, type, capacity, dailyRate et city sont requis' })
+  if (!title || !description || !type || !capacity || !(dailyRate || pricePerDay) || !city) {
+    return res.status(400).json({ message: 'title, description, type, capacity, dailyRate et city sont requis' })
   }
 
   const { data: boat, error } = await supabase.from('boats').insert({
     owner_id: req.user.id,
     title: title.trim(),
-    description: description?.trim() ?? '',
+    description: description.trim(),
     type,
     manufacturer,
     model,
@@ -377,7 +381,15 @@ router.post('/:id/upload-document', authenticate, upload.single('file'), async (
 
   if (!req.file) return res.status(400).json({ message: 'Fichier requis' })
 
-  const docType = req.body.type || 'document'
+  const docType = req.body.docType || req.body.type || 'document'
+  const fieldMap = {
+    insurance: 'insurance_doc',
+    registration: 'registration_doc',
+    license: 'license_scan_doc',
+    contract: 'contract_doc',
+  }
+  const field = fieldMap[docType]
+  if (!field) return res.status(400).json({ message: 'Type de document invalide' })
 
   const result = await new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
@@ -387,12 +399,6 @@ router.post('/:id/upload-document', authenticate, upload.single('file'), async (
     stream.end(req.file.buffer)
   })
 
-  const fieldMap = {
-    insurance: 'insurance_doc',
-    registration: 'registration_doc',
-    license: 'license_scan_doc',
-  }
-  const field = fieldMap[docType] || 'registration_doc'
   const updates = { [field]: result.secure_url, updated_at: new Date().toISOString() }
 
   const { data: updated, error } = await supabase.from('boats').update(updates).eq('id', req.params.id).select('*, users(id, first_name, last_name, avatar)').single()

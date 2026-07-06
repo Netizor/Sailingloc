@@ -19,7 +19,7 @@ import type { SearchParams } from '../components/boats/SearchBar'
 import type { Boat } from '../types'
 import { BoatStatus, BoatType, MotorizationType } from '../types'
 import { boatsApi } from '../api/boats.api'
-import { HOME_DESTINATIONS } from '../data/destinations'
+import { getDestinationImage, HOME_DESTINATIONS } from '../data/destinations'
 
 type PopularBoatItem = {
   boat: Boat
@@ -232,13 +232,6 @@ const Home: React.FC = () => {
     retry: false,
   })
 
-  const { data: destinationSummary } = useQuery({
-    queryKey: ['destinations', 'summary'],
-    queryFn: () => boatsApi.getDestinationSummary(),
-    staleTime: 5 * 60 * 1000,
-    retry: false,
-  })
-
   const popularBoats: PopularBoatItem[] =
     featuredBoats && featuredBoats.length > 0
       ? featuredBoats.map((boat) => ({
@@ -287,9 +280,9 @@ const Home: React.FC = () => {
       </section>
 
       {/* Concept */}
-      <section id="comment-ca-marche" className="pt-24 pb-24 bg-white" aria-labelledby="how-it-works-title">
+      <section id="comment-ca-marche" className="pt-20 pb-14 bg-white" aria-labelledby="how-it-works-title">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <p className="text-[#2563FF] text-sm font-medium mb-4">{t('home.conceptLabel')}</p>
             <h2 id="how-it-works-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy">
               {t('home.howTitle')}
@@ -309,7 +302,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Popular boats */}
-      <section className="py-24 bg-white" aria-labelledby="featured-boats-title">
+      <section className="py-14 bg-white" aria-labelledby="featured-boats-title">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-start justify-between gap-4 mb-10">
             <div>
@@ -353,7 +346,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Destinations bento */}
-      <section className="py-24 bg-white" aria-labelledby="destinations-title">
+      <section className="py-14 bg-white" aria-labelledby="destinations-title">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10">
             <h2 id="destinations-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy mb-2">
@@ -364,9 +357,7 @@ const Home: React.FC = () => {
 
           <div className="grid grid-cols-12 auto-rows-[200px] sm:auto-rows-[220px] gap-4">
             {HOME_DESTINATIONS.map((dest) => {
-              const cover =
-                dest.country && destinationSummary?.find((s) => s.country === dest.country)?.image
-              const image = cover || dest.image
+              const image = getDestinationImage(dest)
               const label = i18n.language.startsWith('en') ? dest.nameEn : dest.name
               return (
                 <Link
@@ -394,9 +385,9 @@ const Home: React.FC = () => {
       <EngagementSection />
 
       {/* Testimonials */}
-      <section className="py-24 bg-[#f8f9fa]" aria-labelledby="testimonials-title">
+      <section className="py-14 bg-[#f8f9fa]" aria-labelledby="testimonials-title">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 id="testimonials-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy text-center mb-14">
+          <h2 id="testimonials-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy text-center mb-10">
             {t('home.testimonialsTitle')}
           </h2>
 

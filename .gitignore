@@ -14,6 +14,7 @@ package-lock.json
 .env.local
 .env.*.local
 .env.production
+**/.env
 
 # ─── Frontend — Build & cache ────────────────────────────────────────────────
 frontend/dist/

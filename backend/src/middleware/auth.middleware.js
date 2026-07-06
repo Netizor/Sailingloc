@@ -23,7 +23,7 @@ export async function authenticate(req, res, next) {
 
   const { data: user, error } = await supabase
     .from('users')
-    .select('id, email, role, first_name, last_name, phone, avatar, bio, is_blocked, email_verified_at, terms_accepted_at, created_at')
+    .select('id, email, role, first_name, last_name, phone, avatar, bio, kyc_status, kyc_verified_at, sailing_experience_years, sailing_qualifications, sailing_areas, sailor_bio, sailor_cv_status, sailor_cv_doc, sailor_cv_submitted_at, sailor_cv_reviewed_at, sailor_cv_rejection_reason, is_blocked, email_verified_at, terms_accepted_at, created_at, updated_at')
     .eq('id', payload.sub)
     .single()
 

@@ -1,17 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
-import { Camera, Download, Eye, EyeOff, Lock, ShieldAlert, Trash2, UserCircle } from 'lucide-react'
+import { Anchor, Camera, Download, Eye, EyeOff, FileCheck, Lock, ShieldAlert, Trash2, Upload, UserCircle } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 
 import { useAuthStore } from '../../store/auth.store'
-import { updateProfile, changePassword, uploadAvatar, exportMyData, deleteAccount } from '../../api/users.api'
+import { updateProfile, changePassword, uploadAvatar, uploadSailorCvDocument, exportMyData, deleteAccount } from '../../api/users.api'
 import Input from '../../components/ui/Input'
 import Textarea from '../../components/ui/Textarea'
 import Button from '../../components/ui/Button'
 import Spinner from '../../components/ui/Spinner'
 import { getInitials } from '../../lib/utils'
+import { UserRole } from '../../types'
 
 // ─── Constantes partagées entre sections ─────────────────────────────────────
 
@@ -219,6 +220,211 @@ const PersonalInfoSection: React.FC = () => {
           </Button>
         </div>
       </form>
+    </div>
+  )
+}
+
+// ─── CV de marin (propriétaire) ───────────────────────────────────────────────
+
+interface SailorCvForm {
+  sailingExperienceYears: string
+  sailingQualifications:  string
+  sailingAreas:           string
+  sailorBio:              string
+}
+
+const SailorCvSection: React.FC = () => {
+  const { user, updateUser } = useAuthStore()
+  const documentInputRef = useRef<HTMLInputElement>(null)
+  const [form, setForm] = useState<SailorCvForm>({
+    sailingExperienceYears: user?.sailingExperienceYears != null ? String(user.sailingExperienceYears) : '',
+    sailingQualifications:  user?.sailingQualifications ?? '',
+    sailingAreas:           user?.sailingAreas ?? '',
+    sailorBio:              user?.sailorBio ?? '',
+  })
+
+  useEffect(() => {
+    if (user) {
+      setForm({
+        sailingExperienceYears: user.sailingExperienceYears != null ? String(user.sailingExperienceYears) : '',
+        sailingQualifications:  user.sailingQualifications ?? '',
+        sailingAreas:           user.sailingAreas ?? '',
+        sailorBio:              user.sailorBio ?? '',
+      })
+    }
+  }, [user?.id])
+
+  const mutation = useMutation({
+    mutationFn: updateProfile,
+    onSuccess: (updated) => {
+      updateUser({
+        sailingExperienceYears: updated.sailingExperienceYears,
+        sailingQualifications:  updated.sailingQualifications,
+        sailingAreas:           updated.sailingAreas,
+        sailorBio:              updated.sailorBio,
+      })
+      toast.success('CV de marin mis à jour')
+    },
+    onError: () => {
+      toast.error('Erreur lors de la mise à jour du CV de marin')
+    },
+  })
+
+  const documentMutation = useMutation({
+    mutationFn: uploadSailorCvDocument,
+    onSuccess: (updated) => {
+      updateUser({
+        sailorCvStatus: updated.sailorCvStatus,
+        sailorCvDoc: updated.sailorCvDoc,
+        sailorCvSubmittedAt: updated.sailorCvSubmittedAt,
+        sailorCvReviewedAt: updated.sailorCvReviewedAt,
+        sailorCvRejectionReason: updated.sailorCvRejectionReason,
+      })
+      toast.success('Justificatif envoyé pour validation')
+    },
+    onError: () => {
+      toast.error("Erreur lors de l'envoi du justificatif")
+    },
+  })
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target
+    setForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    mutation.mutate({
+      sailingExperienceYears: form.sailingExperienceYears === '' ? null : Number(form.sailingExperienceYears),
+      sailingQualifications:  form.sailingQualifications.trim(),
+      sailingAreas:           form.sailingAreas.trim(),
+      sailorBio:              form.sailorBio.trim(),
+    })
+  }
+
+  const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png']
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Format accepté : PDF, JPG ou PNG')
+      e.target.value = ''
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Le justificatif ne doit pas dépasser 5 Mo')
+      e.target.value = ''
+      return
+    }
+    documentMutation.mutate(file)
+    e.target.value = ''
+  }
+
+  const status = user?.sailorCvStatus ?? 'NOT_SUBMITTED'
+  const statusLabel = {
+    NOT_SUBMITTED: 'Non vérifié',
+    PENDING: 'En attente de validation',
+    APPROVED: 'Vérifié par SailingLoc',
+    REJECTED: 'Refusé',
+  }[status]
+  const statusClass = {
+    NOT_SUBMITTED: 'bg-gray-50 text-gray-600 border-gray-200',
+    PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
+    APPROVED: 'bg-green-50 text-green-700 border-green-200',
+    REJECTED: 'bg-red-50 text-red-700 border-red-200',
+  }[status]
+
+  return (
+    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700 p-6">
+      <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-1 flex items-center gap-2">
+        <Anchor size={18} className="text-ocean-700 dark:text-ocean-400" />
+        CV de marin
+      </h2>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+        Ces informations sont affichées sur votre profil public et rassurent les locataires.
+      </p>
+      <div className={`mb-5 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${statusClass}`}>
+        <FileCheck size={14} />
+        {statusLabel}
+      </div>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <Input
+          label="Années d'expérience en navigation"
+          name="sailingExperienceYears"
+          type="number"
+          min={0}
+          max={100}
+          value={form.sailingExperienceYears}
+          onChange={handleChange}
+          placeholder="Ex : 12"
+        />
+
+        <Textarea
+          label="Permis et qualifications"
+          name="sailingQualifications"
+          rows={2}
+          value={form.sailingQualifications}
+          onChange={handleChange}
+          placeholder="Ex : Permis côtier, permis hauturier, certificat restreint de radiotéléphoniste…"
+        />
+
+        <Textarea
+          label="Zones de navigation"
+          name="sailingAreas"
+          rows={2}
+          value={form.sailingAreas}
+          onChange={handleChange}
+          placeholder="Ex : Méditerranée, Atlantique, Manche…"
+        />
+
+        <Textarea
+          label="Présentation de marin"
+          name="sailorBio"
+          rows={4}
+          value={form.sailorBio}
+          onChange={handleChange}
+          placeholder="Décrivez votre parcours de marin, vos navigations marquantes, votre approche…"
+        />
+
+        <div className="flex justify-end pt-1">
+          <Button type="submit" loading={mutation.isPending}>
+            Enregistrer
+          </Button>
+        </div>
+      </form>
+
+      <div className="mt-5 pt-5 border-t border-gray-100 dark:border-gray-700">
+        <p className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">
+          Justificatif pour validation
+        </p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+          Envoyez un permis, diplôme, certificat ou attestation nautique. Un admin SailingLoc pourra vérifier votre CV.
+        </p>
+        {user?.sailorCvRejectionReason && status === 'REJECTED' && (
+          <p className="text-xs text-red-600 dark:text-red-400 mb-3">
+            Motif du refus : {user.sailorCvRejectionReason}
+          </p>
+        )}
+        <input
+          ref={documentInputRef}
+          type="file"
+          accept="application/pdf,image/jpeg,image/png"
+          className="hidden"
+          onChange={handleDocumentChange}
+        />
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          leftIcon={<Upload size={14} />}
+          loading={documentMutation.isPending}
+          onClick={() => documentInputRef.current?.click()}
+        >
+          Envoyer un justificatif
+        </Button>
+      </div>
     </div>
   )
 }
@@ -497,6 +703,8 @@ const UserProfile: React.FC = () => {
 
   if (!user) return null
 
+  const isOwner = user.role === UserRole.OWNER || user.role === UserRole.ADMIN
+
   return (
     <div className="max-w-2xl">
       <div className="mb-6">
@@ -512,6 +720,7 @@ const UserProfile: React.FC = () => {
       <div className="flex flex-col gap-4">
         <AvatarSection />
         <PersonalInfoSection />
+        {isOwner && <SailorCvSection />}
         <SecuritySection />
         <DataPrivacySection />
       </div>

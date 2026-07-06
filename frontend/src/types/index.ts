@@ -76,6 +76,15 @@ export interface User {
   role: UserRole
   kycVerified: boolean
   isActive: boolean
+  sailingExperienceYears?: number | null
+  sailingQualifications?: string | null
+  sailingAreas?: string | null
+  sailorBio?: string | null
+  sailorCvStatus?: 'NOT_SUBMITTED' | 'PENDING' | 'APPROVED' | 'REJECTED'
+  sailorCvDoc?: string | null
+  sailorCvSubmittedAt?: string | null
+  sailorCvReviewedAt?: string | null
+  sailorCvRejectionReason?: string | null
   emailVerifiedAt?: string | null
   createdAt: string
   updatedAt?: string
@@ -114,6 +123,7 @@ export interface Boat {
   registrationDoc?: string
   insuranceDoc?: string
   licenseScanDoc?: string
+  contractDoc?: string
   status: BoatStatus
   rating: number
   reviewCount: number

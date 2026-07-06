@@ -35,7 +35,10 @@ export const getConversationMessages = async (
 }
 
 export const sendMessage = async (payload: SendMessageData): Promise<Message> => {
-  const { data } = await api.post<Message>('/messages', payload)
+  const { data } = await api.post<Message>('/messages', {
+    recipientId: payload.receiverId,
+    content: payload.content,
+  })
   return data
 }
 
