@@ -290,6 +290,28 @@ router.post('/confirm-payment', authenticate, async (req, res) => {
   const { bookingId, paymentIntentId } = req.body
   if (!bookingId || !paymentIntentId) return res.status(400).json({ message: 'bookingId et paymentIntentId requis' })
 
+  // Fetch booking and verify ownership
+  const { data: booking } = await supabase.from('bookings').select('id, renter_id, status, total_price').eq('id', bookingId).single()
+  if (!booking) return res.status(404).json({ message: 'Réservation introuvable' })
+  if (booking.renter_id !== req.user.id) return res.status(403).json({ message: 'Accès refusé' })
+  if (booking.status !== 'PENDING') return res.status(400).json({ message: 'Réservation déjà traitée' })
+
+  // Verify payment with Stripe
+  if (stripe) {
+    try {
+      const intent = await stripe.paymentIntents.retrieve(paymentIntentId)
+      if (intent.status !== 'succeeded') {
+        return res.status(402).json({ message: `Paiement non abouti (${intent.status})` })
+      }
+      const expectedAmount = Math.round(booking.total_price * 100)
+      if (intent.amount !== expectedAmount || intent.currency !== 'eur') {
+        return res.status(400).json({ message: 'Montant ou devise incorrect' })
+      }
+    } catch (stripeErr) {
+      return res.status(400).json({ message: 'Payment intent invalide' })
+    }
+  }
+
   const { data: updated, error } = await supabase.from('bookings').update({
     status: 'CONFIRMED',
     stripe_payment_intent_id: paymentIntentId,
