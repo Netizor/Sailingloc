@@ -157,7 +157,7 @@ const Messages: React.FC = () => {
 
   const firstMsgMutation = useMutation({
     mutationFn: (content: string) =>
-      sendMessage({ receiverId: toId!, content, boatId: boatParam ?? undefined }),
+      sendMessage({ recipientId: toId!, content, boatId: boatParam ?? undefined }),
     onSuccess: (msg) => {
       qc.invalidateQueries({ queryKey: ['conversations'] })
       if (msg.conversationId) navigate(`/mon-espace/messages/${msg.conversationId}`, { replace: true })
@@ -170,7 +170,7 @@ const Messages: React.FC = () => {
   const doSend = () => {
     const content = draft.trim()
     if (!content || !other?.id) return
-    sendMutation.mutate({ receiverId: other.id, content, conversationId })
+    sendMutation.mutate({ recipientId: other.id, content, conversationId })
   }
 
   const filteredConvs = (conversations ?? []).filter(c => {
@@ -357,7 +357,7 @@ interface ConvItemProps {
 }
 
 const ConvItem: React.FC<ConvItemProps> = ({ conv, currentUserId, isActive, onClick }) => {
-  const other = conv.participants.find(p => p.id !== currentUserId)
+  const other = conv.participants?.find(p => p.id !== currentUserId)
   const name = other ? `${other.firstName ?? ''} ${other.lastName ?? ''}`.trim() : 'Inconnu'
   const initials = other ? `${other.firstName?.[0] ?? ''}${other.lastName?.[0] ?? ''}`.toUpperCase() : '?'
   const hasUnread = (conv.unreadCount ?? 0) > 0
