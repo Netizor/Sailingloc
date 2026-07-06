@@ -444,4 +444,127 @@
     color: #ffffff;
     border: 2px solid var(--sl-navy);
   }
+
+  /* ── Profil propriétaire : section avis animée ── */
+  @keyframes owner-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes owner-rating-pop {
+    0% {
+      opacity: 0;
+      transform: scale(0.85);
+    }
+    70% {
+      transform: scale(1.04);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes owner-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes owner-star-pulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.15);
+      opacity: 0.85;
+    }
+  }
+
+  @keyframes owner-empty-star {
+    0%, 100% {
+      opacity: 0.35;
+      transform: translateY(0);
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(-4px);
+    }
+  }
+
+  .owner-reviews-section--visible {
+    animation: owner-fade-up 0.55s ease-out both;
+  }
+
+  .owner-reviews-score {
+    opacity: 0;
+  }
+
+  .owner-reviews-score--visible {
+    animation: owner-rating-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+  }
+
+  .owner-reviews-star {
+    animation: owner-star-pulse 2s ease-in-out infinite;
+  }
+
+  .owner-review-card {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .owner-review-card--visible {
+    animation: owner-fade-up 0.55s ease-out both;
+  }
+
+  .owner-reviews-track {
+    width: max-content;
+    animation: owner-marquee 40s linear infinite;
+  }
+
+  .owner-reviews-track:hover {
+    animation-play-state: paused;
+  }
+
+  .owner-reviews-empty {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  .owner-reviews-empty--visible {
+    animation: owner-fade-up 0.6s ease-out 0.2s both;
+  }
+
+  .owner-reviews-empty-icon {
+    animation: owner-rating-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.35s both;
+  }
+
+  .owner-reviews-empty-stars svg {
+    animation: owner-empty-star 1.8s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .owner-reviews-section--visible,
+    .owner-reviews-score--visible,
+    .owner-review-card--visible,
+    .owner-reviews-empty--visible,
+    .owner-reviews-empty-icon,
+    .owner-reviews-track,
+    .owner-reviews-star,
+    .owner-reviews-empty-stars svg {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
 }

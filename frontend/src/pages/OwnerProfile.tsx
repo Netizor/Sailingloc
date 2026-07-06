@@ -2,12 +2,12 @@ import React from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Ship, MapPin, Star, Calendar, MessageCircle, Anchor, Compass, ShieldCheck } from 'lucide-react'
+import { Ship, Star, Calendar, MessageCircle, Anchor, Compass, ShieldCheck } from 'lucide-react'
 import { getPublicProfile } from '../api/users.api'
 import { formatDate } from '../lib/utils'
 import { useAuthStore } from '../store/auth.store'
 import BoatCard from '../components/boats/BoatCard'
-import Stars from '../components/ui/Stars'
+import OwnerReviewsSection from '../components/owner/OwnerReviewsSection'
 import Spinner from '../components/ui/Spinner'
 
 const OwnerProfile: React.FC = () => {
@@ -18,6 +18,8 @@ const OwnerProfile: React.FC = () => {
     queryKey: ['owner-profile', id],
     queryFn: () => getPublicProfile(Number(id!)),
     enabled: !!id,
+    staleTime: 0,
+    refetchOnMount: 'always',
   })
 
   if (isLoading) {
@@ -120,6 +122,12 @@ const OwnerProfile: React.FC = () => {
           </div>
         </div>
 
+        <OwnerReviewsSection
+          reviews={reviews}
+          rating={rating}
+          reviewCount={reviewCount}
+        />
+
         {/* CV de marin */}
         {(user.sailorBio || user.sailingQualifications || user.sailingAreas || user.sailingExperienceYears != null) && (
           <section className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 sm:p-8">
@@ -191,54 +199,6 @@ const OwnerProfile: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {boats.map((boat) => (
                 <BoatCard key={boat.id} boat={boat as any} isFavorite={false} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Avis reçus */}
-        {reviews.length > 0 && (
-          <section>
-            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
-              <Star size={18} className="text-amber-400" />
-              Avis reçus
-            </h2>
-            <div className="space-y-4">
-              {reviews.map((review) => (
-                <div
-                  key={review.id}
-                  className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="h-9 w-9 rounded-full bg-ocean-100 dark:bg-ocean-800/40 text-ocean-700 dark:text-ocean-400 flex items-center justify-center text-sm font-semibold flex-shrink-0">
-                      {review.reviewer?.firstName?.[0]}{review.reviewer?.lastName?.[0]}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between gap-2 flex-wrap">
-                        <p className="font-medium text-gray-900 dark:text-gray-100 text-sm">
-                          {review.reviewer?.firstName} {review.reviewer?.lastName}
-                        </p>
-                        {review.rating != null && (
-                          <Stars rating={review.rating} size="sm" showValue />
-                        )}
-                      </div>
-                      {review.boat && (
-                        <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1 mt-0.5">
-                          <MapPin size={11} />
-                          {review.boat.title}
-                        </p>
-                      )}
-                      {review.comment && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">
-                          {review.comment}
-                        </p>
-                      )}
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-                        {review.createdAt ? formatDate(review.createdAt) : ''}
-                      </p>
-                    </div>
-                  </div>
-                </div>
               ))}
             </div>
           </section>
