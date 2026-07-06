@@ -12,6 +12,7 @@ import {
   UserCircle,
 } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../../store/auth.store'
 import { MY_PUBLIC_PROFILE_ROUTE, SETTINGS_ROUTE, getPublicProfilePath } from '../../lib/profilePaths'
 import { resolveApiBaseUrl } from '../../lib/axios'
@@ -20,7 +21,7 @@ import { UserRole } from '../../types'
 
 interface NavItem {
   to: string
-  label: string
+  labelKey: string
   icon: React.ReactNode
   end?: boolean
   ownerOnly?: boolean
@@ -28,25 +29,26 @@ interface NavItem {
 }
 
 const renterNavItems: NavItem[] = [
-  { to: '/mon-espace', label: 'Tableau de bord', icon: <LayoutDashboard size={18} />, end: true },
-  { to: '/mon-espace/reservations', label: 'Mes Réservations', icon: <CalendarCheck size={18} /> },
-  { to: '/proprietaire/bateaux', label: 'Mon Bateaux', icon: <Ship size={18} />, ownerOnly: true },
-  { to: '/mon-espace/messages', label: 'Messages', icon: <MessageCircle size={18} /> },
-  { to: '/mon-espace/verification', label: "Vérification d'identité", icon: <ShieldCheck size={18} /> },
-  { to: SETTINGS_ROUTE, label: 'Paramètres', icon: <Settings size={18} /> },
+  { to: '/mon-espace', labelKey: 'layout.dashboard', icon: <LayoutDashboard size={18} />, end: true },
+  { to: '/mon-espace/reservations', labelKey: 'layout.myBookings', icon: <CalendarCheck size={18} /> },
+  { to: '/proprietaire/bateaux', labelKey: 'layout.myBoats', icon: <Ship size={18} />, ownerOnly: true },
+  { to: '/mon-espace/messages', labelKey: 'layout.messages', icon: <MessageCircle size={18} /> },
+  { to: '/mon-espace/verification', labelKey: 'layout.identityVerification', icon: <ShieldCheck size={18} /> },
+  { to: SETTINGS_ROUTE, labelKey: 'layout.settings', icon: <Settings size={18} /> },
 ]
 
 const ownerNavItems: NavItem[] = [
-  { to: '/proprietaire', label: 'Tableau de bord', icon: <LayoutDashboard size={18} />, end: true },
-  { to: '/proprietaire/reservations', label: 'Mes Réservations', icon: <CalendarCheck size={18} /> },
-  { to: '/proprietaire/bateaux', label: 'Mon Bateaux', icon: <Ship size={18} /> },
-  { to: '/mon-espace/messages', label: 'Messages', icon: <MessageCircle size={18} /> },
-  { to: '/mon-espace/verification', label: "Vérification d'identité", icon: <ShieldCheck size={18} /> },
-  { to: MY_PUBLIC_PROFILE_ROUTE, label: 'Mon profil', icon: <UserCircle size={18} /> },
-  { to: SETTINGS_ROUTE, label: 'Paramètres', icon: <Settings size={18} /> },
+  { to: '/proprietaire', labelKey: 'layout.dashboard', icon: <LayoutDashboard size={18} />, end: true },
+  { to: '/proprietaire/reservations', labelKey: 'layout.myBookings', icon: <CalendarCheck size={18} /> },
+  { to: '/proprietaire/bateaux', labelKey: 'layout.myBoats', icon: <Ship size={18} /> },
+  { to: '/mon-espace/messages', labelKey: 'layout.messages', icon: <MessageCircle size={18} /> },
+  { to: '/mon-espace/verification', labelKey: 'layout.identityVerification', icon: <ShieldCheck size={18} /> },
+  { to: MY_PUBLIC_PROFILE_ROUTE, labelKey: 'nav.myProfile', icon: <UserCircle size={18} /> },
+  { to: SETTINGS_ROUTE, labelKey: 'layout.settings', icon: <Settings size={18} /> },
 ]
 
 const UserDashboardLayout: React.FC = () => {
+  const { t } = useTranslation()
   const { user, accessToken } = useAuthStore()
   const navigate = useNavigate()
   const { pathname } = useLocation()
@@ -97,23 +99,21 @@ const UserDashboardLayout: React.FC = () => {
 
   const roleLabel =
     user?.role === UserRole.OWNER
-      ? 'Propriétaire Premium'
+      ? t('layout.ownerPremium')
       : user?.role === UserRole.ADMIN
-        ? 'Administrateur'
-        : 'Locataire'
+        ? t('layout.administrator')
+        : t('layout.renter')
 
   const displayName = isOwnerSpace && user
     ? `${user.firstName} ${user.lastName}`
-    : 'Mon Compte'
+    : t('layout.myAccount')
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          {/* Sidebar */}
           <aside className="w-full lg:w-64 flex-shrink-0">
             <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 sticky top-24 flex flex-col">
-              {/* Profil */}
               <div className="flex flex-col items-center text-center pb-5 border-b border-gray-100 dark:border-gray-700">
                 {user && getPublicProfilePath(user) ? (
                   <button
@@ -167,7 +167,6 @@ const UserDashboardLayout: React.FC = () => {
                 </p>
               </div>
 
-              {/* Navigation */}
               <nav className="py-4 space-y-1 flex-1">
                 {navItems
                   .filter((item) => {
@@ -190,7 +189,7 @@ const UserDashboardLayout: React.FC = () => {
                       }
                     >
                       {item.icon}
-                      {item.label}
+                      {t(item.labelKey)}
                     </NavLink>
                   ))}
                 {isAdmin && (
@@ -206,25 +205,23 @@ const UserDashboardLayout: React.FC = () => {
                     }
                   >
                     <Shield size={18} />
-                    Administration (tous les bateaux)
+                    {t('layout.adminAllBoats')}
                   </NavLink>
                 )}
               </nav>
 
-              {/* Ajouter un bateau - bouton mis en avant */}
               {isOwner && (
                 <button
                   onClick={() => navigate('/proprietaire/bateaux/nouveau')}
                   className="w-full flex items-center justify-center gap-2.5 bg-brand-teal hover:bg-brand-teal/90 active:scale-[0.98] text-white text-sm font-semibold py-3.5 px-4 rounded-xl transition-all mt-2 shadow-lg shadow-brand-teal/30 ring-2 ring-brand-teal/20 hover:shadow-xl hover:ring-brand-teal/40"
                 >
                   <Plus size={18} strokeWidth={2.5} />
-                  Ajouter un bateau
+                  {t('layout.addBoat')}
                 </button>
               )}
             </div>
           </aside>
 
-          {/* Contenu principal */}
           <main className="flex-1 min-w-0">
             <Outlet />
           </main>

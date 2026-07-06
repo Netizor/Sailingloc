@@ -1,4 +1,5 @@
 import React, { HTMLAttributes } from 'react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/utils'
 
 type SpinnerSize = 'sm' | 'md' | 'lg'
@@ -16,14 +17,17 @@ const sizeClasses: Record<SpinnerSize, string> = {
 
 const Spinner: React.FC<SpinnerProps> = ({
   size = 'md',
-  label = 'Chargement…',
+  label,
   className,
   ...props
 }) => {
+  const { t } = useTranslation()
+  const ariaLabel = label ?? t('common.loading')
+
   return (
     <div
       role="status"
-      aria-label={label}
+      aria-label={ariaLabel}
       className={cn('inline-flex items-center justify-center', className)}
       {...props}
     >
@@ -35,21 +39,24 @@ const Spinner: React.FC<SpinnerProps> = ({
         style={{ borderTopColor: '#0369a1', borderColor: '#bae6fd' }}
         aria-hidden="true"
       />
-      <span className="sr-only">{label}</span>
+      <span className="sr-only">{ariaLabel}</span>
     </div>
   )
 }
 
-export const FullPageSpinner: React.FC<{ label?: string }> = ({
-  label = 'Chargement…',
-}) => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-    <div className="flex flex-col items-center gap-4">
-      <Spinner size="lg" label={label} />
-      <p className="text-gray-500 dark:text-gray-400 text-sm">{label}</p>
+export const FullPageSpinner: React.FC<{ label?: string }> = ({ label }) => {
+  const { t } = useTranslation()
+  const displayLabel = label ?? t('common.loading')
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="flex flex-col items-center gap-4">
+        <Spinner size="lg" label={displayLabel} />
+        <p className="text-gray-500 dark:text-gray-400 text-sm">{displayLabel}</p>
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 export default Spinner
 export type { SpinnerProps, SpinnerSize }

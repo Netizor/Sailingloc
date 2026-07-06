@@ -10,20 +10,22 @@ import {
   Shield,
   ShieldCheck,
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../../store/auth.store'
 import { cn } from '../../lib/utils'
 
 const navItems = [
-  { to: '/admin', label: 'Tableau de bord', icon: <LayoutDashboard size={18} />, end: true },
-  { to: '/admin/utilisateurs', label: 'Utilisateurs', icon: <Users size={18} /> },
-  { to: '/admin/bateaux', label: 'Bateaux', icon: <Ship size={18} /> },
-  { to: '/admin/reservations', label: 'Réservations', icon: <CalendarCheck size={18} /> },
-  { to: '/admin/signalements', label: 'Signalements', icon: <Flag size={18} /> },
-  { to: '/admin/avis', label: 'Avis', icon: <Star size={18} /> },
-  { to: '/admin/roles', label: 'Rôles', icon: <ShieldCheck size={18} /> },
+  { to: '/admin', labelKey: 'layout.dashboard', icon: <LayoutDashboard size={18} />, end: true },
+  { to: '/admin/utilisateurs', labelKey: 'layout.users', icon: <Users size={18} /> },
+  { to: '/admin/bateaux', labelKey: 'layout.boatsNav', icon: <Ship size={18} /> },
+  { to: '/admin/reservations', labelKey: 'layout.bookingsNav', icon: <CalendarCheck size={18} /> },
+  { to: '/admin/signalements', labelKey: 'layout.reports', icon: <Flag size={18} /> },
+  { to: '/admin/avis', labelKey: 'layout.reviewsNav', icon: <Star size={18} /> },
+  { to: '/admin/roles', labelKey: 'layout.roles', icon: <ShieldCheck size={18} /> },
 ]
 
 const AdminDashboardLayout: React.FC = () => {
+  const { t } = useTranslation()
   const { user } = useAuthStore()
 
   return (
@@ -38,7 +40,7 @@ const AdminDashboardLayout: React.FC = () => {
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
-                    Administration
+                    {t('layout.administration')}
                   </p>
                   <p className="text-xs text-gray-400 dark:text-gray-500">
                     {user?.firstName} {user?.lastName}
@@ -62,7 +64,7 @@ const AdminDashboardLayout: React.FC = () => {
                     }
                   >
                     {item.icon}
-                    {item.label}
+                    {t(item.labelKey)}
                   </NavLink>
                 ))}
               </nav>

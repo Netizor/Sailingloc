@@ -565,14 +565,10 @@ const Search: React.FC = () => {
                 <p className="text-xs text-amber-600 mb-4">
 
                   {isError
-
-                    ? 'Connexion API indisponible - recherche appliquée sur les bateaux de démonstration.'
-
+                    ? t('search.demoApiError')
                     : hasActiveFilters
-
-                      ? 'Aucun résultat API pour ces critères - affichage des bateaux de démonstration correspondants.'
-
-                      : 'Affichage de bateaux de démonstration.'}
+                      ? t('search.demoNoResults')
+                      : t('search.demoFallback')}
 
                 </p>
 
