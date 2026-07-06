@@ -2,7 +2,7 @@ import api from '../lib/axios'
 import type { Conversation, Message } from '../types'
 
 export interface SendMessageData {
-  receiverId: number
+  recipientId: number
   content: string
   conversationId?: string
   boatId?: number
