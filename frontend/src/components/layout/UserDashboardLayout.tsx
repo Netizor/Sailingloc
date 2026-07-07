@@ -13,6 +13,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../../store/auth.store'
 import { getInitials, cn } from '../../lib/utils'
+import { getDefaultDashboardPath } from '../../lib/profilePaths'
 import { UserRole } from '../../types'
 
 interface NavItem {
@@ -51,7 +52,11 @@ const UserDashboardLayout: React.FC = () => {
   const isOwner = user?.role === UserRole.OWNER || isAdmin
   const isOwnerSpace = pathname.startsWith('/proprietaire')
 
-  const navItems = isOwnerSpace ? ownerNavItems : renterNavItems
+  const navItems = (isOwnerSpace ? ownerNavItems : renterNavItems).map((item) =>
+    !isOwnerSpace && isOwner && item.to === '/mon-espace' && item.end
+      ? { ...item, to: '/proprietaire' }
+      : item,
+  )
 
   const roleLabel =
     user?.role === UserRole.OWNER

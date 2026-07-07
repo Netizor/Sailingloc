@@ -7,7 +7,6 @@ import {
   LogOut,
   Menu,
   MessageSquare,
-  Ship,
   User,
   X,
   LayoutDashboard,
@@ -16,6 +15,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/utils'
 import { useAuthStore } from '../../store/auth.store'
+import { getDefaultDashboardPath } from '../../lib/profilePaths'
 import { getUnreadCount } from '../../api/notifications.api'
 import { getUnreadMessagesCount } from '../../api/messages.api'
 import NotificationPanel from '../notifications/NotificationPanel'
@@ -200,10 +200,7 @@ const Header: React.FC = () => {
                         </p>
                         <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{user.email}</p>
                       </div>
-                      <DropdownItem icon={<LayoutDashboard size={15} />} label={t('nav.mySpace')} to="/mon-espace" onClick={() => setDropdownOpen(false)} />
-                      {(user.role === 'OWNER' || user.role === 'ADMIN') && (
-                        <DropdownItem icon={<Ship size={15} />} label={t('nav.ownerSpace')} to="/proprietaire" onClick={() => setDropdownOpen(false)} />
-                      )}
+                      <DropdownItem icon={<LayoutDashboard size={15} />} label={t('nav.mySpace')} to={getDefaultDashboardPath(user.role)} onClick={() => setDropdownOpen(false)} />
                       {user.role === 'ADMIN' && (
                         <DropdownItem icon={<Settings size={15} />} label={t('nav.admin')} to="/admin" onClick={() => setDropdownOpen(false)} />
                       )}

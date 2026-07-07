@@ -5,6 +5,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { authApi } from '../../api/auth.api'
 import { useAuthStore } from '../../store/auth.store'
+import { getDefaultDashboardPath } from '../../lib/profilePaths'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import toast from 'react-hot-toast'
@@ -41,7 +42,9 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
     onSuccess: (data) => {
       setAuth(data.user, data.accessToken, data.refreshToken, rememberMe)
       toast.success(t('auth.login.welcome', { name: data.user.firstName }))
-      navigate(from, { replace: true })
+      const target =
+        from === '/mon-espace' ? getDefaultDashboardPath(data.user.role) : from
+      navigate(target, { replace: true })
 
       // Vérification HIBP en arrière-plan - non bloquante, silencieuse en cas d'erreur réseau.
       // Le backend utilise k-anonymity : seuls 5 chars du hash SHA-1 sont envoyés à l'API HIBP.

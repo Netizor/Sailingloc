@@ -45,7 +45,7 @@ const Conversation: React.FC = () => {
   // Résolution du nom de l'interlocuteur depuis la liste des conversations
   const { data: conversations } = useQuery({
     queryKey: ['conversations'],
-    queryFn: getConversations,
+    queryFn: () => getConversations(),
     staleTime: 30_000,
   })
 
