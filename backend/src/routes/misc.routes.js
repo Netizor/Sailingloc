@@ -5,6 +5,18 @@ import supabase from '../lib/supabase.js'
 import { authenticate, requireRole } from '../middleware/auth.middleware.js'
 import { verifyAccessToken } from '../lib/jwt.js'
 
+async function notifyAdmins(type, title, body, data = {}) {
+  try {
+    const { data: admins } = await supabase.from('users').select('id').eq('role', 'ADMIN')
+    if (!admins?.length) return
+    await supabase.from('notifications').insert(
+      admins.map(a => ({ user_id: a.id, type, title, body, data, is_read: false }))
+    )
+  } catch (e) {
+    console.error('[notifyAdmins]', e.message)
+  }
+}
+
 // ═══════════════════════════════════════════════════════════
 // NOTIFICATIONS
 // ═══════════════════════════════════════════════════════════
@@ -73,6 +85,14 @@ reviewsRouter.post('/', authenticate, async (req, res) => {
       await supabase.from('boats').update({ average_rating: Math.round(avg * 10) / 10, review_count: allReviews.length }).eq('id', booking.boat_id)
     }
   }
+
+  notifyAdmins(
+    'NEW_REVIEW',
+    'Nouvel avis',
+    `Avis ${rating}/5 posté sur la réservation #${bookingId}`,
+    { reviewId: review.id, bookingId, boatId: booking.boat_id }
+  ).catch(() => {})
+
   return res.status(201).json(review)
 })
 

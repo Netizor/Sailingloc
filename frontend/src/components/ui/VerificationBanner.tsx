@@ -23,7 +23,7 @@ const VerificationBanner: React.FC = () => {
   const [emailDismissed, setEmailDismissed] = useState(false)
   const [phoneDismissed, setPhoneDismissed] = useState(false)
 
-  const showEmailBanner = !!user && !user.emailVerifiedAt && !emailDismissed
+  const showEmailBanner = false
   const showPhoneBanner = !!user && user.role === UserRole.OWNER && !user.phone && !phoneDismissed
 
   const resendMutation = useMutation({

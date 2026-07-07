@@ -1,6 +1,6 @@
 import React from 'react'
 import Badge from '../ui/Badge'
-import { getBookingStatusLabel, getBookingStatusColor } from '../../lib/utils'
+import { getBookingStatusLabel } from '../../lib/utils'
 import type { BadgeVariant } from '../ui/Badge'
 import type { BookingStatus } from '../../types'
 
@@ -10,13 +10,12 @@ interface BookingStatusBadgeProps {
   dot?: boolean
 }
 
-const colorToVariant: Record<string, BadgeVariant> = {
-  gray: 'default',
-  green: 'success',
-  yellow: 'warning',
-  red: 'danger',
-  blue: 'info',
-  ocean: 'primary',
+const statusToVariant: Record<string, BadgeVariant> = {
+  PENDING:   'warning',
+  CONFIRMED: 'success',
+  CANCELLED: 'danger',
+  COMPLETED: 'primary',
+  DISPUTED:  'info',
 }
 
 const BookingStatusBadge: React.FC<BookingStatusBadgeProps> = ({
@@ -25,8 +24,7 @@ const BookingStatusBadge: React.FC<BookingStatusBadgeProps> = ({
   dot = true,
 }) => {
   const label = getBookingStatusLabel(status)
-  const color = getBookingStatusColor(status)
-  const variant: BadgeVariant = colorToVariant[color] ?? 'default'
+  const variant: BadgeVariant = statusToVariant[status] ?? 'default'
 
   return (
     <Badge variant={variant} size={size} dot={dot}>
