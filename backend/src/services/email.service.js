@@ -25,6 +25,8 @@ const smtpTransport = smtpHost && smtpPort && smtpUser && smtpPass
   : null
 
 async function sendMail({ to, subject, html }) {
+  let providerConfigured = Boolean(resend || smtpTransport)
+
   if (resend) {
     try {
       const result = await resend.emails.send({
@@ -57,11 +59,13 @@ async function sendMail({ to, subject, html }) {
     }
   }
 
-  console.error('[Email] Aucun fournisseur configuré. Ajoutez RESEND_API_KEY ou SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS dans .env.')
+  if (!providerConfigured) {
+    console.error('[Email] Aucun fournisseur configuré. Ajoutez RESEND_API_KEY ou SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS dans .env.')
+  }
 }
 
 export async function sendEmailVerification(to, firstName, token) {
-  const link = `${FRONTEND_URL}/verify-email?token=${token}`;
+  const link = `${FRONTEND_URL}/verifier-email?token=${token}`;
   await sendMail({
     to,
     subject: 'Vérifiez votre adresse email – SailingLoc',
@@ -76,7 +80,7 @@ export async function sendEmailVerification(to, firstName, token) {
 }
 
 export async function sendPasswordReset(to, firstName, token) {
-  const link = `${FRONTEND_URL}/reset-password?token=${token}`;
+  const link = `${FRONTEND_URL}/reinitialiser-mot-de-passe?token=${token}`;
   await sendMail({
     to,
     subject: 'Réinitialisation de votre mot de passe – SailingLoc',
