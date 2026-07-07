@@ -198,13 +198,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
       <form
         onSubmit={handleSubmit}
         className={cn(
-          'bg-white rounded-full shadow-[0_8px_40px_rgba(0,0,0,0.14)] p-1.5 max-w-5xl mx-auto',
+          'w-full bg-white rounded-2xl sm:rounded-full shadow-[0_8px_40px_rgba(0,0,0,0.14)] p-2 sm:p-1.5 max-w-5xl mx-auto',
           className
         )}
         aria-label={t('searchBar.searchBoat')}
       >
-        <div className="flex flex-col md:flex-row md:items-center">
-          <div className="flex-1 flex items-center gap-3 px-5 py-3 md:py-2.5 border-b md:border-b-0 md:border-r border-gray-200">
+        <div className="flex flex-col lg:flex-row lg:items-center">
+          <div className="flex-1 flex items-center gap-3 px-4 sm:px-5 py-3 lg:py-2.5 border-b lg:border-b-0 lg:border-r border-gray-200">
             <MapPin size={18} className="text-gray-400 flex-shrink-0" strokeWidth={1.5} />
             <div className="flex-1 min-w-0 text-left">
               <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400 mb-0.5">
@@ -220,7 +220,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             </div>
           </div>
 
-          <div className="flex-1 flex items-center gap-3 px-5 py-3 md:py-2.5 border-b md:border-b-0 md:border-r border-gray-200">
+          <div className="flex-1 flex items-center gap-3 px-4 sm:px-5 py-3 lg:py-2.5 border-b lg:border-b-0 lg:border-r border-gray-200">
             <Calendar size={18} className="text-gray-400 flex-shrink-0" strokeWidth={1.5} />
             <div className="flex-1 min-w-0 text-left relative">
               <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400 mb-0.5">
@@ -244,7 +244,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             </div>
           </div>
 
-          <div className="flex-1 flex items-center gap-3 px-5 py-3 md:py-2.5 border-b md:border-b-0 md:border-r border-gray-200">
+          <div className="flex-1 flex items-center gap-3 px-4 sm:px-5 py-3 lg:py-2.5 border-b lg:border-b-0 lg:border-r border-gray-200">
             <Ship size={18} className="text-gray-400 flex-shrink-0" strokeWidth={1.5} />
             <div className="flex-1 min-w-0 text-left">
               <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400 mb-0.5">
@@ -268,10 +268,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center p-1 md:pl-0 md:pr-1">
+          <div className="flex items-center p-1 lg:pl-0 lg:pr-1">
             <button
               type="submit"
-              className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 bg-[#003366] text-white font-medium rounded-full whitespace-nowrap text-sm"
+              className="w-full lg:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 bg-[#003366] text-white font-medium rounded-full whitespace-nowrap text-sm"
             >
               <Search size={16} strokeWidth={2} />
               {t('searchBar.explore')}
