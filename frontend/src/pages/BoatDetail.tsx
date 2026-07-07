@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { Helmet } from 'react-helmet-async'
+import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
@@ -13,7 +14,25 @@ import {
   AlertTriangle,
   Star,
   ArrowRight,
+  UserCheck,
+  Navigation,
+  Radio,
+  Compass,
+  LifeBuoy,
+  Waves,
+  Utensils,
+  Refrigerator,
+  ShowerHead,
+  BedDouble,
+  Wifi,
+  Music,
+  Sun,
+  Snowflake,
+  Zap,
+  Wind,
+  Check,
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { cn, formatDate } from '../lib/utils'
 import { boatsApi } from '../api/boats.api'
 import { bookingsApi } from '../api/bookings.api'
@@ -24,6 +43,7 @@ import { useAuthStore } from '../store/auth.store'
 import type { Boat, Review } from '../types'
 import { BoatType, UserRole } from '../types'
 import { BOAT_TYPE_LABELS } from '../lib/labels'
+import { getBoatEquipment, getEnrichedDescription } from '../lib/boatContent'
 import { reportBoat } from '../api/reports.api'
 import type { ReportReason } from '../api/reports.api'
 import { getDemoBoat } from '../data/demoBoats'
@@ -54,23 +74,53 @@ const DEMO_REVIEWS: Partial<Review>[] = [
   },
 ]
 
-const getTypeSpecLabel = (type: BoatType) => {
-  if (type === BoatType.SAILBOAT) return 'Monocoque'
-  if (type === BoatType.CATAMARAN) return 'Catamaran'
-  return BOAT_TYPE_LABELS[type] ?? type
-}
+// Associe chaque équipement à une icône pertinente (recherche par mot-clé)
+const EQUIPMENT_ICONS: { match: RegExp; icon: LucideIcon }[] = [
+  { match: /gps|traceur|cartes/i, icon: Navigation },
+  { match: /vhf|radio/i, icon: Radio },
+  { match: /pilote|guindeau|enrouleur|lazy|génois/i, icon: Compass },
+  { match: /gilet|radeau|extincteur|secours|sécurit/i, icon: LifeBuoy },
+  { match: /annexe|hors-bord|jet|jouets|nautiques|trampolines/i, icon: Waves },
+  { match: /cuisine|four|gazini|barbecue/i, icon: Utensils },
+  { match: /frigo|réfrig|glaci/i, icon: Refrigerator },
+  { match: /eau chaude|douche|dessalinisateur/i, icon: ShowerHead },
+  { match: /literie|linge|cabine/i, icon: BedDouble },
+  { match: /wi-fi|wifi/i, icon: Wifi },
+  { match: /son|bluetooth|musique/i, icon: Music },
+  { match: /solaire|soleil|bimini|taud|flybridge/i, icon: Sun },
+  { match: /clim/i, icon: Snowflake },
+  { match: /usb|220v|convertisseur|générateur|électr/i, icon: Zap },
+  { match: /paddle|sup|snorkeling|masque/i, icon: Wind },
+]
 
-const getLuxuryTypeLabel = (type: BoatType) => {
-  const base = BOAT_TYPE_LABELS[type] ?? type
-  if (type === BoatType.YACHT || type === BoatType.SAILBOAT) return `${base} de Luxe`
-  return base
-}
+const getEquipmentIcon = (name: string): LucideIcon =>
+  EQUIPMENT_ICONS.find((e) => e.match.test(name))?.icon ?? Check
 
 const BoatDetail: React.FC = () => {
+  const { t, i18n } = useTranslation()
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { isAuthenticated } = useAuthStore()
   const qc = useQueryClient()
+
+  const getTypeSpecLabel = (type: BoatType) => {
+    if (type === BoatType.SAILBOAT) return t('boat.detail.monocoque')
+    if (type === BoatType.CATAMARAN) return t('boat.type.CATAMARAN')
+    return BOAT_TYPE_LABELS[type] ?? type
+  }
+
+  const getLuxuryTypeLabel = (type: BoatType) => {
+    const base = BOAT_TYPE_LABELS[type] ?? type
+    if (type === BoatType.YACHT || type === BoatType.SAILBOAT) return `${base} ${t('boat.detail.luxurySuffix')}`
+    return base
+  }
+
+  const formatEuro = (amount: number) =>
+    new Intl.NumberFormat(i18n.language.startsWith('en') ? 'en-US' : 'fr-FR', {
+      style: 'currency',
+      currency: 'EUR',
+      maximumFractionDigits: 0,
+    }).format(amount)
   const [descExpanded, setDescExpanded] = useState(false)
   const [bookingPanelOpen, setBookingPanelOpen] = useState(false)
   const [stripePayment, setStripePayment] = useState<{
@@ -124,7 +174,7 @@ const BoatDetail: React.FC = () => {
       await navigator.share({ title: boat?.title ?? 'SailingLoc', url }).catch(() => null)
     } else {
       await navigator.clipboard.writeText(url)
-      toast.success('Lien copié !')
+      toast.success(t('boat.detail.linkCopied'))
     }
   }
 
@@ -160,9 +210,9 @@ const BoatDetail: React.FC = () => {
     mutationFn: () => reportBoat({ boatId: boat!.id, reason: reportReason, details: reportDetails || undefined }),
     onSuccess: () => {
       setReportSent(true)
-      toast.success('Signalement envoyé, merci !')
+      toast.success(t('boat.detail.reportSent'))
     },
-    onError: () => toast.error('Erreur lors du signalement'),
+    onError: () => toast.error(t('boat.detail.reportError')),
   })
 
   const bookingMutation = useMutation({
@@ -175,8 +225,9 @@ const BoatDetail: React.FC = () => {
       setStripePayment(pi)
       setBookingPanelOpen(false)
     },
-    onError: (err: { message?: string }) => {
-      toast.error(err?.message ?? 'Erreur lors de la réservation')
+    onError: (err: { message?: string; response?: { data?: { message?: string } } }) => {
+      const msg = err?.response?.data?.message ?? err?.message ?? t('boat.detail.bookingError')
+      toast.error(msg)
     },
   })
 
@@ -191,9 +242,9 @@ const BoatDetail: React.FC = () => {
   if ((isError && !boat) || !boat) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 text-center px-4 bg-[#f8f9fa]">
-        <p className="text-xl font-semibold text-[#003366]">Bateau introuvable</p>
+        <p className="text-xl font-semibold text-[#003366]">{t('boat.detail.notFound')}</p>
         <Button variant="secondary" onClick={() => navigate('/bateaux')}>
-          Retour aux bateaux
+          {t('boat.detail.backToBoats')}
         </Button>
       </div>
     )
@@ -204,27 +255,29 @@ const BoatDetail: React.FC = () => {
   }
 
   const locationLabel = boat.city ? `${boat.city}, ${boat.country}` : `${boat.port}, ${boat.country}`
-  const description = boat.description || ''
-  const shortDesc = description.length > 320 ? description.slice(0, 320) + '…' : description
+  const description = getEnrichedDescription(boat)
+  const shortDesc = description.length > 900 ? description.slice(0, 900) + '…' : description
+  const equipment = getBoatEquipment(boat)
+  const interestedCount = Math.max(48, boat.reviewCount * 14 + (boat.id % 37) * 3)
 
   const specs = [
-    { label: 'Type', value: getTypeSpecLabel(boat.type) },
-    { label: 'Longueur', value: boat.length ? `${boat.length} m` : '' },
-    { label: 'Cabines', value: boat.cabins ? `${boat.cabins} Cabines` : '' },
-    { label: 'Année', value: boat.year ? String(boat.year) : '' },
-  ]
+    { label: t('boat.detail.specType'), value: getTypeSpecLabel(boat.type) },
+    { label: t('boat.detail.specLength'), value: boat.length ? `${boat.length} m` : '' },
+    { label: t('boat.detail.specCabins'), value: boat.cabins ? t('boat.detail.cabinsCount', { count: boat.cabins }) : '' },
+    { label: t('boat.detail.specYear'), value: boat.year ? String(boat.year) : '' },
+  ].filter((spec) => spec.value)
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] pb-24 lg:pb-12">
       <Helmet>
         <title>{boat.title} - SailingLoc</title>
-        <meta name="description" content={boat.description?.slice(0, 155) ?? `Louez ${boat.title} à ${boat.port}.`} />
+        <meta name="description" content={boat.description?.slice(0, 155) ?? t('boat.detail.rentMeta', { title: boat.title, port: boat.port })} />
         {boat.images?.[0] && <meta property="og:image" content={boat.images[0]} />}
       </Helmet>
 
       <div className="w-full px-[10%] py-8">
         {/* Galerie */}
-        <BoatDetailGallery images={boat.images ?? []} title={boat.title} />
+        <BoatDetailGallery images={boat.images ?? []} title={boat.title} interestedCount={interestedCount} />
 
         <div className="mt-8 flex flex-col lg:flex-row gap-10">
           {/* Colonne principale */}
@@ -239,16 +292,16 @@ const BoatDetail: React.FC = () => {
                   {boat.rating > 0 && (
                     <span className="flex items-center gap-1.5 bg-[#006875] text-white text-sm font-semibold px-3 py-1.5 rounded-full">
                       <Star size={14} fill="white" strokeWidth={0} />
-                      {boat.rating.toFixed(1)} ({boat.reviewCount} avis)
+                      {boat.rating.toFixed(1)} ({boat.reviewCount} {t('boat.detail.reviews')})
                     </span>
                   )}
-                  <button type="button" onClick={handleShare} aria-label="Partager" className="p-2 rounded-full border border-gray-200 text-[#8A94A6] hover:text-[#2563FF]">
+                  <button type="button" onClick={handleShare} aria-label={t('boat.detail.share')} className="p-2 rounded-full border border-gray-200 text-[#8A94A6] hover:text-[#2563FF]">
                     <Share2 size={18} />
                   </button>
                   <button
                     type="button"
                     onClick={handleFavoriteToggle}
-                    aria-label="Favoris"
+                    aria-label={isFavorite ? t('boat.detail.removeFavorite') : t('boat.detail.addFavorite')}
                     className={cn(
                       'p-2 rounded-full border transition-colors',
                       isFavorite ? 'bg-[#2563FF] border-[#2563FF] text-white' : 'border-gray-200 text-[#8A94A6]'
@@ -270,7 +323,11 @@ const BoatDetail: React.FC = () => {
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Users size={15} className="text-[#2563FF]" />
-                  Capacité {boat.capacity} pers.
+                  {t('boat.detail.capacityPers', { count: boat.capacity })}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <UserCheck size={15} className="text-[#2563FF]" />
+                  {boat.withSkipper ? t('boat.detail.withSkipperOptional') : t('boat.detail.withoutSkipper')}
                 </span>
               </div>
             </div>
@@ -288,26 +345,73 @@ const BoatDetail: React.FC = () => {
             {/* Description */}
             {description && (
               <section>
-                <h2 className="text-lg font-bold text-[#003366] mb-4">Réservez votre aventure</h2>
+                <h2 className="text-lg font-bold text-[#003366] mb-4">{t('boat.detail.bookAdventure')}</h2>
                 <p className="text-sm text-[#334155] leading-relaxed whitespace-pre-line">
                   {descExpanded ? description : shortDesc}
                 </p>
-                {description.length > 320 && (
+                {description.length > 900 && (
                   <button
                     type="button"
                     onClick={() => setDescExpanded((v) => !v)}
                     className="mt-3 flex items-center gap-1 text-sm font-semibold text-[#2563FF] hover:underline"
                   >
-                    {descExpanded ? 'Réduire' : 'Lire la suite'}
+                    {descExpanded ? t('boat.detail.readLess') : t('boat.detail.readMore')}
                     <ArrowRight size={14} />
                   </button>
                 )}
               </section>
             )}
 
+            {/* Skipper & navigation */}
+            <section>
+              <h2 className="text-lg font-bold text-[#003366] mb-4">{t('boat.detail.skipperNav')}</h2>
+              <div
+                className={cn(
+                  'flex items-start gap-3 rounded-2xl border p-5',
+                  boat.withSkipper ? 'bg-[#eef3fb] border-[#2563FF]/20' : 'bg-amber-50 border-amber-100',
+                )}
+              >
+                <UserCheck size={22} className={cn('flex-shrink-0 mt-0.5', boat.withSkipper ? 'text-[#2563FF]' : 'text-amber-500')} />
+                <div>
+                  <p className="text-sm font-semibold text-[#003366]">
+                    {boat.withSkipper ? t('boat.detail.withSkipperPro') : t('boat.detail.withoutSkipperSelf')}
+                  </p>
+                  <p className="text-sm text-[#334155] mt-1 leading-relaxed">
+                    {boat.withSkipper
+                      ? t('boat.detail.withSkipperDesc', {
+                          price: boat.skipperPrice
+                            ? t('boat.detail.withSkipperDescPrice', { price: formatEuro(boat.skipperPrice) })
+                            : '',
+                        })
+                      : t('boat.detail.withoutSkipperDesc')}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* Équipements */}
+            {equipment.length > 0 && (
+              <section>
+                <h2 className="text-lg font-bold text-[#003366] mb-4">{t('boat.detail.equipmentOnBoard')}</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                  {equipment.map((item) => {
+                    const Icon = getEquipmentIcon(item)
+                    return (
+                      <div key={item} className="flex items-center gap-3 text-sm text-[#334155]">
+                        <span className="flex-shrink-0 h-9 w-9 rounded-lg bg-[#eef3fb] flex items-center justify-center text-[#2563FF]">
+                          <Icon size={18} />
+                        </span>
+                        {item}
+                      </div>
+                    )
+                  })}
+                </div>
+              </section>
+            )}
+
             {/* Disponibilités */}
             <section>
-              <h2 className="text-lg font-bold text-[#003366] mb-4">Disponibilités</h2>
+              <h2 className="text-lg font-bold text-[#003366] mb-4">{t('boat.detail.availability')}</h2>
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 <BoatAvailabilityCalendar boatId={boat.id} variant="detail" />
               </div>
@@ -316,11 +420,11 @@ const BoatDetail: React.FC = () => {
             {/* Avis */}
             <section>
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-lg font-bold text-[#003366]">Avis des voyageurs</h2>
+                <h2 className="text-lg font-bold text-[#003366]">{t('boat.detail.travelerReviews')}</h2>
                 {boat.rating > 0 && (
                   <span className="text-sm text-[#8A94A6]">
                     <span className="font-bold text-[#003366]">{boat.rating.toFixed(1)}/5</span>
-                    {' '}basé sur {reviewTotal} avis
+                    {' '}{t('boat.detail.basedOnReviews', { count: reviewTotal })}
                   </span>
                 )}
               </div>
@@ -356,7 +460,7 @@ const BoatDetail: React.FC = () => {
                 className="inline-flex items-center gap-1.5 text-xs text-[#8A94A6] hover:text-red-500"
               >
                 <Flag size={12} />
-                Signaler cette annonce
+                {t('boat.detail.report')}
               </button>
             )}
           </div>
@@ -369,6 +473,8 @@ const BoatDetail: React.FC = () => {
                 onSubmit={handleBookingSubmit}
                 loading={bookingMutation.isPending}
                 disabledDates={disabledDates}
+                bookedDates={availData?.booked ?? []}
+                unavailableDates={availData?.unavailable ?? []}
                 variant="detail"
               />
               <BoatOwnerCard
@@ -387,16 +493,16 @@ const BoatDetail: React.FC = () => {
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 px-[10%] py-3 flex items-center justify-between gap-3">
         <div>
           <span className="text-lg font-bold text-[#003366]">
-            {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(boat.dailyRate)}
+            {formatEuro(boat.dailyRate)}
           </span>
-          <span className="text-xs text-[#8A94A6]"> / jour</span>
+          <span className="text-xs text-[#8A94A6]">{t('common.perDay')}</span>
         </div>
         <button
           type="button"
           onClick={() => setBookingPanelOpen(true)}
           className="sl-btn-navy flex-1 max-w-xs py-3 text-sm font-semibold rounded-xl"
         >
-          Réserver maintenant
+          {t('boat.detail.bookNow')}
         </button>
       </div>
 
@@ -406,7 +512,7 @@ const BoatDetail: React.FC = () => {
           <div className="absolute inset-0 bg-black/50" onClick={() => setBookingPanelOpen(false)} />
           <div className="relative mt-auto bg-white rounded-t-3xl max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white flex items-center justify-between px-4 py-3 border-b border-gray-100">
-              <span className="font-semibold text-[#003366]">Réserver</span>
+              <span className="font-semibold text-[#003366]">{t('boat.detail.book')}</span>
               <button type="button" onClick={() => setBookingPanelOpen(false)} className="p-1.5 text-[#8A94A6]">
                 <X size={18} />
               </button>
@@ -420,6 +526,8 @@ const BoatDetail: React.FC = () => {
                 }}
                 loading={bookingMutation.isPending}
                 disabledDates={disabledDates}
+                bookedDates={availData?.booked ?? []}
+                unavailableDates={availData?.unavailable ?? []}
                 variant="detail"
               />
             </div>
@@ -428,37 +536,37 @@ const BoatDetail: React.FC = () => {
       )}
 
       {/* Signalement */}
-      <Modal isOpen={reportOpen} onClose={() => { setReportOpen(false); setReportDetails('') }} title="Signaler cette annonce" size="sm">
+      <Modal isOpen={reportOpen} onClose={() => { setReportOpen(false); setReportDetails('') }} title={t('boat.detail.reportModalTitle')} size="sm">
         <div className="p-6 space-y-5">
           <div className="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-xl p-4">
             <AlertTriangle size={16} className="text-amber-500 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-amber-700">Les signalements abusifs peuvent entraîner la suspension de votre compte.</p>
+            <p className="text-sm text-amber-700">{t('boat.detail.reportWarning')}</p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-[#334155] mb-2">Motif</label>
+            <label className="block text-sm font-medium text-[#334155] mb-2">{t('boat.detail.reportReasonLabel')}</label>
             <select
               value={reportReason}
               onChange={(e) => setReportReason(e.target.value as ReportReason)}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#003366]"
             >
-              <option value="INAPPROPRIATE_CONTENT">Contenu inapproprié</option>
-              <option value="FRAUD">Fraude ou escroquerie</option>
-              <option value="DUPLICATE">Annonce en doublon</option>
-              <option value="WRONG_CATEGORY">Mauvaise catégorie</option>
-              <option value="OTHER">Autre</option>
+              <option value="INAPPROPRIATE_CONTENT">{t('boat.detail.reportReasonInappropriate')}</option>
+              <option value="FRAUD">{t('boat.detail.reportReasonFraud')}</option>
+              <option value="DUPLICATE">{t('boat.detail.reportReasonDuplicate')}</option>
+              <option value="WRONG_CATEGORY">{t('boat.detail.reportReasonWrongCategory')}</option>
+              <option value="OTHER">{t('boat.detail.reportReasonOther')}</option>
             </select>
           </div>
           <textarea
             value={reportDetails}
             onChange={(e) => setReportDetails(e.target.value)}
             rows={3}
-            placeholder="Décrivez le problème…"
+            placeholder={t('boat.detail.reportDetailsPlaceholder')}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none"
           />
           <div className="flex gap-3">
-            <Button variant="secondary" fullWidth onClick={() => setReportOpen(false)}>Annuler</Button>
+            <Button variant="secondary" fullWidth onClick={() => setReportOpen(false)}>{t('common.cancel')}</Button>
             <Button variant="danger" fullWidth onClick={() => reportMutation.mutate()} loading={reportMutation.isPending}>
-              Signaler
+              {t('boat.detail.reportSubmit')}
             </Button>
           </div>
         </div>
@@ -472,7 +580,7 @@ const BoatDetail: React.FC = () => {
           boatTitle={boat.title}
           onSuccess={() => {
             setStripePayment(null)
-            toast.success('Paiement confirmé !')
+            toast.success(t('boat.detail.paymentConfirmed'))
             navigate('/mon-espace/reservations')
           }}
           onClose={() => setStripePayment(null)}

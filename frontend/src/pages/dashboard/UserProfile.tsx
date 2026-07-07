@@ -1,17 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
-import { Camera, Download, Eye, EyeOff, Lock, ShieldAlert, Trash2, UserCircle } from 'lucide-react'
-import { useMutation } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
+import {
+  Anchor, Camera, Download, Eye, EyeOff, FileCheck, Lock, ShieldAlert,
+  Trash2, Upload, UserCircle, Settings, Shield, ExternalLink, ChevronRight,
+} from 'lucide-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 
 import { useAuthStore } from '../../store/auth.store'
-import { updateProfile, changePassword, uploadAvatar, exportMyData, deleteAccount } from '../../api/users.api'
+import { updateProfile, changePassword, uploadAvatar, uploadSailorCvDocument, exportMyData, deleteAccount } from '../../api/users.api'
 import Input from '../../components/ui/Input'
 import Textarea from '../../components/ui/Textarea'
 import Button from '../../components/ui/Button'
 import Spinner from '../../components/ui/Spinner'
-import { getInitials } from '../../lib/utils'
+import { getInitials, cn } from '../../lib/utils'
+import { UserRole } from '../../types'
+import { MY_PUBLIC_PROFILE_ROUTE, getPublicProfilePath } from '../../lib/profilePaths'
+
+type SettingsTab = 'compte' | 'marin' | 'securite' | 'donnees'
 
 // ─── Constantes partagées entre sections ─────────────────────────────────────
 
@@ -32,8 +40,11 @@ const AvatarSection: React.FC = () => {
       updateUser({ avatar: updated.avatar })
       toast.success('Photo de profil mise à jour')
     },
-    onError: () => {
-      toast.error('Erreur lors du téléchargement de la photo')
+    onError: (err: unknown) => {
+      const msg = axios.isAxiosError(err)
+        ? (err.response?.data as { message?: string })?.message
+        : undefined
+      toast.error(msg || 'Erreur lors du téléchargement de la photo')
     },
   })
 
@@ -219,6 +230,225 @@ const PersonalInfoSection: React.FC = () => {
           </Button>
         </div>
       </form>
+    </div>
+  )
+}
+
+// ─── CV de marin (propriétaire) ───────────────────────────────────────────────
+
+interface SailorCvForm {
+  sailingExperienceYears: string
+  sailingQualifications:  string
+  sailingAreas:           string
+  sailorBio:              string
+}
+
+function sailorCvToForm(user: {
+  sailingExperienceYears?: number | null
+  sailingQualifications?: string | null
+  sailingAreas?: string | null
+  sailorBio?: string | null
+}): SailorCvForm {
+  return {
+    sailingExperienceYears: user.sailingExperienceYears != null ? String(user.sailingExperienceYears) : '',
+    sailingQualifications:  user.sailingQualifications ?? '',
+    sailingAreas:           user.sailingAreas ?? '',
+    sailorBio:              user.sailorBio ?? '',
+  }
+}
+
+const SailorCvSection: React.FC = () => {
+  const { user, updateUser } = useAuthStore()
+  const queryClient = useQueryClient()
+  const documentInputRef = useRef<HTMLInputElement>(null)
+  const [form, setForm] = useState<SailorCvForm>(() => sailorCvToForm(user ?? {}))
+
+  useEffect(() => {
+    if (user) setForm(sailorCvToForm(user))
+  }, [user?.id])
+
+  const mutation = useMutation({
+    mutationFn: updateProfile,
+    onSuccess: (updated) => {
+      updateUser({
+        sailingExperienceYears: updated.sailingExperienceYears,
+        sailingQualifications:  updated.sailingQualifications,
+        sailingAreas:           updated.sailingAreas,
+        sailorBio:              updated.sailorBio,
+      })
+      setForm(sailorCvToForm(updated))
+      queryClient.invalidateQueries({ queryKey: ['owner-profile', String(user?.id)] })
+      queryClient.invalidateQueries({ queryKey: ['boat'] })
+      toast.success('Informations enregistrées sur votre profil public.')
+    },
+    onError: () => {
+      toast.error('Erreur lors de la mise à jour du CV de marin')
+    },
+  })
+
+  const documentMutation = useMutation({
+    mutationFn: uploadSailorCvDocument,
+    onSuccess: (updated) => {
+      updateUser({
+        sailorCvStatus: updated.sailorCvStatus,
+        sailorCvDoc: updated.sailorCvDoc,
+        sailorCvSubmittedAt: updated.sailorCvSubmittedAt,
+        sailorCvReviewedAt: updated.sailorCvReviewedAt,
+        sailorCvRejectionReason: updated.sailorCvRejectionReason,
+      })
+      toast.success('Justificatif envoyé pour validation')
+    },
+    onError: () => {
+      toast.error("Erreur lors de l'envoi du justificatif")
+    },
+  })
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target
+    setForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    mutation.mutate({
+      sailingExperienceYears: form.sailingExperienceYears === '' ? null : Number(form.sailingExperienceYears),
+      sailingQualifications:  form.sailingQualifications.trim(),
+      sailingAreas:           form.sailingAreas.trim(),
+      sailorBio:              form.sailorBio.trim(),
+    })
+  }
+
+  const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png']
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Format accepté : PDF, JPG ou PNG')
+      e.target.value = ''
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Le justificatif ne doit pas dépasser 5 Mo')
+      e.target.value = ''
+      return
+    }
+    documentMutation.mutate(file)
+    e.target.value = ''
+  }
+
+  const status = user?.sailorCvStatus ?? 'NOT_SUBMITTED'
+  const statusLabel = {
+    NOT_SUBMITTED: 'Non vérifié',
+    PENDING: 'En attente de validation',
+    APPROVED: 'Vérifié par SailingLoc',
+    REJECTED: 'Refusé',
+  }[status]
+  const statusClass = {
+    NOT_SUBMITTED: 'bg-gray-50 text-gray-600 border-gray-200',
+    PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
+    APPROVED: 'bg-green-50 text-green-700 border-green-200',
+    REJECTED: 'bg-red-50 text-red-700 border-red-200',
+  }[status]
+
+  return (
+    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700 p-6">
+      <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-1 flex items-center gap-2">
+        <Anchor size={18} className="text-ocean-700 dark:text-ocean-400" />
+        CV de marin
+      </h2>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+        Ces informations sont affichées sur votre profil public et rassurent les locataires.
+      </p>
+      <div className="mb-5 space-y-2">
+        <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${statusClass}`}>
+          <FileCheck size={14} />
+          {statusLabel}
+        </div>
+        {status === 'NOT_SUBMITTED' && (
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Enregistrer le formulaire sauvegarde vos informations sur votre profil public.
+            Le statut « Vérifié » nécessite l&apos;envoi d&apos;un justificatif (permis, diplôme…) validé par SailingLoc.
+          </p>
+        )}
+      </div>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <Input
+          label="Années d'expérience en navigation"
+          name="sailingExperienceYears"
+          type="number"
+          min={0}
+          max={100}
+          value={form.sailingExperienceYears}
+          onChange={handleChange}
+          placeholder="Ex : 12"
+        />
+
+        <Textarea
+          label="Permis et qualifications"
+          name="sailingQualifications"
+          rows={2}
+          value={form.sailingQualifications}
+          onChange={handleChange}
+          placeholder="Ex : Permis côtier, permis hauturier, certificat restreint de radiotéléphoniste…"
+        />
+
+        <Textarea
+          label="Zones de navigation"
+          name="sailingAreas"
+          rows={2}
+          value={form.sailingAreas}
+          onChange={handleChange}
+          placeholder="Ex : Méditerranée, Atlantique, Manche…"
+        />
+
+        <Textarea
+          label="Présentation de marin"
+          name="sailorBio"
+          rows={4}
+          value={form.sailorBio}
+          onChange={handleChange}
+          placeholder="Décrivez votre parcours de marin, vos navigations marquantes, votre approche…"
+        />
+
+        <div className="flex justify-end pt-1">
+          <Button type="submit" loading={mutation.isPending}>
+            Enregistrer
+          </Button>
+        </div>
+      </form>
+
+      <div className="mt-5 pt-5 border-t border-gray-100 dark:border-gray-700">
+        <p className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">
+          Justificatif pour validation
+        </p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+          Envoyez un permis, diplôme, certificat ou attestation nautique. Un admin SailingLoc pourra vérifier votre CV.
+        </p>
+        {user?.sailorCvRejectionReason && status === 'REJECTED' && (
+          <p className="text-xs text-red-600 dark:text-red-400 mb-3">
+            Motif du refus : {user.sailorCvRejectionReason}
+          </p>
+        )}
+        <input
+          ref={documentInputRef}
+          type="file"
+          accept="application/pdf,image/jpeg,image/png"
+          className="hidden"
+          onChange={handleDocumentChange}
+        />
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          leftIcon={<Upload size={14} />}
+          loading={documentMutation.isPending}
+          onClick={() => documentInputRef.current?.click()}
+        >
+          Envoyer un justificatif
+        </Button>
+      </div>
     </div>
   )
 }
@@ -494,26 +724,93 @@ const DataPrivacySection: React.FC = () => {
 
 const UserProfile: React.FC = () => {
   const { user } = useAuthStore()
+  const [activeTab, setActiveTab] = useState<SettingsTab>('compte')
 
   if (!user) return null
 
+  const isOwner = user.role === UserRole.OWNER || user.role === UserRole.ADMIN
+  const publicProfilePath = getPublicProfilePath(user)
+
+  const tabs: { id: SettingsTab; label: string; icon: React.ReactNode; ownerOnly?: boolean }[] = [
+    { id: 'compte', label: 'Mon compte', icon: <UserCircle size={18} /> },
+    { id: 'marin', label: 'CV de marin', icon: <Anchor size={18} />, ownerOnly: true },
+    { id: 'securite', label: 'Sécurité', icon: <Shield size={18} /> },
+    { id: 'donnees', label: 'Confidentialité', icon: <Lock size={18} /> },
+  ]
+
+  const visibleTabs = tabs.filter((t) => !t.ownerOnly || isOwner)
+
   return (
-    <div className="max-w-2xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-          <UserCircle size={22} className="text-ocean-700 dark:text-ocean-400" />
-          Paramètres
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-          Gérez vos informations personnelles et votre sécurité
-        </p>
+    <div className="max-w-4xl">
+      {/* En-tête */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-ocean-700 via-brand-blue to-ocean-600 text-white p-6 sm:p-8 mb-6 shadow-lg shadow-ocean-700/20">
+        <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+        <div className="absolute -left-6 bottom-0 h-28 w-28 rounded-full bg-white/5 blur-xl" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center gap-5">
+          <div className="h-16 w-16 rounded-2xl overflow-hidden bg-white/20 flex items-center justify-center flex-shrink-0 ring-2 ring-white/30">
+            {user.avatar ? (
+              <img src={user.avatar} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <span className="text-xl font-bold">{getInitials(user.firstName, user.lastName)}</span>
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <Settings size={18} className="opacity-80" />
+              <h1 className="text-xl sm:text-2xl font-bold">Paramètres</h1>
+            </div>
+            <p className="text-sm text-white/80">
+              {user.firstName} {user.lastName} · {user.email}
+            </p>
+          </div>
+          {publicProfilePath && (
+            <Link
+              to={MY_PUBLIC_PROFILE_ROUTE}
+              className="inline-flex items-center justify-center gap-2 text-sm font-semibold bg-white text-ocean-700 hover:bg-white/90 rounded-xl px-4 py-2.5 transition-colors flex-shrink-0 shadow-sm"
+            >
+              <ExternalLink size={15} />
+              Voir mon profil public
+            </Link>
+          )}
+        </div>
       </div>
 
-      <div className="flex flex-col gap-4">
-        <AvatarSection />
-        <PersonalInfoSection />
-        <SecuritySection />
-        <DataPrivacySection />
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Navigation onglets */}
+        <nav className="lg:w-52 flex-shrink-0">
+          <div className="flex lg:flex-col gap-1 overflow-x-auto pb-1 lg:pb-0 -mx-1 px-1">
+            {visibleTabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  'flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex-shrink-0',
+                  activeTab === tab.id
+                    ? 'bg-white dark:bg-gray-800 text-brand-blue dark:text-ocean-400 shadow-sm border border-gray-100 dark:border-gray-700'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-white/70 dark:hover:bg-gray-800/50',
+                )}
+              >
+                {tab.icon}
+                {tab.label}
+                {activeTab === tab.id && <ChevronRight size={14} className="ml-auto hidden lg:block opacity-50" />}
+              </button>
+            ))}
+          </div>
+        </nav>
+
+        {/* Contenu */}
+        <div className="flex-1 min-w-0 space-y-4">
+          {activeTab === 'compte' && (
+            <>
+              <AvatarSection />
+              <PersonalInfoSection />
+            </>
+          )}
+          {activeTab === 'marin' && isOwner && <SailorCvSection />}
+          {activeTab === 'securite' && <SecuritySection />}
+          {activeTab === 'donnees' && <DataPrivacySection />}
+        </div>
       </div>
     </div>
   )

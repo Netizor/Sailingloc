@@ -13,7 +13,10 @@ export interface PublicProfile {
  * Met à jour les informations personnelles de l'utilisateur connecté.
  */
 export const updateProfile = async (
-  data: Partial<Pick<User, 'firstName' | 'lastName' | 'phone' | 'bio'>>,
+  data: Partial<Pick<User,
+    'firstName' | 'lastName' | 'phone' | 'bio' |
+    'sailingExperienceYears' | 'sailingQualifications' | 'sailingAreas' | 'sailorBio'
+  >>,
 ): Promise<User> => {
   const { data: res } = await api.patch<{ user: User }>('/users/profile', data)
   return res.user
@@ -38,6 +41,13 @@ export const uploadAvatar = async (file: File): Promise<User> => {
   const formData = new FormData()
   formData.append('avatar', file)
   const { data } = await api.post<{ user: User }>('/users/avatar', formData)
+  return data.user
+}
+
+export const uploadSailorCvDocument = async (file: File): Promise<User> => {
+  const formData = new FormData()
+  formData.append('document', file)
+  const { data } = await api.post<{ user: User }>('/users/sailor-cv/document', formData)
   return data.user
 }
 

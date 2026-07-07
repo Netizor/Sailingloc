@@ -21,9 +21,12 @@ export async function authenticate(req, res, next) {
     return res.status(401).json({ message: 'Token expiré ou invalide' })
   }
 
+  // select('*') : évite les erreurs si des colonnes optionnelles (ex. sailing_experience_years)
+  // ne sont pas encore migrées sur Supabase — une liste explicite avec colonne manquante
+  // renvoie 401 et déclenche une déconnexion côté frontend.
   const { data: user, error } = await supabase
     .from('users')
-    .select('id, email, role, first_name, last_name, phone, avatar, bio, is_blocked, email_verified_at, terms_accepted_at, created_at')
+    .select('*')
     .eq('id', payload.sub)
     .single()
 

@@ -159,7 +159,7 @@ const Conversation: React.FC = () => {
       return
     }
 
-    mutation.mutate({ receiverId: resolvedReceiverId, content, conversationId })
+    mutation.mutate({ recipientId: resolvedReceiverId, content, conversationId })
   }
 
   const handleSubmit = (e: React.FormEvent) => {

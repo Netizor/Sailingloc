@@ -3,6 +3,17 @@ import type { PaginatedResponse, Review, ReviewCreateData } from '../types'
 
 export type ReviewModerationStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
+interface MyReviewStats {
+  count: number
+  avgRating: number | null
+  bookingIds: number[]
+}
+
+export const getMyReviewStats = async (): Promise<MyReviewStats> => {
+  const { data } = await api.get<MyReviewStats>('/reviews/mine')
+  return data
+}
+
 /**
  * Fetch published RENTER_TO_BOAT reviews for a specific boat.
  */
@@ -38,12 +49,12 @@ export const adminListReviews = async (
 }
 
 /**
- * Admin - approuve ou rejette un avis.
+ * Admin - publie ou masque un avis.
  */
 export const adminUpdateReview = async (
   id: number,
-  moderationStatus: 'APPROVED' | 'REJECTED',
+  payload: { isPublished: boolean; adminNote?: string },
 ): Promise<Review> => {
-  const { data } = await api.patch<Review>(`/reviews/admin/${id}`, { moderationStatus })
+  const { data } = await api.patch<Review>(`/reviews/admin/${id}`, payload)
   return data
 }

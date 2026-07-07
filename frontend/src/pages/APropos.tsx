@@ -1,229 +1,214 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { Anchor, Users, Newspaper, Briefcase, Mail } from 'lucide-react'
-import PageHero from '../components/ui/PageHero'
-import { usePageTitle } from '../hooks/usePageTitle'
-
-// ─── Données fictives ─────────────────────────────────────────────────────────
-
-const TEAM_MEMBERS = [
-  {
-    initials: 'LM',
-    name: 'Lucas Martin',
-    role: 'Co-fondateur & CEO',
-    bio: 'Passionné de voile depuis l\'enfance, Lucas a navigué sur tous les océans avant de créer SailingLoc pour partager cette passion.',
-  },
-  {
-    initials: 'SC',
-    name: 'Sophie Caron',
-    role: 'Co-fondatrice & CTO',
-    bio: "Ingénieure logiciel avec 10 ans d'expérience, Sophie pilote l'ensemble de la plateforme technique de SailingLoc.",
-  },
-  {
-    initials: 'AR',
-    name: 'Antoine Roux',
-    role: 'Directeur des Opérations',
-    bio: 'Antoine coordonne les relations avec les ports et les propriétaires de bateaux partenaires à travers la France.',
-  },
-  {
-    initials: 'CL',
-    name: 'Camille Lefèvre',
-    role: 'Responsable Marketing',
-    bio: 'Camille développe la communauté SailingLoc et imagine les campagnes qui font découvrir la plaisance au plus grand nombre.',
-  },
-]
-
-const PRESS_ITEMS = [
-  {
-    date: '15 janvier 2026',
-    title: 'SailingLoc lève 2 M€ pour accélérer son développement',
-    outlet: 'Le Figaro Économie',
-  },
-  {
-    date: '3 octobre 2025',
-    title: 'La location de bateaux entre particuliers décolle en France',
-    outlet: 'Le Monde',
-  },
-  {
-    date: '18 juin 2025',
-    title: 'SailingLoc : la startup qui veut démocratiser la navigation de plaisance',
-    outlet: 'Challenges',
-  },
-]
-
-const JOB_OFFERS = [
-  {
-    title: 'Développeur·se Full-Stack (React / Symfony)',
-    type: 'CDI - Marseille / Remote',
-    desc: "Rejoignez l'équipe tech pour construire les nouvelles fonctionnalités de la plateforme.",
-  },
-  {
-    title: 'Chargé·e de partenariats portuaires',
-    type: 'CDI - France entière',
-    desc: 'Développez notre réseau de ports partenaires et accompagnez les propriétaires de bateaux.',
-  },
-  {
-    title: 'Community Manager',
-    type: 'Alternance - Marseille',
-    desc: 'Animez nos réseaux sociaux et construisez la communauté des passionnés de voile SailingLoc.',
-  },
-]
-
-// ─── Page À propos ─────────────────────────────────────────────────────────────
+import React from "react";
+import { Link } from "react-router-dom";
+import {
+  ArrowDown,
+  Headphones,
+  Utensils,
+  Plane,
+  Map,
+  ShieldCheck,
+  Lock,
+  Anchor,
+} from "lucide-react";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 const APropos: React.FC = () => {
-  // #6 - Titre de l'onglet pour le SEO et l'accessibilité
-  usePageTitle('À propos de SailingLoc')
+  usePageTitle("Nos services - SailingLoc");
 
   return (
-  <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
-    {/* #2 - Hero extrait en composant partagé PageHero */}
-    <PageHero
-      icon={Anchor}
-      badge="Notre histoire"
-      title="À propos de SailingLoc"
-      subtitle="La plateforme qui connecte locataires et propriétaires de bateaux en France et en Europe."
-    />
+    <div className="min-h-screen bg-[#f8f7ff] text-[#071d49]">
+      <section
+        className="relative min-h-[620px] bg-cover bg-center flex items-center px-8 lg:px-20"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(3,18,50,.25), rgba(3,18,50,.65)), url('/services-hero.jpg')",
+        }}
+      >
+        <div className="max-w-xl text-white">
+          <span className="inline-block bg-white/20 text-xs tracking-widest uppercase px-4 py-2 rounded-full mb-6">
+            Exclusivité maritime
+          </span>
 
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14 space-y-16">
-      {/* Mission */}
-      <section id="a-propos" className="scroll-mt-20">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="bg-ocean-100 dark:bg-ocean-800/40 p-2.5 rounded-xl">
-            <Anchor size={20} className="text-ocean-700 dark:text-ocean-400" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Notre mission</h2>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-8 space-y-4 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-          <p>
-            SailingLoc est né d'un constat simple : des milliers de bateaux restent à quai chaque
-            été, tandis que des passionnés de mer rêvent de naviguer sans pouvoir se payer un bateau.
-            Notre mission est de connecter ces deux mondes.
-          </p>
-          <p>
-            Fondée en 2024 à Marseille, SailingLoc est une plateforme de location de bateaux entre
-            particuliers opérant dans plus de 50 ports français. Nous proposons voiliers, catamarans,
-            bateaux à moteur et semi-rigides, pour toutes les expériences nautiques.
-          </p>
-          <p>
-            Notre ambition : démocratiser la plaisance en rendant la mer accessible à tous, de façon
-            sécurisée, simple et abordable. Chaque location est couverte par une assurance partenaire
-            et chaque annonce est vérifiée par notre équipe.
-          </p>
-        </div>
-      </section>
+          <h1 className="text-5xl lg:text-7xl font-serif font-bold leading-tight">
+            L’Art de Vivre
+            <br />
+            <span className="italic">Sans Compromis</span>
+          </h1>
 
-      {/* Équipe */}
-      <section id="equipe" className="scroll-mt-20">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="bg-ocean-100 dark:bg-ocean-800/40 p-2.5 rounded-xl">
-            <Users size={20} className="text-ocean-700 dark:text-ocean-400" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">L'équipe</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {TEAM_MEMBERS.map((member) => (
-            <div
-              key={member.name}
-              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 flex items-start gap-4"
-            >
-              {/* Avatar initiales */}
-              <div className="shrink-0 w-12 h-12 rounded-full bg-ocean-700 text-white flex items-center justify-center text-sm font-bold">
-                {member.initials}
-              </div>
-              <div>
-                <p className="font-semibold text-gray-900 dark:text-gray-100">{member.name}</p>
-                <p className="text-xs text-ocean-600 dark:text-ocean-400 font-medium mb-2">{member.role}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{member.bio}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+          <p className="mt-6 text-white/90 leading-relaxed">
+            Notre conciergerie dédiée transforme chaque croisière en une
+            expérience sur-mesure, anticipant vos moindres désirs pour une
+            sérénité absolue en mer.
+          </p>
 
-      {/* Presse */}
-      <section id="presse" className="scroll-mt-20">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="bg-ocean-100 dark:bg-ocean-800/40 p-2.5 rounded-xl">
-            <Newspaper size={20} className="text-ocean-700 dark:text-ocean-400" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Presse</h2>
-        </div>
-        <div className="space-y-4">
-          {PRESS_ITEMS.map((item) => (
-            <div
-              key={item.title}
-              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 flex items-start gap-4"
-            >
-              <div className="shrink-0 text-xs text-gray-400 dark:text-gray-500 font-medium pt-0.5 min-w-[110px]">
-                {item.date}
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-0.5">{item.title}</p>
-                <p className="text-xs text-ocean-600 dark:text-ocean-400">{item.outlet}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-          Pour toute demande presse, contactez-nous à{' '}
           <a
-            href="mailto:presse@sailingloc.fr"
-            className="text-ocean-700 dark:text-ocean-400 hover:text-ocean-900 underline underline-offset-2"
+            href="#services"
+            className="mt-8 inline-flex items-center gap-2 bg-teal-700 hover:bg-teal-800 text-white px-6 py-3 rounded-lg text-sm font-bold uppercase"
           >
-            presse@sailingloc.fr
+            Découvrir nos services <ArrowDown size={16} />
           </a>
-          .
-        </p>
+        </div>
       </section>
 
-      {/* Carrières */}
-      <section id="carrieres" className="scroll-mt-20">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="bg-ocean-100 dark:bg-ocean-800/40 p-2.5 rounded-xl">
-            <Briefcase size={20} className="text-ocean-700 dark:text-ocean-400" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Carrières</h2>
+      <section id="services" className="px-8 lg:px-20 py-20">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <h2 className="text-4xl lg:text-5xl font-serif font-bold">
+            Une Assistance à 360°
+          </h2>
+          <p className="mt-4 text-gray-500">
+            De la gastronomie à la logistique technique, nous redéfinissons les
+            standards du service premium en mer.
+          </p>
         </div>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-          Rejoignez une équipe passionnée qui réinvente la plaisance. Voici nos postes ouverts :
-        </p>
-        <div className="space-y-4">
-          {JOB_OFFERS.map((job) => (
-            <div
-              key={job.title}
-              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6"
-            >
-              <div className="flex items-start justify-between gap-4 mb-2">
-                <p className="font-semibold text-gray-900 dark:text-gray-100">{job.title}</p>
-                <span className="shrink-0 text-xs bg-ocean-50 dark:bg-ocean-900/30 text-ocean-700 dark:text-ocean-400 border border-ocean-200 dark:border-ocean-700 px-2.5 py-1 rounded-full font-medium">
-                  {job.type}
-                </span>
-              </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{job.desc}</p>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <div
+            className="lg:col-span-2 min-h-[340px] rounded-xl overflow-hidden bg-cover bg-center flex items-end p-8 text-white"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(3,18,50,.10), rgba(3,18,50,.75)), url('/service-chef.jpg')",
+            }}
+          >
+            <div>
+              <Utensils className="mb-4" />
+              <h3 className="text-2xl font-serif">Chef Gastronomique à Bord</h3>
+              <p className="mt-2 text-sm text-white/85 max-w-md">
+                <p>
+                  Une table étoilée flottante. Nos chefs privés concoctent des
+                  menus personnalisés selon vos préférences et les arrivages
+                  locaux.
+                </p>
+              </p>
             </div>
-          ))}
+          </div>
+
+          <div className="min-h-[340px] rounded-xl bg-[#eeeef6] border border-gray-200 p-8 flex flex-col justify-between">
+            <Headphones size={34} />
+            <div>
+              <h3 className="text-2xl font-serif">Assistance 24/7</h3>
+              <p className="mt-3 text-sm text-gray-600">
+                <p>
+                  Un support technique et opérationnel disponible à tout
+                  instant. Qu'il s'agisse d'un besoin technique ou d'un conseil
+                  météo, nos experts veillent sur vous.
+                </p>{" "}
+              </p>
+            </div>
+          </div>
+
+          <div className="min-h-[340px] rounded-xl bg-[#071d49] text-white p-8 flex flex-col justify-between">
+            <Plane size={34} />
+            <div>
+              <h3 className="text-2xl font-serif">Logistique VIP</h3>
+              <p className="mt-3 text-sm text-white/80">
+                <p>
+                  Transferts en hélicoptère, chauffeurs privés à l'embarquement
+                  et gestion des bagages pour une transition fluide entre terre
+                  et mer.
+                </p>
+              </p>
+            </div>
+          </div>
+
+          <div
+            className="lg:col-span-2 min-h-[340px] rounded-xl overflow-hidden bg-cover bg-center flex items-end p-8 text-white"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(3,18,50,.10), rgba(3,18,50,.70)), url('/service-itinerary.jpg')",
+            }}
+          >
+            <div>
+              <Map className="mb-4" />
+              <h3 className="text-2xl font-serif">Itinéraires sur Mesure</h3>
+              <p className="mt-2 text-sm text-white/85 max-w-md">
+                <p>
+                  Criques secrètes, réservations dans les clubs de plage les
+                  plus prisés et escales culturelles privatisées. Nos
+                  planificateurs dessinent votre sillage.
+                </p>
+              </p>
+            </div>
+          </div>
         </div>
-        <div className="mt-6 bg-ocean-50 dark:bg-ocean-900/30 rounded-2xl p-6 flex items-center gap-4 border border-ocean-100 dark:border-ocean-800">
-          <Mail size={24} className="shrink-0 text-ocean-600 dark:text-ocean-400" />
+      </section>
+
+      <section className="px-8 lg:px-20 py-24 bg-[#f3f2fb]">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div>
-            <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-0.5">Candidature spontanée</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Vous ne trouvez pas le poste idéal ?{' '}
-              <Link
-                to="/contact"
-                className="text-ocean-700 dark:text-ocean-400 hover:text-ocean-900 underline underline-offset-2"
-              >
-                Contactez-nous
-              </Link>{' '}
-              avec votre CV et votre lettre de motivation.
+            <p className="italic font-serif text-[#071d49]">
+              “Le luxe n’est pas une option, c’est notre standard.”
             </p>
+
+            <p className="mt-6 text-gray-600 leading-relaxed">
+              Parce que chaque navigation est unique, SailingLoc met à votre
+              disposition un concierge dédié dès la confirmation de votre
+              réservation. Notre réseau mondial de partenaires nous permet de
+              répondre aux demandes les plus exigeantes, de la livraison de vins
+              rares au mouillage à l'organisation d'événements privés sur le
+              pont.
+            </p>
+
+            <div className="mt-8 space-y-5">
+              <div className="flex items-center gap-4">
+                <span className="bg-blue-100 text-blue-700 p-3 rounded-full">
+                  <ShieldCheck size={18} />
+                </span>
+                <p className="font-bold text-sm">
+                  Concierges Certifiés Yachting
+                </p>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <span className="bg-blue-100 text-blue-700 p-3 rounded-full">
+                  <Lock size={18} />
+                </span>
+                <p className="font-bold text-sm">
+                  Discrétion & Confidentialité Totale
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <img
+            src="/service-concierge.jpg"
+            alt="Service conciergerie SailingLoc"
+            className="rounded-xl shadow-2xl w-full h-[420px] object-cover"
+          />
+        </div>
+      </section>
+
+      <section className="px-8 py-20">
+        <div className="max-w-3xl mx-auto bg-[#071d49] text-white rounded-xl shadow-2xl px-10 py-12 text-center relative overflow-hidden">
+          <Anchor size={110} className="absolute right-8 top-6 text-white/10" />
+
+          <h2 className="text-3xl font-serif">
+            Prêt pour une expérience d’exception ?
+          </h2>
+
+          <p className="mt-4 text-white/75">
+            Contactez notre équipe conciergerie pour personnaliser votre
+            prochain séjour en mer.
+          </p>
+
+          <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+            <Link
+              to="/contact"
+              className="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-lg text-sm font-bold uppercase"
+            >
+              Prendre rendez-vous
+            </Link>
+
+            <Link
+              to="/temoignages"
+              className="border border-white/30 hover:bg-white/10 px-8 py-3 rounded-lg text-sm font-bold uppercase"
+            >
+              Voir les témoignages
+            </Link>
           </div>
         </div>
       </section>
     </div>
-  </div>
-  )
-}
+  );
+};
 
-export default APropos
+export default APropos;

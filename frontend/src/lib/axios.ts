@@ -25,6 +25,10 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = useAuthStore.getState().accessToken
   if (token) config.headers.Authorization = `Bearer ${token}`
+  // FormData : laisser le navigateur poser Content-Type + boundary (sinon multer ne reçoit pas le fichier)
+  if (config.data instanceof FormData) {
+    delete config.headers['Content-Type']
+  }
   return config
 })
 

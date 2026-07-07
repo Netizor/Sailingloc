@@ -31,7 +31,12 @@ export interface Report {
 
 /** Signale une annonce auprès de la modération. */
 export const reportBoat = async (payload: ReportPayload): Promise<void> => {
-  await api.post('/reports', payload)
+  await api.post('/reports', {
+    targetType: 'BOAT',
+    targetId: payload.boatId,
+    reason: payload.reason,
+    description: payload.details,
+  })
 }
 
 /** Admin - liste paginée des signalements */

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Star, Anchor, UserCheck, Sparkles } from 'lucide-react'
+import { Star, Anchor, UserCheck, Sparkles, Sailboat } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import type { Boat } from '../../types'
 import { BOAT_TYPE_LABELS } from '../../lib/labels'
@@ -73,22 +73,25 @@ const ListingBoatCard: React.FC<ListingBoatCardProps> = ({ boat, className }) =>
             {typeLabel} • {boat.capacity} pers. • {location}
           </p>
 
-          {(boat.withSkipper || showPremiumService) && (
-            <div className="flex items-center gap-1.5 pt-1">
-              {boat.withSkipper && (
-                <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-[#006875]">
-                  <UserCheck size={12} strokeWidth={2.5} color="#006875" />
-                  Skipper professionnel inclus
-                </span>
-              )}
-              {showPremiumService && (
-                <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-[#2563FF]">
-                  <Sparkles size={12} strokeWidth={2.5} color="#2563FF" />
-                  Service de bord premium
-                </span>
-              )}
-            </div>
-          )}
+          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+            {boat.withSkipper ? (
+              <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-[#006875]">
+                <UserCheck size={12} strokeWidth={2.5} color="#006875" />
+                Skipper professionnel inclus
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-[#8A94A6]">
+                <Sailboat size={12} strokeWidth={2.5} color="#8A94A6" />
+                Sans skipper
+              </span>
+            )}
+            {showPremiumService && (
+              <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-[#2563FF]">
+                <Sparkles size={12} strokeWidth={2.5} color="#2563FF" />
+                Service de bord premium
+              </span>
+            )}
+          </div>
         </div>
       </Link>
     </article>

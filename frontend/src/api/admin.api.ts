@@ -11,6 +11,7 @@ import type {
 interface PaginationParams {
   page?: number
   limit?: number
+  status?: string
 }
 
 interface AdminUserListParams extends PaginationParams {
@@ -25,11 +26,48 @@ interface AdminBoatListParams extends PaginationParams {
 
 interface AdminBookingListParams extends PaginationParams {
   status?: string
+  search?: string
+  startDate?: string
+  endDate?: string
 }
 
 export const getDashboardStats = async (): Promise<AdminDashboardStats> => {
   const { data } = await api.get<AdminDashboardStats>('/admin/dashboard')
   return data
+}
+
+export const getRoleStats = async (): Promise<Record<string, number>> => {
+  const { data } = await api.get('/admin/role-stats')
+  return data
+}
+
+export interface RoleDefinition {
+  id: number
+  name: string
+  label: string
+  description: string
+  color: string
+  is_system: boolean
+  created_at: string
+}
+
+export const listRoles = async (): Promise<RoleDefinition[]> => {
+  const { data } = await api.get<{ data: RoleDefinition[] }>('/admin/roles')
+  return data.data
+}
+
+export const createRole = async (payload: { name: string; label: string; description?: string; color?: string }): Promise<RoleDefinition> => {
+  const { data } = await api.post<RoleDefinition>('/admin/roles', payload)
+  return data
+}
+
+export const updateRole = async (id: number, payload: { label?: string; description?: string; color?: string }): Promise<RoleDefinition> => {
+  const { data } = await api.patch<RoleDefinition>(`/admin/roles/${id}`, payload)
+  return data
+}
+
+export const deleteRole = async (id: number): Promise<void> => {
+  await api.delete(`/admin/roles/${id}`)
 }
 
 export const listUsers = async (
@@ -44,6 +82,34 @@ export const getUser = async (userId: number): Promise<User> => {
   return data
 }
 
+export const createAdminUser = async (payload: {
+  firstName: string
+  lastName: string
+  email: string
+  password?: string
+  role?: string
+  phone?: string
+}): Promise<User> => {
+  const { data } = await api.post<User>('/admin/users', payload)
+  return data
+}
+
+export const updateAdminUser = async (
+  userId: number,
+  payload: { firstName?: string; lastName?: string; email?: string; phone?: string; role?: string; isActive?: boolean },
+): Promise<User> => {
+  const { data } = await api.patch<User>(`/admin/users/${userId}`, payload)
+  return data
+}
+
+export const deleteAdminUser = async (userId: number): Promise<void> => {
+  await api.delete(`/admin/users/${userId}`)
+}
+
+export const verifyAdminUserEmail = async (userId: number): Promise<void> => {
+  await api.patch(`/admin/users/${userId}/verify-email`)
+}
+
 export const updateUserStatus = async (
   userId: number,
   payload: { isActive?: boolean; role?: string },
@@ -54,6 +120,13 @@ export const updateUserStatus = async (
   if (payload.role) {
     await api.patch(`/admin/users/${userId}/role`, { role: payload.role })
   }
+}
+
+export const reviewSailorCv = async (
+  userId: number,
+  payload: { status: 'APPROVED' | 'REJECTED'; rejectionReason?: string },
+): Promise<void> => {
+  await api.patch(`/admin/users/${userId}/sailor-cv`, payload)
 }
 
 export const listBoats = async (
@@ -91,6 +164,17 @@ export const updateBookingStatus = async (
   return data
 }
 
+interface ReviewAdminStats {
+  total: number
+  hiddenCount: number
+  avgRating: number | null
+}
+
+export const getReviewStats = async (): Promise<ReviewAdminStats> => {
+  const { data } = await api.get<ReviewAdminStats>('/reviews/admin/stats')
+  return data
+}
+
 export const listReviews = async (
   params: PaginationParams = {},
 ): Promise<PaginatedResponse<Review>> => {
@@ -102,8 +186,22 @@ export const deleteReview = async (reviewId: number): Promise<void> => {
   await api.delete(`/reviews/admin/${reviewId}`)
 }
 
+export const moderateReview = async (
+  reviewId: number,
+  isPublished: boolean,
+  adminNote?: string,
+): Promise<Review> => {
+  const { data } = await api.patch<Review>(`/reviews/admin/${reviewId}`, { isPublished, adminNote })
+  return data
+}
+
 export const adminApi = {
   getStats: getDashboardStats,
+  getRoleStats,
+  listRoles,
+  createRole,
+  updateRole,
+  deleteRole,
   getBookings: listBookings,
   getBooking,
   updateBookingStatus,
@@ -116,16 +214,23 @@ export const adminApi = {
     return { ...result, users: result.data }
   },
   getUser,
+  createUser: createAdminUser,
+  updateUser: updateAdminUser,
+  deleteUser: deleteAdminUser,
+  verifyUserEmail: verifyAdminUserEmail,
   setUserActive: (userId: number, isActive: boolean) =>
     updateUserStatus(userId, { isActive }),
   setUserRole: (userId: number, role: string) =>
     updateUserStatus(userId, { role }),
+  reviewSailorCv,
   getBoats: async (params: AdminBoatListParams = {}) => {
     const result = await listBoats(params)
     return { ...result, boats: result.data }
   },
   setBoatStatus,
   deleteBoat,
+  getReviewStats,
   listReviews,
   deleteReview,
+  moderateReview,
 }

@@ -84,6 +84,10 @@ function formatBoat(b, withOwner = false) {
     rules: b.rules,
     welcomeMessage: b.welcome_message,
     requiredLicense: b.required_license,
+    insuranceDoc: b.insurance_doc,
+    registrationDoc: b.registration_doc,
+    licenseScanDoc: b.license_scan_doc,
+    contractDoc: b.contract_doc,
     status: b.status,
     rating: b.average_rating || 0,
     reviewCount: b.review_count || 0,
@@ -97,6 +101,12 @@ function formatBoat(b, withOwner = false) {
       lastName: b.users.last_name,
       avatar: b.users.avatar,
       bio: b.users.bio,
+      sailingExperienceYears: b.users.sailing_experience_years,
+      sailingQualifications: b.users.sailing_qualifications,
+      sailingAreas: b.users.sailing_areas,
+      sailorBio: b.users.sailor_bio,
+      sailorCvStatus: b.users.sailor_cv_status || 'NOT_SUBMITTED',
+      createdAt: b.users.created_at,
     }
   }
   return base
@@ -110,7 +120,7 @@ router.get('/', optionalAuth, async (req, res) => {
 
   let query = supabase
     .from('boats')
-    .select('*, users(id, first_name, last_name, avatar)', { count: 'exact' })
+    .select('*, users(id, first_name, last_name, avatar, bio, sailing_experience_years, sailing_qualifications, sailing_areas, sailor_bio, sailor_cv_status, created_at)', { count: 'exact' })
     .eq('status', 'active')
 
   query = applyBoatSearchFilters(query, req.query)
@@ -143,13 +153,12 @@ router.get('/my', authenticate, async (req, res) => {
 
   const { data, error, count } = await supabase
     .from('boats')
-    .select('*, users(id, first_name, last_name, avatar)', { count: 'exact' })
+    .select('*, users(id, first_name, last_name, avatar, bio, sailing_experience_years, sailing_qualifications, sailing_areas, sailor_bio, sailor_cv_status, created_at)', { count: 'exact' })
     .eq('owner_id', req.user.id)
     .order('created_at', { ascending: false })
     .range(from, from + limit - 1)
 
-    console.error('ERREUR SUPABASE:', error)
-    if (error) return res.status(500).json({ message: error.message })
+  if (error) return res.status(500).json({ message: error.message })
   return res.json({ data: (data || []).map(b => formatBoat(b, true)), total: count || 0, page, limit })
 })
 
@@ -176,11 +185,51 @@ router.get('/destinations/summary', async (req, res) => {
   return res.json({ countries: [...byCountry.values()] })
 })
 
+// ─── GET /boats/autocomplete ───────────────────────────────
+router.get('/autocomplete', async (req, res, next) => {
+  try {
+    const q = (req.query.q || '').trim()
+    if (q.length < 2) return res.json({ suggestions: [] })
+
+    const [{ data: cities }, { data: ports }, { data: countries }] = await Promise.all([
+      supabase.from('boats').select('city').eq('status', 'active').ilike('city', `%${q}%`).not('city', 'is', null).limit(20),
+      supabase.from('boats').select('port').eq('status', 'active').ilike('port', `%${q}%`).not('port', 'is', null).limit(20),
+      supabase.from('boats').select('country').eq('status', 'active').ilike('country', `%${q}%`).not('country', 'is', null).limit(10),
+    ])
+
+    const seen = new Set()
+    const suggestions = []
+
+    for (const row of (cities || [])) {
+      if (row.city && !seen.has(row.city.toLowerCase())) {
+        seen.add(row.city.toLowerCase())
+        suggestions.push({ label: row.city, type: 'city' })
+      }
+    }
+    for (const row of (ports || [])) {
+      if (row.port && !seen.has(row.port.toLowerCase())) {
+        seen.add(row.port.toLowerCase())
+        suggestions.push({ label: row.port, type: 'port' })
+      }
+    }
+    for (const row of (countries || [])) {
+      if (row.country && !seen.has(row.country.toLowerCase())) {
+        seen.add(row.country.toLowerCase())
+        suggestions.push({ label: row.country, type: 'country' })
+      }
+    }
+
+    return res.json({ suggestions: suggestions.slice(0, 8) })
+  } catch (err) {
+    next(err)
+  }
+})
+
 // ─── GET /boats/:id ────────────────────────────────────────
 router.get('/:id', optionalAuth, async (req, res) => {
   const { data: boat, error } = await supabase
     .from('boats')
-    .select('*, users(id, first_name, last_name, avatar, bio, created_at)')
+    .select('*, users(id, first_name, last_name, avatar, bio, sailing_experience_years, sailing_qualifications, sailing_areas, sailor_bio, sailor_cv_status, created_at)')
     .eq('id', req.params.id)
     .single()
 
@@ -338,7 +387,15 @@ router.post('/:id/upload-document', authenticate, upload.single('file'), async (
 
   if (!req.file) return res.status(400).json({ message: 'Fichier requis' })
 
-  const docType = req.body.type || 'document'
+  const docType = req.body.docType || req.body.type || 'document'
+  const fieldMap = {
+    insurance: 'insurance_doc',
+    registration: 'registration_doc',
+    license: 'license_scan_doc',
+    contract: 'contract_doc',
+  }
+  const field = fieldMap[docType]
+  if (!field) return res.status(400).json({ message: 'Type de document invalide' })
 
   const result = await new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
@@ -348,12 +405,6 @@ router.post('/:id/upload-document', authenticate, upload.single('file'), async (
     stream.end(req.file.buffer)
   })
 
-  const fieldMap = {
-    insurance: 'insurance_doc',
-    registration: 'registration_doc',
-    license: 'license_scan_doc',
-  }
-  const field = fieldMap[docType] || 'registration_doc'
   const updates = { [field]: result.secure_url, updated_at: new Date().toISOString() }
 
   const { data: updated, error } = await supabase.from('boats').update(updates).eq('id', req.params.id).select('*, users(id, first_name, last_name, avatar)').single()

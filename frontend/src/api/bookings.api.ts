@@ -111,6 +111,13 @@ export const cancelBooking = async (
   return data
 }
 
+export const getMyAllBookings = async (): Promise<Booking[]> => {
+  const { data } = await api.get<PaginatedResponse<Booking>>('/bookings/renter', {
+    params: { page: 1, limit: 200 },
+  })
+  return data?.data ?? []
+}
+
 export const bookingsApi = {
   create: createBooking,
   createPaymentIntent,

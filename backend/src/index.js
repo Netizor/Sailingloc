@@ -7,6 +7,7 @@ import rateLimit from 'express-rate-limit'
 import authRouter from './routes/auth.routes.js'
 import boatsRouter from './routes/boats.routes.js'
 import bookingsRouter from './routes/bookings.routes.js'
+import kycRouter from './routes/kyc.routes.js'
 import usersRouter from './routes/users.routes.js'
 import {
   reviewsRouter,
@@ -17,6 +18,7 @@ import {
   notificationsRouter,
   adminRouter,
   reportsRouter,
+  //documentsRouter,
   stripeWebhookRouter,
   seoRouter,
   healthRouter,
@@ -53,6 +55,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use('/api/auth',              authRouter)
 app.use('/api/boats',             boatsRouter)
 app.use('/api/bookings',          bookingsRouter)
+app.use('/api/kyc',               kycRouter)
 app.use('/api/users',             usersRouter)
 app.use('/api/reviews',           reviewsRouter)
 app.use('/api/messages',          messagesRouter)
@@ -62,6 +65,7 @@ app.use('/api/seasonal-prices',   seasonalPricesRouter)
 app.use('/api/notifications',     notificationsRouter)
 app.use('/api/admin',             adminRouter)
 app.use('/api/reports',           reportsRouter)
+//app.use('/api/documents',         documentsRouter)
 app.use('/api',                   seoRouter)
 app.use('/api/health',            healthRouter)
 
@@ -77,10 +81,21 @@ app.use((err, req, res, next) => {
 })
 
 // ─── Démarrage ─────────────────────────────────────────────
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`✅  SailingLoc API démarrée sur http://localhost:${PORT}`)
   console.log(`    Environnement : ${process.env.NODE_ENV || 'development'}`)
   console.log(`    Supabase      : ${process.env.SUPABASE_URL ? '✓ configuré' : '✗ SUPABASE_URL manquant !'}`)
+})
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`\n❌  Port ${PORT} déjà utilisé.`)
+    console.error(`    Arrêtez le processus existant puis relancez :`)
+    console.error(`    Windows : npx kill-port ${PORT}`)
+    console.error(`    Mac/Linux : lsof -ti:${PORT} | xargs kill -9\n`)
+    process.exit(1)
+  }
+  throw err
 })
 
 export default app

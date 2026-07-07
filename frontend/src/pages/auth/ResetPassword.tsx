@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { Eye, EyeOff, Lock, Anchor, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, Lock, AlertCircle, Ship } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
 import { authApi } from '../../api/auth.api'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
+const loginBoat = '/login-boat.jpg'
+const logo = '/logo.jpeg'
 
 interface ResetForm {
   password: string
@@ -25,7 +27,6 @@ const ResetPassword: React.FC = () => {
   const [errors, setErrors] = useState<Partial<ResetForm>>({})
   const [apiError, setApiError] = useState('')
 
-  // Redirection si aucun token dans l'URL
   useEffect(() => {
     if (!token) {
       navigate('/mot-de-passe-oublie', { replace: true })
@@ -43,8 +44,17 @@ const ResetPassword: React.FC = () => {
     },
   })
 
+  const passwordScore = [
+    form.password.length >= 12,
+    /[A-Z]/.test(form.password),
+    /[a-z]/.test(form.password),
+    /[0-9]/.test(form.password),
+    /[^A-Za-z0-9]/.test(form.password),
+  ].filter(Boolean).length
+
   const validate = (): boolean => {
     const newErrors: Partial<ResetForm> = {}
+
     if (!form.password) newErrors.password = t('auth.resetPassword.errorPassword')
     else if (form.password.length < 12) newErrors.password = t('auth.resetPassword.errorPasswordMin')
     else if (form.password.length > 128) newErrors.password = t('auth.resetPassword.errorPasswordMax')
@@ -53,9 +63,13 @@ const ResetPassword: React.FC = () => {
       !/[a-z]/.test(form.password) ||
       !/[0-9]/.test(form.password) ||
       !/[^A-Za-z0-9]/.test(form.password)
-    ) newErrors.password = t('auth.resetPassword.errorPasswordWeak')
+    ) {
+      newErrors.password = t('auth.resetPassword.errorPasswordWeak')
+    }
+
     if (!form.confirmPassword) newErrors.confirmPassword = t('auth.resetPassword.errorConfirmPassword')
     else if (form.password !== form.confirmPassword) newErrors.confirmPassword = t('auth.resetPassword.errorPasswordMatch')
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -75,32 +89,38 @@ const ResetPassword: React.FC = () => {
   if (!token) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ocean-950 via-ocean-800 to-ocean-600 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden">
-          {/* Header */}
-          <div className="bg-ocean-700 px-8 py-8 text-center">
-            <Link to="/" className="inline-flex items-center gap-2 justify-center mb-3">
-              <div className="bg-white/20 p-2 rounded-xl">
-                <Anchor size={24} className="text-white" />
-              </div>
-              <span className="text-2xl font-bold text-white tracking-tight">SailingLoc</span>
+    <div className="min-h-screen bg-white text-[#071d49]">
+      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
+        <section className="flex items-center justify-center px-8 py-12 lg:px-20">
+          <div className="w-full max-w-[460px]">
+            <Link to="/" className="inline-block mb-20">
+              <img src={logo} alt="SailingLoc" className="h-10 w-auto" />
             </Link>
-            <h1 className="text-xl font-bold text-white">{t('auth.resetPassword.title')}</h1>
-            <p className="text-ocean-200 text-sm mt-1">{t('auth.resetPassword.subtitle')}</p>
-          </div>
 
-          <div className="px-8 py-8">
-            <form onSubmit={handleSubmit} noValidate className="space-y-5">
-              {/* Erreur token invalide/expiré */}
+            <h1 className="text-5xl font-serif font-bold leading-tight text-[#071d49]">
+              Choisissez un
+              <br />
+              nouveau mot de
+              <br />
+              passe
+            </h1>
+
+            <p className="mt-5 text-base leading-relaxed text-gray-500">
+              Votre nouveau mot de passe doit être différent des précédents pour votre sécurité.
+            </p>
+
+            <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-5">
               {apiError && (
-                <div className="flex items-start gap-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 rounded-xl px-4 py-3" role="alert">
-                  <AlertCircle size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
+                <div
+                  className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3"
+                  role="alert"
+                >
+                  <AlertCircle size={16} className="mt-0.5 text-red-500" />
                   <div>
-                    <p className="text-sm text-red-700 dark:text-red-400">{apiError}</p>
+                    <p className="text-sm text-red-700">{apiError}</p>
                     <Link
                       to="/mot-de-passe-oublie"
-                      className="text-sm text-red-600 hover:text-red-800 font-medium underline mt-1 inline-block"
+                      className="mt-1 inline-block text-sm font-medium text-red-600 underline hover:text-red-800"
                     >
                       {t('auth.resetPassword.requestNewLink')}
                     </Link>
@@ -109,10 +129,10 @@ const ResetPassword: React.FC = () => {
               )}
 
               <Input
-                label={t('auth.resetPassword.password')}
+                label="Nouveau mot de passe"
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="new-password"
-                placeholder={t('auth.resetPassword.passwordPlaceholder')}
+                placeholder="••••••••••"
                 value={form.password}
                 onChange={handleChange('password')}
                 error={errors.password}
@@ -122,11 +142,31 @@ const ResetPassword: React.FC = () => {
                 required
               />
 
+              <div>
+                <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                  <span>Force du mot de passe</span>
+                  <span className="text-teal-600">
+                    {passwordScore >= 4 ? 'Fort' : passwordScore >= 3 ? 'Moyen' : 'Faible'}
+                  </span>
+                </div>
+
+                <div className="mt-2 grid grid-cols-4 gap-1">
+                  {Array.from({ length: 4 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className={`h-1 rounded-full ${
+                        index < Math.min(passwordScore, 4) ? 'bg-teal-500' : 'bg-gray-300'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+
               <Input
-                label={t('auth.resetPassword.confirmPassword')}
+                label="Confirmer le mot de passe"
                 type={showConfirm ? 'text' : 'password'}
                 autoComplete="new-password"
-                placeholder={t('auth.resetPassword.confirmPasswordPlaceholder')}
+                placeholder="••••••••••"
                 value={form.confirmPassword}
                 onChange={handleChange('confirmPassword')}
                 error={errors.confirmPassword}
@@ -143,15 +183,40 @@ const ResetPassword: React.FC = () => {
                 fullWidth
                 loading={mutation.isPending}
               >
-                {t('auth.resetPassword.submit')}
+                Mettre à jour
               </Button>
             </form>
-          </div>
-        </div>
 
-        <p className="text-center text-ocean-200/60 text-xs mt-6">
-          © {new Date().getFullYear()} SailingLoc
-        </p>
+            <p className="mt-24 text-center text-xs text-gray-400">
+              © {new Date().getFullYear()} SailingLoc. L’excellence maritime journalière.
+            </p>
+          </div>
+        </section>
+
+        <section
+          className="hidden lg:flex relative items-end bg-cover bg-center px-16 py-20 text-white"
+          style={{
+            backgroundImage: `linear-gradient(rgba(3,18,50,0.12), rgba(3,18,50,0.82)), url(${loginBoat})`,
+          }}
+        >
+          <Ship size={130} className="absolute right-20 top-16 text-white/20" />
+
+          <div className="max-w-lg">
+            <span className="inline-block rounded bg-blue-600/80 px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
+              Conciergerie 24/7
+            </span>
+
+            <h2 className="mt-6 text-4xl font-light leading-tight">
+              Naviguez vers l’exceptionnel
+              <br />
+              en toute sérénité.
+            </h2>
+
+            <p className="mt-6 text-base leading-relaxed text-white/85">
+              Chaque voyage est unique. Nos équipes s’occupent de tout, même de vos accès.
+            </p>
+          </div>
+        </section>
       </div>
     </div>
   )

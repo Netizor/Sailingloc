@@ -85,7 +85,7 @@ export default defineConfig({
 
   server: {
     port: 5173,
-    // Même origine en dev : le navigateur appelle /api sur :5173, Vite relaie vers Symfony (:8000) → pas de CORS
+    // Même origine en dev : le navigateur appelle /api sur :5173, Vite relaie vers le backend Node (:3000) → pas de CORS
     proxy: {
       '/api': {
         target: 'http://localhost:3000',

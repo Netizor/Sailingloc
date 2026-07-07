@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Euro,
@@ -21,6 +22,7 @@ import OnboardingModal, { ONBOARDING_KEY } from '../../components/owner/Onboardi
 import toast from 'react-hot-toast'
 
 const OwnerDashboard: React.FC = () => {
+  const { t } = useTranslation()
   const { user } = useAuthStore()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -45,19 +47,19 @@ const OwnerDashboard: React.FC = () => {
   const acceptMutation = useMutation({
     mutationFn: (bookingId: number) => bookingsApi.accept(bookingId),
     onSuccess: () => {
-      toast.success('Réservation confirmée')
+      toast.success(t('ownerDashboard.bookingConfirmed'))
       queryClient.invalidateQueries({ queryKey: ['owner', 'pending-bookings'] })
     },
-    onError: () => toast.error('Erreur lors de la confirmation'),
+    onError: () => toast.error(t('ownerDashboard.confirmError')),
   })
 
   const declineMutation = useMutation({
     mutationFn: (bookingId: number) => bookingsApi.decline(bookingId),
     onSuccess: () => {
-      toast.success('Réservation refusée')
+      toast.success(t('ownerDashboard.bookingDeclined'))
       queryClient.invalidateQueries({ queryKey: ['owner', 'pending-bookings'] })
     },
-    onError: () => toast.error('Erreur lors du refus'),
+    onError: () => toast.error(t('ownerDashboard.declineError')),
   })
 
   const earnings = earningsData ?? { total: 0, thisMonth: 0, pending: 0 }
@@ -69,22 +71,22 @@ const OwnerDashboard: React.FC = () => {
         {/* Header */}
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
-            Espace propriétaire
+            {t('ownerDashboard.title')}
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">Bonjour, {user?.firstName} !</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">{t('ownerDashboard.greeting', { name: user?.firstName })}</p>
         </div>
 
         {/* CTA Ajouter un bateau - mis en avant */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-teal to-brand-navy p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 shadow-lg shadow-brand-teal/20">
           <div className="relative z-10">
             <p className="text-white/70 text-xs font-semibold tracking-wider uppercase mb-1">
-              Publiez votre annonce
+              {t('ownerDashboard.publishCta')}
             </p>
             <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">
-              Ajoutez votre bateau dès maintenant
+              {t('ownerDashboard.addBoatTitle')}
             </h2>
             <p className="text-white/80 text-sm max-w-md">
-              Mettez votre unité en location en quelques minutes et commencez à générer des revenus.
+              {t('ownerDashboard.addBoatDesc')}
             </p>
           </div>
           <button
@@ -93,7 +95,7 @@ const OwnerDashboard: React.FC = () => {
             className="relative z-10 flex-shrink-0 flex items-center gap-2.5 bg-white text-brand-navy hover:bg-gray-50 font-semibold text-sm px-6 py-3.5 rounded-xl shadow-md transition-all hover:shadow-lg active:scale-[0.98]"
           >
             <Ship size={18} />
-            Ajouter un bateau
+            {t('layout.addBoat')}
           </button>
           <div className="absolute -right-8 -bottom-8 h-40 w-40 rounded-full bg-white/5 pointer-events-none" />
           <div className="absolute -right-4 top-4 h-24 w-24 rounded-full bg-white/5 pointer-events-none" />
@@ -108,19 +110,19 @@ const OwnerDashboard: React.FC = () => {
           ) : (
             <>
               <EarningsCard
-                label="Total encaissé"
+                label={t('ownerDashboard.totalEarned')}
                 value={formatPrice(earnings.total)}
                 icon={<Euro size={22} />}
                 color="bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
               />
               <EarningsCard
-                label="Ce mois-ci"
+                label={t('ownerDashboard.thisMonth')}
                 value={formatPrice(earnings.thisMonth)}
                 icon={<TrendingUp size={22} />}
                 color="bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
               />
               <EarningsCard
-                label="En attente"
+                label={t('ownerDashboard.pending')}
                 value={formatPrice(earnings.pending)}
                 icon={<Clock size={22} />}
                 color="bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400"
@@ -135,7 +137,7 @@ const OwnerDashboard: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <h2 id="pending-title" className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                 <Clock size={18} className="text-orange-500" />
-                Demandes en attente
+                {t('ownerDashboard.pendingRequests')}
                 {pendingBookings.length > 0 && (
                   <span className="text-xs bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 rounded-full px-2 py-0.5 font-medium">
                     {pendingBookings.length}
@@ -146,7 +148,7 @@ const OwnerDashboard: React.FC = () => {
                 to="/proprietaire/reservations"
                 className="text-sm text-ocean-600 dark:text-ocean-400 hover:text-ocean-800 dark:hover:text-ocean-300 flex items-center gap-1"
               >
-                Tout voir <ArrowRight size={13} />
+                {t('ownerDashboard.seeAll')} <ArrowRight size={13} />
               </Link>
             </div>
 
@@ -157,7 +159,7 @@ const OwnerDashboard: React.FC = () => {
             ) : pendingBookings.length === 0 ? (
               <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-8 text-center">
                 <CheckCircle size={32} className="text-green-300 mx-auto mb-2" />
-                <p className="text-gray-500 dark:text-gray-400 text-sm">Aucune demande en attente</p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm">{t('ownerDashboard.noPendingRequests')}</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -178,28 +180,28 @@ const OwnerDashboard: React.FC = () => {
           {/* Quick links */}
           <section aria-labelledby="links-title">
             <h2 id="links-title" className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-              Accès rapides
+              {t('ownerDashboard.quickLinks')}
             </h2>
             <div className="space-y-3">
               {[
                 {
                   icon: <Ship size={20} />,
-                  label: 'Mes bateaux',
-                  desc: 'Gérer vos annonces',
+                  label: t('owner.myBoats'),
+                  desc: t('ownerDashboard.manageListings'),
                   to: '/proprietaire/bateaux',
                   color: 'bg-ocean-50 text-ocean-600 dark:bg-ocean-900/30 dark:text-ocean-400',
                 },
                 {
                   icon: <CheckCircle size={20} />,
-                  label: 'Toutes les réservations',
-                  desc: 'Historique complet',
+                  label: t('ownerDashboard.allBookings'),
+                  desc: t('ownerDashboard.fullHistory'),
                   to: '/proprietaire/reservations',
                   color: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
                 },
                 {
                   icon: <BarChart3 size={20} />,
-                  label: 'Revenus détaillés',
-                  desc: 'Statistiques et export',
+                  label: t('ownerDashboard.detailedRevenue'),
+                  desc: t('ownerDashboard.statsExport'),
                   to: '/proprietaire/revenus',
                   color: 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
                 },
@@ -257,17 +259,19 @@ const PendingBookingCard: React.FC<{
   onDecline: () => void
   isAccepting: boolean
   isDeclining: boolean
-}> = ({ booking, onAccept, onDecline, isAccepting, isDeclining }) => (
+}> = ({ booking, onAccept, onDecline, isAccepting, isDeclining }) => {
+  const { t } = useTranslation()
+  return (
   <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
     <div className="flex items-start justify-between gap-2 mb-3">
       <div>
-        <p className="font-medium text-gray-900 dark:text-gray-100 text-sm">{booking.boat?.title ?? 'Bateau'}</p>
+        <p className="font-medium text-gray-900 dark:text-gray-100 text-sm">{booking.boat?.title ?? t('ownerDashboard.boatFallback')}</p>
         <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1 mt-0.5">
           <Clock size={11} />
-          {formatDate(booking.startDate)} au {formatDate(booking.endDate)}
+          {formatDate(booking.startDate)} — {formatDate(booking.endDate)}
         </p>
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          Locataire : {booking.renter?.firstName} {booking.renter?.lastName}
+          {t('ownerDashboard.renter')}: {booking.renter?.firstName} {booking.renter?.lastName}
         </p>
       </div>
       <BookingStatusBadge status={booking.status} />
@@ -281,7 +285,7 @@ const PendingBookingCard: React.FC<{
         loading={isAccepting}
         className="flex-1"
       >
-        Accepter
+        {t('ownerDashboard.accept')}
       </Button>
       <Button
         variant="danger"
@@ -291,10 +295,10 @@ const PendingBookingCard: React.FC<{
         loading={isDeclining}
         className="flex-1"
       >
-        Refuser
+        {t('ownerDashboard.decline')}
       </Button>
     </div>
   </div>
-)
+)}
 
 export default OwnerDashboard

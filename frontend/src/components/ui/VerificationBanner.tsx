@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { MailWarning, Phone, X, RefreshCw } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import { useAuthStore } from '../../store/auth.store'
 import { authApi } from '../../api/auth.api'
 import { UserRole } from '../../types'
+import { SETTINGS_ROUTE, MY_PUBLIC_PROFILE_ROUTE, getPublicProfilePath } from '../../lib/profilePaths'
 
 /**
  * Bandeau persistant affiché quand :
@@ -15,6 +17,7 @@ import { UserRole } from '../../types'
  * Les deux alertes peuvent coexister mais sont empilées verticalement.
  */
 const VerificationBanner: React.FC = () => {
+  const { t } = useTranslation()
   const { user } = useAuthStore()
 
   const [emailDismissed, setEmailDismissed] = useState(false)
@@ -25,8 +28,8 @@ const VerificationBanner: React.FC = () => {
 
   const resendMutation = useMutation({
     mutationFn: authApi.resendVerification,
-    onSuccess: () => toast.success('Email de vérification envoyé !'),
-    onError:   () => toast.error('Erreur lors de l\'envoi. Réessayez dans quelques instants.'),
+    onSuccess: () => toast.success(t('verificationBanner.emailSent')),
+    onError:   () => toast.error(t('verificationBanner.emailSendFailed')),
   })
 
   if (!showEmailBanner && !showPhoneBanner) return null
@@ -38,8 +41,8 @@ const VerificationBanner: React.FC = () => {
           <div className="max-w-7xl mx-auto flex items-center gap-3">
             <MailWarning size={16} className="text-amber-600 dark:text-amber-400 flex-shrink-0" />
             <p className="flex-1 text-sm text-amber-800 dark:text-amber-300">
-              <span className="font-semibold">Vérifiez votre email.</span>
-              {' '}Consultez votre boite mail et cliquez sur le lien pour débloquer toutes les fonctionnalités.
+              <span className="font-semibold">{t('verificationBanner.verifyEmail')}</span>
+              {' '}{t('verificationBanner.verifyEmailDesc')}
             </p>
             <button
               onClick={() => resendMutation.mutate()}
@@ -47,12 +50,12 @@ const VerificationBanner: React.FC = () => {
               className="flex items-center gap-1 text-xs font-medium text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-100 underline underline-offset-2 flex-shrink-0 transition-colors disabled:opacity-50"
             >
               <RefreshCw size={12} className={resendMutation.isPending ? 'animate-spin' : ''} />
-              Renvoyer
+              {t('verificationBanner.resend')}
             </button>
             <button
               onClick={() => setEmailDismissed(true)}
               className="text-amber-500 hover:text-amber-700 dark:hover:text-amber-200 flex-shrink-0 transition-colors"
-              aria-label="Fermer"
+              aria-label={t('common.close')}
             >
               <X size={15} />
             </button>
@@ -65,19 +68,19 @@ const VerificationBanner: React.FC = () => {
           <div className="max-w-7xl mx-auto flex items-center gap-3">
             <Phone size={16} className="text-blue-600 dark:text-blue-400 flex-shrink-0" />
             <p className="flex-1 text-sm text-blue-800 dark:text-blue-300">
-              <span className="font-semibold">Téléphone requis.</span>
-              {' '}En tant que propriétaire, votre numéro de téléphone est obligatoire pour publier un bateau.
+              <span className="font-semibold">{t('verificationBanner.phoneRequired')}</span>
+              {' '}{t('verificationBanner.phoneRequiredDesc')}
             </p>
             <Link
-              to="/mon-espace/profil"
+              to={SETTINGS_ROUTE}
               className="text-xs font-medium text-blue-700 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-100 underline underline-offset-2 flex-shrink-0 transition-colors"
             >
-              Compléter mon profil
+              {t('verificationBanner.completeProfile')}
             </Link>
             <button
               onClick={() => setPhoneDismissed(true)}
               className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-200 flex-shrink-0 transition-colors"
-              aria-label="Fermer"
+              aria-label={t('common.close')}
             >
               <X size={15} />
             </button>

@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { authApi } from '../api/auth.api'
 import { useAuthStore } from '../store/auth.store'
 import { UserRole } from '../types'
@@ -32,14 +32,13 @@ export interface ProfileCompletion {
  * Utilisé pour griser des boutons ou afficher une modale bloquante.
  */
 export function useProfileCompletion(): ProfileCompletion {
-  const { user, updateUser, setAuth, accessToken, refreshToken: rt } = useAuthStore()
-  const navigate = useNavigate()
+  const { t } = useTranslation()
+  const { user } = useAuthStore()
 
-  // Mutation pour renvoyer l'email de vérification
   const resendMutation = useMutation({
     mutationFn: authApi.resendVerification,
-    onSuccess: () => toast.success('Email de vérification envoyé ! Consultez votre boite mail.'),
-    onError:   () => toast.error('Envoi échoué. Réessayez dans quelques instants.'),
+    onSuccess: () => toast.success(t('profileCompletion.emailSent')),
+    onError: () => toast.error(t('profileCompletion.emailSendFailed')),
   })
 
   if (!user) {
@@ -57,9 +56,9 @@ export function useProfileCompletion(): ProfileCompletion {
     if (!isEmailVerified) {
       issues.push({
         key:         'email',
-        title:       'Email non vérifié',
-        description: 'Cliquez sur le lien envoyé lors de votre inscription pour vérifier votre adresse.',
-        actionLabel: 'Renvoyer l\'email',
+        title:       t('profileCompletion.emailNotVerified'),
+        description: t('profileCompletion.emailNotVerifiedDesc'),
+        actionLabel: t('profileCompletion.resendEmail'),
         actionType:  'callback',
         actionFn:    () => resendMutation.mutate(),
       })
@@ -68,11 +67,11 @@ export function useProfileCompletion(): ProfileCompletion {
     if (!hasPhone) {
       issues.push({
         key:         'phone',
-        title:       'Téléphone manquant',
-        description: 'Un numéro de téléphone est obligatoire pour publier une annonce de bateau.',
-        actionLabel: 'Compléter mon profil',
+        title:       t('profileCompletion.phoneMissing'),
+        description: t('profileCompletion.phoneMissingDesc'),
+        actionLabel: t('profileCompletion.completeProfile'),
         actionType:  'navigate',
-        actionTo:    '/mon-espace/profil',
+        actionTo:    SETTINGS_ROUTE,
       })
     }
   }

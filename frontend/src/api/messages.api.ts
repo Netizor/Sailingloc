@@ -2,10 +2,10 @@ import api from '../lib/axios'
 import type { Conversation, Message } from '../types'
 
 export interface SendMessageData {
-  receiverId: number
+  recipientId: number
   content: string
-  /** ID de la conversation existante (optionnel - backend la crée si absent) */
   conversationId?: string
+  boatId?: number
 }
 
 export interface ConversationMessagesResponse {
@@ -14,30 +14,11 @@ export interface ConversationMessagesResponse {
   totalPages: number
 }
 
-/**
- * Retourne la liste des conversations de l'utilisateur connecté.
- * @param archived true → conversations archivées, false (défaut) → actives
- */
-export const getConversations = async (archived = false): Promise<Conversation[]> => {
-  const { data } = await api.get<{ conversations: Conversation[] }>('/messages/conversations', {
-    params: { archived },
-  })
+export const getConversations = async (): Promise<Conversation[]> => {
+  const { data } = await api.get<{ conversations: Conversation[] }>('/messages/conversations')
   return data?.conversations ?? []
 }
 
-export const archiveConversation = async (convId: string): Promise<void> => {
-  await api.post(`/messages/conversations/${convId}/archive`)
-}
-
-export const unarchiveConversation = async (convId: string): Promise<void> => {
-  await api.delete(`/messages/conversations/${convId}/archive`)
-}
-
-/**
- * Retourne les messages d'une conversation paginés.
- * Le backend retourne une PaginatedResponse : les messages sont dans `.data`.
- * Les messages sont déjà triés par date croissante (array_reverse côté backend).
- */
 export const getConversationMessages = async (
   conversationId: string,
   page = 1,
@@ -53,19 +34,14 @@ export const getConversationMessages = async (
   }
 }
 
-/**
- * Envoie un message à un destinataire.
- * Si conversationId est absent, le backend en crée une nouvelle.
- */
 export const sendMessage = async (payload: SendMessageData): Promise<Message> => {
-  const { data } = await api.post<Message>('/messages', payload)
+  const { data } = await api.post<Message>('/messages', {
+    recipientId: payload.recipientId,
+    content: payload.content,
+  })
   return data
 }
 
-/**
- * Retourne le nombre de messages non lus via un endpoint dédié (léger).
- * Utilisé par le Header pour afficher le badge, sans charger toutes les conversations.
- */
 export const getUnreadMessagesCount = async (): Promise<{ count: number }> => {
   const { data } = await api.get<{ count: number }>('/messages/unread-count')
   return data

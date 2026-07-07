@@ -28,9 +28,21 @@ function formatUser(u) {
     phone: u.phone,
     avatar: u.avatar,
     bio: u.bio,
+    kycVerified: Boolean(u.kyc_verified_at || u.kyc_status === 'APPROVED'),
+    isActive: !u.is_blocked,
+    sailingExperienceYears: u.sailing_experience_years,
+    sailingQualifications: u.sailing_qualifications,
+    sailingAreas: u.sailing_areas,
+    sailorBio: u.sailor_bio,
+    sailorCvStatus: u.sailor_cv_status || 'NOT_SUBMITTED',
+    sailorCvDoc: u.sailor_cv_doc,
+    sailorCvSubmittedAt: u.sailor_cv_submitted_at,
+    sailorCvReviewedAt: u.sailor_cv_reviewed_at,
+    sailorCvRejectionReason: u.sailor_cv_rejection_reason,
     emailVerifiedAt: u.email_verified_at,
     termsAcceptedAt: u.terms_accepted_at,
     createdAt: u.created_at,
+    updatedAt: u.updated_at,
   }
 }
 
@@ -93,26 +105,32 @@ router.post('/register', registerLimiter, async (req, res) => {
 })
 
 // ─── POST /auth/login ──────────────────────────────────────
-router.post('/login', loginLimiter, async (req, res) => {
-  const { email, password } = req.body
-  if (!email || !password) return res.status(400).json({ message: 'email et password requis' })
+router.post('/login', loginLimiter, async (req, res, next) => {
+  try {
+    const { email, password } = req.body
+    if (!email || !password) return res.status(400).json({ message: 'email et password requis' })
 
-  const { data: user } = await supabase.from('users').select('*').eq('email', email.toLowerCase()).single()
-  if (!user) return res.status(401).json({ message: 'Identifiants incorrects' })
-  if (user.is_blocked) return res.status(403).json({ message: 'Compte suspendu. Contactez le support.' })
+    const { data: user, error: userError } = await supabase.from('users').select('*').eq('email', email.toLowerCase()).single()
+    if (userError && userError.code !== 'PGRST116') return next(userError)
+    if (!user) return res.status(401).json({ message: 'Identifiants incorrects' })
+    if (user.is_blocked) return res.status(403).json({ message: 'Compte suspendu. Contactez le support.' })
 
-  const valid = await bcrypt.compare(password, user.password)
-  if (!valid) return res.status(401).json({ message: 'Identifiants incorrects' })
+    const valid = await bcrypt.compare(password, user.password)
+    if (!valid) return res.status(401).json({ message: 'Identifiants incorrects' })
 
-  const accessToken  = signAccessToken({ sub: user.id, role: user.role })
-  const refreshToken = generateRefreshToken()
-  await supabase.from('refresh_tokens').insert({
-    token: refreshToken,
-    user_id: user.id,
-    expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-  })
+    const accessToken  = signAccessToken({ sub: user.id, role: user.role })
+    const refreshToken = generateRefreshToken()
+    const { error: insertError } = await supabase.from('refresh_tokens').insert({
+      token: refreshToken,
+      user_id: user.id,
+      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    })
+    if (insertError) return next(insertError)
 
-  return res.json({ accessToken, refreshToken, user: formatUser(user) })
+    return res.json({ accessToken, refreshToken, user: formatUser(user) })
+  } catch (err) {
+    next(err)
+  }
 })
 
 // ─── POST /auth/logout ─────────────────────────────────────
@@ -231,6 +249,35 @@ router.post('/resend-verification', authenticate, async (req, res) => {
   })
   try { await sendEmailVerification(user.email, user.first_name, token) } catch {}
   return res.json({ message: 'Email de vérification renvoyé' })
+})
+
+// ─── DELETE /auth/account ─────────────────────────────────
+router.delete('/account', authenticate, async (req, res, next) => {
+  try {
+    const userId = req.user.id
+
+    // Invalider tous les refresh tokens
+    await supabase.from('refresh_tokens').delete().eq('user_id', userId)
+
+    // Anonymisation RGPD : suppression des données personnelles identifiantes
+    const { error } = await supabase.from('users').update({
+      email: `deleted_${userId}@sailingloc.deleted`,
+      password: '',
+      first_name: 'Compte',
+      last_name: 'supprimé',
+      phone: null,
+      bio: null,
+      avatar: null,
+      is_blocked: true,
+      updated_at: new Date().toISOString(),
+    }).eq('id', userId)
+
+    if (error) return res.status(500).json({ message: 'Erreur lors de la suppression du compte' })
+
+    return res.json({ message: 'Compte supprimé' })
+  } catch (err) {
+    next(err)
+  }
 })
 
 // ─── POST /auth/hibp-check ─────────────────────────────────

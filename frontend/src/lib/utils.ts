@@ -48,24 +48,10 @@ export const daysBetween = (start: string | Date, end: string | Date) => {
 }
 
 export const getBoatTypeLabel = (type: string): string =>
-  ({
-    SAILBOAT: 'Voilier',
-    MOTORBOAT: 'Bateau à moteur',
-    CATAMARAN: 'Catamaran',
-    INFLATABLE: 'Semi-rigide',
-    YACHT: 'Yacht',
-    PONTOON: 'Ponton',
-    DINGHY: 'Dériveur',
-  }[type] ?? type)
+  i18n.t(`boat.type.${type}`, { defaultValue: type })
 
 export const getBookingStatusLabel = (status: string): string =>
-  ({
-    PENDING: 'En attente',
-    CONFIRMED: 'Confirmée',
-    CANCELLED: 'Annulée',
-    COMPLETED: 'Terminée',
-    DISPUTED: 'Litige',
-  }[status] ?? status)
+  i18n.t(`booking.status.${status}`, { defaultValue: status })
 
 export const getBookingStatusColor = (status: string): string =>
   ({
@@ -77,14 +63,7 @@ export const getBookingStatusColor = (status: string): string =>
   }[status] ?? 'bg-gray-100 text-gray-800')
 
 export const getBoatStatusLabel = (status: string): string =>
-  ({
-    DRAFT: 'Brouillon',
-    PENDING_REVIEW: 'En attente de validation',
-    ACTIVE: 'Actif',
-    INACTIVE: 'Inactif',
-    SUSPENDED: 'Suspendu',
-    REJECTED: 'Rejeté',
-  }[status] ?? status)
+  i18n.t(`boat.status.${status}`, { defaultValue: status })
 
 export const getBoatStatusColor = (status: string): string =>
   ({
@@ -97,13 +76,7 @@ export const getBoatStatusColor = (status: string): string =>
   }[status] ?? 'bg-gray-100 text-gray-800')
 
 export const getMotorizationLabel = (type: string): string =>
-  ({
-    NONE: 'Sans moteur',
-    INBOARD: 'Moteur inboard',
-    OUTBOARD: 'Moteur hors-bord',
-    ELECTRIC: 'Électrique',
-    HYBRID: 'Hybride',
-  }[type] ?? type)
+  i18n.t(`boat.motorization.${type}`, { defaultValue: type })
 
 export const truncate = (str: string, n: number): string =>
   str.length > n ? `${str.slice(0, n)}...` : str
