@@ -3,6 +3,7 @@ import { Resend } from 'resend'
 
 const MAIL_FROM = process.env.MAIL_FROM || 'noreply@sailingloc.fr'
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
+const CONTACT_EMAIL = process.env.CONTACT_EMAIL || MAIL_FROM
 
 const resendApiKey = process.env.RESEND_API_KEY?.trim()
 const smtpHost = process.env.SMTP_HOST?.trim()
@@ -62,6 +63,49 @@ async function sendMail({ to, subject, html }) {
   if (!providerConfigured) {
     console.error('[Email] Aucun fournisseur configuré. Ajoutez RESEND_API_KEY ou SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS dans .env.')
   }
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+export async function sendContactMessage({ firstName, lastName, email, subject, message }) {
+  const safe = {
+    firstName: escapeHtml(firstName),
+    lastName: escapeHtml(lastName),
+    email: escapeHtml(email),
+    subject: escapeHtml(subject),
+    message: escapeHtml(message).replace(/\n/g, '<br>'),
+  }
+
+  await sendMail({
+    to: CONTACT_EMAIL,
+    subject: `[Contact] ${safe.subject} – ${safe.firstName} ${safe.lastName}`,
+    html: `
+      <h2>Nouveau message de contact</h2>
+      <ul>
+        <li><strong>Nom :</strong> ${safe.firstName} ${safe.lastName}</li>
+        <li><strong>Email :</strong> ${safe.email}</li>
+        <li><strong>Objet :</strong> ${safe.subject}</li>
+      </ul>
+      <p>${safe.message}</p>
+    `,
+  })
+
+  await sendMail({
+    to: email,
+    subject: 'Votre message a bien été reçu – SailingLoc',
+    html: `
+      <h2>Bonjour ${safe.firstName},</h2>
+      <p>Merci pour votre message concernant « ${safe.subject} ». Notre équipe vous répondra dans les meilleurs délais.</p>
+      <p>L'équipe SailingLoc</p>
+    `,
+  })
 }
 
 export async function sendEmailVerification(to, firstName, token) {
