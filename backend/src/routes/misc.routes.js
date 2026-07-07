@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
 import supabase from '../lib/supabase.js'
 import { authenticate, requireRole } from '../middleware/auth.middleware.js'
+import { verifyAccessToken } from '../lib/jwt.js'
 
 // ═══════════════════════════════════════════════════════════
 // NOTIFICATIONS
