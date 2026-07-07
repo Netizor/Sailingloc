@@ -111,6 +111,10 @@ const CreateEditBoat: React.FC = () => {
   const contractRef   = useRef<HTMLInputElement>(null)
   const [uploadingDoc, setUploadingDoc] = useState<'insurance' | 'registration' | 'license' | 'contract' | null>(null)
 
+  const draftKey = isEditing ? `sailingloc_boat_draft_${id}` : 'sailingloc_boat_draft_new'
+  const [savedAt, setSavedAt] = useState<Date | null>(null)
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   const handleDocUpload = useCallback(async (
     docType: 'insurance' | 'registration' | 'license' | 'contract',
     file: File,
@@ -171,6 +175,33 @@ const CreateEditBoat: React.FC = () => {
     )
   }, [boatData])
 
+  // Restore draft (create mode only — en édition les données serveur font foi)
+  useEffect(() => {
+    if (isEditing) return
+    try {
+      const raw = localStorage.getItem('sailingloc_boat_draft_new')
+      if (!raw) return
+      const saved = JSON.parse(raw)
+      if (!saved.form?.title) return // ne restaure pas un brouillon vide
+      setForm(saved.form)
+      if (saved.discountRules) setDiscountRules(saved.discountRules)
+      if (saved.savedAt) setSavedAt(new Date(saved.savedAt))
+    } catch {}
+  }, [isEditing]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Autosave dans localStorage (debounce 800 ms)
+  useEffect(() => {
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    saveTimerRef.current = setTimeout(() => {
+      try {
+        const now = new Date()
+        localStorage.setItem(draftKey, JSON.stringify({ form, discountRules, savedAt: now.toISOString() }))
+        setSavedAt(now)
+      } catch {}
+    }, 800)
+    return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current) }
+  }, [form, discountRules, draftKey])
+
   const saveMutation = useMutation({
     mutationFn: (params: { data: Partial<Boat>; publish: boolean }) => {
       const payload = {
@@ -181,6 +212,8 @@ const CreateEditBoat: React.FC = () => {
       return isEditing ? boatsApi.update(Number(id!), payload) : boatsApi.create(payload)
     },
     onSuccess: (_, variables) => {
+      try { localStorage.removeItem(draftKey) } catch {}
+      setSavedAt(null)
       toast.success(
         variables.publish ? 'Annonce publiée !' : 'Brouillon enregistré'
       )
@@ -790,7 +823,12 @@ const CreateEditBoat: React.FC = () => {
           )}
 
           {/* Navigation buttons */}
-          <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100 dark:border-gray-700 gap-3 flex-wrap">
+          {savedAt && (
+            <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-6">
+              Brouillon local sauvegardé à {savedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+            </p>
+          )}
+          <div className="flex items-center justify-between mt-4 pt-6 border-t border-gray-100 dark:border-gray-700 gap-3 flex-wrap">
             <div className="flex gap-2">
               {step > 1 && (
                 <Button

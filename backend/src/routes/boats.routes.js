@@ -3,6 +3,7 @@ import multer from 'multer'
 import { v2 as cloudinary } from 'cloudinary'
 import supabase from '../lib/supabase.js'
 import { authenticate, requireRole, optionalAuth } from '../middleware/auth.middleware.js'
+import { notifyAdmins } from '../services/notifications.service.js'
 
 const router = Router()
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } })
@@ -298,6 +299,14 @@ router.post('/', authenticate, requireRole('OWNER', 'ADMIN'), async (req, res) =
   }).select('*, users(id, first_name, last_name, avatar)').single()
 
   if (error) return res.status(500).json({ message: error.message })
+
+  notifyAdmins(
+    'BOAT_CREATED',
+    'Nouvelle annonce créée',
+    `"${boat.title}" ajoutée par ${boat.users?.first_name ?? ''} ${boat.users?.last_name ?? ''} (brouillon)`,
+    { boatId: boat.id, ownerId: req.user.id }
+  ).catch(() => {})
+
   return res.status(201).json(formatBoat(boat, true))
 })
 
@@ -353,16 +362,37 @@ router.patch('/:id/status', authenticate, async (req, res) => {
 
   const { data: updated, error } = await supabase.from('boats').update({ status, updated_at: new Date().toISOString() }).eq('id', req.params.id).select('*, users(id, first_name, last_name, avatar)').single()
   if (error) return res.status(500).json({ message: error.message })
+
+  const statusLabels = { active: 'publiée', inactive: 'désactivée', draft: 'repassée en brouillon' }
+  notifyAdmins(
+    'BOAT_STATUS_CHANGED',
+    `Annonce ${statusLabels[status] ?? status}`,
+    `"${updated.title}" est maintenant ${statusLabels[status] ?? status}`,
+    { boatId: updated.id, status, ownerId: updated.owner_id }
+  ).catch(() => {})
+
   return res.json(formatBoat(updated, true))
 })
 
-//  DELETE /boats/:id 
+//  DELETE /boats/:id
 router.delete('/:id', authenticate, async (req, res) => {
   const { data: existing } = await supabase.from('boats').select('owner_id').eq('id', req.params.id).single()
   if (!existing) return res.status(404).json({ message: 'Bateau introuvable' })
   if (existing.owner_id !== req.user.id && req.user.role !== 'ADMIN') return res.status(403).json({ message: 'Accès refusé' })
 
-  await supabase.from('boats').update({ status: 'inactive', updated_at: new Date().toISOString() }).eq('id', req.params.id)
+  const { data: deleted } = await supabase.from('boats')
+    .update({ status: 'inactive', updated_at: new Date().toISOString() })
+    .eq('id', req.params.id)
+    .select('title, owner_id')
+    .single()
+
+  notifyAdmins(
+    'BOAT_DELETED',
+    'Annonce supprimée',
+    `"${deleted?.title ?? 'Bateau #' + req.params.id}" supprimée par ${req.user.role === 'ADMIN' ? 'un admin' : 'son propriétaire'}`,
+    { boatId: parseInt(req.params.id), ownerId: deleted?.owner_id }
+  ).catch(() => {})
+
   return res.json({ message: 'Bateau désactivé' })
 })
 
