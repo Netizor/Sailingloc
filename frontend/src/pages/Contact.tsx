@@ -11,6 +11,7 @@ import {
 // import type { LucideIcon } from 'lucide-react'
 // import PageHero from '../components/ui/PageHero'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { sendContactMessage } from '../api/contact.api'
 
 const SUBJECTS = [
   'Réservation Premium',
@@ -18,6 +19,24 @@ const SUBJECTS = [
   'Devenir propriétaire',
   'Conciergerie',
   'Autre demande',
+]
+
+const FAQS = [
+  {
+    question: 'Comment réserver sans permis bateau ?',
+    answer:
+      'Une partie de notre flotte est composée de bateaux « permis plaisance », accessibles sans permis (jusqu\'à 6 chevaux et une longueur limitée selon la réglementation en vigueur). Filtrez les annonces avec le critère « Sans permis » pour les repérer facilement.',
+  },
+  {
+    question: 'Quelles sont les conditions d\'annulation ?',
+    answer:
+      'Une annulation gratuite est possible jusqu\'à 7 jours avant le départ. Entre 7 et 3 jours, 50% du montant est remboursé. En dessous de 3 jours, aucun remboursement n\'est applicable, sauf cas de force majeure.',
+  },
+  {
+    question: 'Assurez-vous la livraison au port ?',
+    answer:
+      'Oui, selon les annonces, le bateau peut être livré directement à votre ponton ou point de départ souhaité. Cette option est indiquée sur la fiche du bateau et peut entraîner un supplément selon la distance.',
+  },
 ]
 
 const Contact: React.FC = () => {
@@ -32,6 +51,9 @@ const Contact: React.FC = () => {
   })
 
   const [sent, setSent] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
@@ -39,9 +61,18 @@ const Contact: React.FC = () => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSent(true)
+    setError('')
+    setLoading(true)
+    try {
+      await sendContactMessage(form)
+      setSent(true)
+    } catch {
+      setError('Une erreur est survenue. Veuillez réessayer.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -168,11 +199,16 @@ const Contact: React.FC = () => {
                   />
                 </div>
 
+                {error && (
+                  <p className="text-sm font-semibold text-red-600">{error}</p>
+                )}
+
                 <button
                   type="submit"
-                  className="w-full rounded-lg bg-[#0A737A] py-4 font-semibold text-white shadow-lg transition duration-300 hover:bg-[#096A71]"
+                  disabled={loading}
+                  className="w-full rounded-lg bg-[#0A737A] py-4 font-semibold text-white shadow-lg transition duration-300 hover:bg-[#096A71] disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Envoyer la demande
+                  {loading ? 'Envoi en cours...' : 'Envoyer la demande'}
                 </button>
               </form>
             )}
@@ -181,16 +217,18 @@ const Contact: React.FC = () => {
           <div className="space-y-8 lg:col-span-2">
             <InfoCard
               icon={Phone}
-              title="Ligne Directe"
-              text="Disponible du lundi au samedi, 9h - 19h."
-              action="+33 (0)1 84 20 40 10"
+              title="Contactez-nous"
+              text="Du lundi au vendredi, de 9h à 17h."
+              action="sailingloc-entreprise@outlook.fr"
+              href="mailto:sailingloc-entreprise@outlook.fr"
             />
 
             <InfoCard
               icon={MapPin}
               title="Bureau Principal"
-              text="Port de la Plaisance, 06400 Cannes, France"
+              text="12 rue de la Paix, 75002 Paris"
               action="ITINÉRAIRE"
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('12 rue de la Paix, 75002 Paris')}`}
             />
 
             <InfoCard
@@ -209,19 +247,27 @@ const Contact: React.FC = () => {
             <h2 className="mb-8 text-3xl font-bold">Questions Fréquentes</h2>
 
             <div className="max-w-lg space-y-4">
-              {[
-                'Comment réserver sans permis bateau ?',
-                "Quelles sont les conditions d’annulation ?",
-                'Assurez-vous la livraison au port ?',
-              ].map((question) => (
-                <div
-                  key={question}
-                  className="flex items-center justify-between rounded-lg bg-white px-6 py-5 shadow-sm"
-                >
-                  <span className="text-sm font-semibold">{question}</span>
-                  <Plus size={18} className="text-[#0A737A]" />
-                </div>
-              ))}
+              {FAQS.map(({ question, answer }, index) => {
+                const isOpen = openFaq === index
+                return (
+                  <div key={question} className="rounded-lg bg-white shadow-sm">
+                    <button
+                      type="button"
+                      onClick={() => setOpenFaq(isOpen ? null : index)}
+                      className="flex w-full items-center justify-between px-6 py-5 text-left"
+                    >
+                      <span className="text-sm font-semibold">{question}</span>
+                      <Plus
+                        size={18}
+                        className={`shrink-0 text-[#0A737A] transition-transform duration-200 ${isOpen ? 'rotate-45' : ''}`}
+                      />
+                    </button>
+                    {isOpen && (
+                      <p className="px-6 pb-5 text-sm leading-relaxed text-gray-500">{answer}</p>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </div>
 
@@ -268,9 +314,10 @@ interface InfoCardProps {
   title: string
   text: string
   action: string
+  href?: string
 }
 
-const InfoCard: React.FC<InfoCardProps> = ({ icon: Icon, title, text, action }) => (
+const InfoCard: React.FC<InfoCardProps> = ({ icon: Icon, title, text, action, href }) => (
   <div className="flex items-start gap-6 rounded-xl bg-white p-8 shadow-xl">
     <div className="rounded-full bg-[#0A737A] p-4 text-white">
       <Icon size={22} />
@@ -279,7 +326,18 @@ const InfoCard: React.FC<InfoCardProps> = ({ icon: Icon, title, text, action }) 
     <div>
       <h3 className="text-xl font-bold">{title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-gray-500">{text}</p>
-      <p className="mt-5 font-bold text-[#0A737A]">{action}</p>
+      {href ? (
+        <a
+          href={href}
+          target={href.startsWith('http') ? '_blank' : undefined}
+          rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+          className="mt-5 block font-bold text-[#0A737A] hover:underline"
+        >
+          {action}
+        </a>
+      ) : (
+        <p className="mt-5 font-bold text-[#0A737A]">{action}</p>
+      )}
     </div>
   </div>
 )

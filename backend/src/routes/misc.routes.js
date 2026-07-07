@@ -1,7 +1,41 @@
 import { Router } from 'express'
+import rateLimit from 'express-rate-limit'
 import supabase from '../lib/supabase.js'
 import { authenticate, requireRole } from '../middleware/auth.middleware.js'
 import { verifyAccessToken } from '../lib/jwt.js'
+import { sendContactMessage } from '../services/email.service.js'
+
+// ═══════════════════════════════════════════════════════════
+// CONTACT
+// ═══════════════════════════════════════════════════════════
+export const contactRouter = Router()
+
+const contactLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 5, message: { message: 'Trop de messages envoyés. Réessayez plus tard.' } })
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+contactRouter.post('/', contactLimiter, async (req, res) => {
+  const { firstName, lastName, email, subject, message } = req.body
+  if (!firstName?.trim() || !lastName?.trim() || !email?.trim() || !subject?.trim() || !message?.trim()) {
+    return res.status(400).json({ message: 'Tous les champs sont requis' })
+  }
+  if (!EMAIL_RE.test(email.trim())) return res.status(400).json({ message: 'Email invalide' })
+
+  try {
+    await sendContactMessage({
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: email.trim(),
+      subject: subject.trim(),
+      message: message.trim(),
+    })
+  } catch (error) {
+    console.error('[Contact] Erreur envoi email:', error)
+    return res.status(500).json({ message: 'Impossible d\'envoyer le message pour le moment' })
+  }
+
+  return res.status(201).json({ message: 'Message envoyé' })
+})
 
 // ═══════════════════════════════════════════════════════════
 // NOTIFICATIONS
