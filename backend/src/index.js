@@ -5,6 +5,7 @@ import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 
 import authRouter from './routes/auth.routes.js'
+import pushRouter from './routes/push.routes.js'
 import boatsRouter from './routes/boats.routes.js'
 import bookingsRouter from './routes/bookings.routes.js'
 import kycRouter from './routes/kyc.routes.js'
@@ -63,6 +64,7 @@ app.use('/api/favorites',         favoritesRouter)
 app.use('/api/availability',      availabilityRouter)
 app.use('/api/seasonal-prices',   seasonalPricesRouter)
 app.use('/api/notifications',     notificationsRouter)
+app.use('/api/push',              pushRouter)
 app.use('/api/admin',             adminRouter)
 app.use('/api/reports',           reportsRouter)
 //app.use('/api/documents',         documentsRouter)
