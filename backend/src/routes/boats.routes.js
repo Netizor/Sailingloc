@@ -264,14 +264,23 @@ router.post('/', authenticate, requireRole('OWNER', 'ADMIN'), async (req, res) =
     pricePerDay, deposit, amenities, latitude, longitude,
   } = req.body
 
-  if (!title || !description || !type || !capacity || !(dailyRate || pricePerDay) || !city) {
-    return res.status(400).json({ message: 'title, description, type, capacity, dailyRate et city sont requis' })
+  const rawStatus = typeof req.body.status === 'string' ? req.body.status.toLowerCase() : 'draft'
+  const boatStatus = rawStatus === 'active' ? 'active' : 'draft'
+
+  if (boatStatus === 'active') {
+    if (!title || !description || !type || !capacity || !(dailyRate || pricePerDay) || !city) {
+      return res.status(400).json({ message: 'title, description, type, capacity, dailyRate et city sont requis pour publier' })
+    }
+  } else {
+    if (!title) {
+      return res.status(400).json({ message: 'Le titre est requis' })
+    }
   }
 
   const { data: boat, error } = await supabase.from('boats').insert({
     owner_id: req.user.id,
     title: title.trim(),
-    description: description.trim(),
+    description: description ? description.trim() : null,
     type,
     manufacturer,
     model,
@@ -295,7 +304,7 @@ router.post('/', authenticate, requireRole('OWNER', 'ADMIN'), async (req, res) =
     rules,
     welcome_message: welcomeMessage,
     required_license: requiredLicense,
-    status: 'draft',
+    status: boatStatus,
   }).select('*, users(id, first_name, last_name, avatar)').single()
 
   if (error) return res.status(500).json({ message: error.message })

@@ -243,6 +243,9 @@ const CreateEditBoat: React.FC = () => {
     if (step === 3) {
       if (!form.dailyRate || Number(form.dailyRate) <= 0) e.dailyRate = 'Le tarif journalier est requis'
     }
+    if (step === 4) {
+      if (!form.description.trim()) e.description = 'La description est requise'
+    }
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -284,6 +287,11 @@ const CreateEditBoat: React.FC = () => {
   })
 
   const handleSave = (publish: boolean) => {
+    if (publish && !form.description.trim()) {
+      setStep(4)
+      setErrors(e => ({ ...e, description: 'La description est requise avant de publier' }))
+      return
+    }
     saveMutation.mutate({ data: buildPayload(), publish })
   }
 
@@ -633,8 +641,14 @@ const CreateEditBoat: React.FC = () => {
                   onChange={(e) => setField('description', e.target.value)}
                   placeholder="Décrivez votre bateau, ses atouts, les zones de navigation conseillées…"
                   rows={5}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-ocean-500 resize-none"
+                  className={cn(
+                    'w-full border rounded-xl px-3 py-2.5 text-sm text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-ocean-500 resize-none',
+                    errors.description ? 'border-red-500' : 'border-gray-300 dark:border-gray-600',
+                  )}
                 />
+                {errors.description && (
+                  <p className="mt-1 text-xs text-red-500">{errors.description}</p>
+                )}
               </div>
 
               {/* Equipment tags */}

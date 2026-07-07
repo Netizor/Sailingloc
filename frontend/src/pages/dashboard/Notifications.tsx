@@ -5,7 +5,7 @@ import {
   Bell, BellOff, X, CheckCheck,
   CalendarCheck, CalendarX, CreditCard, Star,
   MessageCircle, ShieldCheck, Ship, AlertCircle,
-  ChevronLeft, ChevronRight,
+  ChevronLeft, ChevronRight, Settings, EyeOff,
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import type { Notification } from '../../types'
@@ -16,71 +16,129 @@ import {
   deleteNotification,
 } from '../../api/notifications.api'
 import { usePushNotifications } from '../../hooks/usePushNotifications'
+import { useNotificationPrefs, NOTIFICATION_TYPES } from '../../hooks/useNotificationPrefs'
 import Button from '../../components/ui/Button'
 import Spinner from '../../components/ui/Spinner'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const NOTIF_ICONS: Record<string, React.ReactElement> = {
-  BOOKING_REQUEST:   <CalendarCheck size={16} />,
-  BOOKING_CONFIRMED: <CalendarCheck size={16} />,
-  BOOKING_CANCELLED: <CalendarX size={16} />,
-  BOOKING_COMPLETED: <CheckCheck size={16} />,
-  PAYMENT_RECEIVED:  <CreditCard size={16} />,
-  NEW_REVIEW:        <Star size={16} />,
-  NEW_MESSAGE:       <MessageCircle size={16} />,
-  KYC_APPROVED:      <ShieldCheck size={16} />,
-  KYC_REJECTED:      <ShieldCheck size={16} />,
-  BOAT_APPROVED:     <Ship size={16} />,
-  BOAT_REJECTED:     <Ship size={16} />,
+  BOOKING_REQUEST:    <CalendarCheck size={16} />,
+  BOOKING_CONFIRMED:  <CalendarCheck size={16} />,
+  BOOKING_CANCELLED:  <CalendarX size={16} />,
+  BOOKING_COMPLETED:  <CheckCheck size={16} />,
+  PAYMENT_RECEIVED:   <CreditCard size={16} />,
+  NEW_REVIEW:         <Star size={16} />,
+  NEW_MESSAGE:        <MessageCircle size={16} />,
+  KYC_APPROVED:       <ShieldCheck size={16} />,
+  KYC_REJECTED:       <ShieldCheck size={16} />,
+  BOAT_APPROVED:      <Ship size={16} />,
+  BOAT_REJECTED:      <Ship size={16} />,
+  BOAT_CREATED:       <Ship size={16} />,
+  BOAT_STATUS_CHANGED:<Ship size={16} />,
+  BOAT_DELETED:       <Ship size={16} />,
 }
 
 const NOTIF_COLORS: Record<string, string> = {
-  BOOKING_REQUEST:   'bg-blue-100 text-blue-600',
-  BOOKING_CONFIRMED: 'bg-green-100 text-green-600',
-  BOOKING_CANCELLED: 'bg-red-100 text-red-600',
-  BOOKING_COMPLETED: 'bg-green-100 text-green-600',
-  PAYMENT_RECEIVED:  'bg-emerald-100 text-emerald-600',
-  NEW_REVIEW:        'bg-amber-100 text-amber-600',
-  NEW_MESSAGE:       'bg-sky-100 text-sky-600',
-  KYC_APPROVED:      'bg-green-100 text-green-600',
-  KYC_REJECTED:      'bg-red-100 text-red-600',
-  BOAT_APPROVED:     'bg-green-100 text-green-600',
-  BOAT_REJECTED:     'bg-red-100 text-red-600',
+  BOOKING_REQUEST:    'bg-blue-100 text-blue-600',
+  BOOKING_CONFIRMED:  'bg-green-100 text-green-600',
+  BOOKING_CANCELLED:  'bg-red-100 text-red-600',
+  BOOKING_COMPLETED:  'bg-green-100 text-green-600',
+  PAYMENT_RECEIVED:   'bg-emerald-100 text-emerald-600',
+  NEW_REVIEW:         'bg-amber-100 text-amber-600',
+  NEW_MESSAGE:        'bg-sky-100 text-sky-600',
+  KYC_APPROVED:       'bg-green-100 text-green-600',
+  KYC_REJECTED:       'bg-red-100 text-red-600',
+  BOAT_APPROVED:      'bg-green-100 text-green-600',
+  BOAT_REJECTED:      'bg-red-100 text-red-600',
+  BOAT_CREATED:       'bg-ocean-100 text-ocean-600',
+  BOAT_STATUS_CHANGED:'bg-ocean-100 text-ocean-600',
+  BOAT_DELETED:       'bg-gray-100 text-gray-600',
 }
 
 const NOTIF_LABELS: Record<string, string> = {
-  BOOKING_REQUEST:   'Demande de réservation',
-  BOOKING_CONFIRMED: 'Réservation confirmée',
-  BOOKING_CANCELLED: 'Réservation annulée',
-  BOOKING_COMPLETED: 'Réservation terminée',
-  PAYMENT_RECEIVED:  'Paiement reçu',
-  NEW_REVIEW:        'Nouvel avis',
-  NEW_MESSAGE:       'Nouveau message',
-  KYC_APPROVED:      'Vérification approuvée',
-  KYC_REJECTED:      'Vérification rejetée',
-  BOAT_APPROVED:     'Annonce approuvée',
-  BOAT_REJECTED:     'Annonce rejetée',
+  BOOKING_REQUEST:    'Demande de réservation',
+  BOOKING_CONFIRMED:  'Réservation confirmée',
+  BOOKING_CANCELLED:  'Réservation annulée',
+  BOOKING_COMPLETED:  'Réservation terminée',
+  PAYMENT_RECEIVED:   'Paiement reçu',
+  NEW_REVIEW:         'Nouvel avis',
+  NEW_MESSAGE:        'Nouveau message',
+  KYC_APPROVED:       'Vérification approuvée',
+  KYC_REJECTED:       'Vérification rejetée',
+  BOAT_APPROVED:      'Annonce approuvée',
+  BOAT_REJECTED:      'Annonce rejetée',
+  BOAT_CREATED:       'Nouvelle annonce',
+  BOAT_STATUS_CHANGED:'Annonce mise à jour',
+  BOAT_DELETED:       'Annonce supprimée',
 }
+
+const PREF_GROUPS = [
+  {
+    label: 'Réservations',
+    types: ['BOOKING_REQUEST', 'BOOKING_CONFIRMED', 'BOOKING_CANCELLED', 'BOOKING_COMPLETED'],
+  },
+  {
+    label: 'Paiements & Avis',
+    types: ['PAYMENT_RECEIVED', 'NEW_REVIEW'],
+  },
+  {
+    label: 'Messages',
+    types: ['NEW_MESSAGE'],
+  },
+  {
+    label: 'Annonces',
+    types: ['BOAT_APPROVED', 'BOAT_REJECTED', 'BOAT_CREATED', 'BOAT_STATUS_CHANGED', 'BOAT_DELETED'],
+  },
+  {
+    label: 'Compte',
+    types: ['KYC_APPROVED', 'KYC_REJECTED'],
+  },
+] as const
 
 function formatDate(date: string): string {
   return new Date(date).toLocaleDateString('fr-FR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+    day: 'numeric', month: 'long', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
   })
 }
 
 const PAGE_SIZE = 15
 
+// ─── Toggle switch ────────────────────────────────────────────────────────────
+
+interface ToggleProps {
+  checked: boolean
+  onChange: () => void
+}
+
+const Toggle: React.FC<ToggleProps> = ({ checked, onChange }) => (
+  <button
+    role="switch"
+    aria-checked={checked}
+    onClick={e => { e.stopPropagation(); onChange() }}
+    className={cn(
+      'relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500',
+      checked ? 'bg-ocean-600 dark:bg-ocean-500' : 'bg-gray-200 dark:bg-gray-600',
+    )}
+  >
+    <span
+      className={cn(
+        'pointer-events-none absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform duration-200',
+        checked ? 'translate-x-4' : 'translate-x-0',
+      )}
+    />
+  </button>
+)
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 const Notifications: React.FC = () => {
   const [page, setPage] = useState(1)
+  const [showPrefs, setShowPrefs] = useState(false)
   const qc = useQueryClient()
   const push = usePushNotifications()
+  const { isEnabled, toggle, disabledCount } = useNotificationPrefs()
 
   const { data, isLoading } = useQuery({
     queryKey: ['notifications', 'list', page],
@@ -111,10 +169,12 @@ const Notifications: React.FC = () => {
     },
   })
 
-  const notifications = data?.notifications ?? []
+  const allNotifications = data?.notifications ?? []
   const total = data?.pagination.total ?? 0
   const totalPages = data?.pagination.totalPages ?? 1
   const unreadCount = data?.unreadCount ?? 0
+
+  const notifications = allNotifications.filter(n => isEnabled(n.type))
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
@@ -129,23 +189,84 @@ const Notifications: React.FC = () => {
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
               {total} notification{total > 1 ? 's' : ''}
               {unreadCount > 0 && ` · ${unreadCount} non lue${unreadCount > 1 ? 's' : ''}`}
+              {disabledCount > 0 && (
+                <span className="ml-1 text-gray-400">
+                  · {disabledCount} type{disabledCount > 1 ? 's' : ''} masqué{disabledCount > 1 ? 's' : ''}
+                </span>
+              )}
             </p>
           )}
         </div>
-        {unreadCount > 0 && (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => readAllMutation.mutate()}
-            disabled={readAllMutation.isPending}
+        <div className="flex items-center gap-2">
+          {unreadCount > 0 && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => readAllMutation.mutate()}
+              disabled={readAllMutation.isPending}
+            >
+              <CheckCheck size={15} className="mr-1.5" />
+              Tout marquer comme lu
+            </Button>
+          )}
+          <button
+            onClick={() => setShowPrefs(p => !p)}
+            className={cn(
+              'p-2 rounded-xl transition-colors',
+              showPrefs
+                ? 'bg-ocean-100 dark:bg-ocean-900/30 text-ocean-700 dark:text-ocean-400'
+                : 'text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-600 dark:hover:text-gray-300',
+            )}
+            title="Préférences de notifications"
           >
-            <CheckCheck size={15} className="mr-1.5" />
-            Tout marquer comme lu
-          </Button>
-        )}
+            <Settings size={17} />
+          </button>
+        </div>
       </div>
 
-      {/* D5 - Bandeau activation push notifications */}
+      {/* Preferences panel */}
+      {showPrefs && (
+        <div className="mb-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 dark:border-gray-800">
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              Préférences de notifications
+            </p>
+            <p className="text-xs text-gray-400">
+              Masque les types sélectionnés sur cette page
+            </p>
+          </div>
+          <div className="p-5 grid sm:grid-cols-2 gap-x-8 gap-y-5">
+            {PREF_GROUPS.map(group => (
+              <div key={group.label}>
+                <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+                  {group.label}
+                </p>
+                <div className="flex flex-col gap-2">
+                  {group.types.map(type => (
+                    <label
+                      key={type}
+                      className="flex items-center justify-between gap-3 cursor-pointer group/row"
+                      onClick={() => toggle(type)}
+                    >
+                      <span className={cn(
+                        'text-sm transition-colors select-none',
+                        isEnabled(type)
+                          ? 'text-gray-700 dark:text-gray-300'
+                          : 'text-gray-400 dark:text-gray-600 line-through',
+                      )}>
+                        {NOTIF_LABELS[type] ?? type}
+                      </span>
+                      <Toggle checked={isEnabled(type)} onChange={() => toggle(type)} />
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Push notifications banner */}
       {push.isSupported && push.permission !== 'denied' && (
         <div className="mb-5 flex items-center justify-between gap-4 bg-ocean-50 dark:bg-ocean-900/20 border border-ocean-100 dark:border-ocean-800 rounded-xl px-4 py-3">
           <div className="flex items-center gap-2.5">
@@ -175,6 +296,20 @@ const Notifications: React.FC = () => {
         </div>
       )}
 
+      {/* Filtered types notice */}
+      {disabledCount > 0 && !showPrefs && (
+        <div className="mb-4 flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+          <EyeOff size={13} />
+          {disabledCount} type{disabledCount > 1 ? 's' : ''} de notification masqué{disabledCount > 1 ? 's' : ''} —{' '}
+          <button
+            className="underline hover:text-gray-600 dark:hover:text-gray-300"
+            onClick={() => setShowPrefs(true)}
+          >
+            modifier
+          </button>
+        </div>
+      )}
+
       {/* Content */}
       {isLoading ? (
         <div className="flex justify-center py-20">
@@ -184,7 +319,11 @@ const Notifications: React.FC = () => {
         <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
           <Bell size={40} strokeWidth={1.5} className="text-gray-200 dark:text-gray-700" />
           <p className="text-gray-500 dark:text-gray-400 font-medium">Aucune notification pour l'instant</p>
-          <p className="text-sm text-gray-400 dark:text-gray-500">Vous serez notifié des activités importantes ici.</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">
+            {disabledCount > 0
+              ? 'Certains types sont masqués — vérifiez vos préférences.'
+              : 'Vous serez notifié des activités importantes ici.'}
+          </p>
         </div>
       ) : (
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden divide-y divide-gray-50 dark:divide-gray-800">
@@ -202,23 +341,13 @@ const Notifications: React.FC = () => {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between mt-6">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setPage((p) => p - 1)}
-            disabled={page <= 1}
-          >
+          <Button variant="secondary" size="sm" onClick={() => setPage(p => p - 1)} disabled={page <= 1}>
             <ChevronLeft size={15} className="mr-1" /> Précédent
           </Button>
           <span className="text-sm text-gray-500 dark:text-gray-400">
             Page {page} sur {totalPages}
           </span>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setPage((p) => p + 1)}
-            disabled={page >= totalPages}
-          >
+          <Button variant="secondary" size="sm" onClick={() => setPage(p => p + 1)} disabled={page >= totalPages}>
             Suivant <ChevronRight size={15} className="ml-1" />
           </Button>
         </div>
@@ -247,17 +376,12 @@ const NotifRow: React.FC<NotifRowProps> = ({ notif, onRead, onDelete }) => {
         !notif.isRead && 'bg-blue-50/30 dark:bg-blue-900/10',
       )}
     >
-      {/* Unread dot */}
       {!notif.isRead && (
         <span className="absolute left-2 top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-orange-400" />
       )}
-
-      {/* Icon */}
       <div className={cn('flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center mt-0.5', colorClass)}>
         {icon}
       </div>
-
-      {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
@@ -270,8 +394,6 @@ const NotifRow: React.FC<NotifRowProps> = ({ notif, onRead, onDelete }) => {
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{notif.body}</p>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{formatDate(notif.createdAt)}</p>
           </div>
-
-          {/* Actions */}
           <div className="flex items-center gap-1 flex-shrink-0">
             <Link
               to={`/mon-espace/notifications/${notif.id}`}
