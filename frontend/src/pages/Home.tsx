@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
@@ -25,6 +25,24 @@ type PopularBoatItem = {
   boat: Boat
   image: string
   badge?: 'PREMIUM' | 'NOUVEAU'
+}
+
+function useInView(threshold = 0.15) {
+  const ref = useRef<HTMLElement>(null)
+  const [inView, setInView] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setInView(true) },
+      { threshold },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [threshold])
+
+  return { ref, inView }
 }
 
 const POPULAR_BOATS: PopularBoatItem[] = [
@@ -215,6 +233,7 @@ const Home: React.FC = () => {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const [carouselIndex, setCarouselIndex] = useState(0)
+  const { ref: testimonialsRef, inView: testimonialsInView } = useInView(0.18)
 
   const steps = [
     { icon: <Search size={36} strokeWidth={1.25} />, title: t('home.step1Title'), desc: t('home.step1Desc') },
@@ -385,15 +404,23 @@ const Home: React.FC = () => {
       <EngagementSection />
 
       {/* Testimonials */}
-      <section className="py-14 bg-[#f8f9fa]" aria-labelledby="testimonials-title">
+      <section ref={testimonialsRef} className="py-14 bg-[#f8f9fa]" aria-labelledby="testimonials-title">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 id="testimonials-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy text-center mb-10">
             {t('home.testimonialsTitle')}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((item) => (
-              <div key={item.id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col gap-4">
+            {testimonials.map((item, i) => (
+              <div
+                key={item.id}
+                className={[
+                  'bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col gap-4',
+                  'transition-[transform,opacity] duration-700 ease-out will-change-transform',
+                  testimonialsInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
+                ].join(' ')}
+                style={{ transitionDelay: `${i * 120}ms` }}
+              >
                 <div className="flex items-center gap-0.5">
                   {Array.from({ length: item.rating }).map((_, j) => (
                     <Star key={j} size={14} fill="currentColor" strokeWidth={0} className="text-amber-400" />

@@ -3,6 +3,7 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom'
 import { Anchor, CheckCircle, XCircle, Loader2 } from 'lucide-react'
 import { authApi } from '../../api/auth.api'
 import { useAuthStore } from '../../store/auth.store'
+import { getDefaultDashboardPath } from '../../lib/profilePaths'
 import Button from '../../components/ui/Button'
 
 type State = 'loading' | 'success' | 'error'
@@ -41,7 +42,7 @@ const VerifyEmail: React.FC = () => {
       })
   }, [token])  // eslint-disable-line react-hooks/exhaustive-deps
 
-  const redirectPath = user?.role === 'OWNER' ? '/proprietaire/tableau-de-bord' : '/mon-espace'
+  const redirectPath = getDefaultDashboardPath(user?.role)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-ocean-950 via-ocean-800 to-ocean-600 flex items-center justify-center px-4 py-12">

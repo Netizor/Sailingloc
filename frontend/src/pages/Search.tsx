@@ -390,7 +390,7 @@ const Search: React.FC = () => {
 
                     >
 
-                      <filter.Icon size={14} color={isActive ? '#ffffff' : '#2563FF'} />
+                      <filter.Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-[#2563FF]'}`} />
 
                       {filter.label}
 
