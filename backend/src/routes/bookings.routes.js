@@ -12,6 +12,18 @@ const stripe = stripeKey && /^sk_(test|live)_[a-zA-Z0-9]{20,}$/.test(stripeKey)
   : null
 const PLATFORM_FEE_PERCENT = parseFloat(process.env.STRIPE_PLATFORM_FEE_PERCENT || '10')
 
+async function notifyAdmins(type, title, body, data = {}) {
+  try {
+    const { data: admins } = await supabase.from('users').select('id').eq('role', 'ADMIN')
+    if (!admins?.length) return
+    await supabase.from('notifications').insert(
+      admins.map(a => ({ user_id: a.id, type, title, body, data, is_read: false }))
+    )
+  } catch (e) {
+    console.error('[notifyAdmins]', e.message)
+  }
+}
+
 function formatBooking(b) {
   return {
     id: b.id,
@@ -92,6 +104,15 @@ router.post('/', authenticate, async (req, res) => {
   }).select('*, boats(id, title, images, city, port, price_per_day)').single()
 
   if (error) return res.status(500).json({ message: error.message })
+
+  const fmtDate = (d) => new Date(d).toLocaleDateString('fr-FR')
+  notifyAdmins(
+    'BOOKING_REQUEST',
+    'Nouvelle réservation',
+    `Réservation pour "${booking.boats?.title || 'un bateau'}" du ${fmtDate(startDate)} au ${fmtDate(endDate)}`,
+    { bookingId: booking.id, boatId }
+  ).catch(() => {})
+
   return res.status(201).json(formatBooking(booking))
 })
 
