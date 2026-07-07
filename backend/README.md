@@ -38,6 +38,12 @@ cp .env.example .env
 | `CLOUDINARY_API_KEY` | API key Cloudinary |
 | `CLOUDINARY_API_SECRET` | API secret Cloudinary |
 | `RESEND_API_KEY` | Clé API Resend (email) |
+| `SMTP_HOST` | Hôte SMTP si vous utilisez Nodemailer |
+| `SMTP_PORT` | Port SMTP si vous utilisez Nodemailer |
+| `SMTP_USER` | Nom d'utilisateur SMTP si vous utilisez Nodemailer |
+| `SMTP_PASS` | Mot de passe SMTP si vous utilisez Nodemailer |
+| `SMTP_SECURE` | `true` pour TLS explicite/implicite (465) |
+| `MAIL_FROM` | Adresse email d'expédition par défaut |
 | `FRONTEND_URL` | URL du frontend (CORS) |
 
 ## Base de données
