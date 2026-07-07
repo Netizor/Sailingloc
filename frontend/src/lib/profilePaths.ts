@@ -13,3 +13,9 @@ export function getPublicProfilePath(user: Pick<User, 'id' | 'role'>): string | 
 export const MY_PUBLIC_PROFILE_ROUTE = '/mon-espace/mon-profil'
 
 export const SETTINGS_ROUTE = '/mon-espace/parametres'
+
+/** Tableau de bord principal selon le rôle */
+export function getDefaultDashboardPath(role?: string): string {
+  if (role === 'OWNER' || role === 'ADMIN') return '/proprietaire'
+  return '/mon-espace'
+}
