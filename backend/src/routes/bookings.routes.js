@@ -3,6 +3,7 @@ import Stripe from 'stripe'
 import supabase from '../lib/supabase.js'
 import { authenticate, requireRole } from '../middleware/auth.middleware.js'
 import { sendCancellationEmail } from '../services/email.service.js'
+import { notifyAdmins } from '../services/notifications.service.js'
 
 const router = Router()
 // Valide uniquement les vraies clés (sk_test_XXX ou sk_live_XXX avec ≥20 chars)
@@ -11,18 +12,6 @@ const stripe = stripeKey && /^sk_(test|live)_[a-zA-Z0-9]{20,}$/.test(stripeKey)
   ? new Stripe(stripeKey)
   : null
 const PLATFORM_FEE_PERCENT = parseFloat(process.env.STRIPE_PLATFORM_FEE_PERCENT || '10')
-
-async function notifyAdmins(type, title, body, data = {}) {
-  try {
-    const { data: admins } = await supabase.from('users').select('id').eq('role', 'ADMIN')
-    if (!admins?.length) return
-    await supabase.from('notifications').insert(
-      admins.map(a => ({ user_id: a.id, type, title, body, data, is_read: false }))
-    )
-  } catch (e) {
-    console.error('[notifyAdmins]', e.message)
-  }
-}
 
 function formatBooking(b) {
   return {
@@ -106,12 +95,21 @@ router.post('/', authenticate, async (req, res) => {
   if (error) return res.status(500).json({ message: error.message })
 
   const fmtDate = (d) => new Date(d).toLocaleDateString('fr-FR')
-  notifyAdmins(
-    'BOOKING_REQUEST',
-    'Nouvelle réservation',
-    `Réservation pour "${booking.boats?.title || 'un bateau'}" du ${fmtDate(startDate)} au ${fmtDate(endDate)}`,
-    { bookingId: booking.id, boatId }
-  ).catch(() => {})
+  const notifBody = `Réservation pour "${booking.boats?.title || 'un bateau'}" du ${fmtDate(startDate)} au ${fmtDate(endDate)}`
+  const notifData = { bookingId: booking.id, boatId }
+
+  // Notifier le propriétaire du bateau
+  supabase.from('notifications').insert({
+    user_id: boat.owner_id,
+    type: 'BOOKING_REQUEST',
+    title: 'Nouvelle demande de réservation',
+    body: notifBody,
+    data: notifData,
+    is_read: false,
+  }).catch(() => {})
+
+  // Notifier les admins
+  notifyAdmins('BOOKING_REQUEST', 'Nouvelle réservation', notifBody, notifData).catch(() => {})
 
   return res.status(201).json(formatBooking(booking))
 })

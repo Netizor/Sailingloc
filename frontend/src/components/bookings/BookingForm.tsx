@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { MessageSquare, User, AlertCircle } from 'lucide-react'
@@ -71,6 +71,48 @@ const BookingForm: React.FC<BookingFormProps> = ({
   const [message, setMessage] = useState('')
   const [dateError, setDateError] = useState<string | undefined>()
   const [passengers, setPassengers] = useState(Math.min(2, boat.capacity))
+
+  const bookingDraftKey = `sailingloc_booking_${boat.id}`
+  const [savedAt, setSavedAt] = useState<Date | null>(null)
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Restore draft on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(bookingDraftKey)
+      if (!raw) return
+      const saved = JSON.parse(raw)
+      if (saved.withSkipper !== undefined) setWithSkipper(saved.withSkipper)
+      if (saved.message) setMessage(saved.message)
+      if (saved.passengers) setPassengers(Math.min(saved.passengers, boat.capacity))
+      if (saved.range?.from) {
+        const from = new Date(saved.range.from)
+        const to = saved.range.to ? new Date(saved.range.to) : undefined
+        if (from > new Date()) setRange({ from, to })
+      }
+      if (saved.savedAt) setSavedAt(new Date(saved.savedAt))
+    } catch {}
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Autosave on changes (debounce 600 ms)
+  useEffect(() => {
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    saveTimerRef.current = setTimeout(() => {
+      try {
+        const now = new Date()
+        localStorage.setItem(bookingDraftKey, JSON.stringify({
+          range: range ? { from: range.from?.toISOString(), to: range.to?.toISOString() } : null,
+          withSkipper,
+          message,
+          passengers,
+          boatTitle: boat.title,
+          savedAt: now.toISOString(),
+        }))
+        setSavedAt(now)
+      } catch {}
+    }, 600)
+    return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current) }
+  }, [range, withSkipper, message, passengers, bookingDraftKey])
 
   const disabledSet = useMemo(() => new Set(disabledDates), [disabledDates])
 
@@ -156,6 +198,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
     }
     if (!validate()) return
     await onSubmit({ startDate, endDate, withSkipper, message })
+    try { localStorage.removeItem(bookingDraftKey) } catch {}
   }
 
   const isDetail = variant === 'detail'
@@ -418,6 +461,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
               ? t('booking.form.bookAndPayDays', { count: totalDays })
               : t('booking.form.bookAndPay')}
           </Button>
+        )}
+
+        {savedAt && (
+          <p className="text-xs text-center text-gray-400">
+            Sélection sauvegardée à {savedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+          </p>
         )}
 
         <p className="text-xs text-center text-[#8A94A6]">

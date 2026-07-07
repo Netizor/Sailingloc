@@ -15,7 +15,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../../store/auth.store'
 import { MY_PUBLIC_PROFILE_ROUTE, SETTINGS_ROUTE, getPublicProfilePath } from '../../lib/profilePaths'
-import { resolveApiBaseUrl } from '../../lib/axios'
+import api, { resolveApiBaseUrl } from '../../lib/axios'
 import { getInitials, cn } from '../../lib/utils'
 import { UserRole } from '../../types'
 
@@ -61,10 +61,25 @@ const UserDashboardLayout: React.FC = () => {
     let es: EventSource | null = null
     let active = true
 
-    const connect = () => {
+    const connect = async () => {
       if (!active) return
-      const token = useAuthStore.getState().accessToken
+      let token = useAuthStore.getState().accessToken
       if (!token) return
+
+      // Rafraîchit le token s'il est expiré avant d'ouvrir le SSE
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
+        if (payload.exp * 1000 < Date.now()) {
+          const rt = useAuthStore.getState().refreshToken
+          if (!rt) return
+          const { data } = await api.post<{ accessToken: string; refreshToken: string }>('/auth/refresh', { refreshToken: rt })
+          useAuthStore.getState().setAccessToken(data.accessToken)
+          useAuthStore.getState().setRefreshToken(data.refreshToken)
+          token = data.accessToken
+        }
+      } catch { return }
+
+      if (!active) return
       const url =
         `${resolveApiBaseUrl()}/messages/stream` +
         `?token=${encodeURIComponent(token)}&lastId=${lastMsgIdRef.current}`

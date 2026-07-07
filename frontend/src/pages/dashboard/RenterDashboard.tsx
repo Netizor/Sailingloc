@@ -23,6 +23,7 @@ import {
 } from '../../lib/utils'
 import Spinner from '../../components/ui/Spinner'
 import Button from '../../components/ui/Button'
+import DraftSection from '../../components/ui/DraftSection'
 import type { Booking } from '../../types'
 import { BookingStatus } from '../../types'
 
@@ -129,6 +130,9 @@ const RenterDashboard: React.FC = () => {
           </div>
         ))}
       </div>
+
+      {/* Réservations non finalisées */}
+      <DraftSection type="bookings" />
 
       {/* Prochaine escapade */}
       {nextBooking ? (

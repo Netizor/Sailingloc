@@ -5,17 +5,7 @@ import supabase from '../lib/supabase.js'
 import { authenticate, requireRole } from '../middleware/auth.middleware.js'
 import { verifyAccessToken } from '../lib/jwt.js'
 
-async function notifyAdmins(type, title, body, data = {}) {
-  try {
-    const { data: admins } = await supabase.from('users').select('id').eq('role', 'ADMIN')
-    if (!admins?.length) return
-    await supabase.from('notifications').insert(
-      admins.map(a => ({ user_id: a.id, type, title, body, data, is_read: false }))
-    )
-  } catch (e) {
-    console.error('[notifyAdmins]', e.message)
-  }
-}
+import { notifyAdmins } from '../services/notifications.service.js'
 
 // ═══════════════════════════════════════════════════════════
 // NOTIFICATIONS
@@ -32,6 +22,17 @@ notificationsRouter.get('/', authenticate, async (req, res) => {
   const limit = Math.min(50, parseInt(req.query.limit) || 20)
   const { data, count } = await supabase.from('notifications').select('*', { count: 'exact' }).eq('user_id', req.user.id).order('created_at', { ascending: false }).range((page - 1) * limit, page * limit - 1)
   return res.json({ notifications: data || [], unreadCount: count || 0, pagination: { page, limit, total: count || 0, totalPages: Math.ceil((count || 0) / limit) } })
+})
+
+notificationsRouter.get('/:id', authenticate, async (req, res) => {
+  const { data, error } = await supabase.from('notifications')
+    .select('*').eq('id', req.params.id).eq('user_id', req.user.id).single()
+  if (error || !data) return res.status(404).json({ message: 'Notification introuvable' })
+  if (!data.is_read) {
+    await supabase.from('notifications').update({ is_read: true }).eq('id', req.params.id)
+    data.is_read = true
+  }
+  return res.json(data)
 })
 
 notificationsRouter.patch('/:id/read', authenticate, async (req, res) => {
