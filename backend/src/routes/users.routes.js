@@ -219,13 +219,13 @@ router.post('/avatar', authenticate, upload.single('avatar'), async (req, res, n
   try {
     if (!req.file) return res.status(400).json({ message: 'Aucun fichier fourni' })
 
-  const result = await new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      { folder: 'sailingloc/avatars', resource_type: 'image', transformation: [{ width: 400, height: 400, crop: 'fill' }] },
-      (err, r) => err ? reject(err) : resolve(r)
-    )
-    stream.end(req.file.buffer)
-  })
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'sailingloc/avatars', resource_type: 'image', transformation: [{ width: 400, height: 400, crop: 'fill' }] },
+        (err, r) => (err ? reject(err) : resolve(r))
+      )
+      stream.end(req.file.buffer)
+    })
 
     const { data: user, error } = await supabase
       .from('users')
@@ -234,8 +234,11 @@ router.post('/avatar', authenticate, upload.single('avatar'), async (req, res, n
       .select()
       .single()
 
-  if (error) return res.status(500).json({ message: error.message })
-  return res.json({ avatar: result.secure_url, user: formatUser(user) })
+    if (error) return res.status(500).json({ message: error.message })
+    return res.json({ avatar: result.secure_url, user: formatUser(user) })
+  } catch (err) {
+    next(err)
+  }
 })
 
 // ─── GET /users/me/export ──────────────────────────────────
