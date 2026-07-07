@@ -1,24 +1,63 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer'
+import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const MAIL_FROM = process.env.MAIL_FROM || 'bouchibasamiya@gmail.com';
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const MAIL_FROM = process.env.MAIL_FROM || 'noreply@sailingloc.fr'
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
+
+const resendApiKey = process.env.RESEND_API_KEY?.trim()
+const smtpHost = process.env.SMTP_HOST?.trim()
+const smtpPort = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined
+const smtpUser = process.env.SMTP_USER?.trim()
+const smtpPass = process.env.SMTP_PASS
+const smtpSecure = process.env.SMTP_SECURE === 'true' || smtpPort === 465
+
+const resend = resendApiKey ? new Resend(resendApiKey) : null
+const smtpTransport = smtpHost && smtpPort && smtpUser && smtpPass
+  ? nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpSecure,
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
+      },
+    })
+  : null
 
 async function sendMail({ to, subject, html }) {
-  try {
-    const result = await resend.emails.send({
-      from: MAIL_FROM,
-      to,
-      subject,
-      html,
-    });
-    
-    if (result.error) {
-      console.error('[Email] Resend error:', result.error);
+  if (resend) {
+    try {
+      const result = await resend.emails.send({
+        from: MAIL_FROM,
+        to,
+        subject,
+        html,
+      })
+
+      if (result?.error) {
+        console.error('[Email] Resend error:', result.error)
+      } else {
+        return result
+      }
+    } catch (error) {
+      console.error('[Email] Resend exception:', error)
     }
-  } catch (error) {
-    console.error('[Email] Exception:', error);
   }
+
+  if (smtpTransport) {
+    try {
+      return await smtpTransport.sendMail({
+        from: MAIL_FROM,
+        to,
+        subject,
+        html,
+      })
+    } catch (error) {
+      console.error('[Email] SMTP error:', error)
+    }
+  }
+
+  console.error('[Email] Aucun fournisseur configuré. Ajoutez RESEND_API_KEY ou SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS dans .env.')
 }
 
 export async function sendEmailVerification(to, firstName, token) {
