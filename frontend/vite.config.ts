@@ -15,6 +15,12 @@ export default defineConfig({
       // Met à jour le SW automatiquement en arrière-plan (sans popup "nouvelle version")
       registerType: 'autoUpdate',
 
+      // Active le SW en mode dev pour que navigator.serviceWorker.ready se résolve
+      devOptions: {
+        enabled: true,
+        type: 'module',
+      },
+
       // Fichiers pré-cachés au build (shell applicatif)
       includeAssets: ['icons/icon.svg', 'favicon.ico'],
 
