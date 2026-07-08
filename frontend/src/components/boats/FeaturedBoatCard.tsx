@@ -7,16 +7,19 @@ import type { Boat } from '../../types'
 interface FeaturedBoatCardProps {
   boat: Boat
   image?: string
-  badge?: 'PREMIUM' | 'NOUVEAU'
+  badge?: 'PREMIUM' | 'NOUVEAU' | 'EXEMPLE'
+  /** Bateau de démonstration : redirige vers la recherche au lieu de la fiche */
+  isDemo?: boolean
 }
 
-const FeaturedBoatCard: React.FC<FeaturedBoatCardProps> = ({ boat, image, badge }) => {
+const FeaturedBoatCard: React.FC<FeaturedBoatCardProps> = ({ boat, image, badge, isDemo = false }) => {
   const mainImage = image ?? boat.images?.[0] ?? null
   const location = boat.city ? `${boat.port}, ${boat.city}` : boat.port
+  const linkTo = isDemo ? '/bateaux' : `/bateaux/${boat.id}`
 
   return (
     <article className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
-      <Link to={`/bateaux/${boat.id}`} className="block">
+      <Link to={linkTo} className="block">
         <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
           {mainImage ? (
             <img

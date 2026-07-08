@@ -90,6 +90,8 @@ export interface User {
   updatedAt?: string
 }
 
+export type RequiredLicense = 'NONE' | 'COASTAL' | 'OFFSHORE' | 'INLAND'
+
 export interface Boat {
   id: number
   ownerId: number
@@ -119,6 +121,7 @@ export interface Boat {
   rules?: string
   images?: string[]
   welcomeMessage?: string
+  requiredLicense?: RequiredLicense | null
   discountRules?: { minDays: number; discountPercent: number }[]
   registrationDoc?: string
   insuranceDoc?: string

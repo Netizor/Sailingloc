@@ -41,6 +41,7 @@
     "aboutShort": "About",
     "services": "Our services",
     "contact": "Contact",
+    "faq": "FAQ",
     "howItWorks": "How it works",
     "login": "Login",
     "becomeOwner": "Become an owner",
@@ -241,6 +242,96 @@
     "ctaSubtitle": "Join the SailingLoc community and enjoy an exceptional nautical experience.",
     "ctaBrowse": "Browse boats",
     "ctaOwner": "Become an owner"
+  },
+  "aboutPage": {
+    "pageTitle": "About SailingLoc",
+    "heroBadge": "Our story",
+    "heroTitle": "The sea,",
+    "heroTitleAccent": "within everyone's reach",
+    "heroSubtitle": "SailingLoc connects renters and boat owners in France. A simple, secure and transparent platform to rent or list a boat between individuals.",
+    "heroCta": "Discover the platform",
+    "missionTitle": "Our mission",
+    "missionP1": "SailingLoc was born from a simple observation: thousands of boats stay docked every summer, while sea lovers dream of sailing without owning their own vessel.",
+    "missionP2": "Founded in Marseille, our platform connects renters and owners across 50+ French ports. Sailboats, catamarans, motorboats or RIBs — every listing is verified and every rental includes partner insurance.",
+    "stats": {
+      "ports": "Ports covered",
+      "rating": "User satisfaction",
+      "support": "Support available",
+      "payments": "Secure payments"
+    },
+    "promiseLabel": "Our commitments",
+    "promiseTitle": "What SailingLoc guarantees",
+    "promiseSubtitle": "Concrete guarantees to rent or list with confidence.",
+    "promise": {
+      "insurance": { "title": "Insurance included", "desc": "Every rental is covered by our maritime insurance partner." },
+      "verified": { "title": "Verified listings", "desc": "Boats and profiles are checked before being published on the platform." },
+      "payment": { "title": "Secure payment", "desc": "Protected transactions via Stripe. Any deposit is agreed directly with the owner." },
+      "support": { "title": "Customer support", "desc": "Our team helps if you have questions before, during or after your rental." }
+    },
+    "journeyLabel": "How it works",
+    "journeyTitle": "From search to sailing",
+    "journeySubtitle": "Four simple steps to book a boat on SailingLoc.",
+    "steps": {
+      "1": { "title": "Search for a boat", "desc": "Browse listings by port, boat type, dates and budget. Filter with or without skipper." },
+      "2": { "title": "Book online", "desc": "Choose your dates, review the detailed price and confirm your booking in a few clicks." },
+      "3": { "title": "Chat with the owner", "desc": "Via built-in messaging, get all practical info: meeting at the port, equipment, guidelines." },
+      "4": { "title": "Sail & leave a review", "desc": "Enjoy your time at sea, then share your experience to help the community." }
+    },
+    "featuresLabel": "The platform",
+    "featuresTitle": "What you can do on SailingLoc",
+    "featuresSubtitle": "Real features, available right now on the site.",
+    "features": {
+      "booking": { "title": "Online booking", "desc": "Check availability, daily rate, service fees and book directly from the site." },
+      "messaging": { "title": "Built-in messaging", "desc": "Contact the owner before the rental to ask questions and arrange the meeting at the port." },
+      "kyc": { "title": "Identity verification", "desc": "Users can verify their identity (KYC) to build trust between renters and owners." },
+      "skipper": { "title": "Skipper optional", "desc": "Some boats offer a skipper. Use search filters to find the right offer for your level." }
+    },
+    "audienceLabel": "Who is it for?",
+    "audienceTitle": "Renters and owners",
+    "audienceSubtitle": "Whether you want to sail or earn from your boat, SailingLoc supports you.",
+    "audiencePopular": "Most popular",
+    "audience": {
+      "renter": {
+        "name": "Renters",
+        "tagline": "Find and book a boat",
+        "cta": "Rent a boat",
+        "features": ["Search by port, dates and type", "Secure online payment", "Rental insurance included", "Messaging with the owner", "Reviews after each rental"]
+      },
+      "owner": {
+        "name": "Owners",
+        "tagline": "Rent your boat between individuals",
+        "cta": "Become an owner",
+        "features": ["Free listing publication", "Availability calendar management", "Secure payment reception", "Revenue & bookings dashboard", "Dedicated owner support"]
+      }
+    },
+    "quote": "The sea should not be an inaccessible luxury.",
+    "quoteBody": "Our ambition is to democratize boating: make sailing accessible, safe and simple, whether you are a renter or an owner.",
+    "badges": {
+      "verified": "Verified profiles & listings",
+      "secure": "Secure Stripe payments",
+      "support": "Responsive support team",
+      "rating": "4.9/5 satisfaction"
+    },
+    "faqLabel": "Frequently asked questions",
+    "faqTitle": "Good to know",
+    "faqSeeAll": "See all questions →",
+    "faq": {
+      "1": { "q": "How do I book a boat on SailingLoc?", "a": "Search by port, dates and number of guests. Choose a listing, click « Book » and follow the steps through to secure payment." },
+      "2": { "q": "Can I cancel my booking?", "a": "Yes, from « My bookings ». Refunds depend on the owner's cancellation policy and how far in advance you cancel." },
+      "3": { "q": "Are boats insured?", "a": "Each owner must provide valid navigation insurance. SailingLoc checks these documents before publishing the listing." },
+      "4": { "q": "Can I rent a boat with a skipper?", "a": "Yes, if the owner offers it. Use the « with skipper » filter in search to find suitable listings." },
+      "5": { "q": "What are the service fees?", "a": "SailingLoc charges around 10% service fees to the renter. The exact amount is always shown before confirmation." },
+      "6": { "q": "How does the deposit work?", "a": "The owner may set a deposit amount in the listing. It is shown for information only; the actual hold or deposit is arranged directly between renter and owner before departure." },
+      "7": { "q": "How do I list my boat for rent?", "a": "Create an owner account, click « Add a boat », fill in the details and add photos. The listing goes live after verification." },
+      "8": { "q": "When does the owner receive payment?", "a": "The renter pays online via Stripe when booking. Owner payouts are tracked in the Revenues dashboard. Automatic payouts via Stripe Connect are planned for phase 2." }
+    },
+    "testimonialLabel": "They trust us",
+    "testimonialCta": "See testimonials",
+    "ctaTitle": "Ready to sail?",
+    "ctaSubtitle": "Explore available boats or list yours on SailingLoc.",
+    "ctaBoats": "Browse boats",
+    "ctaContact": "Contact us",
+    "ctaTestimonials": "Testimonials"
   },
   "search": {
     "adventures_one": "{{count}} maritime adventure available",
@@ -522,6 +613,8 @@
       "serviceFee": "Service fee",
       "cleaningFee": "Cleaning fee",
       "loginRequired": "You must be logged in to book. Click \"Book\" to log in.",
+      "licenseRequired": "This boat requires a boating license. Add your nautical qualifications or upload your license in your profile.",
+      "completeProfile": "Complete my profile",
       "bookNow": "Book now",
       "loading": "Loading…",
       "bookAndPay": "Book & Pay",
@@ -585,6 +678,7 @@
       "noPhoto": "No photo",
       "renterLabel": "Renter: {{name}}",
       "accept": "Accept",
+      "pendingPayment": "Waiting for the renter's payment. The booking is confirmed automatically after payment.",
       "decline": "Decline",
       "rateRenter": "Rate the renter",
       "confirmed": "Booking confirmed",
@@ -714,6 +808,7 @@
     "addBoat": "Add a boat",
     "administration": "Administration",
     "users": "Users",
+    "kycNav": "KYC verifications",
     "boatsNav": "Boats",
     "bookingsNav": "Bookings",
     "reports": "Reports",
@@ -736,7 +831,7 @@
     "availabilityTitle": "Manage your availability",
     "availabilityDesc": "Block unavailable dates and set your rental slots. You remain free to accept or decline each booking request.",
     "revenueTitle": "Receive your earnings",
-    "revenueDesc": "Once a booking is confirmed, payment is secured. You receive your payout within 2 to 5 business days after each rental via Stripe Connect."
+    "revenueDesc": "Once a booking is confirmed, the renter payment is secured via Stripe. Track earnings in your dashboard. Automatic owner payouts via Stripe Connect are planned for phase 2."
   },
   "profileCompletion": {
     "emailNotVerified": "Email not verified",

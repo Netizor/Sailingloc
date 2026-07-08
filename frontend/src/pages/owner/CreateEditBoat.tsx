@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { BoatStatus, BoatType, MotorizationType } from '../../types'
+import { BoatStatus, BoatType, MotorizationType, type RequiredLicense } from '../../types'
 import { BOAT_TYPE_LABELS, MOTORIZATION_LABELS } from '../../lib/labels'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -54,6 +54,7 @@ interface BoatFormData {
   depositAmount: string
   withSkipper: boolean
   skipperPrice: string
+  requiredLicense: RequiredLicense
   // Step 4
   description: string
   equipment: string[]
@@ -82,6 +83,7 @@ const emptyForm: BoatFormData = {
   depositAmount: '',
   withSkipper: false,
   skipperPrice: '',
+  requiredLicense: 'NONE',
   description: '',
   equipment: [],
   rules: '',
@@ -110,6 +112,7 @@ const CreateEditBoat: React.FC = () => {
   const licenseRef    = useRef<HTMLInputElement>(null)
   const contractRef   = useRef<HTMLInputElement>(null)
   const [uploadingDoc, setUploadingDoc] = useState<'insurance' | 'registration' | 'license' | 'contract' | null>(null)
+  const [pendingDocs, setPendingDocs] = useState<Partial<Record<'insurance' | 'registration' | 'license' | 'contract', File>>>({})
 
   const draftKey = isEditing ? `sailingloc_boat_draft_${id}` : 'sailingloc_boat_draft_new'
   const [savedAt, setSavedAt] = useState<Date | null>(null)
@@ -132,8 +135,18 @@ const CreateEditBoat: React.FC = () => {
     }
   }, [id, qc])
 
-  // Load existing boat data - onSuccess est retiré (TanStack Query v5) :
-  // l'effet écoute `boatData` pour pré-remplir le formulaire.
+  const handleDocSelect = useCallback((
+    docType: 'insurance' | 'registration' | 'license' | 'contract',
+    file: File,
+  ) => {
+    if (id) {
+      handleDocUpload(docType, file)
+    } else {
+      setPendingDocs((prev) => ({ ...prev, [docType]: file }))
+    }
+  }, [id, handleDocUpload])
+
+  // Load existing boat data
   const { data: boatData, isLoading: isLoadingBoat } = useQuery({
     queryKey: ['boat', id],
     queryFn: () => boatsApi.getById(Number(id!)),
@@ -160,6 +173,7 @@ const CreateEditBoat: React.FC = () => {
       depositAmount: boatData.depositAmount ? String(boatData.depositAmount) : '',
       withSkipper: boatData.withSkipper ?? false,
       skipperPrice: boatData.skipperPrice ? String(boatData.skipperPrice) : '',
+      requiredLicense: (boatData.requiredLicense as RequiredLicense) || 'NONE',
       description: boatData.description ?? '',
       equipment: boatData.equipment ?? [],
       rules: boatData.rules ?? '',
@@ -203,21 +217,39 @@ const CreateEditBoat: React.FC = () => {
   }, [form, discountRules, draftKey])
 
   const saveMutation = useMutation({
-    mutationFn: (params: { data: Partial<Boat>; publish: boolean }) => {
+    mutationFn: async (params: { data: Partial<Boat>; publish: boolean }) => {
       const payload = {
         ...params.data,
-        // ACTIVE correspond au statut "publié" dans le backend
         status: params.publish ? BoatStatus.ACTIVE : BoatStatus.DRAFT,
       }
-      return isEditing ? boatsApi.update(Number(id!), payload) : boatsApi.create(payload)
+      const boat = isEditing
+        ? await boatsApi.update(Number(id!), payload)
+        : await boatsApi.create(payload)
+
+      if (!isEditing && Object.keys(pendingDocs).length > 0) {
+        for (const [docType, file] of Object.entries(pendingDocs)) {
+          if (file) {
+            await boatsApi.uploadDocument(
+              boat.id,
+              docType as 'insurance' | 'registration' | 'license' | 'contract',
+              file,
+            )
+          }
+        }
+      }
+      return boat
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (boat, variables) => {
       try { localStorage.removeItem(draftKey) } catch {}
       setSavedAt(null)
       toast.success(
         variables.publish ? 'Annonce publiée !' : 'Brouillon enregistré'
       )
-      navigate('/proprietaire/bateaux')
+      if (!isEditing && Object.keys(pendingDocs).length > 0) {
+        navigate(`/proprietaire/bateaux/${boat.id}/editer`)
+      } else {
+        navigate('/proprietaire/bateaux')
+      }
     },
     onError: (err: any) => {
       toast.error(err?.message ?? 'Erreur lors de la sauvegarde')
@@ -273,6 +305,7 @@ const CreateEditBoat: React.FC = () => {
     depositAmount: form.depositAmount ? Number(form.depositAmount) : undefined,
     withSkipper: form.withSkipper,
     skipperPrice: form.skipperPrice ? Number(form.skipperPrice) : undefined,
+    requiredLicense: form.requiredLicense,
     description: form.description || undefined,
     equipment: form.equipment,
     rules: form.rules || undefined,
@@ -564,6 +597,27 @@ const CreateEditBoat: React.FC = () => {
                 )}
               </div>
 
+              {!form.withSkipper && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    Permis requis pour le locataire
+                  </label>
+                  <select
+                    value={form.requiredLicense}
+                    onChange={(e) => setField('requiredLicense', e.target.value as RequiredLicense)}
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-white dark:bg-gray-700"
+                  >
+                    <option value="NONE">Aucun permis requis</option>
+                    <option value="COASTAL">Permis côtier (mer)</option>
+                    <option value="OFFSHORE">Permis hauturier</option>
+                    <option value="INLAND">Permis eaux intérieures</option>
+                  </select>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    Le locataire devra renseigner ses qualifications nautiques ou un permis vérifié dans son profil.
+                  </p>
+                </div>
+              )}
+
               {/* Réductions dégressive (E2) */}
               <div className="rounded-xl border border-gray-200 dark:border-gray-600 p-4">
                 <div className="flex items-center justify-between mb-3">
@@ -779,7 +833,7 @@ const CreateEditBoat: React.FC = () => {
                 <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">
                   Formats acceptés : PDF, JPEG, PNG, WebP.{' '}
                   {!isEditing && (
-                    <span className="text-amber-500">Sauvegardez d'abord le bateau pour activer l'upload.</span>
+                    <span className="text-ocean-600">Les fichiers seront envoyés à la sauvegarde du bateau.</span>
                   )}
                 </p>
                 <div className="flex flex-col gap-3">
@@ -802,33 +856,35 @@ const CreateEditBoat: React.FC = () => {
                           >
                             <ExternalLink size={11} /> Voir le document
                           </a>
+                        ) : pendingDocs[docType] ? (
+                          <p className="text-xs text-green-600 dark:text-green-400 truncate">
+                            Prêt : {pendingDocs[docType]!.name}
+                          </p>
                         ) : (
                           <p className="text-xs text-gray-400 dark:text-gray-500">Non renseigné</p>
                         )}
                       </div>
-                      {isEditing && (
-                        <>
-                          <input
-                            ref={ref}
-                            type="file"
-                            accept=".pdf,.jpg,.jpeg,.png,.webp"
-                            className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0]
-                              if (file) handleDocUpload(docType, file)
-                            }}
-                          />
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            size="sm"
-                            loading={uploadingDoc === docType}
-                            onClick={() => ref.current?.click()}
-                          >
-                            {current ? 'Remplacer' : 'Uploader'}
-                          </Button>
-                        </>
-                      )}
+                      <>
+                        <input
+                          ref={ref}
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png,.webp"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) handleDocSelect(docType, file)
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          loading={uploadingDoc === docType}
+                          onClick={() => ref.current?.click()}
+                        >
+                          {current || pendingDocs[docType] ? 'Remplacer' : 'Uploader'}
+                        </Button>
+                      </>
                     </div>
                   ))}
                 </div>

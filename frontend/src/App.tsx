@@ -35,6 +35,7 @@ const AdminBookings = React.lazy(() => import('./pages/admin/AdminBookings'))
 const AdminReports  = React.lazy(() => import('./pages/admin/AdminReports'))
 const AdminReviews  = React.lazy(() => import('./pages/admin/AdminReviews'))
 const AdminRoles    = React.lazy(() => import('./pages/admin/AdminRoles'))
+const AdminKyc      = React.lazy(() => import('./pages/admin/AdminKyc'))
 const Notifications = React.lazy(() => import('./pages/dashboard/Notifications'))
 const UserProfile = React.lazy(() => import('./pages/dashboard/UserProfile'))
 const MyPublicProfileRedirect = React.lazy(() => import('./pages/dashboard/MyPublicProfileRedirect'))
@@ -216,6 +217,7 @@ export default function App() {
                 <Route path="signalements" element={<AdminReports />} />
                 <Route path="avis" element={<AdminReviews />} />
                 <Route path="roles" element={<AdminRoles />} />
+                <Route path="kyc" element={<AdminKyc />} />
                 </Route>
               </Route>
 

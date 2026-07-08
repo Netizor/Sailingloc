@@ -254,6 +254,17 @@ const BoatDetail: React.FC = () => {
     await bookingMutation.mutateAsync({ ...data, boatId: boat.id })
   }
 
+  const handlePaymentClose = async () => {
+    if (!stripePayment) return
+    const { bookingId } = stripePayment
+    setStripePayment(null)
+    try {
+      await bookingsApi.cancel(bookingId, { cancellationReason: 'Paiement abandonné' })
+    } catch {
+      // La réservation a peut-être déjà été traitée
+    }
+  }
+
   const locationLabel = boat.city ? `${boat.city}, ${boat.country}` : `${boat.port}, ${boat.country}`
   const description = getEnrichedDescription(boat)
   const shortDesc = description.length > 900 ? description.slice(0, 900) + '…' : description
@@ -583,7 +594,7 @@ const BoatDetail: React.FC = () => {
             toast.success(t('boat.detail.paymentConfirmed'))
             navigate('/mon-espace/reservations')
           }}
-          onClose={() => setStripePayment(null)}
+          onClose={handlePaymentClose}
         />
       )}
     </div>

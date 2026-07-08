@@ -41,6 +41,7 @@
     "aboutShort": "À propos",
     "services": "Nos services",
     "contact": "Contact",
+    "faq": "FAQ",
     "howItWorks": "Comment ça marche",
     "login": "Connexion",
     "becomeOwner": "Devenir Propriétaire",
@@ -241,6 +242,96 @@
     "ctaSubtitle": "Rejoignez la communauté SailingLoc et vivez une expérience nautique exceptionnelle.",
     "ctaBrowse": "Explorer les bateaux",
     "ctaOwner": "Devenir propriétaire"
+  },
+  "aboutPage": {
+    "pageTitle": "À propos de SailingLoc",
+    "heroBadge": "Notre histoire",
+    "heroTitle": "La mer,",
+    "heroTitleAccent": "accessible à tous",
+    "heroSubtitle": "SailingLoc connecte locataires et propriétaires de bateaux en France. Une plateforme simple, sécurisée et transparente pour louer ou proposer un bateau entre particuliers.",
+    "heroCta": "Découvrir la plateforme",
+    "missionTitle": "Notre mission",
+    "missionP1": "SailingLoc est né d'un constat simple : des milliers de bateaux restent à quai chaque été, tandis que des passionnés de mer rêvent de naviguer sans posséder leur propre navire.",
+    "missionP2": "Fondée à Marseille, notre plateforme met en relation locataires et propriétaires dans plus de 50 ports français. Voiliers, catamarans, bateaux à moteur ou semi-rigides — chaque annonce est vérifiée et chaque location bénéficie d'une assurance partenaire.",
+    "stats": {
+      "ports": "Ports couverts",
+      "rating": "Satisfaction utilisateurs",
+      "support": "Support disponible",
+      "payments": "Paiements sécurisés"
+    },
+    "promiseLabel": "Nos engagements",
+    "promiseTitle": "Ce que garantit SailingLoc",
+    "promiseSubtitle": "Des garanties concrètes pour louer ou mettre en location en toute confiance.",
+    "promise": {
+      "insurance": { "title": "Assurance incluse", "desc": "Chaque location est couverte par notre partenaire assurance maritime." },
+      "verified": { "title": "Annonces vérifiées", "desc": "Les bateaux et profils sont contrôlés avant publication sur la plateforme." },
+      "payment": { "title": "Paiement sécurisé", "desc": "Transactions protégées via Stripe. La caution éventuelle est convenue directement avec le propriétaire." },
+      "support": { "title": "Support client", "desc": "Notre équipe vous aide en cas de question avant, pendant ou après la location." }
+    },
+    "journeyLabel": "Comment ça marche",
+    "journeyTitle": "De la recherche à la navigation",
+    "journeySubtitle": "Quatre étapes simples pour réserver un bateau sur SailingLoc.",
+    "steps": {
+      "1": { "title": "Rechercher un bateau", "desc": "Parcourez les annonces par port, type de bateau, dates et budget. Filtrez avec ou sans skipper." },
+      "2": { "title": "Réserver en ligne", "desc": "Choisissez vos dates, consultez le prix détaillé et confirmez votre réservation en quelques clics." },
+      "3": { "title": "Échanger avec le propriétaire", "desc": "Via la messagerie intégrée, obtenez toutes les infos pratiques : rendez-vous au port, équipement, consignes." },
+      "4": { "title": "Naviguer & laisser un avis", "desc": "Profitez de votre sortie en mer, puis partagez votre expérience pour aider la communauté." }
+    },
+    "featuresLabel": "La plateforme",
+    "featuresTitle": "Ce que vous pouvez faire sur SailingLoc",
+    "featuresSubtitle": "Des fonctionnalités réelles, disponibles dès maintenant sur le site.",
+    "features": {
+      "booking": { "title": "Réservation en ligne", "desc": "Consultez les disponibilités, le prix par jour, les frais de service et réservez directement depuis le site." },
+      "messaging": { "title": "Messagerie intégrée", "desc": "Contactez le propriétaire avant la location pour poser vos questions et organiser le rendez-vous au port." },
+      "kyc": { "title": "Vérification d'identité", "desc": "Les utilisateurs peuvent vérifier leur identité (KYC) pour renforcer la confiance entre locataires et propriétaires." },
+      "skipper": { "title": "Skipper en option", "desc": "Certains bateaux proposent un skipper. Utilisez les filtres de recherche pour trouver l'offre adaptée à votre niveau." }
+    },
+    "audienceLabel": "Pour qui ?",
+    "audienceTitle": "Locataires et propriétaires",
+    "audienceSubtitle": "Que vous cherchiez à naviguer ou à rentabiliser votre bateau, SailingLoc vous accompagne.",
+    "audiencePopular": "Le plus demandé",
+    "audience": {
+      "renter": {
+        "name": "Locataires",
+        "tagline": "Trouvez et réservez un bateau",
+        "cta": "Louer un bateau",
+        "features": ["Recherche par port, dates et type", "Paiement sécurisé en ligne", "Assurance location incluse", "Messagerie avec le propriétaire", "Avis après chaque location"]
+      },
+      "owner": {
+        "name": "Propriétaires",
+        "tagline": "Louez votre bateau entre particuliers",
+        "cta": "Devenir propriétaire",
+        "features": ["Publication d'annonce gratuite", "Gestion du calendrier de disponibilités", "Paiements reçus de façon sécurisée", "Tableau de bord revenus & réservations", "Support dédié propriétaires"]
+      }
+    },
+    "quote": "La mer ne devrait pas être un luxe inaccessible.",
+    "quoteBody": "Notre ambition est de démocratiser la plaisance : rendre la navigation accessible, sécurisée et simple, que vous soyez locataire ou propriétaire.",
+    "badges": {
+      "verified": "Profils et annonces vérifiés",
+      "secure": "Paiements sécurisés Stripe",
+      "support": "Équipe support réactive",
+      "rating": "4.9/5 de satisfaction"
+    },
+    "faqLabel": "Questions fréquentes",
+    "faqTitle": "Ce qu'il faut savoir",
+    "faqSeeAll": "Voir toutes les questions →",
+    "faq": {
+      "1": { "q": "Comment réserver un bateau sur SailingLoc ?", "a": "Recherchez un bateau par port, dates et nombre de personnes. Choisissez une annonce, cliquez sur « Réserver » et suivez les étapes jusqu'au paiement sécurisé." },
+      "2": { "q": "Puis-je annuler ma réservation ?", "a": "Oui, depuis « Mes réservations ». Le remboursement dépend de la politique d'annulation du propriétaire et du délai avant le départ." },
+      "3": { "q": "Les bateaux sont-ils assurés ?", "a": "Chaque propriétaire doit fournir une assurance navigation valide. SailingLoc vérifie ces documents avant la publication de l'annonce." },
+      "4": { "q": "Puis-je louer un bateau avec skipper ?", "a": "Oui, si le propriétaire le propose. Utilisez le filtre « avec skipper » dans la recherche pour trouver les offres adaptées." },
+      "5": { "q": "Quels sont les frais de service ?", "a": "SailingLoc prélève environ 10 % de frais de service à la charge du locataire. Le montant exact est toujours affiché avant la confirmation." },
+      "6": { "q": "Comment fonctionne la caution ?", "a": "Le propriétaire peut définir un montant de caution dans son annonce. Ce montant est indiqué à titre informatif : la gestion concrète (empreinte bancaire ou dépôt) se fait directement entre locataire et propriétaire avant le départ." },
+      "7": { "q": "Comment mettre mon bateau en location ?", "a": "Créez un compte propriétaire, cliquez sur « Ajouter un bateau », renseignez les informations et ajoutez vos photos. L'annonce est publiée après vérification." },
+      "8": { "q": "Quand le propriétaire reçoit-il son paiement ?", "a": "Le locataire paie en ligne via Stripe lors de la réservation. Le versement au propriétaire est géré par la plateforme ; l'historique est visible dans l'espace « Revenus ». Le virement automatique via Stripe Connect est prévu en phase 2." }
+    },
+    "testimonialLabel": "Ils nous font confiance",
+    "testimonialCta": "Voir les témoignages",
+    "ctaTitle": "Prêt à naviguer ?",
+    "ctaSubtitle": "Explorez les bateaux disponibles ou proposez le vôtre sur SailingLoc.",
+    "ctaBoats": "Voir les bateaux",
+    "ctaContact": "Nous contacter",
+    "ctaTestimonials": "Témoignages"
   },
   "search": {
     "adventures_one": "{{count}} aventure maritime disponible",
@@ -522,6 +613,8 @@
       "serviceFee": "Frais de service",
       "cleaningFee": "Frais de ménage",
       "loginRequired": "Vous devez être connecté pour réserver. Cliquez sur \"Réserver\" pour vous connecter.",
+      "licenseRequired": "Ce bateau nécessite un permis bateau. Renseignez vos qualifications nautiques ou uploadez votre permis.",
+      "completeProfile": "Compléter mon profil",
       "bookNow": "Réserver maintenant",
       "loading": "Chargement…",
       "bookAndPay": "Réserver & Payer",
@@ -585,6 +678,7 @@
       "noPhoto": "Pas de photo",
       "renterLabel": "Locataire : {{name}}",
       "accept": "Accepter",
+      "pendingPayment": "En attente du paiement du locataire. La réservation sera confirmée automatiquement après paiement.",
       "decline": "Refuser",
       "rateRenter": "Évaluer le locataire",
       "confirmed": "Réservation confirmée",
@@ -714,6 +808,7 @@
     "addBoat": "Ajouter un bateau",
     "administration": "Administration",
     "users": "Utilisateurs",
+    "kycNav": "Vérifications KYC",
     "boatsNav": "Bateaux",
     "bookingsNav": "Réservations",
     "reports": "Signalements",
@@ -736,7 +831,7 @@
     "availabilityTitle": "Gérez vos disponibilités",
     "availabilityDesc": "Bloquez vos dates indisponibles et définissez vos créneaux de location. Vous restez libre de refuser ou d'accepter chaque demande de réservation.",
     "revenueTitle": "Percevez vos revenus",
-    "revenueDesc": "Dès qu'une réservation est confirmée, le paiement est sécurisé. Vous recevez votre virement sous 2 à 5 jours ouvrés après la fin de chaque location via Stripe Connect."
+    "revenueDesc": "Dès qu'une réservation est confirmée, le paiement locataire est sécurisé via Stripe. Consultez vos revenus dans l'espace dédié. Les virements automatiques aux propriétaires via Stripe Connect arriveront en phase 2."
   },
   "profileCompletion": {
     "emailNotVerified": "Email non vérifié",
