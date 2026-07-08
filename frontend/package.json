@@ -20,6 +20,7 @@
     "axios": "^1.6.5",
     "clsx": "^2.1.0",
     "date-fns": "^3.3.1",
+    "html2pdf.js": "^0.14.0",
     "i18next": "^25.8.14",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.316.0",

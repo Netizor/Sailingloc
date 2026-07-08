@@ -7,17 +7,38 @@ const router = Router()
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null
 const PLATFORM_FEE_PERCENT = parseFloat(process.env.STRIPE_PLATFORM_FEE_PERCENT || '10')
 
+function computeDays(startDate, endDate) {
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+  const days = Math.round((end - start) / (1000 * 60 * 60 * 24))
+  return Math.max(1, days)
+}
+
 function formatBooking(b) {
+  const totalDays = computeDays(b.start_date, b.end_date)
+  const dailyRate = b.boats?.price_per_day != null ? parseFloat(b.boats.price_per_day) : 0
+  const skipperFee = parseFloat(b.skipper_fee || 0)
+  const serviceFee = parseFloat(b.service_fee || 0)
+  const totalAmount = parseFloat(b.total_price || 0)
+  const subtotal = Math.max(0, totalAmount - serviceFee - skipperFee) || dailyRate * totalDays
+  const depositAmount = b.deposit_amount != null
+    ? parseFloat(b.deposit_amount)
+    : (b.boats?.deposit != null ? parseFloat(b.boats.deposit) : 0)
+
   return {
     id: b.id,
     boatId: b.boat_id,
     renterId: b.renter_id,
+    ownerId: b.boats?.owner_id ?? null,
     startDate: b.start_date,
     endDate: b.end_date,
+    totalDays,
     withSkipper: b.with_skipper,
-    platformFee: b.service_fee,
-    depositAmount: b.deposit_amount,
-    totalAmount: b.total_price,
+    dailyRate,
+    subtotal,
+    platformFee: serviceFee,
+    depositAmount,
+    totalAmount,
     status: b.status,
     cancellationReason: b.cancellation_reason,
     stripePaymentIntentId: b.stripe_payment_intent_id,
@@ -29,11 +50,19 @@ function formatBooking(b) {
       city: b.boats.city,
       port: b.boats.port,
       dailyRate: b.boats.price_per_day,
+      depositAmount: b.boats.deposit,
+    } : null,
+    owner: b.boats?.users ? {
+      id: b.boats.users.id,
+      firstName: b.boats.users.first_name,
+      lastName: b.boats.users.last_name,
+      avatar: b.boats.users.avatar,
     } : null,
     renter: b.renters ? {
       id: b.renters.id,
       firstName: b.renters.first_name,
       lastName: b.renters.last_name,
+      email: b.renters.email,
       avatar: b.renters.avatar,
     } : null,
   }
@@ -133,7 +162,7 @@ router.get('/owner', authenticate, async (req, res) => {
 // ─── GET /bookings/:id ─────────────────────────────────────
 router.get('/:id', authenticate, async (req, res) => {
   const { data: booking } = await supabase.from('bookings')
-    .select('*, boats(*, users(id, first_name, last_name, avatar)), renters:users!renter_id(id, first_name, last_name, avatar)')
+    .select('*, boats(*, users(id, first_name, last_name, avatar)), renters:users!renter_id(id, first_name, last_name, email, avatar)')
     .eq('id', req.params.id).single()
 
   if (!booking) return res.status(404).json({ message: 'Réservation introuvable' })
