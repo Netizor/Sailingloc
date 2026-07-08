@@ -11,6 +11,7 @@ import bookingsRouter from './routes/bookings.routes.js'
 import kycRouter from './routes/kyc.routes.js'
 import usersRouter from './routes/users.routes.js'
 import {
+  contactRouter,
   reviewsRouter,
   messagesRouter,
   favoritesRouter,
@@ -53,6 +54,7 @@ app.use(express.json({ limit: '2mb' }))
 app.use(express.urlencoded({ extended: true }))
 
 // ─── Routes ────────────────────────────────────────────────
+app.use('/api/contact',           contactRouter)
 app.use('/api/auth',              authRouter)
 app.use('/api/boats',             boatsRouter)
 app.use('/api/bookings',          bookingsRouter)

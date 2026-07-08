@@ -19,7 +19,7 @@ const Register = React.lazy(() => import('./pages/auth/Register'))
 const ForgotPassword = React.lazy(() => import('./pages/auth/ForgotPassword'))
 const ResetPassword = React.lazy(() => import('./pages/auth/ResetPassword'))
 const VerifyEmail   = React.lazy(() => import('./pages/auth/VerifyEmail'))
-const RenterDashboard = React.lazy(() => import('./pages/dashboard/RenterDashboard'))
+const DashboardHome = React.lazy(() => import('./pages/dashboard/DashboardHome'))
 const MyBookings = React.lazy(() => import('./pages/dashboard/MyBookings'))
 const OwnerDashboard = React.lazy(() => import('./pages/owner/OwnerDashboard'))
 const MyBoats = React.lazy(() => import('./pages/owner/MyBoats'))
@@ -163,7 +163,7 @@ export default function App() {
               {/* ── Renter (any authenticated user) ───────────────────────── */}
               <Route path="mon-espace" element={<ProtectedRoute />}>
                 <Route element={<UserDashboardLayout />}>
-                <Route index element={<RenterDashboard />} />
+                <Route index element={<DashboardHome />} />
                 <Route path="reservations" element={<MyBookings />} />
                 <Route path="reservations/:id" element={<BookingDetail />} />
                 <Route path="reservations/:id/avis" element={<LeaveReview />} />

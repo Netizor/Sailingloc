@@ -87,7 +87,7 @@ const MonthlyBarChart: React.FC<{ rows: RevenueByMonth[] }> = ({ rows }) => {
               width={56}
             />
             <Tooltip
-              formatter={(value: number | undefined) => [formatPrice(value ?? 0), 'Revenus']}
+              formatter={(value) => [formatPrice(Number(value ?? 0)), 'Revenus']}
               contentStyle={{
                 borderRadius: '12px',
                 border: '1px solid #e5e7eb',
