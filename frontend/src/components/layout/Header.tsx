@@ -3,7 +3,9 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import {
   Bell,
+  CalendarCheck,
   ChevronDown,
+  LayoutDashboard,
   LogOut,
   Menu,
   MessageSquare,
@@ -199,6 +201,10 @@ const Header: React.FC = () => {
                         </p>
                         <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{user.email}</p>
                       </div>
+                      <DropdownItem icon={<LayoutDashboard size={15} />} label={t('nav.mySpace')} to="/mon-espace" onClick={() => setDropdownOpen(false)} />
+                      {user.role === 'RENTER' && (
+                        <DropdownItem icon={<CalendarCheck size={15} />} label={t('nav.myBookings')} to="/mon-espace/reservations" onClick={() => setDropdownOpen(false)} />
+                      )}
                       {(user.role === 'OWNER' || user.role === 'ADMIN') && (
                         <DropdownItem icon={<Ship size={15} />} label={t('nav.ownerSpace')} to="/proprietaire" onClick={() => setDropdownOpen(false)} />
                       )}
