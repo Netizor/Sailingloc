@@ -88,19 +88,20 @@ const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
           <span className="text-xl font-bold text-ocean-700">{formatPrice(total)}</span>
         </div>
 
-        {/* Deposit note */}
-        <div className="mt-1 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2.5 flex items-start gap-2">
-          <Shield size={15} className="text-amber-500 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-xs font-semibold text-amber-800">
-              Caution : {formatPrice(depositAmount)}
-            </p>
-            <p className="text-xs text-amber-700 mt-0.5">
-              La caution est préautorisée sur votre carte mais n&apos;est pas débitée sauf dommages
-              constatés.
-            </p>
+        {/* Deposit note — informational only */}
+        {depositAmount > 0 && (
+          <div className="mt-1 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2.5 flex items-start gap-2">
+            <Shield size={15} className="text-amber-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-semibold text-amber-800">
+                Caution indicative : {formatPrice(depositAmount)}
+              </p>
+              <p className="text-xs text-amber-700 mt-0.5">
+                Montant convenu avec le propriétaire avant le départ. Non prélevé en ligne sur SailingLoc.
+              </p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )

@@ -1,5 +1,7 @@
 import React, { useMemo, useId, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { ChevronDown, HelpCircle, MessageCircle } from 'lucide-react'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -66,14 +68,14 @@ const FAQ_DATA: FaqQuestion[] = [
     category: 'paiements',
     question: 'Quand suis-je débité ?',
     answer:
-      'Le montant total est pré-autorisé lors de la réservation. Il est effectivement débité dès que le propriétaire confirme votre demande. Si la demande expire ou est refusée, l\'autorisation est annulée et aucune somme n\'est prélevée.',
+      'Le montant total est débité en ligne via Stripe dès que vous confirmez votre réservation. La réservation passe automatiquement au statut « Confirmée » après paiement réussi.',
   },
   {
     id: 'pai-caution',
     category: 'paiements',
     question: 'Comment fonctionne la caution ?',
     answer:
-      'Une caution peut être définie par le propriétaire. Elle fait l\'objet d\'une pré-autorisation sur votre carte, sans débit réel, au moment de la confirmation. Elle est libérée automatiquement à la fin de la location si aucun dommage n\'est signalé.',
+      'Le propriétaire peut définir un montant de caution dans son annonce. Ce montant est affiché à titre informatif : la gestion concrète (empreinte bancaire ou dépôt) se fait directement entre locataire et propriétaire avant le départ.',
   },
   {
     id: 'pai-remboursement',
@@ -117,7 +119,7 @@ const FAQ_DATA: FaqQuestion[] = [
     category: 'proprietaires',
     question: 'Comment et quand reçois-je mes paiements ?',
     answer:
-      'Les paiements sont versés sur votre compte bancaire via Stripe Connect dans les 2 à 5 jours ouvrés suivant la fin de la location. Vous pouvez consulter l\'historique de vos versements dans votre tableau de bord "Revenus".',
+      'Le locataire paie en ligne via Stripe lors de la réservation. Le versement au propriétaire est suivi dans l\'espace « Revenus ». Les virements automatiques via Stripe Connect sont prévus en phase 2.',
   },
   {
     id: 'pro-bloquer-dates',
@@ -140,7 +142,7 @@ const FAQ_DATA: FaqQuestion[] = [
     category: 'securite',
     question: 'Que se passe-t-il en cas de dommage pendant la location ?',
     answer:
-      'En cas de dommage, signalez-le immédiatement via la messagerie et remplissez le formulaire d\'incident disponible dans votre réservation. SailingLoc sert de médiateur entre locataire et propriétaire. La caution peut être partiellement ou totalement retenue selon les constats.',
+      'En cas de dommage, signalez-le immédiatement via la messagerie et remplissez le formulaire d\'incident disponible dans votre réservation. SailingLoc sert de médiateur entre locataire et propriétaire. La caution éventuelle est gérée directement entre les parties selon les constats.',
   },
   {
     id: 'sec-verification-locataires',
@@ -229,6 +231,8 @@ const FaqItem: React.FC<FaqItemProps> = ({ question, answer }) => {
 const Faq: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<Category>('all')
 
+  usePageTitle('FAQ - SailingLoc')
+
   // Mémoïsation du filtrage pour éviter un recalcul à chaque rendu
   const filtered = useMemo(
     () =>
@@ -241,18 +245,31 @@ const Faq: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-ocean-900 to-ocean-700 text-white py-20 px-4 text-center">
-        <span className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-          <HelpCircle size={15} />
-          Centre d'aide
-        </span>
-        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-          Questions fréquentes
-        </h1>
-        <p className="text-lg text-ocean-100 max-w-xl mx-auto">
-          Retrouvez les réponses aux questions les plus posées sur SailingLoc.
-          Vous ne trouvez pas ce que vous cherchez ? Contactez-nous.
-        </p>
+      <section className="relative min-h-[420px] sm:min-h-[480px] flex items-center justify-center text-center px-4">
+        <img
+          src="/boat-navigating-through-canyon.jpg"
+          alt=""
+          aria-hidden
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#071d49]/80 via-[#071d49]/65 to-[#071d49]/85" />
+        <div className="relative z-10 max-w-2xl py-20 text-white">
+          <span className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
+            <HelpCircle size={15} />
+            Centre d'aide
+          </span>
+          <h1 className="text-4xl sm:text-5xl font-serif font-bold tracking-tight mb-4">
+            Questions fréquentes
+          </h1>
+          <p className="text-lg text-white/85 leading-relaxed">
+            Retrouvez les réponses aux questions les plus posées sur SailingLoc.
+            Vous ne trouvez pas ce que vous cherchez ?{' '}
+            <Link to="/contact" className="text-teal-300 hover:text-teal-200 underline underline-offset-2">
+              Contactez-nous
+            </Link>
+            .
+          </p>
+        </div>
       </section>
 
       {/* Contenu principal */}
@@ -303,12 +320,12 @@ const Faq: React.FC = () => {
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
             Notre équipe est disponible pour vous aider du lundi au vendredi, de 9 h à 18 h.
           </p>
-          <a
-            href="mailto:contact@sailingloc.fr"
+          <Link
+            to="/contact"
             className="inline-flex items-center gap-2 bg-ocean-700 hover:bg-ocean-800 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition-colors"
           >
             Nous contacter
-          </a>
+          </Link>
         </div>
       </div>
     </div>

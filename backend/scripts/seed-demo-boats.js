@@ -165,18 +165,10 @@ async function seedBoats(ownerId) {
       await supabase.from('boats').delete().eq('id', existing.id)
     }
 
-<<<<<<< Updated upstream
-=======
-    process.stdout.write(`📷 ${title}… `)
-    const pexelsImages = await pickBoatPhotos(pexelsKey, imageQueries(boat), 3, usedPhotoIds)
-    const images = pexelsImages.length ? pexelsImages : [FALLBACK_IMAGE]
-    console.log(pexelsImages.length ? `${images.length} photos Pexels` : 'repli local')
-
     // 2 bateaux sur 3 sont proposés avec skipper, le reste en location seule
     const withSkipper = i % 3 !== 0
     const boatMeta = { ...boat, withSkipper }
 
->>>>>>> Stashed changes
     const row = {
       owner_id: ownerId,
       title,

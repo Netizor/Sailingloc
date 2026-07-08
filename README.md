@@ -4,9 +4,9 @@
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?logo=typescript&logoColor=white)
-![Symfony](https://img.shields.io/badge/Symfony-7.2-000000?logo=symfony&logoColor=white)
-![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?logo=php&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-20-339933?logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express-4-000000?logo=express&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3FCF8E?logo=supabase&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ---
@@ -46,15 +46,13 @@ sailingloc/
 │   │   ├── store/     # Zustand (auth, compare)
 │   │   └── lib/       # axios, labels, utils
 │   └── public/
-├── backend/           # API REST Symfony — déployée sur Railway
+├── backend/           # API REST Node/Express + Supabase — déployée sur Railway
 │   ├── src/
-│   │   ├── Controller/
-│   │   ├── Entity/
-│   │   ├── Repository/
-│   │   ├── Service/
-│   │   └── EventListener/
-│   ├── config/
-│   └── migrations/
+│   │   ├── routes/    # auth, boats, bookings, users, kyc…
+│   │   ├── middleware/
+│   │   ├── services/
+│   │   └── lib/       # supabase, helpers
+│   └── scripts/       # seed données démo
 └── package.json       # Lanceur racine (concurrently)
 ```
 

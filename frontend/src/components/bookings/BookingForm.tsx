@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { MessageSquare, User, AlertCircle } from 'lucide-react'
 import { differenceInDays, parseISO, format, addDays, isBefore } from 'date-fns'
@@ -55,7 +55,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
 }) => {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuthStore()
+  const location = useLocation()
+  const { isAuthenticated, user } = useAuthStore()
 
   const dateLocale = i18n.language.startsWith('en') ? enUS : fr
   const priceLocale = i18n.language
@@ -70,7 +71,16 @@ const BookingForm: React.FC<BookingFormProps> = ({
   const [withSkipper, setWithSkipper] = useState(false)
   const [message, setMessage] = useState('')
   const [dateError, setDateError] = useState<string | undefined>()
+  const [licenseError, setLicenseError] = useState<string | undefined>()
   const [passengers, setPassengers] = useState(Math.min(2, boat.capacity))
+
+  const licenseRequired = Boolean(
+    boat.requiredLicense && boat.requiredLicense !== 'NONE' && !withSkipper,
+  )
+  const hasBoatingCredentials = Boolean(
+    user?.sailingQualifications?.trim()
+    || (user?.sailorCvStatus === 'APPROVED' && user?.sailorCvDoc),
+  )
 
   const disabledSet = useMemo(() => new Set(disabledDates), [disabledDates])
 
@@ -144,7 +154,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
       setDateError(t('booking.form.errorDatesUnavailable'))
       return false
     }
+    if (licenseRequired && !hasBoatingCredentials) {
+      setLicenseError(t('booking.form.licenseRequired'))
+      return false
+    }
     setDateError(undefined)
+    setLicenseError(undefined)
     return true
   }
 
@@ -319,7 +334,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
             <input
               type="checkbox"
               checked={withSkipper}
-              onChange={(e) => setWithSkipper(e.target.checked)}
+                    onChange={(e) => {
+                      setWithSkipper(e.target.checked)
+                      setLicenseError(undefined)
+                    }}
               className="mt-0.5 h-4 w-4 rounded border-gray-300 text-ocean-600 focus:ring-ocean-500 cursor-pointer"
             />
             <div>
@@ -395,6 +413,26 @@ const BookingForm: React.FC<BookingFormProps> = ({
             <AlertCircle size={14} className="flex-shrink-0 mt-0.5 text-blue-500" />
             {t('booking.form.loginRequired')}
           </div>
+        )}
+
+        {licenseRequired && isAuthenticated && !hasBoatingCredentials && (
+          <div className="flex items-start gap-2 bg-amber-50 text-amber-800 rounded-xl px-3 py-2.5 text-xs">
+            <AlertCircle size={14} className="flex-shrink-0 mt-0.5 text-amber-500" />
+            <span>
+              {t('booking.form.licenseRequired')}{' '}
+              <button
+                type="button"
+                onClick={() => navigate('/mon-espace/profil')}
+                className="underline font-medium"
+              >
+                {t('booking.form.completeProfile')}
+              </button>
+            </span>
+          </div>
+        )}
+
+        {licenseError && (
+          <p className="text-xs text-red-600">{licenseError}</p>
         )}
 
         {isDetail ? (

@@ -27,3 +27,49 @@ export const submitKyc = async (frontFile: File, backFile: File): Promise<KycSta
   const { data } = await api.post<KycStatusResponse>('/kyc/submit', formData)
   return data
 }
+
+export interface PendingKycUser {
+  id: number
+  email: string
+  firstName: string
+  lastName: string
+  role: string
+  kycStatus: string
+  kycFrontDoc?: string
+  kycBackDoc?: string
+  kycSubmittedAt?: string
+}
+
+function mapPendingKycUser(row: Record<string, unknown>): PendingKycUser {
+  return {
+    id: row.id as number,
+    email: row.email as string,
+    firstName: row.first_name as string,
+    lastName: row.last_name as string,
+    role: row.role as string,
+    kycStatus: row.kyc_status as string,
+    kycFrontDoc: row.kyc_front_doc as string | undefined,
+    kycBackDoc: row.kyc_back_doc as string | undefined,
+    kycSubmittedAt: row.kyc_submitted_at as string | undefined,
+  }
+}
+
+export const getPendingKycUsers = async (): Promise<PendingKycUser[]> => {
+  const { data } = await api.get<{ data: Record<string, unknown>[] }>('/kyc/admin/pending')
+  return (data.data ?? []).map(mapPendingKycUser)
+}
+
+export const reviewKyc = async (
+  userId: number,
+  payload: { status: 'APPROVED' | 'REJECTED'; rejectionReason?: string },
+): Promise<KycStatusResponse> => {
+  const { data } = await api.patch<KycStatusResponse>(`/kyc/admin/${userId}`, payload)
+  return data
+}
+
+export const kycApi = {
+  getStatus: getKycStatus,
+  submit: submitKyc,
+  getPendingUsers: getPendingKycUsers,
+  review: reviewKyc,
+}

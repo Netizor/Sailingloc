@@ -25,7 +25,8 @@ import { TESTIMONIALS } from '../data/testimonials'
 type PopularBoatItem = {
   boat: Boat
   image: string
-  badge?: 'PREMIUM' | 'NOUVEAU'
+  badge?: 'PREMIUM' | 'NOUVEAU' | 'EXEMPLE'
+  isDemo?: boolean
 }
 
 function useInView(threshold = 0.15) {
@@ -238,7 +239,11 @@ const Home: React.FC = () => {
           boat,
           image: boat.images?.[0] ?? IMAGES.boatFallback,
         }))
-      : POPULAR_BOATS
+      : POPULAR_BOATS.map((item) => ({
+          ...item,
+          badge: 'EXEMPLE' as const,
+          isDemo: true,
+        }))
 
   const visibleBoats = popularBoats.slice(carouselIndex, carouselIndex + 3)
   const canPrev = carouselIndex > 0
@@ -337,8 +342,8 @@ const Home: React.FC = () => {
             <div className="flex justify-center py-20"><Spinner size="lg" /></div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {visibleBoats.map(({ boat, image, badge }) => (
-                <FeaturedBoatCard key={boat.id} boat={boat} image={image} badge={badge} />
+              {visibleBoats.map(({ boat, image, badge, isDemo }) => (
+                <FeaturedBoatCard key={boat.id} boat={boat} image={image} badge={badge} isDemo={isDemo} />
               ))}
             </div>
           )}

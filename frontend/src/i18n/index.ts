@@ -5,14 +5,14 @@ import en from './locales/en.json'
 
 const STORAGE_KEY = 'sailingloc_lang'
 
-const initialLang = localStorage.getItem(STORAGE_KEY) ?? 'en'
+const initialLang = localStorage.getItem(STORAGE_KEY) ?? 'fr'
 
 i18n
   .use(initReactI18next)
   .init({
     resources: { fr: { translation: fr }, en: { translation: en } },
     lng: initialLang,
-    fallbackLng: 'en',
+    fallbackLng: 'fr',
     interpolation: { escapeValue: false },
   })
 
