@@ -243,6 +243,78 @@
     "ctaBrowse": "Explorer les bateaux",
     "ctaOwner": "Devenir propriétaire"
   },
+  "servicesPage": {
+    "pageTitle": "Nos services",
+    "heroBadge": "Exclusivité maritime",
+    "heroTitle": "L'Art de Vivre",
+    "heroTitleAccent": "Sans Compromis",
+    "heroSubtitle": "Notre conciergerie dédiée transforme chaque croisière en une expérience sur-mesure, anticipant vos moindres désirs pour une sérénité absolue en mer.",
+    "heroCta": "Découvrir nos services",
+    "stats": {
+      "ports": "Ports partenaires",
+      "rating": "Satisfaction clients",
+      "support": "Assistance dédiée",
+      "payments": "Paiements sécurisés"
+    },
+    "promiseLabel": "La promesse SailingLoc",
+    "promiseTitle": "Une plateforme pensée pour votre sérénité",
+    "promiseSubtitle": "Au-delà de la conciergerie premium, chaque location bénéficie de garanties solides pour naviguer l'esprit tranquille.",
+    "promise": {
+      "insurance": { "title": "Assurance incluse", "desc": "Chaque location est couverte par notre partenaire assurance maritime." },
+      "verified": { "title": "Bateaux vérifiés", "desc": "Annonces contrôlées et profils vérifiés pour une communauté de confiance." },
+      "payment": { "title": "Paiement sécurisé", "desc": "Transactions protégées et caution gérée de façon transparente." },
+      "support": { "title": "Support réactif", "desc": "Une équipe disponible avant, pendant et après votre navigation." }
+    },
+    "journeyLabel": "Votre parcours",
+    "journeyTitle": "De la réservation à la mer",
+    "journeySubtitle": "Un accompagnement fluide à chaque étape, pour une expérience sans friction.",
+    "steps": {
+      "1": { "title": "Recherche & réservation", "desc": "Trouvez le bateau idéal, consultez les disponibilités et réservez en ligne en quelques clics." },
+      "2": { "title": "Confirmation & briefing", "desc": "Votre réservation est validée. Vous recevez toutes les informations pratiques avant le départ." },
+      "3": { "title": "Navigation sereine", "desc": "Embarquez en toute confiance : bateau vérifié, assurance incluse et support disponible." },
+      "4": { "title": "Conciergerie sur-mesure", "desc": "Chef à bord, itinéraires privés, transferts VIP — nous personnalisons chaque séjour." }
+    },
+    "premiumLabel": "Conciergerie premium",
+    "premiumTitle": "Une Assistance à 360°",
+    "premiumSubtitle": "De la gastronomie à la logistique technique, nous redéfinissons les standards du service premium en mer.",
+    "premium": {
+      "chef": { "title": "Chef Gastronomique à Bord", "desc": "Une table étoilée flottante. Nos chefs privés concoctent des menus personnalisés selon vos préférences et les arrivages locaux." },
+      "support": { "title": "Assistance 24/7", "desc": "Un support technique et opérationnel disponible à tout instant. Qu'il s'agisse d'un besoin technique ou d'un conseil météo, nos experts veillent sur vous." },
+      "vip": { "title": "Logistique VIP", "desc": "Transferts en hélicoptère, chauffeurs privés à l'embarquement et gestion des bagages pour une transition fluide entre terre et mer." },
+      "itinerary": { "title": "Itinéraires sur Mesure", "desc": "Criques secrètes, réservations dans les clubs de plage les plus prisés et escales culturelles privatisées. Nos planificateurs dessinent votre sillage." }
+    },
+    "offersLabel": "Nos formules",
+    "offersTitle": "Choisissez votre niveau de service",
+    "offersSubtitle": "De la location simple à l'expérience concierge complète, adaptez votre séjour à vos envies.",
+    "offersPopular": "Populaire",
+    "offers": {
+      "essential": { "name": "Essentiel", "tagline": "L'expérience SailingLoc", "cta": "Nous contacter", "features": ["Réservation en ligne simplifiée", "Assurance location incluse", "Support client 7j/7", "Profils propriétaires vérifiés"] },
+      "premium": { "name": "Premium", "tagline": "Le confort en plus", "cta": "Réserver un bateau", "features": ["Tout l'offre Essentiel", "Skipper professionnel disponible", "Assistance météo & navigation", "Check-in prioritaire au port"] },
+      "concierge": { "name": "Conciergerie", "tagline": "Sur-mesure & exclusif", "cta": "Nous contacter", "features": ["Concierge dédié à votre séjour", "Chef gastronomique à bord", "Itinéraires & escales privées", "Logistique VIP terre-mer"] }
+    },
+    "quote": "Le luxe n'est pas une option, c'est notre standard.",
+    "quoteBody": "Parce que chaque navigation est unique, SailingLoc met à votre disposition un concierge dédié dès la confirmation de votre réservation. Notre réseau de partenaires nous permet de répondre aux demandes les plus exigeantes.",
+    "badges": {
+      "concierge": "Concierges certifiés yachting",
+      "privacy": "Discrétion & confidentialité",
+      "response": "Réponse sous 2 h",
+      "rating": "4.9/5 de satisfaction"
+    },
+    "faqLabel": "Questions fréquentes",
+    "faqTitle": "Tout savoir sur nos services",
+    "faq": {
+      "1": { "q": "L'assurance est-elle vraiment incluse ?", "a": "Oui. Chaque réservation via SailingLoc inclut une couverture assurance partenaire. Les détails sont communiqués avant la confirmation de votre location." },
+      "2": { "q": "Puis-je demander un skipper ou un chef à bord ?", "a": "Absolument. Lors de la réservation ou via notre conciergerie, vous pouvez ajouter un skipper professionnel ou un chef gastronomique selon la formule choisie." },
+      "3": { "q": "Comment fonctionne la conciergerie premium ?", "a": "Dès la confirmation, un concierge dédié prend contact avec vous pour personnaliser votre séjour : itinéraire, transferts, restauration, événements privés à bord." }
+    },
+    "testimonialLabel": "Ils nous font confiance",
+    "testimonialCta": "Voir tous les témoignages",
+    "ctaTitle": "Prêt pour une expérience d'exception ?",
+    "ctaSubtitle": "Explorez notre flotte ou contactez notre équipe conciergerie pour personnaliser votre prochain séjour en mer.",
+    "ctaBoats": "Voir les bateaux",
+    "ctaContact": "Prendre rendez-vous",
+    "ctaTestimonials": "Témoignages"
+  },
   "search": {
     "adventures_one": "{{count}} aventure maritime disponible",
     "adventures_other": "{{count}} aventures maritimes disponibles",

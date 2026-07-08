@@ -243,6 +243,78 @@
     "ctaBrowse": "Browse boats",
     "ctaOwner": "Become an owner"
   },
+  "servicesPage": {
+    "pageTitle": "Our services",
+    "heroBadge": "Maritime exclusivity",
+    "heroTitle": "The Art of Living",
+    "heroTitleAccent": "Without Compromise",
+    "heroSubtitle": "Our dedicated concierge turns every cruise into a tailor-made experience, anticipating your every wish for absolute serenity at sea.",
+    "heroCta": "Discover our services",
+    "stats": {
+      "ports": "Partner ports",
+      "rating": "Customer satisfaction",
+      "support": "Dedicated assistance",
+      "payments": "Secure payments"
+    },
+    "promiseLabel": "The SailingLoc promise",
+    "promiseTitle": "A platform designed for your peace of mind",
+    "promiseSubtitle": "Beyond premium concierge services, every rental comes with solid guarantees so you can sail with confidence.",
+    "promise": {
+      "insurance": { "title": "Insurance included", "desc": "Every rental is covered by our maritime insurance partner." },
+      "verified": { "title": "Verified boats", "desc": "Checked listings and verified profiles for a trusted community." },
+      "payment": { "title": "Secure payment", "desc": "Protected transactions and transparent deposit handling." },
+      "support": { "title": "Responsive support", "desc": "A team available before, during and after your trip." }
+    },
+    "journeyLabel": "Your journey",
+    "journeyTitle": "From booking to sea",
+    "journeySubtitle": "Smooth support at every step for a frictionless experience.",
+    "steps": {
+      "1": { "title": "Search & book", "desc": "Find the ideal boat, check availability and book online in a few clicks." },
+      "2": { "title": "Confirmation & briefing", "desc": "Your booking is confirmed. You receive all practical information before departure." },
+      "3": { "title": "Peaceful sailing", "desc": "Board with confidence: verified boat, insurance included and support available." },
+      "4": { "title": "Tailored concierge", "desc": "On-board chef, private itineraries, VIP transfers — we personalize every stay." }
+    },
+    "premiumLabel": "Premium concierge",
+    "premiumTitle": "360° Assistance",
+    "premiumSubtitle": "From gastronomy to technical logistics, we redefine premium service standards at sea.",
+    "premium": {
+      "chef": { "title": "On-board Gourmet Chef", "desc": "A floating Michelin-style table. Our private chefs craft personalized menus based on your tastes and local produce." },
+      "support": { "title": "24/7 Assistance", "desc": "Technical and operational support available at all times. Whether you need technical help or weather advice, our experts watch over you." },
+      "vip": { "title": "VIP Logistics", "desc": "Helicopter transfers, private drivers at embarkation and luggage handling for a seamless land-to-sea transition." },
+      "itinerary": { "title": "Tailored Itineraries", "desc": "Secret coves, reservations at the finest beach clubs and private cultural stops. Our planners chart your course." }
+    },
+    "offersLabel": "Our plans",
+    "offersTitle": "Choose your level of service",
+    "offersSubtitle": "From simple rental to full concierge experience, tailor your stay to your desires.",
+    "offersPopular": "Popular",
+    "offers": {
+      "essential": { "name": "Essential", "tagline": "The SailingLoc experience", "cta": "Contact us", "features": ["Simplified online booking", "Rental insurance included", "Customer support 7 days a week", "Verified owner profiles"] },
+      "premium": { "name": "Premium", "tagline": "Extra comfort", "cta": "Book a boat", "features": ["Everything in Essential", "Professional skipper available", "Weather & navigation assistance", "Priority port check-in"] },
+      "concierge": { "name": "Concierge", "tagline": "Tailored & exclusive", "cta": "Contact us", "features": ["Dedicated concierge for your stay", "On-board gourmet chef", "Private itineraries & stops", "Land-to-sea VIP logistics"] }
+    },
+    "quote": "Luxury is not an option, it's our standard.",
+    "quoteBody": "Because every voyage is unique, SailingLoc provides a dedicated concierge from the moment your booking is confirmed. Our partner network allows us to meet the most demanding requests.",
+    "badges": {
+      "concierge": "Certified yachting concierges",
+      "privacy": "Discretion & confidentiality",
+      "response": "Response within 2 hours",
+      "rating": "4.9/5 satisfaction"
+    },
+    "faqLabel": "Frequently asked questions",
+    "faqTitle": "Everything about our services",
+    "faq": {
+      "1": { "q": "Is insurance really included?", "a": "Yes. Every booking through SailingLoc includes partner insurance coverage. Details are shared before your rental is confirmed." },
+      "2": { "q": "Can I request a skipper or on-board chef?", "a": "Absolutely. When booking or through our concierge, you can add a professional skipper or gourmet chef depending on your chosen plan." },
+      "3": { "q": "How does premium concierge work?", "a": "Once confirmed, a dedicated concierge contacts you to personalize your stay: itinerary, transfers, dining, private events on board." }
+    },
+    "testimonialLabel": "They trust us",
+    "testimonialCta": "See all testimonials",
+    "ctaTitle": "Ready for an exceptional experience?",
+    "ctaSubtitle": "Explore our fleet or contact our concierge team to personalize your next stay at sea.",
+    "ctaBoats": "Browse boats",
+    "ctaContact": "Book an appointment",
+    "ctaTestimonials": "Testimonials"
+  },
   "search": {
     "adventures_one": "{{count}} maritime adventure available",
     "adventures_other": "{{count}} maritime adventures available",
