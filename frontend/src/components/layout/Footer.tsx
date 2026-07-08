@@ -15,6 +15,7 @@ const Footer: React.FC = () => {
 
   const supportLinks = [
     { label: t('footer.contactUs'), to: '/contact' },
+    { label: t('footer.testimonials'), to: '/temoignages' },
     { label: t('footer.faq'), to: '/faq' },
   ]
 

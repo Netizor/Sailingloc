@@ -40,6 +40,7 @@
     "aboutUs": "Qui sommes-nous ?",
     "aboutShort": "À propos",
     "services": "Nos services",
+    "contact": "Contact",
     "howItWorks": "Comment ça marche",
     "login": "Connexion",
     "becomeOwner": "Devenir Propriétaire",
@@ -89,6 +90,7 @@
     "availablePorts": "Ports disponibles",
     "insurance": "Assurance & sécurité",
     "faq": "FAQ",
+    "testimonials": "Témoignages",
     "becomeOwner": "Devenir propriétaire",
     "ownerSpace": "Espace propriétaire",
     "manageBoats": "Gérer mes bateaux",
@@ -181,6 +183,7 @@
     "milesStatLabel": "Milles marins parcourus",
     "testimonialsTitle": "Ils ont navigué avec nous",
     "testimonialsRating": "4.9 / 5 en moyenne",
+    "testimonialsSeeAll": "Voir tous les témoignages →",
     "ctaTitle": "Prête à explorer la mer ?",
     "ctaSubtitle": "Rejoignez des milliers de navigateurs qui ont choisi SailingLoc pour leurs aventures nautiques.",
     "ctaRentBoat": "Louer un bateau",
@@ -197,6 +200,47 @@
     "skipperOptional": "Skipper (optionnel)",
     "platformFee": "Commission plateforme",
     "estimationNote": "*Estimation indicative basée sur la moyenne des propriétaires actifs."
+  },
+  "testimonials": {
+    "pageTitle": "Témoignages",
+    "heroBadge": "Avis vérifiés",
+    "heroTitle": "Ils ont navigué avec SailingLoc",
+    "heroSubtitle": "Découvrez les expériences de locataires et propriétaires qui font confiance à notre plateforme pour vivre des moments inoubliables en mer.",
+    "readReviews": "Lire les avis",
+    "stats": {
+      "rating": "Note moyenne",
+      "reviews": "Avis publiés",
+      "reviewsCount": "{{count}} avis",
+      "satisfaction": "Clients satisfaits",
+      "ports": "Ports partenaires"
+    },
+    "featuredLabel": "Témoignage vedette",
+    "gridTitle": "Ce que disent nos membres",
+    "gridSubtitle": "Des avis authentiques, laissés après des locations confirmées sur SailingLoc.",
+    "filters": {
+      "all": "Tous",
+      "renters": "Locataires",
+      "owners": "Propriétaires"
+    },
+    "trustTitle": "Pourquoi ils nous font confiance",
+    "trust": {
+      "security": {
+        "title": "Sécurité & assurance",
+        "desc": "Chaque location est couverte par une assurance partenaire et un contrat clair entre les parties."
+      },
+      "verified": {
+        "title": "Profils vérifiés",
+        "desc": "Identités contrôlées, annonces validées et avis modérés pour une communauté de confiance."
+      },
+      "community": {
+        "title": "Communauté passionnée",
+        "desc": "Des milliers de navigateurs et propriétaires partagent la même passion de la mer."
+      }
+    },
+    "ctaTitle": "Votre prochaine aventure vous attend",
+    "ctaSubtitle": "Rejoignez la communauté SailingLoc et vivez une expérience nautique exceptionnelle.",
+    "ctaBrowse": "Explorer les bateaux",
+    "ctaOwner": "Devenir propriétaire"
   },
   "search": {
     "adventures_one": "{{count}} aventure maritime disponible",

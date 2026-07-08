@@ -16,8 +16,8 @@ import {
   AlertTriangle,
 } from 'lucide-react'
 import { bookingsApi } from '../../api/bookings.api'
-import { formatDate, formatPrice } from '../../lib/utils'
-import { generateInvoice } from '../../lib/generateInvoice'
+import { daysBetween, formatDate, formatPrice } from '../../lib/utils'
+import { downloadInvoicePdf } from '../../lib/generateInvoice'
 import { useAuthStore } from '../../store/auth.store'
 import { BookingStatus } from '../../types'
 import BookingStatusBadge from '../../components/bookings/BookingStatusBadge'
@@ -91,6 +91,9 @@ const BookingDetail: React.FC = () => {
   }
 
   const boat = booking.boat
+  const totalDays = booking.totalDays || daysBetween(booking.startDate, booking.endDate) || 1
+  const dailyRate = booking.dailyRate ?? boat?.dailyRate ?? 0
+  const subtotal = booking.subtotal ?? dailyRate * totalDays
   const canReview = booking.status === BookingStatus.COMPLETED
   // Le locataire peut annuler si la réservation est encore active
   const canCancel =
@@ -111,7 +114,10 @@ const BookingDetail: React.FC = () => {
     const renterName = booking.renter
       ? `${booking.renter.firstName ?? ''} ${booking.renter.lastName ?? ''}`.trim()
       : (user ? `${user.firstName} ${user.lastName}` : 'Client')
-    generateInvoice(booking, renterName)
+    const renterEmail = booking.renter?.email ?? user?.email
+    downloadInvoicePdf(booking, { name: renterName || 'Client', email: renterEmail }).catch(() => {
+      toast.error("Impossible de télécharger la facture")
+    })
   }
 
   return (
@@ -180,7 +186,7 @@ const BookingDetail: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <InfoRow icon={<CalendarDays size={16} />} label="Arrivée" value={formatDate(booking.startDate)} />
               <InfoRow icon={<CalendarDays size={16} />} label="Départ" value={formatDate(booking.endDate)} />
-              <InfoRow icon={<Clock size={16} />} label="Durée" value={`${booking.totalDays} jour${booking.totalDays > 1 ? 's' : ''}`} />
+              <InfoRow icon={<Clock size={16} />} label="Durée" value={`${totalDays} jour${totalDays > 1 ? 's' : ''}`} />
             </div>
           </section>
 
@@ -191,8 +197,8 @@ const BookingDetail: React.FC = () => {
             </h2>
             <div className="space-y-2.5 text-sm">
               <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                <span>{booking.dailyRate} € × {booking.totalDays} jour{booking.totalDays > 1 ? 's' : ''}</span>
-                <span>{formatPrice(booking.subtotal ?? 0)}</span>
+                <span>{formatPrice(dailyRate)} × {totalDays} jour{totalDays > 1 ? 's' : ''}</span>
+                <span>{formatPrice(subtotal)}</span>
               </div>
               {booking.withSkipper && (
                 <div className="flex justify-between text-gray-600 dark:text-gray-400">
