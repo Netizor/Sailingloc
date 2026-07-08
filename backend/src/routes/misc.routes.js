@@ -33,10 +33,10 @@ contactRouter.post('/', contactLimiter, async (req, res) => {
     })
   } catch (error) {
     console.error('[Contact] Erreur envoi email:', error)
-    return res.status(500).json({ message: 'Impossible d\'envoyer le message pour le moment' })
+    return res.status(500).json({ success: false, message: 'Impossible d\'envoyer le message pour le moment' })
   }
 
-  return res.status(201).json({ message: 'Message envoyé' })
+  return res.status(201).json({ success: true, message: 'Message envoyé' })
 })
 
 import { notifyAdmins } from '../services/notifications.service.js'

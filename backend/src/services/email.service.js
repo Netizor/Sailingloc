@@ -1,68 +1,35 @@
-import nodemailer from 'nodemailer'
 import { Resend } from 'resend'
 
-const MAIL_FROM = process.env.MAIL_FROM || 'noreply@sailingloc.fr'
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
-const CONTACT_EMAIL = process.env.CONTACT_EMAIL || MAIL_FROM
+const RESEND_API_KEY = process.env.RESEND_API_KEY?.trim()
+const RESEND_FROM = (process.env.RESEND_FROM || 'SailingLoc <onboarding@resend.dev>').trim()
+const RESEND_TO_EMAIL = (process.env.RESEND_TO_EMAIL || process.env.CONTACT_EMAIL || 'your-email@outlook.com').trim()
 
-const resendApiKey = process.env.RESEND_API_KEY?.trim()
-const smtpHost = process.env.SMTP_HOST?.trim()
-const smtpPort = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined
-const smtpUser = process.env.SMTP_USER?.trim()
-const smtpPass = process.env.SMTP_PASS
-const smtpSecure = process.env.SMTP_SECURE === 'true' || smtpPort === 465
+const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null
 
-const resend = resendApiKey ? new Resend(resendApiKey) : null
-const smtpTransport = smtpHost && smtpPort && smtpUser && smtpPass
-  ? nodemailer.createTransport({
-      host: smtpHost,
-      port: smtpPort,
-      secure: smtpSecure,
-      auth: {
-        user: smtpUser,
-        pass: smtpPass,
-      },
-    })
-  : null
-
-async function sendMail({ to, subject, html }) {
-  let providerConfigured = Boolean(resend || smtpTransport)
-
-  if (resend) {
-    try {
-      const result = await resend.emails.send({
-        from: MAIL_FROM,
-        to,
-        subject,
-        html,
-      })
-
-      if (result?.error) {
-        console.error('[Email] Resend error:', result.error)
-      } else {
-        return result
-      }
-    } catch (error) {
-      console.error('[Email] Resend exception:', error)
-    }
+async function sendMail({ to, subject, html, replyTo }) {
+  if (!resend) {
+    throw new Error('RESEND_API_KEY is not configured')
   }
 
-  if (smtpTransport) {
-    try {
-      return await smtpTransport.sendMail({
-        from: MAIL_FROM,
-        to,
-        subject,
-        html,
-      })
-    } catch (error) {
-      console.error('[Email] SMTP error:', error)
-    }
+  const response = await resend.emails.send({
+    from: RESEND_FROM,
+    to: [to],
+    replyTo,
+    subject,
+    html,
+  })
+
+  if (response?.error) {
+    const message = response.error?.message || 'Resend rejected the email'
+    throw new Error(message)
   }
 
-  if (!providerConfigured) {
-    console.error('[Email] Aucun fournisseur configuré. Ajoutez RESEND_API_KEY ou SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS dans .env.')
+  if (!response?.data?.id) {
+    throw new Error('Resend did not return a message id')
   }
+
+  return response.data
 }
 
 function escapeHtml(str) {
@@ -84,7 +51,8 @@ export async function sendContactMessage({ firstName, lastName, email, subject, 
   }
 
   await sendMail({
-    to: CONTACT_EMAIL,
+    to: RESEND_TO_EMAIL,
+    replyTo: email,
     subject: `[Contact] ${safe.subject} – ${safe.firstName} ${safe.lastName}`,
     html: `
       <h2>Nouveau message de contact</h2>
@@ -94,16 +62,6 @@ export async function sendContactMessage({ firstName, lastName, email, subject, 
         <li><strong>Objet :</strong> ${safe.subject}</li>
       </ul>
       <p>${safe.message}</p>
-    `,
-  })
-
-  await sendMail({
-    to: email,
-    subject: 'Votre message a bien été reçu – SailingLoc',
-    html: `
-      <h2>Bonjour ${safe.firstName},</h2>
-      <p>Merci pour votre message concernant « ${safe.subject} ». Notre équipe vous répondra dans les meilleurs délais.</p>
-      <p>L'équipe SailingLoc</p>
     `,
   })
 }
