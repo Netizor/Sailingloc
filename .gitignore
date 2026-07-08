@@ -11,9 +11,11 @@ yarn-error.log*
 package-lock.json
 
 # ─── Variables d'environnement ───────────────────────────────────────────────
+.env
 .env.local
 .env.*.local
 .env.production
+!.env.example
 
 # ─── Frontend — Build & cache ────────────────────────────────────────────────
 frontend/dist/
@@ -32,6 +34,7 @@ frontend/.env.*.local
 # ─── Backend — Symfony ───────────────────────────────────────────────────────
 backend/vendor/
 backend/var/
+backend/.env
 backend/.env.local
 backend/.env.local.php
 backend/.env.*.local
