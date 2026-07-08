@@ -17,7 +17,6 @@ const SUBJECTS = [
   'Réservation Premium',
   'Question technique',
   'Devenir propriétaire',
-  'Conciergerie',
   'Autre demande',
 ]
 
