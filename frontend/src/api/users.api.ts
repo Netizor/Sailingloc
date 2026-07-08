@@ -37,7 +37,9 @@ export const changePassword = async (data: {
 export const uploadAvatar = async (file: File): Promise<User> => {
   const formData = new FormData()
   formData.append('avatar', file)
-  const { data } = await api.post<{ user: User }>('/users/avatar', formData)
+  const { data } = await api.post<{ user: User }>('/users/avatar', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
   return data.user
 }
 

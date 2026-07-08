@@ -24,6 +24,8 @@ export const submitKyc = async (frontFile: File, backFile: File): Promise<KycSta
   const formData = new FormData()
   formData.append('front', frontFile)
   formData.append('back', backFile)
-  const { data } = await api.post<KycStatusResponse>('/kyc/submit', formData)
+  const { data } = await api.post<KycStatusResponse>('/kyc/submit', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
   return data
 }

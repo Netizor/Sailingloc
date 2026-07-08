@@ -66,6 +66,29 @@ export async function sendContactMessage({ firstName, lastName, email, subject, 
   })
 }
 
+export async function sendContactConfirmation({ firstName, lastName, email, subject, message }) {
+  const safe = {
+    firstName: escapeHtml(firstName),
+    lastName: escapeHtml(lastName),
+    subject: escapeHtml(subject),
+    message: escapeHtml(message).replace(/\n/g, '<br>'),
+  }
+
+  await sendMail({
+    to: email,
+    subject: 'Nous avons bien reçu votre message – SailingLoc',
+    html: `
+      <h2>Bonjour ${safe.firstName},</h2>
+      <p>Merci de nous avoir contactés. Voici un récapitulatif de votre demande :</p>
+      <ul>
+        <li><strong>Objet :</strong> ${safe.subject}</li>
+      </ul>
+      <p>${safe.message}</p>
+      <p>Notre équipe vous répondra dans les meilleurs délais.</p>
+    `,
+  })
+}
+
 export async function sendEmailVerification(to, firstName, token) {
   const link = `${FRONTEND_URL}/verifier-email?token=${token}`;
   await sendMail({

@@ -3,7 +3,7 @@ import rateLimit from 'express-rate-limit'
 import supabase from '../lib/supabase.js'
 import { authenticate, requireRole } from '../middleware/auth.middleware.js'
 import { verifyAccessToken } from '../lib/jwt.js'
-import { sendContactMessage } from '../services/email.service.js'
+import { sendContactMessage, sendContactConfirmation } from '../services/email.service.js'
 
 // ═══════════════════════════════════════════════════════════
 // CONTACT
@@ -21,17 +21,25 @@ contactRouter.post('/', contactLimiter, async (req, res) => {
   }
   if (!EMAIL_RE.test(email.trim())) return res.status(400).json({ message: 'Email invalide' })
 
+  const payload = {
+    firstName: firstName.trim(),
+    lastName: lastName.trim(),
+    email: email.trim(),
+    subject: subject.trim(),
+    message: message.trim(),
+  }
+
   try {
-    await sendContactMessage({
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      email: email.trim(),
-      subject: subject.trim(),
-      message: message.trim(),
-    })
+    await sendContactMessage(payload)
   } catch (error) {
     console.error('[Contact] Erreur envoi email:', error)
     return res.status(500).json({ success: false, message: 'Impossible d\'envoyer le message pour le moment' })
+  }
+
+  try {
+    await sendContactConfirmation(payload)
+  } catch (error) {
+    console.error('[Contact] Erreur envoi email de confirmation:', error)
   }
 
   return res.status(201).json({ success: true, message: 'Message envoyé' })

@@ -10,7 +10,6 @@ import {
   Ship,
   User,
   X,
-  LayoutDashboard,
   Settings,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -200,7 +199,6 @@ const Header: React.FC = () => {
                         </p>
                         <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{user.email}</p>
                       </div>
-                      <DropdownItem icon={<LayoutDashboard size={15} />} label={t('nav.mySpace')} to="/mon-espace" onClick={() => setDropdownOpen(false)} />
                       {(user.role === 'OWNER' || user.role === 'ADMIN') && (
                         <DropdownItem icon={<Ship size={15} />} label={t('nav.ownerSpace')} to="/proprietaire" onClick={() => setDropdownOpen(false)} />
                       )}
