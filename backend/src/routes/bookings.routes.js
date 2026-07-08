@@ -3,7 +3,7 @@ import Stripe from 'stripe'
 import supabase from '../lib/supabase.js'
 import { authenticate, requireRole } from '../middleware/auth.middleware.js'
 import { sendCancellationEmail } from '../services/email.service.js'
-import { notifyAdmins } from '../services/notifications.service.js'
+import { notifyAdmins, notifyUser } from '../services/notifications.service.js'
 
 const router = Router()
 // Valide uniquement les vraies clés (sk_test_XXX ou sk_live_XXX avec ≥20 chars)
@@ -99,14 +99,7 @@ router.post('/', authenticate, async (req, res) => {
   const notifData = { bookingId: booking.id, boatId }
 
   // Notifier le propriétaire du bateau
-  supabase.from('notifications').insert({
-    user_id: boat.owner_id,
-    type: 'BOOKING_REQUEST',
-    title: 'Nouvelle demande de réservation',
-    body: notifBody,
-    data: notifData,
-    is_read: false,
-  }).catch(() => {})
+  notifyUser(boat.owner_id, 'BOOKING_REQUEST', 'Nouvelle demande de réservation', notifBody, notifData).catch(() => {})
 
   // Notifier les admins
   notifyAdmins('BOOKING_REQUEST', 'Nouvelle réservation', notifBody, notifData).catch(() => {})
