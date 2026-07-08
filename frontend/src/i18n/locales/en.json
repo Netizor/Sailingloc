@@ -40,6 +40,7 @@
     "aboutUs": "About us",
     "aboutShort": "About",
     "services": "Our services",
+    "contact": "Contact",
     "howItWorks": "How it works",
     "login": "Login",
     "becomeOwner": "Become an owner",
@@ -90,6 +91,7 @@
     "availablePorts": "Available ports",
     "insurance": "Insurance & safety",
     "faq": "FAQ",
+    "testimonials": "Testimonials",
     "becomeOwner": "Become an owner",
     "ownerSpace": "Owner space",
     "manageBoats": "Manage my boats",
@@ -182,6 +184,7 @@
     "milesStatLabel": "Nautical miles sailed",
     "testimonialsTitle": "They sailed with us",
     "testimonialsRating": "4.9 / 5 average",
+    "testimonialsSeeAll": "See all testimonials →",
     "ctaTitle": "Ready to explore the sea?",
     "ctaSubtitle": "Join thousands of sailors who chose SailingLoc for their nautical adventures.",
     "ctaRentBoat": "Rent a boat",
@@ -198,6 +201,47 @@
     "skipperOptional": "Skipper (optional)",
     "platformFee": "Platform fee",
     "estimationNote": "*Indicative estimate based on the average of active owners."
+  },
+  "testimonials": {
+    "pageTitle": "Testimonials",
+    "heroBadge": "Verified reviews",
+    "heroTitle": "They sailed with SailingLoc",
+    "heroSubtitle": "Discover the experiences of renters and owners who trust our platform for unforgettable moments at sea.",
+    "readReviews": "Read reviews",
+    "stats": {
+      "rating": "Average rating",
+      "reviews": "Published reviews",
+      "reviewsCount": "{{count}} reviews",
+      "satisfaction": "Satisfied customers",
+      "ports": "Partner ports"
+    },
+    "featuredLabel": "Featured testimonial",
+    "gridTitle": "What our members say",
+    "gridSubtitle": "Authentic reviews left after confirmed rentals on SailingLoc.",
+    "filters": {
+      "all": "All",
+      "renters": "Renters",
+      "owners": "Owners"
+    },
+    "trustTitle": "Why they trust us",
+    "trust": {
+      "security": {
+        "title": "Safety & insurance",
+        "desc": "Every rental is covered by partner insurance and a clear contract between parties."
+      },
+      "verified": {
+        "title": "Verified profiles",
+        "desc": "Checked identities, validated listings and moderated reviews for a trusted community."
+      },
+      "community": {
+        "title": "Passionate community",
+        "desc": "Thousands of sailors and owners share the same love of the sea."
+      }
+    },
+    "ctaTitle": "Your next adventure awaits",
+    "ctaSubtitle": "Join the SailingLoc community and enjoy an exceptional nautical experience.",
+    "ctaBrowse": "Browse boats",
+    "ctaOwner": "Become an owner"
   },
   "search": {
     "adventures_one": "{{count}} maritime adventure available",

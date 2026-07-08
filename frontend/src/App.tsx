@@ -59,6 +59,7 @@ const Contact = React.lazy(() => import('./pages/Contact'))
 const APropos = React.lazy(() => import('./pages/APropos'))
 const GuideProprietaire = React.lazy(() => import('./pages/GuideProprietaire'))
 const DevenirProprietaire = React.lazy(() => import('./pages/DevenirProprietaire'))
+const Temoignages = React.lazy(() => import('./pages/Temoignages'))
 const OwnerAuthPage = React.lazy(() => import('./pages/OwnerAuthPage'))
 
 // ── Comparateur ────────────────────────────────────────────────────────────────
@@ -143,6 +144,7 @@ export default function App() {
               <Route path="faq" element={<Faq />} />
               <Route path="contact" element={<Contact />} />
               <Route path="a-propos" element={<APropos />} />
+              <Route path="temoignages" element={<Temoignages />} />
               <Route path="guide-proprietaire" element={<GuideProprietaire />} />
               <Route path="devenir-proprietaire" element={<DevenirProprietaire />} />
               <Route path="devenir-proprietaire/commencer" element={<OwnerAuthPage />} />

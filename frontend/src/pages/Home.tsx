@@ -6,7 +6,6 @@ import {
   Search,
   Heart,
   Anchor,
-  Star,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
@@ -14,12 +13,14 @@ import { useTranslation } from 'react-i18next'
 import SearchBar from '../components/boats/SearchBar'
 import FeaturedBoatCard from '../components/boats/FeaturedBoatCard'
 import EngagementSection from '../components/home/EngagementSection'
+import TestimonialCard from '../components/testimonials/TestimonialCard'
 import Spinner from '../components/ui/Spinner'
 import type { SearchParams } from '../components/boats/SearchBar'
 import type { Boat } from '../types'
 import { BoatStatus, BoatType, MotorizationType } from '../types'
 import { boatsApi } from '../api/boats.api'
 import { HOME_DESTINATIONS } from '../data/destinations'
+import { TESTIMONIALS } from '../data/testimonials'
 
 type PopularBoatItem = {
   boat: Boat
@@ -201,33 +202,6 @@ const IMAGES = {
   cta: '/view-luxurious-cruise-ship.jpg',
   boatFallback: '/ai-generated-boat-picture.jpg',
 } as const
-
-const testimonials = [
-  {
-    id: 1,
-    name: 'Sophie Martin',
-    role: 'Locataire vérifiée',
-    text: 'Une expérience formidable ! Le propriétaire était super accueillant et le voilier en parfait état.',
-    rating: 5,
-    avatar: 'SM',
-  },
-  {
-    id: 2,
-    name: 'Thomas Leroy',
-    role: 'Propriétaire',
-    text: 'Première location via SailingLoc. La réservation était simple, le prix transparent. Parfait en famille.',
-    rating: 5,
-    avatar: 'TL',
-  },
-  {
-    id: 3,
-    name: 'Claire Bernard',
-    role: 'Locataire vérifiée',
-    text: 'Le skipper était exceptionnel, très pédagogue. Un weekend inoubliable sur la Méditerranée.',
-    rating: 5,
-    avatar: 'CB',
-  },
-]
 
 const Home: React.FC = () => {
   const navigate = useNavigate()
@@ -415,38 +389,32 @@ const Home: React.FC = () => {
       {/* Testimonials */}
       <section ref={testimonialsRef} className="py-14 bg-[#f8f9fa]" aria-labelledby="testimonials-title">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 id="testimonials-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy text-center mb-10">
-            {t('home.testimonialsTitle')}
-          </h2>
+          <div className="text-center mb-10">
+            <h2 id="testimonials-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy text-center mb-3">
+              {t('home.testimonialsTitle')}
+            </h2>
+            <p className="text-brand-slate text-sm">{t('home.testimonialsRating')}</p>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((item, i) => (
-              <div
+            {TESTIMONIALS.slice(0, 3).map((item, i) => (
+              <TestimonialCard
                 key={item.id}
-                className={[
-                  'bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col gap-4',
-                  'transition-[transform,opacity] duration-700 ease-out will-change-transform',
-                  testimonialsInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
-                ].join(' ')}
+                item={item}
+                animated
+                inView={testimonialsInView}
                 style={{ transitionDelay: `${i * 120}ms` }}
-              >
-                <div className="flex items-center gap-0.5">
-                  {Array.from({ length: item.rating }).map((_, j) => (
-                    <Star key={j} size={14} fill="currentColor" strokeWidth={0} className="text-amber-400" />
-                  ))}
-                </div>
-                <p className="text-brand-slate text-sm leading-relaxed flex-1">&ldquo;{item.text}&rdquo;</p>
-                <div className="flex items-center gap-3 pt-3">
-                  <div className="h-10 w-10 rounded-full bg-brand-navy text-white flex items-center justify-center text-xs font-bold">
-                    {item.avatar}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-brand-navy text-sm">{item.name}</p>
-                    <p className="text-xs text-brand-slate">{item.role}</p>
-                  </div>
-                </div>
-              </div>
+              />
             ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <Link
+              to="/temoignages"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-brand-navy hover:text-brand-blue transition-colors"
+            >
+              {t('home.testimonialsSeeAll')}
+            </Link>
           </div>
         </div>
       </section>
