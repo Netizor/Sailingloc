@@ -94,7 +94,7 @@ const BookingDetail: React.FC = () => {
   const totalDays = booking.totalDays || daysBetween(booking.startDate, booking.endDate) || 1
   const dailyRate = booking.dailyRate ?? boat?.dailyRate ?? 0
   const subtotal = booking.subtotal ?? dailyRate * totalDays
-  const canReview = booking.status === BookingStatus.COMPLETED
+  const canReview = booking.status === BookingStatus.COMPLETED && !booking.hasReview
   // Le locataire peut annuler si la réservation est encore active
   const canCancel =
     user?.id === booking.renterId &&

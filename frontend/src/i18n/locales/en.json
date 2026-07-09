@@ -682,7 +682,8 @@
       "statusConfirmed": "Confirmed",
       "statusPending": "Pending",
       "boatFallback": "Boat",
-      "reviewLeft": "Review left"
+      "reviewLeft": "Review left",
+      "leaveReview": "Leave a review"
     },
     "ownerBookings": {
       "title": "My bookings",

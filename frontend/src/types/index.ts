@@ -152,6 +152,8 @@ export interface Booking {
   depositAmount: number
   totalAmount: number
   status: BookingStatus
+  /** L'utilisateur connecté a déjà laissé un avis pour cette réservation */
+  hasReview?: boolean
   cancellationReason?: string
   stripePaymentIntentId?: string
   message?: string
