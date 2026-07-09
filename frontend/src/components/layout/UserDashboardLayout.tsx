@@ -193,24 +193,27 @@ const UserDashboardLayout: React.FC = () => {
                     if (item.renterOnly && isOwner) return false
                     return true
                   })
-                  .map((item) => (
-                    <NavLink
-                      key={item.to}
-                      to={item.to}
-                      end={item.end}
-                      className={({ isActive }) =>
-                        cn(
-                          'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
-                          isActive
-                            ? 'bg-brand-blue text-white shadow-sm'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-gray-200',
-                        )
-                      }
-                    >
-                      {item.icon}
-                      {t(item.labelKey)}
-                    </NavLink>
-                  ))}
+                  .map((item) => {
+                    const isSettingsForRenter = item.labelKey === 'layout.settings' && !isOwner
+                    return (
+                      <NavLink
+                        key={item.to}
+                        to={item.to}
+                        end={item.end}
+                        className={({ isActive }) =>
+                          cn(
+                            'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
+                            isActive
+                              ? 'bg-brand-blue text-white shadow-sm'
+                              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-gray-200',
+                          )
+                        }
+                      >
+                        {isSettingsForRenter ? <UserCircle size={18} /> : item.icon}
+                        {isSettingsForRenter ? t('nav.myProfile') : t(item.labelKey)}
+                      </NavLink>
+                    )
+                  })}
                 {isAdmin && (
                   <NavLink
                     to="/admin/bateaux"

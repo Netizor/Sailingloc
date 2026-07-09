@@ -7,6 +7,7 @@ import { getFavorites, removeFavorite } from '../../api/favorites.api'
 import BoatCard from '../../components/boats/BoatCard'
 import Spinner from '../../components/ui/Spinner'
 import Button from '../../components/ui/Button'
+import DashboardBanner from '../../components/ui/DashboardBanner'
 import type { Boat } from '../../types'
 
 const MyFavorites: React.FC = () => {
@@ -28,15 +29,15 @@ const MyFavorites: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex items-center gap-3 mb-8">
-          <Heart size={22} className="text-rose-500" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('favorites.title')}</h1>
-          {favorites && favorites.length > 0 && (
-            <span className="text-sm bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 border border-rose-100 rounded-full px-2.5 py-0.5 font-medium">
-              {favorites.length}
-            </span>
-          )}
-        </div>
+        <DashboardBanner
+          icon={<Heart size={18} className="opacity-80" />}
+          title="Mes favoris"
+          subtitle={
+            favorites && favorites.length > 0
+              ? `${favorites.length} bateau${favorites.length > 1 ? 'x' : ''} enregistré${favorites.length > 1 ? 's' : ''}`
+              : undefined
+          }
+        />
 
         {isLoading ? (
           <div className="flex justify-center py-20">

@@ -14,6 +14,7 @@ import type { KycStatus } from '../../api/kyc.api'
 import { formatDate } from '../../lib/utils'
 import Button from '../../components/ui/Button'
 import Spinner from '../../components/ui/Spinner'
+import DashboardBanner from '../../components/ui/DashboardBanner'
 import toast from 'react-hot-toast'
 
 // ─── Bloc de statut ───────────────────────────────────────────────────────────
@@ -136,10 +137,11 @@ const KycVerification: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Vérification d'identité</h1>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">
-        La vérification d'identité est requise pour effectuer des réservations et recevoir des paiements.
-      </p>
+      <DashboardBanner
+        icon={<ShieldCheck size={18} className="opacity-80" />}
+        title="Vérification d'identité"
+        subtitle="La vérification d'identité est requise pour effectuer des réservations et recevoir des paiements."
+      />
 
       {isLoading ? (
         <div className="flex justify-center py-20">

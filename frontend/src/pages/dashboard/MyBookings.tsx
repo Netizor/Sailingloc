@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import {
   Anchor,
+  CalendarCheck,
   Calendar,
   ChevronDown,
   Download,
@@ -26,6 +27,7 @@ import { BookingStatus } from '../../types'
 import type { Booking } from '../../types'
 import Spinner from '../../components/ui/Spinner'
 import Button from '../../components/ui/Button'
+import DashboardBanner from '../../components/ui/DashboardBanner'
 
 type HistoryFilter = 'ALL' | 'UPCOMING' | 'COMPLETED' | 'PENDING' | 'CANCELLED'
 
@@ -125,14 +127,11 @@ const MyBookings: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
-          {t('booking.myBookings.title')}
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-          {t('booking.myBookings.subtitle')}
-        </p>
-      </div>
+      <DashboardBanner
+        icon={<CalendarCheck size={18} className="opacity-80" />}
+        title={t('booking.myBookings.title')}
+        subtitle={t('booking.myBookings.subtitle')}
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard

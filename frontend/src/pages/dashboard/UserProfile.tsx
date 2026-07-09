@@ -756,8 +756,8 @@ const UserProfile: React.FC = () => {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <Settings size={18} className="opacity-80" />
-              <h1 className="text-xl sm:text-2xl font-bold">Paramètres</h1>
+              {isOwner ? <Settings size={18} className="opacity-80" /> : <UserCircle size={18} className="opacity-80" />}
+              <h1 className="text-xl sm:text-2xl font-bold">{isOwner ? 'Paramètres' : 'Mon profil'}</h1>
             </div>
             <p className="text-sm text-white/80">
               {user.firstName} {user.lastName} · {user.email}
