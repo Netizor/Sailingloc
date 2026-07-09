@@ -375,12 +375,22 @@ router.post('/:id/payment-intent', authenticate, async (req, res) => {
   if (booking.renter_id !== req.user.id) return res.status(403).json({ message: 'Accès refusé' })
   if (booking.status !== 'PENDING') return res.status(400).json({ message: 'Statut invalide pour le paiement' })
 
-  const intent = await stripe.paymentIntents.create({
-    amount: Math.round(booking.total_price * 100),
-    currency: 'eur',
-    metadata: { bookingId: String(booking.id) },
-    description: `SailingLoc – ${booking.boats?.title || 'Réservation'}`,
-  })
+  let intent
+  try {
+    intent = await stripe.paymentIntents.create({
+      amount: Math.round(booking.total_price * 100),
+      currency: 'eur',
+      metadata: { bookingId: String(booking.id) },
+      description: `SailingLoc – ${booking.boats?.title || 'Réservation'}`,
+    })
+  } catch (err) {
+    const statusCode = err?.statusCode || err?.raw?.statusCode
+    const isAuthError = err?.type === 'StripeAuthenticationError' || statusCode === 401
+    const message = isAuthError
+      ? 'Stripe: clé API invalide côté serveur (STRIPE_SECRET_KEY).'
+      : 'Stripe: impossible de créer le PaymentIntent.'
+    return res.status(isAuthError ? 502 : 500).json({ message })
+  }
 
   await supabase.from('bookings').update({
     stripe_payment_intent_id: intent.id,

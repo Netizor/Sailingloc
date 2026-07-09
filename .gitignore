@@ -11,6 +11,7 @@ yarn-error.log*
 package-lock.json
 
 # ─── Variables d'environnement ───────────────────────────────────────────────
+
 .env
 .env.local
 .env.*.local
