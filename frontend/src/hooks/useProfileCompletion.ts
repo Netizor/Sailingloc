@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../store/auth.store'
+import { SETTINGS_ROUTE } from '../lib/profilePaths'
 import { UserRole } from '../types'
 
 export interface ProfileIssue {
@@ -49,7 +50,7 @@ export function useProfileCompletion(): ProfileCompletion {
       description: t('profileCompletion.phoneMissingDesc'),
       actionLabel: t('profileCompletion.completeProfile'),
       actionType:  'navigate',
-      actionTo:    '/mon-espace/parametres',
+      actionTo:    SETTINGS_ROUTE,
     })
   }
 

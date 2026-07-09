@@ -3,12 +3,15 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import {
   Bell,
+  CalendarCheck,
   ChevronDown,
+  Heart,
   LayoutDashboard,
   LogOut,
   Menu,
   MessageSquare,
   Ship,
+  ShieldCheck,
   User,
   X,
   Settings,
@@ -16,6 +19,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/utils'
 import { useAuthStore } from '../../store/auth.store'
+import { getDefaultDashboardPath } from '../../lib/profilePaths'
 import { getUnreadCount } from '../../api/notifications.api'
 import { getUnreadMessagesCount } from '../../api/messages.api'
 import { MY_PUBLIC_PROFILE_ROUTE, SETTINGS_ROUTE } from '../../lib/profilePaths'
@@ -128,7 +132,7 @@ const Header: React.FC = () => {
           {/* Actions - boutons auth avant les icônes pour éviter la coupure à droite */}
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 self-center min-w-0">
             {!isAuthenticated && (
-              <div className="hidden md:flex items-center gap-2 shrink-0">
+              <div className="hidden lg:flex items-center gap-2 shrink-0">
                 <button
                   type="button"
                   onClick={() => navigate('/connexion')}
@@ -202,15 +206,28 @@ const Header: React.FC = () => {
                         </p>
                         <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{user.email}</p>
                       </div>
+                      {user.role === 'RENTER' ? (
+                        <DropdownItem icon={<User size={15} />} label={t('nav.myProfile')} to={SETTINGS_ROUTE} onClick={() => setDropdownOpen(false)} />
+                      ) : (
+                        <DropdownItem icon={<User size={15} />} label={t('nav.myProfile')} to={MY_PUBLIC_PROFILE_ROUTE} onClick={() => setDropdownOpen(false)} />
+                      )}
                       <DropdownItem icon={<LayoutDashboard size={15} />} label={t('nav.mySpace')} to="/mon-espace" onClick={() => setDropdownOpen(false)} />
+                      {user.role === 'RENTER' && (
+                        <>
+                          <DropdownItem icon={<CalendarCheck size={15} />} label={t('layout.myBookings')} to="/mon-espace/reservations" onClick={() => setDropdownOpen(false)} />
+                          <DropdownItem icon={<Heart size={15} />} label={t('favorites.title')} to="/mon-espace/favoris" onClick={() => setDropdownOpen(false)} />
+                          <DropdownItem icon={<ShieldCheck size={15} />} label={t('layout.identityVerification')} to="/mon-espace/verification" onClick={() => setDropdownOpen(false)} />
+                        </>
+                      )}
                       {(user.role === 'OWNER' || user.role === 'ADMIN') && (
                         <DropdownItem icon={<Ship size={15} />} label={t('nav.ownerSpace')} to="/proprietaire" onClick={() => setDropdownOpen(false)} />
                       )}
                       {user.role === 'ADMIN' && (
                         <DropdownItem icon={<Settings size={15} />} label={t('nav.admin')} to="/admin" onClick={() => setDropdownOpen(false)} />
                       )}
-                      <DropdownItem icon={<User size={15} />} label={t('nav.myProfile')} to={MY_PUBLIC_PROFILE_ROUTE} onClick={() => setDropdownOpen(false)} />
-                      <DropdownItem icon={<Settings size={15} />} label="Paramètres" to={SETTINGS_ROUTE} onClick={() => setDropdownOpen(false)} />
+                      {(user.role === 'OWNER' || user.role === 'ADMIN') && (
+                        <DropdownItem icon={<Settings size={15} />} label={t('layout.settings')} to={SETTINGS_ROUTE} onClick={() => setDropdownOpen(false)} />
+                      )}
                       <div className="border-t border-gray-50 dark:border-gray-700 mt-1 pt-1">
                         <button onClick={handleLogout} className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700/50">
                           <LogOut size={15} />

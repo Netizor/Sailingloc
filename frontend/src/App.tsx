@@ -175,8 +175,8 @@ export default function App() {
                 <Route path="messages/:conversationId" element={<Messages />} />
                 <Route path="notifications" element={<Notifications />} />
                 <Route path="notifications/:id" element={<NotificationDetail />} />
-                <Route path="profil" element={<LegacyProfileRedirect />} />
-                <Route path="parametres" element={<UserProfile />} />
+                <Route path="profil" element={<UserProfile />} />
+                <Route path="parametres" element={<LegacyProfileRedirect />} />
                 <Route path="mon-profil" element={<MyPublicProfileRedirect />} />
                 {/* D3 - Historique des paiements */}
                 <Route path="paiements" element={<MyPayments />} />

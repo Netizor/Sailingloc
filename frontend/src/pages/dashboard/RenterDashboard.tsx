@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import {
   Calendar,
   Heart,
+  LayoutDashboard,
   Star,
   ArrowRight,
   Anchor,
@@ -24,6 +25,7 @@ import {
 import Spinner from '../../components/ui/Spinner'
 import Button from '../../components/ui/Button'
 import DraftSection from '../../components/ui/DraftSection'
+import DashboardBanner from '../../components/ui/DashboardBanner'
 import type { Booking } from '../../types'
 import { BookingStatus } from '../../types'
 
@@ -104,14 +106,11 @@ const RenterDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-          Bonjour, {user?.firstName}
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-          Bienvenue dans votre espace personnel.
-        </p>
-      </div>
+      <DashboardBanner
+        icon={<LayoutDashboard size={18} className="opacity-80" />}
+        title={`Bonjour, ${user?.firstName}`}
+        subtitle="Bienvenue dans votre espace personnel."
+      />
 
       {/* Statistiques */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
