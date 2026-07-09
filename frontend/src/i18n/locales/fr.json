@@ -682,7 +682,8 @@
       "statusConfirmed": "Confirmée",
       "statusPending": "En attente",
       "boatFallback": "Bateau",
-      "reviewLeft": "Avis laissé"
+      "reviewLeft": "Avis laissé",
+      "leaveReview": "Laisser un avis"
     },
     "ownerBookings": {
       "title": "Mes réservations",

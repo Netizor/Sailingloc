@@ -260,6 +260,7 @@ const MyBookings: React.FC = () => {
                     <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">{t('booking.myBookings.tableLocation')}</th>
                     <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">{t('booking.myBookings.tableStatus')}</th>
                     <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase text-right">{t('booking.myBookings.tableAmount')}</th>
+                    <th className="px-5 py-3.5" />
                   </tr>
                 </thead>
                 <tbody>
@@ -296,6 +297,21 @@ const MyBookings: React.FC = () => {
                       </td>
                       <td className="px-5 py-4 text-right font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">
                         {formatPrice(booking.totalAmount ?? 0)}
+                      </td>
+                      <td className="px-5 py-4 text-right whitespace-nowrap">
+                        {booking.status === BookingStatus.COMPLETED && !reviewedBookingIds.has(booking.id) && (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            leftIcon={<Star size={13} />}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              navigate(`/mon-espace/reservations/${booking.id}/avis`)
+                            }}
+                          >
+                            {t('booking.myBookings.leaveReview')}
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))}

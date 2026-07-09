@@ -20,7 +20,7 @@ function computeDays(startDate, endDate) {
   return Math.max(1, days)
 }
 
-function formatBooking(b) {
+function formatBooking(b, hasReview = false) {
   const totalDays = computeDays(b.start_date, b.end_date)
   const dailyRate = b.boats?.price_per_day != null ? parseFloat(b.boats.price_per_day) : 0
   const skipperFee = parseFloat(b.skipper_fee || 0)
@@ -46,6 +46,7 @@ function formatBooking(b) {
     depositAmount,
     totalAmount,
     status: b.status,
+    hasReview,
     cancellationReason: b.cancellation_reason,
     stripePaymentIntentId: b.stripe_payment_intent_id,
     createdAt: b.created_at,
@@ -167,7 +168,20 @@ router.get('/renter', authenticate, async (req, res) => {
 
   const { data, count, error } = await query
   if (error) return res.status(500).json({ message: error.message })
-  return res.json({ data: (data || []).map(formatBooking), total: count || 0, page, limit })
+
+  const bookings = data || []
+  const bookingIds = bookings.map((b) => b.id)
+  const { data: reviewed } = bookingIds.length
+    ? await supabase.from('reviews').select('booking_id').eq('author_id', req.user.id).in('booking_id', bookingIds)
+    : { data: [] }
+  const reviewedIds = new Set((reviewed || []).map((r) => r.booking_id))
+
+  return res.json({
+    data: bookings.map((b) => formatBooking(b, reviewedIds.has(b.id))),
+    total: count || 0,
+    page,
+    limit,
+  })
 })
 
 const MONTH_LABELS_FR = [
@@ -315,7 +329,20 @@ router.get('/owner', authenticate, async (req, res) => {
 
   const { data, count, error } = await query
   if (error) return res.status(500).json({ message: error.message })
-  return res.json({ data: (data || []).map(formatBooking), total: count || 0, page, limit })
+
+  const bookings = data || []
+  const bookingIds = bookings.map((b) => b.id)
+  const { data: reviewed } = bookingIds.length
+    ? await supabase.from('reviews').select('booking_id').eq('author_id', req.user.id).in('booking_id', bookingIds)
+    : { data: [] }
+  const reviewedIds = new Set((reviewed || []).map((r) => r.booking_id))
+
+  return res.json({
+    data: bookings.map((b) => formatBooking(b, reviewedIds.has(b.id))),
+    total: count || 0,
+    page,
+    limit,
+  })
 })
 
 // ─── GET /bookings/:id ─────────────────────────────────────
@@ -330,7 +357,10 @@ router.get('/:id', authenticate, async (req, res) => {
   const isOwner  = booking.boats?.owner_id === req.user.id
   if (!isRenter && !isOwner && req.user.role !== 'ADMIN') return res.status(403).json({ message: 'Accès refusé' })
 
-  return res.json(formatBooking(booking))
+  const { data: existingReview } = await supabase.from('reviews')
+    .select('id').eq('booking_id', booking.id).eq('author_id', req.user.id).maybeSingle()
+
+  return res.json(formatBooking(booking, !!existingReview))
 })
 
 // ─── PATCH /bookings/:id/status ────────────────────────────
