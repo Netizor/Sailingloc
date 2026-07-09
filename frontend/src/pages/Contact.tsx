@@ -88,7 +88,6 @@ const Contact: React.FC = () => {
       >
         <div className="max-w-6xl mx-auto w-full">
           <div className="max-w-2xl text-white">
-            <p className="text-brand-blue text-sm font-medium mb-4">Contact</p>
             <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
               Discutons de votre
               <br />

@@ -1,9 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
+import { loadStripe } from '@stripe/stripe-js'
+import {
+  Elements,
+  PaymentElement,
+  useElements,
+  useStripe,
+} from '@stripe/react-stripe-js'
 import {
   Anchor, Camera, Download, Eye, EyeOff, FileCheck, Lock, ShieldAlert,
   Trash2, Upload, UserCircle, Settings, Shield, ExternalLink, ChevronRight,
+  CreditCard, PencilLine,
 } from 'lucide-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
@@ -11,10 +19,12 @@ import toast from 'react-hot-toast'
 
 import { useAuthStore } from '../../store/auth.store'
 import { updateProfile, changePassword, uploadAvatar, uploadSailorCvDocument, exportMyData, deleteAccount } from '../../api/users.api'
+import { stripeApi } from '../../api/stripe.api'
 import Input from '../../components/ui/Input'
 import Textarea from '../../components/ui/Textarea'
 import Button from '../../components/ui/Button'
 import Spinner from '../../components/ui/Spinner'
+import Modal from '../../components/ui/Modal'
 import { getInitials, cn } from '../../lib/utils'
 import { UserRole } from '../../types'
 import { MY_PUBLIC_PROFILE_ROUTE, getPublicProfilePath } from '../../lib/profilePaths'
@@ -27,6 +37,18 @@ const MAX_AVATAR_SIZE  = 5 * 1024 * 1024                          // 5 Mo
 const ALLOWED_TYPES    = ['image/jpeg', 'image/png', 'image/webp'] // Pas de SVG (XSS)
 const MIN_PASSWORD_LEN = 12
 const MAX_PASSWORD_LEN = 128
+
+// Style de carte partagé par toutes les sections du profil
+const CARD = 'bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 p-6 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300'
+const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY as string | undefined
+const stripePromise = stripePublicKey ? loadStripe(stripePublicKey) : null
+
+/** Icône de section dans un badge coloré, pour un en-tête plus moderne. */
+const SectionIcon: React.FC<{ icon: React.ReactNode }> = ({ icon }) => (
+  <div className="h-9 w-9 rounded-xl bg-ocean-50 dark:bg-ocean-900/30 flex items-center justify-center text-ocean-700 dark:text-ocean-400 flex-shrink-0">
+    {icon}
+  </div>
+)
 
 // ─── Avatar ───────────────────────────────────────────────────────────────────
 
@@ -72,11 +94,11 @@ const AvatarSection: React.FC = () => {
   if (!user) return null
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700 p-6">
-      <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-5">Photo de profil</h2>
+    <div className={CARD}>
+      <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-6">Photo de profil</h2>
       <div className="flex items-center gap-6">
         <div className="flex-shrink-0">
-          <div className="h-24 w-24 rounded-full overflow-hidden bg-ocean-100 dark:bg-ocean-800/40 flex items-center justify-center">
+          <div className="h-24 w-24 rounded-full overflow-hidden bg-ocean-100 dark:bg-ocean-800/40 flex items-center justify-center ring-4 ring-ocean-50 dark:ring-ocean-900/40">
             {mutation.isPending ? (
               <Spinner size="md" />
             ) : user.avatar ? (
@@ -130,6 +152,7 @@ interface ProfileForm {
 
 const PersonalInfoSection: React.FC = () => {
   const { user, updateUser } = useAuthStore()
+  const [isEditing, setIsEditing] = useState(false)
   const [form, setForm] = useState<ProfileForm>({
     firstName: user?.firstName ?? '',
     lastName:  user?.lastName  ?? '',
@@ -180,56 +203,69 @@ const PersonalInfoSection: React.FC = () => {
       lastName:  form.lastName.trim(),
       phone:     form.phone.trim(),
       bio:       form.bio.trim(),
+    }, {
+      onSuccess: () => {
+        setIsEditing(false)
+      },
     })
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700 p-6">
-      <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-5">
-        Informations personnelles
-      </h2>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            label="Prénom"
-            name="firstName"
-            value={form.firstName}
-            onChange={handleChange}
-            required
-          />
-          <Input
-            label="Nom"
-            name="lastName"
-            value={form.lastName}
-            onChange={handleChange}
-            required
-          />
+    <div className={CARD}>
+      <div className="mb-6 flex items-start justify-between gap-3">
+        <div>
+          <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Informations personnelles</h2>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Vos données visibles et modifiables en un seul endroit.</p>
         </div>
-
-        <Input
-          label="Téléphone"
-          name="phone"
-          type="tel"
-          value={form.phone}
-          onChange={handleChange}
-          placeholder="+33 6 12 34 56 78"
-        />
-
-        <Textarea
-          label="Biographie"
-          name="bio"
-          rows={3}
-          value={form.bio}
-          onChange={handleChange}
-          placeholder="Présentez-vous en quelques mots…"
-        />
-
-        <div className="flex justify-end pt-1">
-          <Button type="submit" loading={mutation.isPending}>
-            Enregistrer
+        {!isEditing && (
+          <Button type="button" variant="secondary" size="sm" leftIcon={<PencilLine size={14} />} onClick={() => setIsEditing(true)}>
+            Modifier
           </Button>
+        )}
+      </div>
+
+      {!isEditing ? (
+        <div className="space-y-4">
+          <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+            <p className="text-sm font-semibold text-gray-900">Nom complet</p>
+            <p className="mt-1 text-sm text-gray-600">{user?.firstName} {user?.lastName}</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+              <p className="text-sm font-semibold text-gray-900">Téléphone</p>
+              <p className="mt-1 text-sm text-gray-600">{user?.phone || 'Non renseigné'}</p>
+            </div>
+            <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+              <p className="text-sm font-semibold text-gray-900">Email</p>
+              <p className="mt-1 text-sm text-gray-600">{user?.email}</p>
+            </div>
+          </div>
+          <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+            <p className="text-sm font-semibold text-gray-900">Biographie</p>
+            <p className="mt-1 text-sm text-gray-600">{user?.bio || 'Aucune biographie ajoutée.'}</p>
+          </div>
         </div>
-      </form>
+      ) : (
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <Input label="Prénom" name="firstName" value={form.firstName} onChange={handleChange} required />
+            <Input label="Nom" name="lastName" value={form.lastName} onChange={handleChange} required />
+          </div>
+
+          <Input label="Téléphone" name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder="+33 6 12 34 56 78" />
+
+          <Textarea label="Biographie" name="bio" rows={3} value={form.bio} onChange={handleChange} placeholder="Présentez-vous en quelques mots…" />
+
+          <div className="flex flex-wrap justify-end gap-2 pt-1">
+            <Button type="button" variant="secondary" onClick={() => { setIsEditing(false); setForm({ firstName: user?.firstName ?? '', lastName: user?.lastName ?? '', phone: user?.phone ?? '', bio: user?.bio ?? '' }) }}>
+              Annuler
+            </Button>
+            <Button type="submit" loading={mutation.isPending}>
+              Enregistrer
+            </Button>
+          </div>
+        </form>
+      )}
     </div>
   )
 }
@@ -353,12 +389,12 @@ const SailorCvSection: React.FC = () => {
   }[status]
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700 p-6">
-      <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-1 flex items-center gap-2">
-        <Anchor size={18} className="text-ocean-700 dark:text-ocean-400" />
-        CV de marin
-      </h2>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+    <div className={CARD}>
+      <div className="flex items-center gap-2.5 mb-1">
+        <SectionIcon icon={<Anchor size={17} />} />
+        <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">CV de marin</h2>
+      </div>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 ml-[46px]">
         Ces informations sont affichées sur votre profil public et rassurent les locataires.
       </p>
       <div className="mb-5 space-y-2">
@@ -540,11 +576,11 @@ const SecuritySection: React.FC = () => {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700 p-6">
-      <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-5 flex items-center gap-2">
-        <Lock size={16} className="text-gray-400 dark:text-gray-500" />
-        Sécurité
-      </h2>
+    <div className={CARD}>
+      <div className="flex items-center gap-2.5 mb-6">
+        <SectionIcon icon={<Lock size={16} />} />
+        <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Sécurité</h2>
+      </div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Input
           label="Mot de passe actuel"
@@ -585,6 +621,179 @@ const SecuritySection: React.FC = () => {
         </div>
       </form>
     </div>
+  )
+}
+
+// ─── Paiement ───────────────────────────────────────────────────────────────
+
+interface AddCardModalProps {
+  isOpen: boolean
+  onClose: () => void
+  onSuccess: () => void
+}
+
+const AddCardModal: React.FC<AddCardModalProps> = ({ isOpen, onClose, onSuccess }) => {
+  const [setupClientSecret, setSetupClientSecret] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSetupClientSecret(null)
+      setError(null)
+      return
+    }
+
+    let isCancelled = false
+
+    const init = async () => {
+      try {
+        const { clientSecret } = await stripeApi.createSetupIntent()
+        if (!isCancelled) {
+          setSetupClientSecret(clientSecret)
+          setError(null)
+        }
+      } catch {
+        if (!isCancelled) {
+          setSetupClientSecret(null)
+          setError("Impossible d'initialiser l'ajout de carte pour le moment.")
+        }
+      }
+    }
+
+    void init()
+    return () => {
+      isCancelled = true
+    }
+  }, [isOpen])
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title="Ajouter une carte" size="md">
+      <div className="p-6">
+        {error ? (
+          <p className="text-sm text-red-600">{error}</p>
+        ) : setupClientSecret && stripePromise ? (
+          <Elements stripe={stripePromise} options={{ clientSecret: setupClientSecret }}>
+            <AddCardForm onSuccess={onSuccess} onCancel={onClose} />
+          </Elements>
+        ) : (
+          <div className="flex justify-center py-8">
+            <Spinner size="md" />
+          </div>
+        )}
+      </div>
+    </Modal>
+  )
+}
+
+interface AddCardFormProps {
+  onSuccess: () => void
+  onCancel: () => void
+}
+
+const AddCardForm: React.FC<AddCardFormProps> = ({ onSuccess, onCancel }) => {
+  const stripe = useStripe()
+  const elements = useElements()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!stripe || !elements) return
+
+    setLoading(true)
+    setError(null)
+
+    const { error: stripeError } = await stripe.confirmSetup({
+      elements,
+      confirmParams: {
+        return_url: window.location.href,
+      },
+      redirect: 'if_required',
+    })
+
+    setLoading(false)
+
+    if (stripeError) {
+      setError(stripeError.message ?? 'Une erreur est survenue.')
+    } else {
+      onSuccess()
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <PaymentElement />
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      <div className="flex flex-wrap gap-3">
+        <Button type="submit" loading={loading} disabled={!stripe}>
+          Enregistrer la carte
+        </Button>
+        <Button type="button" variant="secondary" onClick={onCancel} disabled={loading}>
+          Annuler
+        </Button>
+      </div>
+    </form>
+  )
+}
+
+const PaymentSection: React.FC = () => {
+  const { user } = useAuthStore()
+  const [isAddCardOpen, setIsAddCardOpen] = useState(false)
+
+  const handleCardSaved = () => {
+    setIsAddCardOpen(false)
+    toast.success('Carte ajoutée avec succès')
+  }
+
+  return (
+    <>
+      <div className={CARD}>
+        <div className="flex items-start justify-between gap-3 mb-6">
+          <div>
+            <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Paiement</h2>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Gérez votre moyen de paiement et profitez d’un flux sécurisé pour vos réservations.</p>
+          </div>
+          <div className="rounded-2xl bg-ocean-50 p-2 text-ocean-700">
+            <CreditCard size={18} />
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-gray-100 bg-gradient-to-br from-[#071d49] via-[#0A737A] to-[#0f8e9d] p-5 text-white shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-white/70">Compte de paiement</p>
+              <p className="mt-1 text-lg font-semibold">{user?.email}</p>
+            </div>
+            <div className="rounded-2xl bg-white/15 p-3">
+              <CreditCard size={18} />
+            </div>
+          </div>
+          <div className="mt-6 rounded-2xl bg-white/10 p-4 backdrop-blur-sm">
+            <p className="text-sm text-white/70">Statut</p>
+            <p className="mt-1 text-base font-semibold">Paiements sécurisés via Stripe</p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+            <p className="text-sm font-semibold text-gray-900">Ajouter une carte</p>
+            <p className="mt-1 text-sm text-gray-600">Sauvegardez une carte pour accélérer vos réservations et payer en toute sécurité.</p>
+            <Button onClick={() => setIsAddCardOpen(true)} size="sm" className="mt-4">
+              Ajouter une carte
+            </Button>
+          </div>
+          <div className="rounded-2xl border border-gray-100 bg-white p-4">
+            <p className="text-sm font-semibold text-gray-900">Paiement Stripe</p>
+            <p className="mt-1 text-sm text-gray-600">Vos réservations utilisent Stripe comme méthode de paiement principale, avec une expérience sécurisée.</p>
+            <div className="mt-3 inline-flex rounded-full bg-ocean-50 px-3 py-1 text-xs font-semibold text-ocean-700">
+              Sécurisé
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <AddCardModal isOpen={isAddCardOpen} onClose={() => setIsAddCardOpen(false)} onSuccess={handleCardSaved} />
+    </>
   )
 }
 
@@ -633,12 +842,12 @@ const DataPrivacySection: React.FC = () => {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700 p-6">
-      <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-1 flex items-center gap-2">
-        <ShieldAlert size={16} className="text-gray-400 dark:text-gray-500" />
-        Données &amp; vie privée
-      </h2>
-      <p className="text-xs text-gray-500 dark:text-gray-400 mb-5">
+    <div className={CARD}>
+      <div className="flex items-center gap-2.5 mb-1">
+        <SectionIcon icon={<ShieldAlert size={17} />} />
+        <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Données &amp; vie privée</h2>
+      </div>
+      <p className="text-xs text-gray-500 dark:text-gray-400 mb-6 ml-[46px]">
         Conformément au RGPD, vous disposez d'un droit d'accès, de portabilité et d'effacement de vos données.
       </p>
 
@@ -735,38 +944,33 @@ const UserProfile: React.FC = () => {
     { id: 'compte', label: 'Mon compte', icon: <UserCircle size={18} /> },
     { id: 'marin', label: 'CV de marin', icon: <Anchor size={18} />, ownerOnly: true },
     { id: 'securite', label: 'Sécurité', icon: <Shield size={18} /> },
-    { id: 'donnees', label: 'Confidentialité', icon: <Lock size={18} /> },
+    { id: 'donnees', label: 'Paiement', icon: <CreditCard size={18} /> },
   ]
 
   const visibleTabs = tabs.filter((t) => !t.ownerOnly || isOwner)
 
   return (
-    <div className="max-w-4xl">
+    <div className="max-w-4xl mx-auto">
       {/* En-tête */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-ocean-700 via-brand-blue to-ocean-600 text-white p-6 sm:p-8 mb-6 shadow-lg shadow-ocean-700/20">
-        <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute -left-6 bottom-0 h-28 w-28 rounded-full bg-white/5 blur-xl" />
-        <div className="relative flex flex-col sm:flex-row sm:items-center gap-5">
-          <div className="h-16 w-16 rounded-2xl overflow-hidden bg-white/20 flex items-center justify-center flex-shrink-0 ring-2 ring-white/30">
-            {user.avatar ? (
-              <img src={user.avatar} alt="" className="h-full w-full object-cover" />
-            ) : (
-              <span className="text-xl font-bold">{getInitials(user.firstName, user.lastName)}</span>
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              {isOwner ? <Settings size={18} className="opacity-80" /> : <UserCircle size={18} className="opacity-80" />}
-              <h1 className="text-xl sm:text-2xl font-bold">{isOwner ? 'Paramètres' : 'Mon profil'}</h1>
+      <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-12 rounded-full overflow-hidden bg-ocean-100 flex items-center justify-center ring-1 ring-ocean-200">
+              {user.avatar ? (
+                <img src={user.avatar} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <span className="text-sm font-semibold text-ocean-700">{getInitials(user.firstName, user.lastName)}</span>
+              )}
             </div>
-            <p className="text-sm text-white/80">
-              {user.firstName} {user.lastName} · {user.email}
-            </p>
+            <div>
+              <h1 className="text-lg font-semibold text-gray-900">Mon profil</h1>
+              <p className="text-sm text-gray-500">{user.firstName} {user.lastName} · {user.email}</p>
+            </div>
           </div>
           {publicProfilePath && (
             <Link
               to={MY_PUBLIC_PROFILE_ROUTE}
-              className="inline-flex items-center justify-center gap-2 text-sm font-semibold bg-white text-ocean-700 hover:bg-white/90 rounded-xl px-4 py-2.5 transition-colors flex-shrink-0 shadow-sm"
+              className="inline-flex items-center justify-center gap-2 text-sm font-medium text-ocean-700 hover:text-ocean-800"
             >
               <ExternalLink size={15} />
               Voir mon profil public
@@ -809,7 +1013,7 @@ const UserProfile: React.FC = () => {
           )}
           {activeTab === 'marin' && isOwner && <SailorCvSection />}
           {activeTab === 'securite' && <SecuritySection />}
-          {activeTab === 'donnees' && <DataPrivacySection />}
+          {activeTab === 'donnees' && <PaymentSection />}
         </div>
       </div>
     </div>

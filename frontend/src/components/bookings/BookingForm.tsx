@@ -11,6 +11,7 @@ import 'react-day-picker/style.css'
 import { cn } from '../../lib/utils'
 import type { Boat } from '../../types'
 import { useAuthStore } from '../../store/auth.store'
+import { SETTINGS_ROUTE } from '../../lib/profilePaths'
 import Button from '../ui/Button'
 import PriceBreakdown from '../boats/PriceBreakdown'
 
@@ -465,7 +466,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               {t('booking.form.licenseRequired')}{' '}
               <button
                 type="button"
-                onClick={() => navigate('/mon-espace/profil')}
+                onClick={() => navigate(SETTINGS_ROUTE)}
                 className="underline font-medium"
               >
                 {t('booking.form.completeProfile')}
