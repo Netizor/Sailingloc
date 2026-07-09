@@ -1,11 +1,13 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Star, Anchor, UserCheck, Sparkles, Sailboat } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { Star, Anchor, UserCheck, Sparkles, Sailboat, GitCompareArrows } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { INLINE_SEP } from '../../lib/typography'
 import type { Boat } from '../../types'
 import { BOAT_TYPE_LABELS } from '../../lib/labels'
 import { BoatType } from '../../types'
+import { useCompareStore } from '../../store/compare.store'
 import FavoriteButton from './FavoriteButton'
 
 interface ListingBoatCardProps {
@@ -17,11 +19,26 @@ const formatDailyPrice = (amount: number) =>
   `${Math.round(amount).toLocaleString('fr-FR')}€`
 
 const ListingBoatCard: React.FC<ListingBoatCardProps> = ({ boat, className }) => {
+  const { t } = useTranslation()
   const mainImage = boat.images?.[0] ?? null
   const typeLabel = BOAT_TYPE_LABELS[boat.type] ?? boat.type
   const location = boat.city || boat.port
   const isTopRated = (boat.rating ?? 0) >= 4.9
   const showPremiumService = boat.type === BoatType.YACHT
+
+  const { ids, add, remove } = useCompareStore()
+  const isCompared = ids.includes(boat.id)
+  const canAddMore = ids.length < 3
+
+  const handleCompareClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (isCompared) {
+      remove(boat.id)
+    } else if (canAddMore) {
+      add(boat.id)
+    }
+  }
 
   return (
     <article
@@ -58,9 +75,28 @@ const ListingBoatCard: React.FC<ListingBoatCardProps> = ({ boat, className }) =>
             </span>
           )}
 
+          <button
+            type="button"
+            onClick={handleCompareClick}
+            aria-label={isCompared ? t('compare.remove') : t('compare.add')}
+            aria-pressed={isCompared}
+            disabled={!isCompared && !canAddMore}
+            className={cn(
+              'absolute bottom-3 left-3 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded transition-all duration-150 z-10',
+              'focus:outline-none focus:ring-2 focus:ring-brand-blue',
+              isCompared
+                ? 'bg-brand-blue text-white shadow-md'
+                : 'bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-brand-navy dark:text-white hover:bg-white shadow-sm',
+              !isCompared && !canAddMore && 'opacity-40 cursor-not-allowed',
+            )}
+          >
+            <GitCompareArrows size={12} strokeWidth={2.5} />
+            {t('compare.compare')}
+          </button>
+
           {isTopRated && (
-            <span className="absolute bottom-3 left-3 bg-brand-teal dark:bg-teal-800 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded">
-              Coup de coeur
+            <span className="absolute bottom-3 right-3 bg-brand-teal dark:bg-teal-800 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded">
+              {t('search.topRated')}
             </span>
           )}
         </div>
@@ -72,30 +108,30 @@ const ListingBoatCard: React.FC<ListingBoatCardProps> = ({ boat, className }) =>
             </h3>
             <div className="text-right flex-shrink-0">
               <span className="text-base font-bold text-brand-navy dark:text-white">{formatDailyPrice(boat.dailyRate)}</span>
-              <span className="text-xs text-brand-slate dark:text-gray-400"> /jour</span>
+              <span className="text-xs text-brand-slate dark:text-gray-400"> {t('search.perDay')}</span>
             </div>
           </div>
 
           <p className="text-xs text-brand-muted dark:text-gray-400 mb-3">
-            {typeLabel}{INLINE_SEP}{boat.capacity} pers.{INLINE_SEP}{location}
+            {typeLabel}{INLINE_SEP}{boat.capacity} {t('search.persons')}{INLINE_SEP}{location}
           </p>
 
           <div className="flex flex-wrap items-center gap-1.5 pt-1">
             {boat.withSkipper ? (
               <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-brand-teal dark:text-teal-300">
                 <UserCheck size={12} strokeWidth={2.5} />
-                Skipper professionnel inclus
+                {t('search.withSkipperIncluded')}
               </span>
             ) : (
               <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-brand-muted dark:text-gray-400">
                 <Sailboat size={12} strokeWidth={2.5} />
-                Sans skipper
+                {t('search.withoutSkipper')}
               </span>
             )}
             {showPremiumService && (
               <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-brand-blue dark:text-blue-300">
                 <Sparkles size={12} strokeWidth={2.5} />
-                Service de bord premium
+                {t('search.premiumService')}
               </span>
             )}
           </div>

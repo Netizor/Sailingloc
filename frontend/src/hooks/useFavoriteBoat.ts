@@ -43,6 +43,7 @@ export function useFavoriteBoat(boatId: number) {
       invalidate()
       toast.success(t('favorites.added', { defaultValue: 'Ajouté aux favoris' }))
     },
+    onError: () => toast.error(t('common.error')),
   })
 
   const removeMutation = useMutation({
@@ -51,6 +52,7 @@ export function useFavoriteBoat(boatId: number) {
       invalidate()
       toast.success(t('favorites.removed', { defaultValue: 'Retiré des favoris' }))
     },
+    onError: () => toast.error(t('common.error')),
   })
 
   const toggle = (e?: MouseEvent) => {

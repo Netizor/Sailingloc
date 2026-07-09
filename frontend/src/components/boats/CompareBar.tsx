@@ -1,10 +1,12 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { X, GitCompareArrows } from 'lucide-react'
 import { useCompareStore } from '../../store/compare.store'
 import Button from '../ui/Button'
 
 const CompareBar: React.FC = () => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { ids, remove, clear } = useCompareStore()
 
@@ -25,10 +27,10 @@ const CompareBar: React.FC = () => {
               key={id}
               className="flex items-center gap-1.5 bg-ocean-50 border border-ocean-200 rounded-full px-3 py-1 text-xs font-medium text-ocean-700 dark:bg-ocean-900/30 dark:border-ocean-700 dark:text-ocean-400"
             >
-              <span>Bateau #{id}</span>
+              <span>{t('compare.boatId', { id })}</span>
               <button
                 onClick={() => remove(id)}
-                aria-label="Retirer du comparateur"
+                aria-label={t('compare.remove')}
                 className="text-ocean-400 hover:text-ocean-700 transition-colors"
               >
                 <X size={12} />
@@ -41,7 +43,7 @@ const CompareBar: React.FC = () => {
               key={`empty-${i}`}
               className="flex items-center gap-1.5 border border-dashed border-gray-300 rounded-full px-3 py-1 text-xs text-gray-400 dark:border-gray-600 dark:text-gray-500"
             >
-              Ajouter un bateau
+              {t('compare.addSlot')}
             </div>
           ))}
         </div>
@@ -52,7 +54,7 @@ const CompareBar: React.FC = () => {
             onClick={clear}
             className="text-xs text-gray-400 hover:text-gray-700 transition-colors px-2 py-1 dark:text-gray-500 dark:hover:text-gray-300"
           >
-            Tout effacer
+            {t('compare.clearAll')}
           </button>
           <Button
             variant="primary"
@@ -61,7 +63,7 @@ const CompareBar: React.FC = () => {
             onClick={handleCompare}
             disabled={ids.length < 2}
           >
-            Comparer ({ids.length})
+            {t('compare.compareCount', { count: ids.length })}
           </Button>
         </div>
       </div>

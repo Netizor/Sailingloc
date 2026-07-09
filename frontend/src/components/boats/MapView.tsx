@@ -99,7 +99,8 @@ const MapView: React.FC<MapViewProps> = ({ boats, className, dark = false, fullH
     [located],
   )
 
-  const zoom = located.length > 0 ? 8 : DEFAULT_ZOOM
+  const zoom =
+    located.length === 1 ? 13 : located.length > 0 ? 8 : DEFAULT_ZOOM
 
   return (
     <div className={dark ? `map-teal-blueprint ${className ?? ''}` : className}>

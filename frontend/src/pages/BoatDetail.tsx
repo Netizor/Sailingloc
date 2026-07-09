@@ -52,6 +52,7 @@ import BoatDetailGallery from '../components/boats/BoatDetailGallery'
 import BoatAvailabilityCalendar from '../components/boats/BoatAvailabilityCalendar'
 import BoatOwnerCard from '../components/boats/BoatOwnerCard'
 import SimilarBoats from '../components/boats/SimilarBoats'
+import MapView from '../components/boats/MapView'
 import BookingForm, { BookingFormData } from '../components/bookings/BookingForm'
 import StripePaymentModal from '../components/bookings/StripePaymentModal'
 import Modal from '../components/ui/Modal'
@@ -421,6 +422,20 @@ const BoatDetail: React.FC = () => {
                 </div>
               </section>
             )}
+
+            {/* Localisation */}
+            <section>
+              <h2 className="text-lg font-bold text-[#003366] mb-4">{t('boat.detail.location')}</h2>
+              <p className="text-sm text-[#334155] mb-4 flex items-center gap-2">
+                <MapPin size={16} className="text-[#2563FF] flex-shrink-0" />
+                {boat.port}{boat.city ? `, ${boat.city}` : ''}{boat.country ? `, ${boat.country}` : ''}
+              </p>
+              {boat.lat != null && boat.lng != null ? (
+                <MapView boats={[boat]} className="rounded-2xl overflow-hidden border border-gray-100" />
+              ) : (
+                <p className="text-sm text-[#8A94A6] italic">{t('boat.detail.noMapCoordinates')}</p>
+              )}
+            </section>
 
             {/* Disponibilités */}
             <section>
