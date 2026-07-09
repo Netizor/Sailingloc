@@ -185,7 +185,7 @@ router.post('/forgot-password', resetLimiter, async (req, res) => {
       user_id: user.id,
       expires_at: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
     })
-    try { await sendPasswordReset(email, user.first_name, token) } catch {}
+    try { await sendPasswordReset(email, user.first_name, token) } catch (err) { console.error('[Email] sendPasswordReset:', err?.message ?? err) }
   }
   return res.json({ message: 'Si cet email existe, un lien a été envoyé.' })
 })

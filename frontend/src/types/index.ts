@@ -19,12 +19,12 @@ export enum MotorizationType {
 }
 
 export enum BoatStatus {
-  DRAFT = 'DRAFT',
-  PENDING_REVIEW = 'PENDING_REVIEW',
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  SUSPENDED = 'SUSPENDED',
-  REJECTED = 'REJECTED',
+  DRAFT = 'draft',
+  PENDING_REVIEW = 'pending_review',
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  SUSPENDED = 'suspended',
+  REJECTED = 'rejected',
 }
 
 export enum BookingStatus {

@@ -337,13 +337,9 @@ router.get('/:id', authenticate, async (req, res) => {
 router.patch('/:id/status', authenticate, async (req, res) => {
   const { status, action, cancellationReason } = req.body
 
-  // Supporte aussi { action: 'accept'|'reject' } pour compatibilité frontend
+  // Supporte { action: 'accept'|'reject' } et { status: '...' }
   let finalStatus = status
-  if (action === 'accept') {
-    return res.status(400).json({
-      message: 'La réservation est confirmée automatiquement après le paiement du locataire.',
-    })
-  }
+  if (action === 'accept') finalStatus = 'CONFIRMED'
   if (action === 'reject') finalStatus = 'CANCELLED'
 
   const validStatuses = ['CONFIRMED','CANCELLED','COMPLETED','DISPUTED']
@@ -356,8 +352,13 @@ router.patch('/:id/status', authenticate, async (req, res) => {
   const isOwner  = booking.boats?.owner_id === req.user.id
   if (!isRenter && !isOwner && req.user.role !== 'ADMIN') return res.status(403).json({ message: 'Accès refusé' })
 
-  if (finalStatus === 'CONFIRMED' && !booking.stripe_payment_intent_id) {
+  // Seul le propriétaire ou l'admin peut confirmer manuellement (sans paiement Stripe)
+  if (finalStatus === 'CONFIRMED' && !booking.stripe_payment_intent_id && !isOwner && req.user.role !== 'ADMIN') {
     return res.status(400).json({ message: 'Impossible de confirmer sans paiement enregistré.' })
+  }
+  // Bloquer la transition si déjà annulé ou terminé
+  if (['CANCELLED','COMPLETED'].includes(booking.status) && finalStatus !== booking.status) {
+    return res.status(400).json({ message: 'Cette réservation ne peut plus être modifiée.' })
   }
 
   const updates = { status: finalStatus, updated_at: new Date().toISOString() }

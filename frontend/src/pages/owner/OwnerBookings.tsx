@@ -161,6 +161,15 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
   const [cancelReason, setCancelReason] = useState(OWNER_CANCEL_REASONS[0])
   const [cancelOther, setCancelOther]  = useState('')
 
+  const { mutate: accept, isPending: isAccepting } = useMutation({
+    mutationFn: () => bookingsApi.accept(booking.id),
+    onSuccess: () => {
+      toast.success('Réservation acceptée')
+      queryClient.invalidateQueries({ queryKey: ['owner', 'bookings'] })
+    },
+    onError: (err: any) => toast.error(err?.response?.data?.message ?? 'Erreur lors de l\'acceptation'),
+  })
+
   const { mutate: decline, isPending: isDeclining } = useMutation({
     mutationFn: () => bookingsApi.decline(booking.id),
     onSuccess: () => {
@@ -236,10 +245,19 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
             </p>
             <div className="flex items-center gap-2 flex-wrap">
               <Button
+                variant="primary"
+                size="sm"
+                onClick={() => accept()}
+                disabled={isAccepting || isDeclining}
+                loading={isAccepting}
+              >
+                Accepter
+              </Button>
+              <Button
                 variant="danger"
                 size="sm"
                 onClick={() => decline()}
-                disabled={isDeclining}
+                disabled={isDeclining || isAccepting}
                 loading={isDeclining}
               >
                 {t('booking.ownerBookings.decline')}

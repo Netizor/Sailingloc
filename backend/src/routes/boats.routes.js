@@ -277,22 +277,25 @@ router.post('/', authenticate, requireRole('OWNER', 'ADMIN'), async (req, res) =
     }
   }
 
+  const parsedCapacity = capacity ? parseInt(capacity) : 1
+  const parsedDailyRate = dailyRate ? parseFloat(dailyRate) : (pricePerDay ? parseFloat(pricePerDay) : 0)
+
   const { data: boat, error } = await supabase.from('boats').insert({
     owner_id: req.user.id,
     title: title.trim(),
-    description: description ? description.trim() : null,
+    description: description ? description.trim() : '',
     type,
     manufacturer,
     model,
     year,
     length,
-    capacity: parseInt(capacity),
+    capacity: parsedCapacity,
     cabins: parseInt(cabins) || 0,
-    motorization_type: motorizationType || 'SAIL',
+    motorization_type: motorizationType || null,
     motor_power: motorPower,
     with_skipper: Boolean(withSkipper),
     skipper_price: skipperPrice,
-    price_per_day: parseFloat(dailyRate || pricePerDay),
+    price_per_day: parsedDailyRate,
     deposit: depositAmount ? parseFloat(depositAmount) : (deposit ? parseFloat(deposit) : null),
     city: city.trim(),
     port: port?.trim(),
