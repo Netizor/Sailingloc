@@ -4,9 +4,11 @@ import { useQuery } from '@tanstack/react-query'
 import {
   Bell,
   ChevronDown,
+  LayoutDashboard,
   LogOut,
   Menu,
   MessageSquare,
+  Ship,
   User,
   X,
   Settings,
@@ -14,7 +16,6 @@ import {
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/utils'
 import { useAuthStore } from '../../store/auth.store'
-import { getDefaultDashboardPath } from '../../lib/profilePaths'
 import { getUnreadCount } from '../../api/notifications.api'
 import { getUnreadMessagesCount } from '../../api/messages.api'
 import { MY_PUBLIC_PROFILE_ROUTE, SETTINGS_ROUTE } from '../../lib/profilePaths'
@@ -127,7 +128,7 @@ const Header: React.FC = () => {
           {/* Actions - boutons auth avant les icônes pour éviter la coupure à droite */}
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 self-center min-w-0">
             {!isAuthenticated && (
-              <div className="hidden lg:flex items-center gap-2 shrink-0">
+              <div className="hidden md:flex items-center gap-2 shrink-0">
                 <button
                   type="button"
                   onClick={() => navigate('/connexion')}

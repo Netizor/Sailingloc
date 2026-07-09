@@ -55,25 +55,25 @@ export const getBookingStatusLabel = (status: string): string =>
 
 export const getBookingStatusColor = (status: string): string =>
   ({
-    PENDING: 'bg-yellow-100 text-yellow-800',
-    CONFIRMED: 'bg-green-100 text-green-800',
-    CANCELLED: 'bg-red-100 text-red-800',
-    COMPLETED: 'bg-ocean-100 text-ocean-800',
-    DISPUTED: 'bg-orange-100 text-orange-800',
-  }[status] ?? 'bg-gray-100 text-gray-800')
+    PENDING: 'badge-variant-warning',
+    CONFIRMED: 'badge-variant-success',
+    CANCELLED: 'badge-variant-danger',
+    COMPLETED: 'badge-variant-primary',
+    DISPUTED: 'badge-variant-info',
+  }[status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300')
 
 export const getBoatStatusLabel = (status: string): string =>
   i18n.t(`boat.status.${status}`, { defaultValue: status })
 
 export const getBoatStatusColor = (status: string): string =>
   ({
-    DRAFT: 'bg-gray-100 text-gray-700',
-    PENDING_REVIEW: 'bg-yellow-100 text-yellow-800',
-    ACTIVE: 'bg-green-100 text-green-800',
-    INACTIVE: 'bg-gray-100 text-gray-700',
-    SUSPENDED: 'bg-red-100 text-red-800',
-    REJECTED: 'bg-red-100 text-red-800',
-  }[status] ?? 'bg-gray-100 text-gray-800')
+    DRAFT: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
+    PENDING_REVIEW: 'badge-variant-warning',
+    ACTIVE: 'badge-variant-success',
+    INACTIVE: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
+    SUSPENDED: 'badge-variant-danger',
+    REJECTED: 'badge-variant-danger',
+  }[status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300')
 
 export const getMotorizationLabel = (type: string): string =>
   i18n.t(`boat.motorization.${type}`, { defaultValue: type })

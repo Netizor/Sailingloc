@@ -29,184 +29,22 @@
     --status-primary-dot: #2563ff;
   }
 
-  /* Daltonien — jaune fort type Sorbonne (fond #FFFF00, texte noir) */
-  :root.cb-yellow {
-    --sl-navy: #000000;
-    --sl-blue: #000000;
-    --sl-teal: #000000;
-    --sl-slate: #000000;
-    --sl-muted: #1a1a1a;
-    --sl-light: #FFFF00;
-
-    --status-success-bg: #FFFF00;
-    --status-success-text: #000000;
-    --status-success-dot: #000000;
-    --status-warning-bg: #FFF200;
-    --status-warning-text: #000000;
-    --status-warning-dot: #000000;
-    --status-danger-bg: #FFEB00;
-    --status-danger-text: #000000;
-    --status-danger-dot: #000000;
-    --status-info-bg: #FFFF00;
-    --status-info-text: #000000;
-    --status-info-dot: #000000;
-    --status-primary-bg: #FFFF00;
-    --status-primary-text: #000000;
-    --status-primary-dot: #000000;
-  }
-
-  :root.cb-yellow body,
-  :root.cb-yellow.dark body {
-    background-color: #FFFF00 !important;
-    color: #000000 !important;
-  }
-
-  :root.cb-yellow .bg-white,
-  :root.cb-yellow .bg-gray-50,
-  :root.cb-yellow .bg-gray-100,
-  :root.cb-yellow.dark .bg-white,
-  :root.cb-yellow.dark .bg-gray-50,
-  :root.cb-yellow.dark .bg-gray-100 {
-    background-color: #FFFF00 !important;
-  }
-
-  :root.cb-yellow .text-brand-navy,
-  :root.cb-yellow .text-gray-900,
-  :root.cb-yellow .text-brand-slate,
-  :root.cb-yellow .text-gray-600,
-  :root.cb-yellow .text-gray-500,
-  :root.cb-yellow .text-gray-700,
-  :root.cb-yellow .text-gray-400,
-  :root.cb-yellow .text-gray-300,
-  :root.cb-yellow.dark .text-brand-navy,
-  :root.cb-yellow.dark .text-gray-900,
-  :root.cb-yellow.dark .text-brand-slate,
-  :root.cb-yellow.dark .text-gray-600,
-  :root.cb-yellow.dark .text-gray-500,
-  :root.cb-yellow.dark .text-gray-700,
-  :root.cb-yellow.dark .text-gray-400,
-  :root.cb-yellow.dark .text-gray-300 {
-    color: #000000 !important;
-  }
-
-  :root.cb-yellow .text-brand-blue,
-  :root.cb-yellow .text-\[\#2563FF\],
-  :root.cb-yellow .text-ocean-600,
-  :root.cb-yellow .text-ocean-700,
-  :root.cb-yellow.dark .text-brand-blue,
-  :root.cb-yellow.dark .text-\[\#2563FF\],
-  :root.cb-yellow.dark .text-ocean-600,
-  :root.cb-yellow.dark .text-ocean-700 {
-    color: #000000 !important;
-    text-decoration: underline;
-  }
-
-  :root.cb-yellow .bg-brand-blue,
-  :root.cb-yellow .bg-\[\#2563FF\],
-  :root.cb-yellow .bg-ocean-600,
-  :root.cb-yellow .bg-ocean-700,
-  :root.cb-yellow .hover\:bg-ocean-700:hover,
-  :root.cb-yellow.dark .bg-brand-blue,
-  :root.cb-yellow.dark .bg-\[\#2563FF\],
-  :root.cb-yellow.dark .bg-ocean-600,
-  :root.cb-yellow.dark .bg-ocean-700 {
-    background-color: #000000 !important;
-    color: #FFFF00 !important;
-  }
-
-  :root.cb-yellow .border-\[\#2563FF\],
-  :root.cb-yellow .border-brand-blue,
-  :root.cb-yellow .border-gray-100,
-  :root.cb-yellow .border-gray-200,
-  :root.cb-yellow .border-gray-300,
-  :root.cb-yellow.dark .border-\[\#2563FF\],
-  :root.cb-yellow.dark .border-brand-blue,
-  :root.cb-yellow.dark .border-gray-100,
-  :root.cb-yellow.dark .border-gray-200,
-  :root.cb-yellow.dark .border-gray-300 {
-    border-color: #000000 !important;
-  }
-
-  :root.cb-yellow header.bg-white,
-  :root.cb-yellow.dark header.bg-white {
-    background-color: #FFFF00 !important;
-    border-color: #000000 !important;
-  }
-
-  :root.cb-yellow .bg-green-500,
-  :root.cb-yellow .bg-green-100,
-  :root.cb-yellow .bg-red-500,
-  :root.cb-yellow .bg-red-100,
-  :root.cb-yellow .bg-red-50,
-  :root.cb-yellow .bg-sky-100,
-  :root.cb-yellow .bg-yellow-100,
-  :root.cb-yellow .bg-orange-500,
-  :root.cb-yellow .bg-blue-50,
-  :root.cb-yellow.dark .bg-green-500,
-  :root.cb-yellow.dark .bg-green-100,
-  :root.cb-yellow.dark .bg-red-500,
-  :root.cb-yellow.dark .bg-red-100,
-  :root.cb-yellow.dark .bg-red-50,
-  :root.cb-yellow.dark .bg-sky-100,
-  :root.cb-yellow.dark .bg-yellow-100,
-  :root.cb-yellow.dark .bg-orange-500,
-  :root.cb-yellow.dark .bg-blue-50 {
-    background-color: #FFFF00 !important;
-  }
-
-  :root.cb-yellow .text-green-800,
-  :root.cb-yellow .text-green-600,
-  :root.cb-yellow .text-red-600,
-  :root.cb-yellow .text-red-800,
-  :root.cb-yellow .text-sky-800,
-  :root.cb-yellow .text-red-400,
-  :root.cb-yellow .text-blue-400,
-  :root.cb-yellow.dark .text-green-800,
-  :root.cb-yellow.dark .text-green-600,
-  :root.cb-yellow.dark .text-red-600,
-  :root.cb-yellow.dark .text-red-800,
-  :root.cb-yellow.dark .text-sky-800,
-  :root.cb-yellow.dark .text-red-400,
-  :root.cb-yellow.dark .text-blue-400 {
-    color: #000000 !important;
-  }
-
-  :root.cb-yellow .btn-primary,
-  :root.cb-yellow.dark .btn-primary {
-    background-color: #000000 !important;
-    color: #FFFF00 !important;
-    border: 2px solid #000000 !important;
-  }
-
-  :root.cb-yellow .btn-secondary,
-  :root.cb-yellow.dark .btn-secondary {
-    background-color: #FFFF00 !important;
-    color: #000000 !important;
-    border: 2px solid #000000 !important;
-  }
-
-  :root.cb-yellow .card,
-  :root.cb-yellow.dark .card {
-    background-color: #FFFF00 !important;
-    border: 2px solid #000000 !important;
-  }
-
-  :root.cb-yellow .input,
-  :root.cb-yellow.dark .input {
-    background-color: #FFFF00 !important;
-    border: 2px solid #000000 !important;
-    color: #000000 !important;
-  }
-
-  :root.cb-yellow a,
-  :root.cb-yellow.dark a {
-    color: #000000 !important;
-    text-decoration: underline;
-  }
-
-  :root.cb-yellow img,
-  :root.cb-yellow.dark img {
-    outline: 2px solid #000000;
+  .dark {
+    --status-success-bg: #14532d;
+    --status-success-text: #86efac;
+    --status-success-dot: #22c55e;
+    --status-warning-bg: #713f12;
+    --status-warning-text: #fde68a;
+    --status-warning-dot: #eab308;
+    --status-danger-bg: #7f1d1d;
+    --status-danger-text: #fca5a5;
+    --status-danger-dot: #ef4444;
+    --status-info-bg: #0c4a6e;
+    --status-info-text: #7dd3fc;
+    --status-info-dot: #0ea5e9;
+    --status-primary-bg: #1e3a5f;
+    --status-primary-text: #93c5fd;
+    --status-primary-dot: #2563ff;
   }
 
   html {
@@ -268,6 +106,75 @@
 
   .dark header.bg-white {
     background-color: #111827;
+  }
+
+  /* Mode sombre — couleurs hex hardcodées (contraste daltonien) */
+  .dark .text-\[\#003366\],
+  .dark .text-\[\#071d49\] {
+    color: #f3f4f6 !important;
+  }
+
+  .dark .text-\[\#334155\] {
+    color: #d1d5db !important;
+  }
+
+  .dark .text-\[\#8A94A6\],
+  .dark .text-\[\#8a94a6\] {
+    color: #cbd5e1 !important;
+  }
+
+  .dark .text-\[\#2563FF\] {
+    color: #60a5fa !important;
+  }
+
+  .dark .text-\[\#006875\] {
+    color: #5eead4 !important;
+  }
+
+  .dark .bg-\[\#f8f9fa\],
+  .dark .bg-\[\#f8f7ff\] {
+    background-color: #111827 !important;
+  }
+
+  .dark .bg-\[\#eef3fb\],
+  .dark .bg-\[\#f1f2f4\] {
+    background-color: #1f2937 !important;
+  }
+
+  .dark .bg-\[\#006875\] {
+    background-color: #0d4f5e !important;
+  }
+
+  .dark .border-gray-200 {
+    border-color: #4b5563;
+  }
+
+  .dark .text-gray-400 {
+    color: #cbd5e1;
+  }
+
+  .dark .text-gray-500 {
+    color: #d1d5db;
+  }
+
+  .dark .text-amber-700 {
+    color: #fde68a;
+  }
+
+  .dark .bg-amber-50 {
+    background-color: #78350f;
+    border-color: #92400e;
+  }
+
+  .dark select,
+  .dark textarea {
+    background-color: #1f2937;
+    border-color: #4b5563;
+    color: #f3f4f6;
+  }
+
+  .dark .placeholder-gray-400::placeholder {
+    color: #9ca3af;
   }
 }
 

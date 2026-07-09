@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, User, Phone, AlertCircle, Check } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -63,12 +63,17 @@ interface RegisterProps {
 
 const Register: React.FC<RegisterProps> = ({
   embedded = false,
-  defaultRole = UserRole.RENTER,
-  hideRoleToggle = false,
+  defaultRole: defaultRoleProp = UserRole.RENTER,
+  hideRoleToggle: hideRoleToggleProp = false,
 }) => {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { setAuth } = useAuthStore()
   const { t } = useTranslation()
+
+  const roleFromUrl = searchParams.get('role') === 'owner' ? UserRole.OWNER : UserRole.RENTER
+  const defaultRole = embedded ? defaultRoleProp : roleFromUrl
+  const hideRoleToggle = embedded ? hideRoleToggleProp : searchParams.get('role') === 'owner'
 
   const [form, setForm] = useState<RegisterForm>({
     firstName: '',
@@ -158,28 +163,38 @@ const Register: React.FC<RegisterProps> = ({
   ] as { key: keyof PasswordCriteria; label: string }[]
 
   const formContent = (
-    <div className="w-full max-w-[620px]">
-      <Link to="/" className="inline-block mb-12">
-        <img src={LOGO_IMAGE} alt="SailingLoc" className="h-11 w-auto" />
-      </Link>
+    <div className={embedded ? 'w-full' : 'w-full max-w-[620px]'}>
+      {!embedded && (
+        <>
+          <Link to="/" className="inline-block mb-12">
+            <img src={LOGO_IMAGE} alt="SailingLoc" className="h-11 w-auto" />
+          </Link>
+          <Link to="/" className="text-sm font-medium text-brand-slate dark:text-gray-400 hover:text-brand-navy dark:hover:text-white transition-colors">
+            ← Retour d'accueil
+          </Link>
+        </>
+      )}
 
-      <Link to="/" className="text-sm font-medium text-gray-500 hover:text-gray-700">
-        ← Retour d’accueil
-      </Link>
+      {embedded && (
+        <img src={LOGO_IMAGE} alt="SailingLoc" className="h-9 w-auto mb-6" />
+      )}
 
-      <h1 className="mt-10 text-5xl font-serif font-bold leading-tight text-[#071d49]">
-  Créer un compte
-</h1>
+      <h1 className={cn(
+        'font-serif font-bold leading-tight text-brand-navy dark:text-white',
+        embedded ? 'text-2xl sm:text-3xl' : 'mt-10 text-5xl',
+      )}>
+        Créer un compte
+      </h1>
 
-      <p className="mt-3 text-lg text-gray-500">
-        Rejoignez la communauté SailingLoc.
+      <p className="mt-2 text-sm text-brand-slate dark:text-gray-400">
+        {embedded ? 'Inscrivez-vous en tant que propriétaire.' : 'Rejoignez la communauté SailingLoc.'}
       </p>
 
-      <div className="mt-8 grid grid-cols-2 gap-6">
-        <button type="button" className="h-12 rounded-lg border border-gray-300 bg-white font-semibold text-[#071d49]">
+      <div className="mt-6 grid grid-cols-2 gap-4">
+        <button type="button" className="h-11 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 font-semibold text-brand-navy dark:text-gray-200 text-sm">
           Continuer avec Google
         </button>
-        <button type="button" className="h-12 rounded-lg border border-gray-300 bg-white font-semibold text-[#071d49]">
+        <button type="button" className="h-11 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 font-semibold text-brand-navy dark:text-gray-200 text-sm">
           Continuer avec Facebook
         </button>
       </div>
@@ -244,29 +259,28 @@ const Register: React.FC<RegisterProps> = ({
 
         {!hideRoleToggle && (
           <div>
-            <p className="mb-2 text-sm font-bold text-[#071d49]">Je suis</p>
-            <div className="grid grid-cols-2 rounded-lg border border-gray-300 bg-white">
+            <p className="mb-2 text-sm font-bold text-brand-navy dark:text-white">Je suis</p>
+            <div className="grid grid-cols-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800">
               <button
                 type="button"
                 onClick={() => setField('role', UserRole.RENTER)}
                 className={cn(
                   'h-12 rounded-lg font-semibold transition',
                   form.role === UserRole.RENTER
-                    ? 'border-2 border-blue-600 text-blue-600'
-                    : 'text-[#071d49]'
+                    ? 'border-2 border-brand-blue text-brand-blue'
+                    : 'text-brand-slate dark:text-gray-400',
                 )}
               >
                 Locataire
               </button>
-
               <button
                 type="button"
                 onClick={() => setField('role', UserRole.OWNER)}
                 className={cn(
                   'h-12 rounded-lg font-semibold transition',
                   form.role === UserRole.OWNER
-                    ? 'border-2 border-blue-600 text-blue-600'
-                    : 'text-[#071d49]'
+                    ? 'border-2 border-brand-blue text-brand-blue'
+                    : 'text-brand-slate dark:text-gray-400',
                 )}
               >
                 Propriétaire
@@ -315,8 +329,8 @@ const Register: React.FC<RegisterProps> = ({
                 className={cn(
                   'rounded-full px-3 py-2 text-xs font-semibold',
                   passwordCriteria[key]
-                    ? 'bg-blue-50 text-blue-700'
-                    : 'bg-gray-100 text-gray-500'
+                    ? 'bg-ocean-100 dark:bg-ocean-900/40 text-brand-navy dark:text-brand-blue'
+                    : 'bg-gray-100 dark:bg-gray-700 text-brand-slate dark:text-gray-400',
                 )}
               >
                 {passwordCriteria[key] ? '✓' : '○'} {label}
@@ -332,19 +346,19 @@ const Register: React.FC<RegisterProps> = ({
               onClick={() => setField('acceptTerms', !form.acceptTerms)}
               className={cn(
                 'mt-1 flex h-5 w-5 items-center justify-center rounded border',
-                form.acceptTerms ? 'border-blue-600 bg-blue-600' : 'border-gray-300 bg-white'
+                form.acceptTerms ? 'border-brand-blue bg-brand-blue' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800',
               )}
             >
               {form.acceptTerms && <Check size={13} className="text-white" />}
             </button>
 
-            <span className="text-sm text-gray-500">
-              J’accepte les{' '}
-              <Link to="/cgu" className="font-semibold text-blue-600">
-                Conditions Générales d’Utilisation
+            <span className="text-sm text-brand-slate dark:text-gray-400">
+              J'accepte les{' '}
+              <Link to="/cgu" className="font-semibold text-brand-blue hover:text-ocean-600">
+                Conditions Générales d'Utilisation
               </Link>{' '}
               et la{' '}
-              <Link to="/rgpd" className="font-semibold text-blue-600">
+              <Link to="/rgpd" className="font-semibold text-brand-blue hover:text-ocean-600">
                 Politique de Confidentialité.
               </Link>
             </span>
@@ -361,9 +375,9 @@ const Register: React.FC<RegisterProps> = ({
       </form>
 
       {!embedded && (
-        <p className="mt-7 text-center text-sm text-gray-500">
+        <p className="mt-7 text-center text-sm text-brand-slate dark:text-gray-400">
           Vous avez déjà un compte ?{' '}
-          <Link to="/connexion" className="font-bold text-blue-600">
+          <Link to="/connexion" className="font-bold text-brand-blue hover:text-ocean-600">
             Se connecter
           </Link>
         </p>
@@ -372,20 +386,20 @@ const Register: React.FC<RegisterProps> = ({
   )
 
   if (embedded) {
-    return <div className="w-full">{formContent}</div>
+    return formContent
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
-        <section className="flex items-center justify-center bg-[#f8f7ff] px-8 py-12 lg:px-16">
+    <div className="-mt-[72px] pt-[72px] min-h-screen bg-white dark:bg-gray-900">
+      <div className="grid min-h-[calc(100vh-72px)] grid-cols-1 lg:grid-cols-2">
+        <section className="flex items-center justify-center bg-white dark:bg-gray-900 px-8 py-12 lg:px-16">
           {formContent}
         </section>
 
         <section
-          className="hidden lg:flex items-end bg-cover bg-center px-16 py-20 text-white"
+          className="hidden lg:flex items-end bg-cover bg-center px-16 py-20 text-white relative"
           style={{
-            backgroundImage: `linear-gradient(rgba(3,18,50,0.15), rgba(3,18,50,0.85)), url(${LOGIN_HERO_IMAGE})`,
+            backgroundImage: `linear-gradient(rgba(0,51,102,0.35), rgba(0,51,102,0.85)), url(${LOGIN_HERO_IMAGE})`,
           }}
         >
           <Ship

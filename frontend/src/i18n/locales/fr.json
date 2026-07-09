@@ -525,6 +525,8 @@
       "ownerBoats": "{{count}} bateau",
       "ownerBoats_other": "{{count}} bateaux",
       "similarBoats": "Bateaux similaires",
+      "similarBoatsSubtitle": "D'autres bateaux qui pourraient vous plaire dans la même région.",
+      "similarBoatsSeeAll": "Voir plus",
       "report": "Signaler cette annonce",
       "share": "Partager",
       "addFavorite": "Ajouter aux favoris",
@@ -736,7 +738,9 @@
   "favorites": {
     "title": "Mes favoris",
     "noFavorites": "Aucun favori",
-    "noFavoritesHint": "Sauvegardez les bateaux qui vous intéressent pour les retrouver facilement."
+    "noFavoritesHint": "Sauvegardez les bateaux qui vous intéressent pour les retrouver facilement.",
+    "added": "Ajouté aux favoris",
+    "removed": "Retiré des favoris"
   },
   "kyc": {
     "title": "Vérification d'identité",

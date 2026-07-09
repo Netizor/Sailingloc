@@ -21,6 +21,7 @@ import { BoatStatus, BoatType, MotorizationType } from '../types'
 import { boatsApi } from '../api/boats.api'
 import { getDestinationImage, HOME_DESTINATIONS } from '../data/destinations'
 import { TESTIMONIALS } from '../data/testimonials'
+import { TITLE_SEP } from '../lib/typography'
 
 type PopularBoatItem = {
   boat: Boat
@@ -253,7 +254,7 @@ const Home: React.FC = () => {
   return (
     <div className="flex flex-col bg-white">
       <Helmet>
-        <title>SailingLoc  Location de bateaux entre particuliers</title>
+        <title>SailingLoc{TITLE_SEP}Location de bateaux entre particuliers</title>
         <meta name="description" content="Louez un voilier, catamaran ou yacht d'exception dans les plus beaux ports de France et d'Europe." />
       </Helmet>
 

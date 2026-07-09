@@ -6,6 +6,7 @@ import type { Boat } from '../../types'
 import Badge from '../ui/Badge'
 import { useCompareStore } from '../../store/compare.store'
 import { BOAT_TYPE_LABELS } from '../../lib/labels'
+import FavoriteButton from './FavoriteButton'
 
 interface BoatCardProps {
   boat: Boat
@@ -83,20 +84,26 @@ const BoatCard: React.FC<BoatCardProps> = ({
           </div>
 
           {/* Favorite button */}
-          <button
-            onClick={handleFavoriteClick}
-            aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
-            aria-pressed={isFavorite}
-            className={cn(
-              'absolute top-3 right-3 p-2 rounded-full transition-all duration-150',
-              'focus:outline-none focus:ring-2 focus:ring-orange-400',
-              isFavorite
-                ? 'bg-orange-500 text-white shadow-md'
-                : 'bg-white/80 backdrop-blur-sm text-gray-500 hover:text-orange-500 hover:bg-white shadow dark:bg-gray-800/80 dark:text-gray-300'
-            )}
-          >
-            <Heart size={16} fill={isFavorite ? 'currentColor' : 'none'} strokeWidth={2} />
-          </button>
+          {onFavoriteToggle ? (
+            <button
+              onClick={handleFavoriteClick}
+              aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+              aria-pressed={isFavorite}
+              className={cn(
+                'absolute top-3 right-3 p-2 rounded-full transition-all duration-150',
+                'focus:outline-none focus:ring-2 focus:ring-brand-blue',
+                isFavorite
+                  ? 'bg-rose-500 text-white shadow-md'
+                  : 'bg-white/80 backdrop-blur-sm text-gray-500 hover:text-rose-500 hover:bg-white shadow dark:bg-gray-800/80 dark:text-gray-300',
+              )}
+            >
+              <Heart size={16} fill={isFavorite ? 'currentColor' : 'none'} strokeWidth={2} />
+            </button>
+          ) : (
+            <div className="absolute top-3 right-3 z-10">
+              <FavoriteButton boatId={boat.id} size="sm" />
+            </div>
+          )}
 
           {/* Bouton comparateur - coin bas gauche */}
           <button

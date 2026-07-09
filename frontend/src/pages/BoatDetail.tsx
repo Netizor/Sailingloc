@@ -34,6 +34,7 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn, formatDate } from '../lib/utils'
+import { TITLE_SEP } from '../lib/typography'
 import { boatsApi } from '../api/boats.api'
 import { bookingsApi } from '../api/bookings.api'
 import { availabilityApi } from '../api/availability.api'
@@ -50,6 +51,7 @@ import { getDemoBoat } from '../data/demoBoats'
 import BoatDetailGallery from '../components/boats/BoatDetailGallery'
 import BoatAvailabilityCalendar from '../components/boats/BoatAvailabilityCalendar'
 import BoatOwnerCard from '../components/boats/BoatOwnerCard'
+import SimilarBoats from '../components/boats/SimilarBoats'
 import BookingForm, { BookingFormData } from '../components/bookings/BookingForm'
 import StripePaymentModal from '../components/bookings/StripePaymentModal'
 import Modal from '../components/ui/Modal'
@@ -279,9 +281,9 @@ const BoatDetail: React.FC = () => {
   ].filter((spec) => spec.value)
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] pb-24 lg:pb-12">
+    <div className="min-h-screen bg-[#f8f9fa] dark:bg-gray-900 pb-24 lg:pb-12">
       <Helmet>
-        <title>{boat.title} - SailingLoc</title>
+        <title>{boat.title}{TITLE_SEP}SailingLoc</title>
         <meta name="description" content={boat.description?.slice(0, 155) ?? t('boat.detail.rentMeta', { title: boat.title, port: boat.port })} />
         {boat.images?.[0] && <meta property="og:image" content={boat.images[0]} />}
       </Helmet>
@@ -498,10 +500,12 @@ const BoatDetail: React.FC = () => {
             </div>
           </aside>
         </div>
+
+        <SimilarBoats currentBoatId={boat.id} boatType={boat.type} city={boat.city} />
       </div>
 
       {/* Mobile CTA */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 px-[10%] py-3 flex items-center justify-between gap-3">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-[10%] py-3 flex items-center justify-between gap-3">
         <div>
           <span className="text-lg font-bold text-[#003366]">
             {formatEuro(boat.dailyRate)}
