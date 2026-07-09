@@ -161,15 +161,6 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
   const [cancelReason, setCancelReason] = useState(OWNER_CANCEL_REASONS[0])
   const [cancelOther, setCancelOther]  = useState('')
 
-  const { mutate: accept, isPending: isAccepting } = useMutation({
-    mutationFn: () => bookingsApi.accept(booking.id),
-    onSuccess: () => {
-      toast.success(t('booking.ownerBookings.confirmed'))
-      queryClient.invalidateQueries({ queryKey: ['owner', 'bookings'] })
-    },
-    onError: () => toast.error(t('booking.ownerBookings.confirmError')),
-  })
-
   const { mutate: decline, isPending: isDeclining } = useMutation({
     mutationFn: () => bookingsApi.decline(booking.id),
     onSuccess: () => {
@@ -239,25 +230,21 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
         </div>
 
         {isPending && (
-          <div className="flex items-center gap-2 flex-wrap">
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => accept()}
-              disabled={isAccepting || isDeclining}
-              loading={isAccepting}
-            >
-              {t('booking.ownerBookings.accept')}
-            </Button>
-            <Button
-              variant="danger"
-              size="sm"
-              onClick={() => decline()}
-              disabled={isAccepting || isDeclining}
-              loading={isDeclining}
-            >
-              {t('booking.ownerBookings.decline')}
-            </Button>
+          <div className="flex flex-col gap-2">
+            <p className="text-xs text-amber-600 dark:text-amber-400">
+              {t('booking.ownerBookings.pendingPayment')}
+            </p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => decline()}
+                disabled={isDeclining}
+                loading={isDeclining}
+              >
+                {t('booking.ownerBookings.decline')}
+              </Button>
+            </div>
           </div>
         )}
 

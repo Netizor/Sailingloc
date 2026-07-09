@@ -17,7 +17,6 @@ import { useAuthStore } from '../../store/auth.store'
 import { MY_PUBLIC_PROFILE_ROUTE, SETTINGS_ROUTE, getPublicProfilePath } from '../../lib/profilePaths'
 import api, { resolveApiBaseUrl } from '../../lib/axios'
 import { getInitials, cn } from '../../lib/utils'
-import { getDefaultDashboardPath } from '../../lib/profilePaths'
 import { UserRole } from '../../types'
 
 interface NavItem {

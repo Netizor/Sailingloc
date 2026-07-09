@@ -29,7 +29,7 @@ const STEPS: Step[] = [
     number: '01',
     icon: Anchor,
     title: 'Créez votre compte propriétaire',
-    desc: 'Inscrivez-vous gratuitement et sélectionnez le rôle "Propriétaire". Complétez votre profil avec vos informations et votre RIB pour recevoir vos paiements via Stripe Connect.',
+    desc: 'Inscrivez-vous gratuitement et sélectionnez le rôle "Propriétaire". Complétez votre profil avec vos informations et votre RIB pour préparer les futurs versements.',
   },
   {
     number: '02',
@@ -47,7 +47,7 @@ const STEPS: Step[] = [
     number: '04',
     icon: CreditCard,
     title: 'Recevez vos paiements',
-    desc: "Dès qu'une réservation est confirmée, le montant est sécurisé sur la plateforme. Vous recevez votre virement dans les 2 à 5 jours ouvrés suivant la fin de la location.",
+    desc: "Dès qu'une réservation est confirmée, le paiement locataire est sécurisé via Stripe. Consultez vos revenus dans l'espace dédié.",
   },
   {
     number: '05',
@@ -65,7 +65,7 @@ const DOCUMENTS = [
   "Attestation d'assurance navigation valide (responsabilité civile + dommages)",
   'Photos récentes du bateau (extérieur, intérieur, cockpit)',
   'Certificat de conformité ou procès-verbal de visite (si applicable)',
-  'IBAN pour les virements Stripe Connect',
+  'IBAN pour les futurs virements (Stripe Connect — phase 2)',
 ]
 
 // ─── Estimateur de revenus ────────────────────────────────────────────────────

@@ -202,7 +202,7 @@ const RenterDashboard: React.FC = () => {
                       </td>
                       <td className="px-5 py-4">
                         <span
-                          className={`inline-block text-[10px] font-bold tracking-wide px-2.5 py-1 rounded-md ${getBookingStatusColor(booking.status)}`}
+                          className={`inline-block text-[10px] font-bold tracking-wide px-2.5 py-1 rounded-full border ${getBookingStatusColor(booking.status)}`}
                         >
                           {getBookingStatusLabel(booking.status).toUpperCase()}
                         </span>

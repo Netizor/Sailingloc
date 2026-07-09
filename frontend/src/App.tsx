@@ -35,6 +35,7 @@ const AdminBookings = React.lazy(() => import('./pages/admin/AdminBookings'))
 const AdminReports  = React.lazy(() => import('./pages/admin/AdminReports'))
 const AdminReviews  = React.lazy(() => import('./pages/admin/AdminReviews'))
 const AdminRoles    = React.lazy(() => import('./pages/admin/AdminRoles'))
+const AdminKyc      = React.lazy(() => import('./pages/admin/AdminKyc'))
 const Notifications = React.lazy(() => import('./pages/dashboard/Notifications'))
 const UserProfile = React.lazy(() => import('./pages/dashboard/UserProfile'))
 const MyPublicProfileRedirect = React.lazy(() => import('./pages/dashboard/MyPublicProfileRedirect'))
@@ -62,6 +63,7 @@ const Contact = React.lazy(() => import('./pages/Contact'))
 const APropos = React.lazy(() => import('./pages/APropos'))
 const GuideProprietaire = React.lazy(() => import('./pages/GuideProprietaire'))
 const DevenirProprietaire = React.lazy(() => import('./pages/DevenirProprietaire'))
+const Temoignages = React.lazy(() => import('./pages/Temoignages'))
 const OwnerAuthPage = React.lazy(() => import('./pages/OwnerAuthPage'))
 
 // ── Comparateur ────────────────────────────────────────────────────────────────
@@ -146,6 +148,7 @@ export default function App() {
               <Route path="faq" element={<Faq />} />
               <Route path="contact" element={<Contact />} />
               <Route path="a-propos" element={<APropos />} />
+              <Route path="temoignages" element={<Temoignages />} />
               <Route path="guide-proprietaire" element={<GuideProprietaire />} />
               <Route path="devenir-proprietaire" element={<DevenirProprietaire />} />
               <Route path="devenir-proprietaire/commencer" element={<OwnerAuthPage />} />
@@ -214,6 +217,7 @@ export default function App() {
                 <Route path="signalements" element={<AdminReports />} />
                 <Route path="avis" element={<AdminReviews />} />
                 <Route path="roles" element={<AdminRoles />} />
+                <Route path="kyc" element={<AdminKyc />} />
                 </Route>
               </Route>
 

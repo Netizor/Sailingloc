@@ -40,10 +40,11 @@
     "aboutUs": "Qui sommes-nous ?",
     "aboutShort": "À propos",
     "services": "Nos services",
+    "contact": "Contact",
+    "faq": "FAQ",
     "howItWorks": "Comment ça marche",
     "login": "Connexion",
     "becomeOwner": "Devenir Propriétaire",
-    "mySpace": "Mon espace",
     "ownerSpace": "Espace propriétaire",
     "admin": "Administration",
     "myProfile": "Mon profil",
@@ -90,6 +91,7 @@
     "availablePorts": "Ports disponibles",
     "insurance": "Assurance & sécurité",
     "faq": "FAQ",
+    "testimonials": "Témoignages",
     "becomeOwner": "Devenir propriétaire",
     "ownerSpace": "Espace propriétaire",
     "manageBoats": "Gérer mes bateaux",
@@ -182,6 +184,7 @@
     "milesStatLabel": "Milles marins parcourus",
     "testimonialsTitle": "Ils ont navigué avec nous",
     "testimonialsRating": "4.9 / 5 en moyenne",
+    "testimonialsSeeAll": "Voir tous les témoignages →",
     "ctaTitle": "Prête à explorer la mer ?",
     "ctaSubtitle": "Rejoignez des milliers de navigateurs qui ont choisi SailingLoc pour leurs aventures nautiques.",
     "ctaRentBoat": "Louer un bateau",
@@ -198,6 +201,137 @@
     "skipperOptional": "Skipper (optionnel)",
     "platformFee": "Commission plateforme",
     "estimationNote": "*Estimation indicative basée sur la moyenne des propriétaires actifs."
+  },
+  "testimonials": {
+    "pageTitle": "Témoignages",
+    "heroBadge": "Avis vérifiés",
+    "heroTitle": "Ils ont navigué avec SailingLoc",
+    "heroSubtitle": "Découvrez les expériences de locataires et propriétaires qui font confiance à notre plateforme pour vivre des moments inoubliables en mer.",
+    "readReviews": "Lire les avis",
+    "stats": {
+      "rating": "Note moyenne",
+      "reviews": "Avis publiés",
+      "reviewsCount": "{{count}} avis",
+      "satisfaction": "Clients satisfaits",
+      "ports": "Ports partenaires"
+    },
+    "featuredLabel": "Témoignage vedette",
+    "gridTitle": "Ce que disent nos membres",
+    "gridSubtitle": "Des avis authentiques, laissés après des locations confirmées sur SailingLoc.",
+    "filters": {
+      "all": "Tous",
+      "renters": "Locataires",
+      "owners": "Propriétaires"
+    },
+    "trustTitle": "Pourquoi ils nous font confiance",
+    "trust": {
+      "security": {
+        "title": "Sécurité & assurance",
+        "desc": "Chaque location est couverte par une assurance partenaire et un contrat clair entre les parties."
+      },
+      "verified": {
+        "title": "Profils vérifiés",
+        "desc": "Identités contrôlées, annonces validées et avis modérés pour une communauté de confiance."
+      },
+      "community": {
+        "title": "Communauté passionnée",
+        "desc": "Des milliers de navigateurs et propriétaires partagent la même passion de la mer."
+      }
+    },
+    "ctaTitle": "Votre prochaine aventure vous attend",
+    "ctaSubtitle": "Rejoignez la communauté SailingLoc et vivez une expérience nautique exceptionnelle.",
+    "ctaBrowse": "Explorer les bateaux",
+    "ctaOwner": "Devenir propriétaire"
+  },
+  "aboutPage": {
+    "pageTitle": "À propos de SailingLoc",
+    "heroBadge": "Notre histoire",
+    "heroTitle": "La mer,",
+    "heroTitleAccent": "accessible à tous",
+    "heroSubtitle": "SailingLoc connecte locataires et propriétaires de bateaux en France. Une plateforme simple, sécurisée et transparente pour louer ou proposer un bateau entre particuliers.",
+    "heroCta": "Découvrir la plateforme",
+    "missionTitle": "Notre mission",
+    "missionP1": "SailingLoc est né d'un constat simple : des milliers de bateaux restent à quai chaque été, tandis que des passionnés de mer rêvent de naviguer sans posséder leur propre navire.",
+    "missionP2": "Fondée à Marseille, notre plateforme met en relation locataires et propriétaires dans plus de 50 ports français. Voiliers, catamarans, bateaux à moteur ou semi-rigides — chaque annonce est vérifiée et chaque location bénéficie d'une assurance partenaire.",
+    "stats": {
+      "ports": "Ports couverts",
+      "rating": "Satisfaction utilisateurs",
+      "support": "Support disponible",
+      "payments": "Paiements sécurisés"
+    },
+    "promiseLabel": "Nos engagements",
+    "promiseTitle": "Ce que garantit SailingLoc",
+    "promiseSubtitle": "Des garanties concrètes pour louer ou mettre en location en toute confiance.",
+    "promise": {
+      "insurance": { "title": "Assurance incluse", "desc": "Chaque location est couverte par notre partenaire assurance maritime." },
+      "verified": { "title": "Annonces vérifiées", "desc": "Les bateaux et profils sont contrôlés avant publication sur la plateforme." },
+      "payment": { "title": "Paiement sécurisé", "desc": "Transactions protégées via Stripe. La caution éventuelle est convenue directement avec le propriétaire." },
+      "support": { "title": "Support client", "desc": "Notre équipe vous aide en cas de question avant, pendant ou après la location." }
+    },
+    "journeyLabel": "Comment ça marche",
+    "journeyTitle": "De la recherche à la navigation",
+    "journeySubtitle": "Quatre étapes simples pour réserver un bateau sur SailingLoc.",
+    "steps": {
+      "1": { "title": "Rechercher un bateau", "desc": "Parcourez les annonces par port, type de bateau, dates et budget. Filtrez avec ou sans skipper." },
+      "2": { "title": "Réserver en ligne", "desc": "Choisissez vos dates, consultez le prix détaillé et confirmez votre réservation en quelques clics." },
+      "3": { "title": "Échanger avec le propriétaire", "desc": "Via la messagerie intégrée, obtenez toutes les infos pratiques : rendez-vous au port, équipement, consignes." },
+      "4": { "title": "Naviguer & laisser un avis", "desc": "Profitez de votre sortie en mer, puis partagez votre expérience pour aider la communauté." }
+    },
+    "featuresLabel": "La plateforme",
+    "featuresTitle": "Ce que vous pouvez faire sur SailingLoc",
+    "featuresSubtitle": "Des fonctionnalités réelles, disponibles dès maintenant sur le site.",
+    "features": {
+      "booking": { "title": "Réservation en ligne", "desc": "Consultez les disponibilités, le prix par jour, les frais de service et réservez directement depuis le site." },
+      "messaging": { "title": "Messagerie intégrée", "desc": "Contactez le propriétaire avant la location pour poser vos questions et organiser le rendez-vous au port." },
+      "kyc": { "title": "Vérification d'identité", "desc": "Les utilisateurs peuvent vérifier leur identité (KYC) pour renforcer la confiance entre locataires et propriétaires." },
+      "skipper": { "title": "Skipper en option", "desc": "Certains bateaux proposent un skipper. Utilisez les filtres de recherche pour trouver l'offre adaptée à votre niveau." }
+    },
+    "audienceLabel": "Pour qui ?",
+    "audienceTitle": "Locataires et propriétaires",
+    "audienceSubtitle": "Que vous cherchiez à naviguer ou à rentabiliser votre bateau, SailingLoc vous accompagne.",
+    "audiencePopular": "Le plus demandé",
+    "audience": {
+      "renter": {
+        "name": "Locataires",
+        "tagline": "Trouvez et réservez un bateau",
+        "cta": "Louer un bateau",
+        "features": ["Recherche par port, dates et type", "Paiement sécurisé en ligne", "Assurance location incluse", "Messagerie avec le propriétaire", "Avis après chaque location"]
+      },
+      "owner": {
+        "name": "Propriétaires",
+        "tagline": "Louez votre bateau entre particuliers",
+        "cta": "Devenir propriétaire",
+        "features": ["Publication d'annonce gratuite", "Gestion du calendrier de disponibilités", "Paiements reçus de façon sécurisée", "Tableau de bord revenus & réservations", "Support dédié propriétaires"]
+      }
+    },
+    "quote": "La mer ne devrait pas être un luxe inaccessible.",
+    "quoteBody": "Notre ambition est de démocratiser la plaisance : rendre la navigation accessible, sécurisée et simple, que vous soyez locataire ou propriétaire.",
+    "badges": {
+      "verified": "Profils et annonces vérifiés",
+      "secure": "Paiements sécurisés Stripe",
+      "support": "Équipe support réactive",
+      "rating": "4.9/5 de satisfaction"
+    },
+    "faqLabel": "Questions fréquentes",
+    "faqTitle": "Ce qu'il faut savoir",
+    "faqSeeAll": "Voir toutes les questions →",
+    "faq": {
+      "1": { "q": "Comment réserver un bateau sur SailingLoc ?", "a": "Recherchez un bateau par port, dates et nombre de personnes. Choisissez une annonce, cliquez sur « Réserver » et suivez les étapes jusqu'au paiement sécurisé." },
+      "2": { "q": "Puis-je annuler ma réservation ?", "a": "Oui, depuis « Mes réservations ». Le remboursement dépend de la politique d'annulation du propriétaire et du délai avant le départ." },
+      "3": { "q": "Les bateaux sont-ils assurés ?", "a": "Chaque propriétaire doit fournir une assurance navigation valide. SailingLoc vérifie ces documents avant la publication de l'annonce." },
+      "4": { "q": "Puis-je louer un bateau avec skipper ?", "a": "Oui, si le propriétaire le propose. Utilisez le filtre « avec skipper » dans la recherche pour trouver les offres adaptées." },
+      "5": { "q": "Quels sont les frais de service ?", "a": "SailingLoc prélève environ 10 % de frais de service à la charge du locataire. Le montant exact est toujours affiché avant la confirmation." },
+      "6": { "q": "Comment fonctionne la caution ?", "a": "Le propriétaire peut définir un montant de caution dans son annonce. Ce montant est indiqué à titre informatif : la gestion concrète (empreinte bancaire ou dépôt) se fait directement entre locataire et propriétaire avant le départ." },
+      "7": { "q": "Comment mettre mon bateau en location ?", "a": "Créez un compte propriétaire, cliquez sur « Ajouter un bateau », renseignez les informations et ajoutez vos photos. L'annonce est publiée après vérification." },
+      "8": { "q": "Quand le propriétaire reçoit-il son paiement ?", "a": "Le locataire paie en ligne via Stripe lors de la réservation. Le versement au propriétaire est géré par la plateforme ; l'historique est visible dans l'espace « Revenus ». Le virement automatique via Stripe Connect est prévu en phase 2." }
+    },
+    "testimonialLabel": "Ils nous font confiance",
+    "testimonialCta": "Voir les témoignages",
+    "ctaTitle": "Prêt à naviguer ?",
+    "ctaSubtitle": "Explorez les bateaux disponibles ou proposez le vôtre sur SailingLoc.",
+    "ctaBoats": "Voir les bateaux",
+    "ctaContact": "Nous contacter",
+    "ctaTestimonials": "Témoignages"
   },
   "search": {
     "adventures_one": "{{count}} aventure maritime disponible",
@@ -223,7 +357,20 @@
     "results": "Résultats",
     "demoApiError": "Connexion API indisponible — recherche appliquée sur les bateaux de démonstration.",
     "demoNoResults": "Aucun résultat API pour ces critères — affichage des bateaux de démonstration correspondants.",
-    "demoFallback": "Affichage de bateaux de démonstration."
+    "demoFallback": "Affichage de bateaux de démonstration.",
+    "sortByLabel": "Trier par :",
+    "pageTitle": "Nos bateaux - SailingLoc",
+    "titleWithLocation": "Bateaux à {{location}} - SailingLoc",
+    "boatsAtLocation_one": "{{count}} bateau à {{location}}",
+    "boatsAtLocation_other": "{{count}} bateaux à {{location}}",
+    "resultsByCriteria": "Résultats selon vos critères de recherche.",
+    "clearFilters": "Effacer les filtres",
+    "topRated": "Coup de cœur",
+    "perDay": "/jour",
+    "persons": "pers.",
+    "withSkipperIncluded": "Skipper professionnel inclus",
+    "withoutSkipper": "Sans skipper",
+    "premiumService": "Service de bord premium"
   },
   "filters": {
     "title": "Filtres",
@@ -391,6 +538,8 @@
       "ownerBoats": "{{count}} bateau",
       "ownerBoats_other": "{{count}} bateaux",
       "similarBoats": "Bateaux similaires",
+      "similarBoatsSubtitle": "D'autres bateaux qui pourraient vous plaire dans la même région.",
+      "similarBoatsSeeAll": "Voir plus",
       "report": "Signaler cette annonce",
       "share": "Partager",
       "addFavorite": "Ajouter aux favoris",
@@ -437,7 +586,8 @@
       "reportError": "Erreur lors du signalement",
       "paymentConfirmed": "Paiement confirmé !",
       "bookingError": "Erreur lors de la réservation",
-      "rentMeta": "Louez {{title}} à {{port}}."
+      "rentMeta": "Louez {{title}} à {{port}}.",
+      "noMapCoordinates": "Carte indisponible — coordonnées GPS non renseignées pour ce bateau."
     }
   },
   "booking": {
@@ -479,6 +629,8 @@
       "serviceFee": "Frais de service",
       "cleaningFee": "Frais de ménage",
       "loginRequired": "Vous devez être connecté pour réserver. Cliquez sur \"Réserver\" pour vous connecter.",
+      "licenseRequired": "Ce bateau nécessite un permis bateau. Renseignez vos qualifications nautiques ou uploadez votre permis.",
+      "completeProfile": "Compléter mon profil",
       "bookNow": "Réserver maintenant",
       "loading": "Chargement…",
       "bookAndPay": "Réserver & Payer",
@@ -542,6 +694,7 @@
       "noPhoto": "Pas de photo",
       "renterLabel": "Locataire : {{name}}",
       "accept": "Accepter",
+      "pendingPayment": "En attente du paiement du locataire. La réservation sera confirmée automatiquement après paiement.",
       "decline": "Refuser",
       "rateRenter": "Évaluer le locataire",
       "confirmed": "Réservation confirmée",
@@ -583,12 +736,26 @@
   },
   "messages": {
     "title": "Messages",
-    "noMessages": "Aucune conversation",
-    "noMessagesHint": "Vos échanges avec les propriétaires apparaîtront ici.",
+    "noMessages": "Aucun message",
+    "noMessagesHint": "Contactez un propriétaire depuis la fiche d'un bateau pour démarrer une conversation.",
     "typeMessage": "Votre message...",
     "send": "Envoyer",
     "today": "Aujourd'hui",
-    "yesterday": "Hier"
+    "yesterday": "Hier",
+    "active": "Actifs",
+    "archived": "Archivés",
+    "startConversation": "Démarrer une conversation avec ce propriétaire",
+    "startPlaceholder": "Bonjour, je suis intéressé par votre bateau…",
+    "exploreBoats": "Explorer les bateaux",
+    "youPrefix": "Vous : ",
+    "noMessageYet": "Aucun message",
+    "unknown": "Inconnu",
+    "archive": "Archiver",
+    "unarchive": "Désarchiver",
+    "justNow": "À l'instant",
+    "minutesAgo": "{{count}} min",
+    "hoursAgo": "{{count}} h",
+    "daysAgo": "{{count}} j"
   },
   "notifications": {
     "title": "Notifications",
@@ -598,8 +765,14 @@
   },
   "favorites": {
     "title": "Mes favoris",
-    "noFavorites": "Aucun favori",
-    "noFavoritesHint": "Sauvegardez les bateaux qui vous intéressent pour les retrouver facilement."
+    "noFavorites": "Aucun bateau en favoris",
+    "noFavoritesHint": "Cliquez sur le cœur d'une annonce pour la sauvegarder ici.",
+    "add": "Ajouter aux favoris",
+    "remove": "Retirer des favoris",
+    "added": "Ajouté aux favoris",
+    "removed": "Retiré des favoris",
+    "loadError": "Erreur lors du chargement de vos favoris.",
+    "explore": "Explorer les bateaux"
   },
   "kyc": {
     "title": "Vérification d'identité",
@@ -671,6 +844,7 @@
     "addBoat": "Ajouter un bateau",
     "administration": "Administration",
     "users": "Utilisateurs",
+    "kycNav": "Vérifications KYC",
     "boatsNav": "Bateaux",
     "bookingsNav": "Réservations",
     "reports": "Signalements",
@@ -693,7 +867,7 @@
     "availabilityTitle": "Gérez vos disponibilités",
     "availabilityDesc": "Bloquez vos dates indisponibles et définissez vos créneaux de location. Vous restez libre de refuser ou d'accepter chaque demande de réservation.",
     "revenueTitle": "Percevez vos revenus",
-    "revenueDesc": "Dès qu'une réservation est confirmée, le paiement est sécurisé. Vous recevez votre virement sous 2 à 5 jours ouvrés après la fin de chaque location via Stripe Connect."
+    "revenueDesc": "Dès qu'une réservation est confirmée, le paiement locataire est sécurisé via Stripe. Consultez vos revenus dans l'espace dédié. Les virements automatiques aux propriétaires via Stripe Connect arriveront en phase 2."
   },
   "profileCompletion": {
     "emailNotVerified": "Email non vérifié",
@@ -786,5 +960,136 @@
     "completeProfile": "Compléter mon profil",
     "emailSent": "Email de vérification envoyé !",
     "emailSendFailed": "Erreur lors de l'envoi. Réessayez dans quelques instants."
+  },
+  "compare": {
+    "pageTitle": "Comparateur de bateaux",
+    "title": "Comparateur de bateaux",
+    "minBoats": "Sélectionnez au moins 2 bateaux pour les comparer.",
+    "backToSearch": "Retour à la recherche",
+    "back": "Retour",
+    "partialError": "Certains bateaux n'ont pas pu être chargés.",
+    "compare": "Comparer",
+    "compareCount": "Comparer ({{count}})",
+    "add": "Ajouter au comparateur",
+    "remove": "Retirer du comparateur",
+    "addSlot": "Ajouter un bateau",
+    "clearAll": "Tout effacer",
+    "boatId": "Bateau #{{id}}",
+    "type": "Type",
+    "port": "Port",
+    "length": "Longueur",
+    "capacity": "Capacité",
+    "cabins": "Cabines",
+    "cabins_one": "{{count}} cabine",
+    "cabins_other": "{{count}} cabines",
+    "motorization": "Motorisation",
+    "skipperIncluded": "Skipper inclus",
+    "yes": "✓ Oui",
+    "no": "✗ Non",
+    "rating": "Note",
+    "notRated": "Pas encore noté",
+    "ratingValue": "{{rating}} / 5 ({{count}} avis)",
+    "pricePerDay": "Prix / jour",
+    "deposit": "Caution",
+    "equipment": "Équipements",
+    "notProvided": "Non renseigné",
+    "viewListing": "Voir l'annonce"
+  },
+  "contactPage": {
+    "pageTitle": "Contactez-nous",
+    "badge": "Nous contacter",
+    "title": "Contactez-nous",
+    "subtitle": "Une question, un problème ou une idée ? Notre équipe vous répond rapidement.",
+    "email": "E-mail",
+    "emailValue": "contact@sailingloc.fr",
+    "emailDetail": "Réponse sous 24 h ouvrées",
+    "phone": "Téléphone",
+    "phoneValue": "+33 1 23 45 67 89",
+    "phoneDetail": "Lun-Ven, 9 h à 18 h",
+    "address": "Adresse",
+    "addressValue": "12 Quai de la Joliette, 13002 Marseille",
+    "addressDetail": "Siège social (pas de permanence)",
+    "availability": "Disponibilité",
+    "availabilityValue": "Lun-Ven, 9 h à 18 h",
+    "availabilityDetail": "Hors jours fériés",
+    "faqTitle": "Consultez d'abord la FAQ",
+    "faqHint": "La réponse à votre question s'y trouve peut-être déjà.",
+    "faqLink": "Voir la FAQ →",
+    "sentTitle": "Message envoyé !",
+    "sentHint": "Merci de nous avoir contactés. Nous vous répondrons dans les 24 h ouvrées.",
+    "sendAnother": "Envoyer un autre message",
+    "nameLabel": "Nom complet",
+    "namePlaceholder": "Jean Dupont",
+    "emailLabel": "Adresse e-mail",
+    "emailPlaceholder": "jean@exemple.fr",
+    "subjectLabel": "Sujet",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Décrivez votre demande en détail…",
+    "submit": "Envoyer le message",
+    "subjects": {
+      "booking": "Question sur une réservation",
+      "technical": "Problème technique",
+      "report": "Signalement d'annonce",
+      "partnership": "Partenariat / Presse",
+      "other": "Autre"
+    }
+  },
+  "createEditBoat": {
+    "editTitle": "Modifier le bateau",
+    "addTitle": "Ajouter un bateau",
+    "stepLabel": "Étape {{step}} : {{title}}",
+    "steps": {
+      "basic": "Informations de base",
+      "location": "Localisation",
+      "pricing": "Tarifs & skipper",
+      "equipment": "Équipements & règles",
+      "media": "Photos & documents"
+    },
+    "prev": "Précédent",
+    "next": "Suivant",
+    "saveDraft": "Enregistrer le brouillon",
+    "publish": "Publier l'annonce",
+    "published": "Annonce publiée !",
+    "draftSaved": "Brouillon enregistré",
+    "saveError": "Erreur lors de la sauvegarde",
+    "docUploaded": "Document uploadé avec succès",
+    "docUploadError": "Erreur lors de l'upload du document",
+    "validation": {
+      "titleRequired": "Le titre est requis",
+      "typeRequired": "Le type est requis",
+      "capacityRequired": "La capacité est requise",
+      "portRequired": "Le port est requis",
+      "cityRequired": "La ville est requise",
+      "dailyRateRequired": "Le tarif journalier est requis"
+    },
+    "fields": {
+      "title": "Titre de l'annonce",
+      "titlePlaceholder": "Ex: Voilier Jeanneau Sun Odyssey 440",
+      "boatType": "Type de bateau",
+      "manufacturer": "Fabricant",
+      "manufacturerPlaceholder": "Jeanneau, Bénéteau…",
+      "model": "Modèle",
+      "modelPlaceholder": "Sun Odyssey 440",
+      "year": "Année",
+      "length": "Longueur (m)",
+      "capacity": "Capacité (pers.)",
+      "cabins": "Cabines",
+      "port": "Port d'attache",
+      "city": "Ville",
+      "country": "Pays",
+      "motorization": "Motorisation",
+      "dailyRate": "Tarif journalier (€)",
+      "weeklyRate": "Tarif hebdomadaire (€)",
+      "deposit": "Caution (€)",
+      "withSkipper": "Proposer un skipper",
+      "skipperPrice": "Tarif skipper / jour (€)",
+      "requiredLicense": "Permis requis",
+      "description": "Description",
+      "equipment": "Équipements",
+      "rules": "Règles à bord",
+      "welcomeMessage": "Message de bienvenue",
+      "photos": "Photos du bateau",
+      "documents": "Documents officiels"
+    }
   }
 }

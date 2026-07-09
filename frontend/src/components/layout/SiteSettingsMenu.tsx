@@ -1,5 +1,5 @@
 import React from 'react'
-import { Eye, EyeOff, Moon, Sun } from 'lucide-react'
+import { Moon, Sun } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/utils'
 import { usePreferencesStore } from '../../store/preferences.store'
@@ -16,21 +16,13 @@ const LANG_FLAG_CODE = {
 
 const SiteSettingsMenu: React.FC<SiteSettingsMenuProps> = ({ variant = 'header' }) => {
   const { t, i18n } = useTranslation()
-  const { theme, toggleTheme, colorBlindMode, toggleColorBlind } = usePreferencesStore()
+  const { theme, toggleTheme } = usePreferencesStore()
 
   const currentLang = i18n.language?.startsWith('en') ? 'en' : 'fr'
-  const isYellowMode = colorBlindMode === 'yellow'
 
   const switchLanguage = (lang: 'fr' | 'en') => {
     i18n.changeLanguage(lang)
   }
-
-  const colorBlindButtonClass = cn(
-    'p-1.5 rounded-lg transition-colors',
-    isYellowMode
-      ? 'text-black bg-[#FFFF00] ring-2 ring-black'
-      : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200'
-  )
 
   if (variant === 'mobile') {
     return (
@@ -57,32 +49,14 @@ const SiteSettingsMenu: React.FC<SiteSettingsMenuProps> = ({ variant = 'header' 
           </div>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-          >
-            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-            {theme === 'dark' ? t('nav.lightMode') : t('nav.darkMode')}
-          </button>
-
-          <button
-            type="button"
-            onClick={toggleColorBlind}
-            aria-label={isYellowMode ? t('accessibility.colorBlindOff') : t('accessibility.colorBlindOn')}
-            aria-pressed={isYellowMode}
-            className={cn(
-              'flex items-center gap-2 w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-              isYellowMode
-                ? 'bg-[#FFFF00] text-black font-semibold ring-2 ring-black'
-                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
-            )}
-          >
-            {isYellowMode ? <Eye size={18} /> : <EyeOff size={18} />}
-            {isYellowMode ? t('accessibility.colorBlindOff') : t('accessibility.colorBlindOn')}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+        >
+          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          {theme === 'dark' ? t('nav.lightMode') : t('nav.darkMode')}
+        </button>
       </div>
     )
   }
@@ -115,16 +89,6 @@ const SiteSettingsMenu: React.FC<SiteSettingsMenuProps> = ({ variant = 'header' 
         className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
       >
         {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-      </button>
-
-      <button
-        type="button"
-        onClick={toggleColorBlind}
-        aria-label={isYellowMode ? t('accessibility.colorBlindOff') : t('accessibility.colorBlindOn')}
-        aria-pressed={isYellowMode}
-        className={colorBlindButtonClass}
-      >
-        {isYellowMode ? <Eye size={18} /> : <EyeOff size={18} />}
       </button>
     </div>
   )
@@ -161,13 +125,13 @@ const LangFlagButton: React.FC<LangFlagButtonProps> = ({
           ? cn(
               'flex-1 px-3 py-2 text-sm font-medium',
               isActive
-                ? 'bg-[#2563FF] text-white'
+                ? 'bg-brand-blue text-white'
                 : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300',
             )
           : cn(
               'p-1.5',
               isActive
-                ? 'bg-[#2563FF]/15 ring-2 ring-[#2563FF]'
+                ? 'bg-brand-blue/15 ring-2 ring-brand-blue'
                 : 'hover:bg-gray-50 dark:hover:bg-gray-800 opacity-70 hover:opacity-100',
             ),
       )}

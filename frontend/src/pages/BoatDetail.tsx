@@ -34,6 +34,7 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn, formatDate } from '../lib/utils'
+import { TITLE_SEP } from '../lib/typography'
 import { boatsApi } from '../api/boats.api'
 import { bookingsApi } from '../api/bookings.api'
 import { availabilityApi } from '../api/availability.api'
@@ -50,6 +51,8 @@ import { getDemoBoat } from '../data/demoBoats'
 import BoatDetailGallery from '../components/boats/BoatDetailGallery'
 import BoatAvailabilityCalendar from '../components/boats/BoatAvailabilityCalendar'
 import BoatOwnerCard from '../components/boats/BoatOwnerCard'
+import SimilarBoats from '../components/boats/SimilarBoats'
+import MapView from '../components/boats/MapView'
 import BookingForm, { BookingFormData } from '../components/bookings/BookingForm'
 import StripePaymentModal from '../components/bookings/StripePaymentModal'
 import Modal from '../components/ui/Modal'
@@ -254,6 +257,17 @@ const BoatDetail: React.FC = () => {
     await bookingMutation.mutateAsync({ ...data, boatId: boat.id })
   }
 
+  const handlePaymentClose = async () => {
+    if (!stripePayment) return
+    const { bookingId } = stripePayment
+    setStripePayment(null)
+    try {
+      await bookingsApi.cancel(bookingId, { cancellationReason: 'Paiement abandonné' })
+    } catch {
+      // La réservation a peut-être déjà été traitée
+    }
+  }
+
   const locationLabel = boat.city ? `${boat.city}, ${boat.country}` : `${boat.port}, ${boat.country}`
   const description = getEnrichedDescription(boat)
   const shortDesc = description.length > 900 ? description.slice(0, 900) + '…' : description
@@ -268,9 +282,9 @@ const BoatDetail: React.FC = () => {
   ].filter((spec) => spec.value)
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] pb-24 lg:pb-12">
+    <div className="min-h-screen bg-[#f8f9fa] dark:bg-gray-900 pb-24 lg:pb-12">
       <Helmet>
-        <title>{boat.title} - SailingLoc</title>
+        <title>{boat.title}{TITLE_SEP}SailingLoc</title>
         <meta name="description" content={boat.description?.slice(0, 155) ?? t('boat.detail.rentMeta', { title: boat.title, port: boat.port })} />
         {boat.images?.[0] && <meta property="og:image" content={boat.images[0]} />}
       </Helmet>
@@ -409,6 +423,20 @@ const BoatDetail: React.FC = () => {
               </section>
             )}
 
+            {/* Localisation */}
+            <section>
+              <h2 className="text-lg font-bold text-[#003366] mb-4">{t('boat.detail.location')}</h2>
+              <p className="text-sm text-[#334155] mb-4 flex items-center gap-2">
+                <MapPin size={16} className="text-[#2563FF] flex-shrink-0" />
+                {boat.port}{boat.city ? `, ${boat.city}` : ''}{boat.country ? `, ${boat.country}` : ''}
+              </p>
+              {boat.lat != null && boat.lng != null ? (
+                <MapView boats={[boat]} className="rounded-2xl overflow-hidden border border-gray-100" />
+              ) : (
+                <p className="text-sm text-[#8A94A6] italic">{t('boat.detail.noMapCoordinates')}</p>
+              )}
+            </section>
+
             {/* Disponibilités */}
             <section>
               <h2 className="text-lg font-bold text-[#003366] mb-4">{t('boat.detail.availability')}</h2>
@@ -487,10 +515,12 @@ const BoatDetail: React.FC = () => {
             </div>
           </aside>
         </div>
+
+        <SimilarBoats currentBoatId={boat.id} boatType={boat.type} city={boat.city} />
       </div>
 
       {/* Mobile CTA */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 px-[10%] py-3 flex items-center justify-between gap-3">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-[10%] py-3 flex items-center justify-between gap-3">
         <div>
           <span className="text-lg font-bold text-[#003366]">
             {formatEuro(boat.dailyRate)}
@@ -583,7 +613,7 @@ const BoatDetail: React.FC = () => {
             toast.success(t('boat.detail.paymentConfirmed'))
             navigate('/mon-espace/reservations')
           }}
-          onClose={() => setStripePayment(null)}
+          onClose={handlePaymentClose}
         />
       )}
     </div>

@@ -44,17 +44,17 @@ const NOTIF_ICONS: Record<string, React.ReactElement> = {
 }
 
 const NOTIF_COLORS: Record<string, string> = {
-  BOOKING_REQUEST:   'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
-  BOOKING_CONFIRMED: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
-  BOOKING_CANCELLED: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
-  BOOKING_COMPLETED: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
-  PAYMENT_RECEIVED:  'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
-  NEW_REVIEW:        'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
-  NEW_MESSAGE:       'bg-sky-100 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400',
-  KYC_APPROVED:      'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
-  KYC_REJECTED:      'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
-  BOAT_APPROVED:     'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
-  BOAT_REJECTED:     'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
+  BOOKING_REQUEST:   'badge-variant-info border',
+  BOOKING_CONFIRMED: 'badge-variant-success border',
+  BOOKING_CANCELLED: 'badge-variant-danger border',
+  BOOKING_COMPLETED: 'badge-variant-primary border',
+  PAYMENT_RECEIVED:  'badge-variant-success border',
+  NEW_REVIEW:        'badge-variant-warning border',
+  NEW_MESSAGE:       'badge-variant-info border',
+  KYC_APPROVED:      'badge-variant-success border',
+  KYC_REJECTED:      'badge-variant-danger border',
+  BOAT_APPROVED:     'badge-variant-success border',
+  BOAT_REJECTED:     'badge-variant-danger border',
 }
 
 // ─── Panel ────────────────────────────────────────────────────────────────────

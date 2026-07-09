@@ -8,6 +8,7 @@ interface BookingStatusBadgeProps {
   status: BookingStatus
   size?: 'sm' | 'md'
   dot?: boolean
+  className?: string
 }
 
 const statusToVariant: Record<string, BadgeVariant> = {
@@ -22,12 +23,13 @@ const BookingStatusBadge: React.FC<BookingStatusBadgeProps> = ({
   status,
   size = 'sm',
   dot = true,
+  className,
 }) => {
   const label = getBookingStatusLabel(status)
   const variant: BadgeVariant = statusToVariant[status] ?? 'default'
 
   return (
-    <Badge variant={variant} size={size} dot={dot}>
+    <Badge variant={variant} size={size} dot={dot} className={className}>
       {label}
     </Badge>
   )

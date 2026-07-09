@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { BoatStatus, BoatType, MotorizationType } from '../../types'
+import { useTranslation } from 'react-i18next'
+import { BoatStatus, BoatType, MotorizationType, type RequiredLicense } from '../../types'
 import { BOAT_TYPE_LABELS, MOTORIZATION_LABELS } from '../../lib/labels'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -24,14 +25,7 @@ import { useProfileCompletion } from '../../hooks/useProfileCompletion'
 import { cn } from '../../lib/utils'
 import toast from 'react-hot-toast'
 
-const STEPS = [
-  { number: 1, title: 'Informations de base' },
-  { number: 2, title: 'Localisation' },
-  { number: 3, title: 'Tarifs & skipper' },
-  { number: 4, title: 'Équipements & règles' },
-  { number: 5, title: 'Photos & documents' },
-]
-
+const STEP_KEYS = ['basic', 'location', 'pricing', 'equipment', 'media'] as const
 
 interface BoatFormData {
   // Step 1
@@ -54,6 +48,7 @@ interface BoatFormData {
   depositAmount: string
   withSkipper: boolean
   skipperPrice: string
+  requiredLicense: RequiredLicense
   // Step 4
   description: string
   equipment: string[]
@@ -82,6 +77,7 @@ const emptyForm: BoatFormData = {
   depositAmount: '',
   withSkipper: false,
   skipperPrice: '',
+  requiredLicense: 'NONE',
   description: '',
   equipment: [],
   rules: '',
@@ -91,6 +87,7 @@ const emptyForm: BoatFormData = {
 }
 
 const CreateEditBoat: React.FC = () => {
+  const { t } = useTranslation()
   const { id } = useParams<{ id?: string }>()
   const navigate = useNavigate()
   const isEditing = !!id
@@ -110,10 +107,16 @@ const CreateEditBoat: React.FC = () => {
   const licenseRef    = useRef<HTMLInputElement>(null)
   const contractRef   = useRef<HTMLInputElement>(null)
   const [uploadingDoc, setUploadingDoc] = useState<'insurance' | 'registration' | 'license' | 'contract' | null>(null)
+  const [pendingDocs, setPendingDocs] = useState<Partial<Record<'insurance' | 'registration' | 'license' | 'contract', File>>>({})
 
   const draftKey = isEditing ? `sailingloc_boat_draft_${id}` : 'sailingloc_boat_draft_new'
   const [savedAt, setSavedAt] = useState<Date | null>(null)
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const steps = STEP_KEYS.map((key, index) => ({
+    number: index + 1,
+    title: t(`createEditBoat.steps.${key}`),
+  }))
 
   const handleDocUpload = useCallback(async (
     docType: 'insurance' | 'registration' | 'license' | 'contract',
@@ -124,16 +127,26 @@ const CreateEditBoat: React.FC = () => {
     try {
       await boatsApi.uploadDocument(Number(id), docType, file)
       await qc.invalidateQueries({ queryKey: ['boat', id] })
-      toast.success('Document uploadé avec succès')
+      toast.success(t('createEditBoat.docUploaded'))
     } catch {
-      toast.error('Erreur lors de l\'upload du document')
+      toast.error(t('createEditBoat.docUploadError'))
     } finally {
       setUploadingDoc(null)
     }
-  }, [id, qc])
+  }, [id, qc, t])
 
-  // Load existing boat data - onSuccess est retiré (TanStack Query v5) :
-  // l'effet écoute `boatData` pour pré-remplir le formulaire.
+  const handleDocSelect = useCallback((
+    docType: 'insurance' | 'registration' | 'license' | 'contract',
+    file: File,
+  ) => {
+    if (id) {
+      handleDocUpload(docType, file)
+    } else {
+      setPendingDocs((prev) => ({ ...prev, [docType]: file }))
+    }
+  }, [id, handleDocUpload])
+
+  // Load existing boat data
   const { data: boatData, isLoading: isLoadingBoat } = useQuery({
     queryKey: ['boat', id],
     queryFn: () => boatsApi.getById(Number(id!)),
@@ -160,6 +173,7 @@ const CreateEditBoat: React.FC = () => {
       depositAmount: boatData.depositAmount ? String(boatData.depositAmount) : '',
       withSkipper: boatData.withSkipper ?? false,
       skipperPrice: boatData.skipperPrice ? String(boatData.skipperPrice) : '',
+      requiredLicense: (boatData.requiredLicense as RequiredLicense) || 'NONE',
       description: boatData.description ?? '',
       equipment: boatData.equipment ?? [],
       rules: boatData.rules ?? '',
@@ -203,24 +217,42 @@ const CreateEditBoat: React.FC = () => {
   }, [form, discountRules, draftKey])
 
   const saveMutation = useMutation({
-    mutationFn: (params: { data: Partial<Boat>; publish: boolean }) => {
+    mutationFn: async (params: { data: Partial<Boat>; publish: boolean }) => {
       const payload = {
         ...params.data,
-        // ACTIVE correspond au statut "publié" dans le backend
         status: params.publish ? BoatStatus.ACTIVE : BoatStatus.DRAFT,
       }
-      return isEditing ? boatsApi.update(Number(id!), payload) : boatsApi.create(payload)
+      const boat = isEditing
+        ? await boatsApi.update(Number(id!), payload)
+        : await boatsApi.create(payload)
+
+      if (!isEditing && Object.keys(pendingDocs).length > 0) {
+        for (const [docType, file] of Object.entries(pendingDocs)) {
+          if (file) {
+            await boatsApi.uploadDocument(
+              boat.id,
+              docType as 'insurance' | 'registration' | 'license' | 'contract',
+              file,
+            )
+          }
+        }
+      }
+      return boat
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (boat, variables) => {
       try { localStorage.removeItem(draftKey) } catch {}
       setSavedAt(null)
       toast.success(
-        variables.publish ? 'Annonce publiée !' : 'Brouillon enregistré'
+        variables.publish ? t('createEditBoat.published') : t('createEditBoat.draftSaved')
       )
-      navigate('/proprietaire/bateaux')
+      if (!isEditing && Object.keys(pendingDocs).length > 0) {
+        navigate(`/proprietaire/bateaux/${boat.id}/editer`)
+      } else {
+        navigate('/proprietaire/bateaux')
+      }
     },
     onError: (err: any) => {
-      toast.error(err?.message ?? 'Erreur lors de la sauvegarde')
+      toast.error(err?.message ?? t('createEditBoat.saveError'))
     },
   })
 
@@ -232,16 +264,16 @@ const CreateEditBoat: React.FC = () => {
   const validateStep = (): boolean => {
     const e: typeof errors = {}
     if (step === 1) {
-      if (!form.title.trim()) e.title = 'Le titre est requis'
-      if (!form.type) e.type = 'Le type est requis'
-      if (!form.capacity || Number(form.capacity) < 1) e.capacity = 'La capacité est requise'
+      if (!form.title.trim()) e.title = t('createEditBoat.validation.titleRequired')
+      if (!form.type) e.type = t('createEditBoat.validation.typeRequired')
+      if (!form.capacity || Number(form.capacity) < 1) e.capacity = t('createEditBoat.validation.capacityRequired')
     }
     if (step === 2) {
-      if (!form.port.trim()) e.port = 'Le port est requis'
-      if (!form.city.trim()) e.city = 'La ville est requise'
+      if (!form.port.trim()) e.port = t('createEditBoat.validation.portRequired')
+      if (!form.city.trim()) e.city = t('createEditBoat.validation.cityRequired')
     }
     if (step === 3) {
-      if (!form.dailyRate || Number(form.dailyRate) <= 0) e.dailyRate = 'Le tarif journalier est requis'
+      if (!form.dailyRate || Number(form.dailyRate) <= 0) e.dailyRate = t('createEditBoat.validation.dailyRateRequired')
     }
     if (step === 4) {
       if (!form.description.trim()) e.description = 'La description est requise'
@@ -251,7 +283,7 @@ const CreateEditBoat: React.FC = () => {
   }
 
   const goNext = () => {
-    if (validateStep()) setStep((s) => Math.min(s + 1, STEPS.length))
+    if (validateStep()) setStep((s) => Math.min(s + 1, steps.length))
   }
   const goPrev = () => setStep((s) => Math.max(s - 1, 1))
 
@@ -273,6 +305,7 @@ const CreateEditBoat: React.FC = () => {
     depositAmount: form.depositAmount ? Number(form.depositAmount) : undefined,
     withSkipper: form.withSkipper,
     skipperPrice: form.skipperPrice ? Number(form.skipperPrice) : undefined,
+    requiredLicense: form.requiredLicense,
     description: form.description || undefined,
     equipment: form.equipment,
     rules: form.rules || undefined,
@@ -329,12 +362,12 @@ const CreateEditBoat: React.FC = () => {
       {!canManageBoat && <BlockedModal issues={issues} />}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">
-          {isEditing ? 'Modifier le bateau' : 'Ajouter un bateau'}
+          {isEditing ? t('createEditBoat.editTitle') : t('createEditBoat.addTitle')}
         </h1>
 
         {/* Progress stepper */}
         <div className="flex items-center gap-0 mb-10 overflow-x-auto">
-          {STEPS.map((s, i) => (
+          {steps.map((s, i) => (
             <React.Fragment key={s.number}>
               <div className="flex flex-col items-center flex-shrink-0">
                 <button
@@ -360,7 +393,7 @@ const CreateEditBoat: React.FC = () => {
                   {s.title}
                 </span>
               </div>
-              {i < STEPS.length - 1 && (
+              {i < steps.length - 1 && (
                 <div
                   className={cn(
                     'flex-1 h-0.5 mt-[-12px] min-w-4',
@@ -375,15 +408,15 @@ const CreateEditBoat: React.FC = () => {
         {/* Form card */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 sm:p-8">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
-            Étape {step} : {STEPS[step - 1].title}
+            {t('createEditBoat.stepLabel', { step, title: steps[step - 1].title })}
           </h2>
 
           {/* Step 1 */}
           {step === 1 && (
             <div className="space-y-5">
               <Input
-                label="Titre de l'annonce"
-                placeholder="Ex: Voilier Jeanneau Sun Odyssey 440"
+                label={t('createEditBoat.fields.title')}
+                placeholder={t('createEditBoat.fields.titlePlaceholder')}
                 value={form.title}
                 onChange={(e) => setField('title', e.target.value)}
                 error={errors.title}
@@ -391,7 +424,7 @@ const CreateEditBoat: React.FC = () => {
               />
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  Type de bateau <span className="text-red-500">*</span>
+                  {t('createEditBoat.fields.boatType')} <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={form.type}
@@ -405,21 +438,21 @@ const CreateEditBoat: React.FC = () => {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
-                  label="Fabricant"
-                  placeholder="Jeanneau, Bénéteau…"
+                  label={t('createEditBoat.fields.manufacturer')}
+                  placeholder={t('createEditBoat.fields.manufacturerPlaceholder')}
                   value={form.manufacturer}
                   onChange={(e) => setField('manufacturer', e.target.value)}
                 />
                 <Input
-                  label="Modèle"
-                  placeholder="Sun Odyssey 440"
+                  label={t('createEditBoat.fields.model')}
+                  placeholder={t('createEditBoat.fields.modelPlaceholder')}
                   value={form.model}
                   onChange={(e) => setField('model', e.target.value)}
                 />
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 <Input
-                  label="Année"
+                  label={t('createEditBoat.fields.year')}
                   type="number"
                   placeholder="2020"
                   min="1900"
@@ -428,7 +461,7 @@ const CreateEditBoat: React.FC = () => {
                   onChange={(e) => setField('year', e.target.value)}
                 />
                 <Input
-                  label="Longueur (m)"
+                  label={t('createEditBoat.fields.length')}
                   type="number"
                   placeholder="12.5"
                   min="0"
@@ -563,6 +596,27 @@ const CreateEditBoat: React.FC = () => {
                   </div>
                 )}
               </div>
+
+              {!form.withSkipper && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    Permis requis pour le locataire
+                  </label>
+                  <select
+                    value={form.requiredLicense}
+                    onChange={(e) => setField('requiredLicense', e.target.value as RequiredLicense)}
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-white dark:bg-gray-700"
+                  >
+                    <option value="NONE">Aucun permis requis</option>
+                    <option value="COASTAL">Permis côtier (mer)</option>
+                    <option value="OFFSHORE">Permis hauturier</option>
+                    <option value="INLAND">Permis eaux intérieures</option>
+                  </select>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    Le locataire devra renseigner ses qualifications nautiques ou un permis vérifié dans son profil.
+                  </p>
+                </div>
+              )}
 
               {/* Réductions dégressive (E2) */}
               <div className="rounded-xl border border-gray-200 dark:border-gray-600 p-4">
@@ -779,7 +833,7 @@ const CreateEditBoat: React.FC = () => {
                 <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">
                   Formats acceptés : PDF, JPEG, PNG, WebP.{' '}
                   {!isEditing && (
-                    <span className="text-amber-500">Sauvegardez d'abord le bateau pour activer l'upload.</span>
+                    <span className="text-ocean-600">Les fichiers seront envoyés à la sauvegarde du bateau.</span>
                   )}
                 </p>
                 <div className="flex flex-col gap-3">
@@ -802,33 +856,35 @@ const CreateEditBoat: React.FC = () => {
                           >
                             <ExternalLink size={11} /> Voir le document
                           </a>
+                        ) : pendingDocs[docType] ? (
+                          <p className="text-xs text-green-600 dark:text-green-400 truncate">
+                            Prêt : {pendingDocs[docType]!.name}
+                          </p>
                         ) : (
                           <p className="text-xs text-gray-400 dark:text-gray-500">Non renseigné</p>
                         )}
                       </div>
-                      {isEditing && (
-                        <>
-                          <input
-                            ref={ref}
-                            type="file"
-                            accept=".pdf,.jpg,.jpeg,.png,.webp"
-                            className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0]
-                              if (file) handleDocUpload(docType, file)
-                            }}
-                          />
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            size="sm"
-                            loading={uploadingDoc === docType}
-                            onClick={() => ref.current?.click()}
-                          >
-                            {current ? 'Remplacer' : 'Uploader'}
-                          </Button>
-                        </>
-                      )}
+                      <>
+                        <input
+                          ref={ref}
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png,.webp"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) handleDocSelect(docType, file)
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          loading={uploadingDoc === docType}
+                          onClick={() => ref.current?.click()}
+                        >
+                          {current || pendingDocs[docType] ? 'Remplacer' : 'Uploader'}
+                        </Button>
+                      </>
                     </div>
                   ))}
                 </div>
@@ -850,7 +906,7 @@ const CreateEditBoat: React.FC = () => {
                   onClick={goPrev}
                   leftIcon={<ChevronLeft size={16} />}
                 >
-                  Précédent
+                  {t('createEditBoat.prev')}
                 </Button>
               )}
             </div>
@@ -862,16 +918,16 @@ const CreateEditBoat: React.FC = () => {
                 loading={saveMutation.isPending}
                 leftIcon={<Save size={14} />}
               >
-                Enregistrer brouillon
+                {t('createEditBoat.saveDraft')}
               </Button>
 
-              {step < STEPS.length ? (
+              {step < steps.length ? (
                 <Button
                   variant="primary"
                   onClick={goNext}
                   rightIcon={<ChevronRight size={16} />}
                 >
-                  Suivant
+                  {t('createEditBoat.next')}
                 </Button>
               ) : (
                 <Button
@@ -880,7 +936,7 @@ const CreateEditBoat: React.FC = () => {
                   loading={saveMutation.isPending}
                   leftIcon={<Check size={14} />}
                 >
-                  Publier l&apos;annonce
+                  {t('createEditBoat.publish')}
                 </Button>
               )}
             </div>

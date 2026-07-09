@@ -36,22 +36,22 @@ const STATUS_CONFIG: Record<KycStatus, {
     icon: <Clock size={24} />,
     title: 'Vérification en cours',
     description: "Vos documents ont été reçus et sont en cours d'examen par notre équipe (sous 24-48h).",
-    color: 'text-amber-600',
-    bg: 'bg-amber-50 border-amber-200',
+    color: 'text-brand-navy dark:text-yellow-200',
+    bg: 'badge-variant-warning border',
   },
   APPROVED: {
     icon: <ShieldCheck size={24} />,
     title: 'Identité vérifiée',
     description: "Votre identité a été validée. Vous bénéficiez de l'accès complet à la plateforme.",
-    color: 'text-green-600',
-    bg: 'bg-green-50 border-green-200',
+    color: 'text-brand-navy dark:text-green-200',
+    bg: 'badge-variant-success border',
   },
   REJECTED: {
     icon: <ShieldAlert size={24} />,
     title: 'Vérification refusée',
     description: 'Votre dossier a été rejeté. Veuillez soumettre à nouveau vos documents.',
-    color: 'text-red-600',
-    bg: 'bg-red-50 border-red-200',
+    color: 'text-brand-navy dark:text-red-200',
+    bg: 'badge-variant-danger border',
   },
 }
 
