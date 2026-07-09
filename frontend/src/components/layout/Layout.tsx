@@ -3,6 +3,7 @@ import { Outlet, Navigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Header from './Header'
 import Footer from './Footer'
+import CompareBar from '../boats/CompareBar'
 import VerificationBanner from '../ui/VerificationBanner'
 import { useAuthStore } from '../../store/auth.store'
 import { FullPageSpinner } from '../ui/Spinner'
@@ -41,6 +42,7 @@ const Layout: React.FC = () => {
         <Outlet />
       </main>
       <Footer />
+      <CompareBar />
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { BoatStatus, BoatType, MotorizationType, type RequiredLicense } from '../../types'
 import { BOAT_TYPE_LABELS, MOTORIZATION_LABELS } from '../../lib/labels'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -24,14 +25,7 @@ import { useProfileCompletion } from '../../hooks/useProfileCompletion'
 import { cn } from '../../lib/utils'
 import toast from 'react-hot-toast'
 
-const STEPS = [
-  { number: 1, title: 'Informations de base' },
-  { number: 2, title: 'Localisation' },
-  { number: 3, title: 'Tarifs & skipper' },
-  { number: 4, title: 'Équipements & règles' },
-  { number: 5, title: 'Photos & documents' },
-]
-
+const STEP_KEYS = ['basic', 'location', 'pricing', 'equipment', 'media'] as const
 
 interface BoatFormData {
   // Step 1
@@ -93,6 +87,7 @@ const emptyForm: BoatFormData = {
 }
 
 const CreateEditBoat: React.FC = () => {
+  const { t } = useTranslation()
   const { id } = useParams<{ id?: string }>()
   const navigate = useNavigate()
   const isEditing = !!id
@@ -114,6 +109,11 @@ const CreateEditBoat: React.FC = () => {
   const [uploadingDoc, setUploadingDoc] = useState<'insurance' | 'registration' | 'license' | 'contract' | null>(null)
   const [pendingDocs, setPendingDocs] = useState<Partial<Record<'insurance' | 'registration' | 'license' | 'contract', File>>>({})
 
+  const steps = STEP_KEYS.map((key, index) => ({
+    number: index + 1,
+    title: t(`createEditBoat.steps.${key}`),
+  }))
+
   const handleDocUpload = useCallback(async (
     docType: 'insurance' | 'registration' | 'license' | 'contract',
     file: File,
@@ -123,13 +123,13 @@ const CreateEditBoat: React.FC = () => {
     try {
       await boatsApi.uploadDocument(Number(id), docType, file)
       await qc.invalidateQueries({ queryKey: ['boat', id] })
-      toast.success('Document uploadé avec succès')
+      toast.success(t('createEditBoat.docUploaded'))
     } catch {
-      toast.error('Erreur lors de l\'upload du document')
+      toast.error(t('createEditBoat.docUploadError'))
     } finally {
       setUploadingDoc(null)
     }
-  }, [id, qc])
+  }, [id, qc, t])
 
   const handleDocSelect = useCallback((
     docType: 'insurance' | 'registration' | 'license' | 'contract',
@@ -210,7 +210,7 @@ const CreateEditBoat: React.FC = () => {
     },
     onSuccess: (boat, variables) => {
       toast.success(
-        variables.publish ? 'Annonce publiée !' : 'Brouillon enregistré'
+        variables.publish ? t('createEditBoat.published') : t('createEditBoat.draftSaved')
       )
       if (!isEditing && Object.keys(pendingDocs).length > 0) {
         navigate(`/proprietaire/bateaux/${boat.id}/editer`)
@@ -219,7 +219,7 @@ const CreateEditBoat: React.FC = () => {
       }
     },
     onError: (err: any) => {
-      toast.error(err?.message ?? 'Erreur lors de la sauvegarde')
+      toast.error(err?.message ?? t('createEditBoat.saveError'))
     },
   })
 
@@ -231,23 +231,23 @@ const CreateEditBoat: React.FC = () => {
   const validateStep = (): boolean => {
     const e: typeof errors = {}
     if (step === 1) {
-      if (!form.title.trim()) e.title = 'Le titre est requis'
-      if (!form.type) e.type = 'Le type est requis'
-      if (!form.capacity || Number(form.capacity) < 1) e.capacity = 'La capacité est requise'
+      if (!form.title.trim()) e.title = t('createEditBoat.validation.titleRequired')
+      if (!form.type) e.type = t('createEditBoat.validation.typeRequired')
+      if (!form.capacity || Number(form.capacity) < 1) e.capacity = t('createEditBoat.validation.capacityRequired')
     }
     if (step === 2) {
-      if (!form.port.trim()) e.port = 'Le port est requis'
-      if (!form.city.trim()) e.city = 'La ville est requise'
+      if (!form.port.trim()) e.port = t('createEditBoat.validation.portRequired')
+      if (!form.city.trim()) e.city = t('createEditBoat.validation.cityRequired')
     }
     if (step === 3) {
-      if (!form.dailyRate || Number(form.dailyRate) <= 0) e.dailyRate = 'Le tarif journalier est requis'
+      if (!form.dailyRate || Number(form.dailyRate) <= 0) e.dailyRate = t('createEditBoat.validation.dailyRateRequired')
     }
     setErrors(e)
     return Object.keys(e).length === 0
   }
 
   const goNext = () => {
-    if (validateStep()) setStep((s) => Math.min(s + 1, STEPS.length))
+    if (validateStep()) setStep((s) => Math.min(s + 1, steps.length))
   }
   const goPrev = () => setStep((s) => Math.max(s - 1, 1))
 
@@ -321,12 +321,12 @@ const CreateEditBoat: React.FC = () => {
       {!canManageBoat && <BlockedModal issues={issues} />}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">
-          {isEditing ? 'Modifier le bateau' : 'Ajouter un bateau'}
+          {isEditing ? t('createEditBoat.editTitle') : t('createEditBoat.addTitle')}
         </h1>
 
         {/* Progress stepper */}
         <div className="flex items-center gap-0 mb-10 overflow-x-auto">
-          {STEPS.map((s, i) => (
+          {steps.map((s, i) => (
             <React.Fragment key={s.number}>
               <div className="flex flex-col items-center flex-shrink-0">
                 <button
@@ -352,7 +352,7 @@ const CreateEditBoat: React.FC = () => {
                   {s.title}
                 </span>
               </div>
-              {i < STEPS.length - 1 && (
+              {i < steps.length - 1 && (
                 <div
                   className={cn(
                     'flex-1 h-0.5 mt-[-12px] min-w-4',
@@ -367,15 +367,15 @@ const CreateEditBoat: React.FC = () => {
         {/* Form card */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 sm:p-8">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
-            Étape {step} : {STEPS[step - 1].title}
+            {t('createEditBoat.stepLabel', { step, title: steps[step - 1].title })}
           </h2>
 
           {/* Step 1 */}
           {step === 1 && (
             <div className="space-y-5">
               <Input
-                label="Titre de l'annonce"
-                placeholder="Ex: Voilier Jeanneau Sun Odyssey 440"
+                label={t('createEditBoat.fields.title')}
+                placeholder={t('createEditBoat.fields.titlePlaceholder')}
                 value={form.title}
                 onChange={(e) => setField('title', e.target.value)}
                 error={errors.title}
@@ -383,7 +383,7 @@ const CreateEditBoat: React.FC = () => {
               />
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  Type de bateau <span className="text-red-500">*</span>
+                  {t('createEditBoat.fields.boatType')} <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={form.type}
@@ -397,21 +397,21 @@ const CreateEditBoat: React.FC = () => {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
-                  label="Fabricant"
-                  placeholder="Jeanneau, Bénéteau…"
+                  label={t('createEditBoat.fields.manufacturer')}
+                  placeholder={t('createEditBoat.fields.manufacturerPlaceholder')}
                   value={form.manufacturer}
                   onChange={(e) => setField('manufacturer', e.target.value)}
                 />
                 <Input
-                  label="Modèle"
-                  placeholder="Sun Odyssey 440"
+                  label={t('createEditBoat.fields.model')}
+                  placeholder={t('createEditBoat.fields.modelPlaceholder')}
                   value={form.model}
                   onChange={(e) => setField('model', e.target.value)}
                 />
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 <Input
-                  label="Année"
+                  label={t('createEditBoat.fields.year')}
                   type="number"
                   placeholder="2020"
                   min="1900"
@@ -420,7 +420,7 @@ const CreateEditBoat: React.FC = () => {
                   onChange={(e) => setField('year', e.target.value)}
                 />
                 <Input
-                  label="Longueur (m)"
+                  label={t('createEditBoat.fields.length')}
                   type="number"
                   placeholder="12.5"
                   min="0"
@@ -854,7 +854,7 @@ const CreateEditBoat: React.FC = () => {
                   onClick={goPrev}
                   leftIcon={<ChevronLeft size={16} />}
                 >
-                  Précédent
+                  {t('createEditBoat.prev')}
                 </Button>
               )}
             </div>
@@ -866,16 +866,16 @@ const CreateEditBoat: React.FC = () => {
                 loading={saveMutation.isPending}
                 leftIcon={<Save size={14} />}
               >
-                Enregistrer brouillon
+                {t('createEditBoat.saveDraft')}
               </Button>
 
-              {step < STEPS.length ? (
+              {step < steps.length ? (
                 <Button
                   variant="primary"
                   onClick={goNext}
                   rightIcon={<ChevronRight size={16} />}
                 >
-                  Suivant
+                  {t('createEditBoat.next')}
                 </Button>
               ) : (
                 <Button
@@ -884,7 +884,7 @@ const CreateEditBoat: React.FC = () => {
                   loading={saveMutation.isPending}
                   leftIcon={<Check size={14} />}
                 >
-                  Publier l&apos;annonce
+                  {t('createEditBoat.publish')}
                 </Button>
               )}
             </div>

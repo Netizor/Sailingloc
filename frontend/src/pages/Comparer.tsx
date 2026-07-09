@@ -1,5 +1,6 @@
 import React from 'react'
 import { useSearchParams, useNavigate, Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useQueries } from '@tanstack/react-query'
 import {
   Anchor,
@@ -19,22 +20,19 @@ import type { Boat } from '../types'
 import Spinner from '../components/ui/Spinner'
 import Button from '../components/ui/Button'
 
-// ─── Page Comparer ────────────────────────────────────────────────────────────
-
 const Comparer: React.FC = () => {
-  usePageTitle('Comparateur de bateaux')
+  const { t } = useTranslation()
+  usePageTitle(t('compare.pageTitle'))
 
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
 
-  // Récupère les IDs depuis ?ids=id1,id2,id3
   const ids = (searchParams.get('ids') ?? '')
     .split(',')
     .map((id) => id.trim())
     .filter(Boolean)
-    .slice(0, 3) // maximum 3
+    .slice(0, 3)
 
-  // Charge chaque bateau en parallèle
   const queries = useQueries({
     queries: ids.map((id) => ({
       queryKey: ['boat', id],
@@ -52,10 +50,10 @@ const Comparer: React.FC = () => {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-800 flex flex-col items-center justify-center gap-4 text-center px-4">
         <Anchor size={40} className="text-gray-300 dark:text-gray-600" />
         <p className="text-gray-600 dark:text-gray-400 font-medium">
-          Sélectionnez au moins 2 bateaux pour les comparer.
+          {t('compare.minBoats')}
         </p>
         <Button variant="secondary" onClick={() => navigate('/bateaux')}>
-          Retour à la recherche
+          {t('compare.backToSearch')}
         </Button>
       </div>
     )
@@ -64,23 +62,21 @@ const Comparer: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Retour */}
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-6 transition-colors"
         >
           <ArrowLeft size={15} />
-          Retour
+          {t('compare.back')}
         </button>
 
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">
-          Comparateur de bateaux
+          {t('compare.title')}
         </h1>
 
-        {/* Erreur chargement partiel */}
         {hasError && !isLoading && (
           <p className="text-sm text-red-500 mb-4">
-            Certains bateaux n'ont pas pu être chargés.
+            {t('compare.partialError')}
           </p>
         )}
 
@@ -93,7 +89,6 @@ const Comparer: React.FC = () => {
             <table className="w-full border-collapse">
               <thead>
                 <tr>
-                  {/* Colonne étiquettes */}
                   <th className="w-32 sm:w-44 text-left" />
                   {boats.map((boat) => (
                     <th
@@ -107,63 +102,62 @@ const Comparer: React.FC = () => {
               </thead>
               <tbody>
                 <CompareRow
-                  label="Type"
+                  label={t('compare.type')}
                   icon={<Anchor size={14} />}
                   values={boats.map((b) => BOAT_TYPE_LABELS[b.type] ?? b.type)}
                 />
                 <CompareRow
-                  label="Port"
+                  label={t('compare.port')}
                   icon={<MapPin size={14} />}
                   values={boats.map((b) => `${b.port}${b.city ? `, ${b.city}` : ''}`)}
                 />
                 <CompareRow
-                  label="Longueur"
+                  label={t('compare.length')}
                   icon={<Ruler size={14} />}
                   values={boats.map((b) => (b.length ? `${b.length} m` : ''))}
                 />
                 <CompareRow
-                  label="Capacité"
+                  label={t('compare.capacity')}
                   icon={<Users size={14} />}
-                  values={boats.map((b) => `${b.capacity} pers.`)}
+                  values={boats.map((b) => `${b.capacity} ${t('search.persons')}`)}
                 />
                 <CompareRow
-                  label="Cabines"
-                  values={boats.map((b) => `${b.cabins} cabine${b.cabins !== 1 ? 's' : ''}`)}
+                  label={t('compare.cabins')}
+                  values={boats.map((b) => t('compare.cabins', { count: b.cabins }))}
                 />
                 <CompareRow
-                  label="Motorisation"
+                  label={t('compare.motorization')}
                   values={boats.map((b) => MOTORIZATION_LABELS[b.motorizationType] ?? b.motorizationType)}
                 />
                 <CompareRow
-                  label="Skipper inclus"
-                  values={boats.map((b) => (b.withSkipper ? '✓ Oui' : '✗ Non'))}
+                  label={t('compare.skipperIncluded')}
+                  values={boats.map((b) => (b.withSkipper ? t('compare.yes') : t('compare.no')))}
                   highlight
                 />
                 <CompareRow
-                  label="Note"
+                  label={t('compare.rating')}
                   icon={<Star size={14} />}
                   values={boats.map((b) =>
                     b.rating > 0
-                      ? `${b.rating.toFixed(1)} / 5 (${b.reviewCount} avis)`
-                      : 'Pas encore noté',
+                      ? t('compare.ratingValue', { rating: b.rating.toFixed(1), count: b.reviewCount })
+                      : t('compare.notRated'),
                   )}
                 />
                 <CompareRow
-                  label="Prix / jour"
+                  label={t('compare.pricePerDay')}
                   icon={<Euro size={14} />}
                   values={boats.map((b) => formatPrice(b.dailyRate))}
                   bold
                 />
                 <CompareRow
-                  label="Caution"
+                  label={t('compare.deposit')}
                   values={boats.map((b) => formatPrice(b.depositAmount))}
                 />
-                {/* Équipements */}
                 <tr>
                   <td className="py-4 pr-4 text-sm font-semibold text-gray-500 dark:text-gray-400 align-top whitespace-nowrap">
                     <span className="flex items-center gap-1.5">
                       <CheckCircle size={14} />
-                      Équipements
+                      {t('compare.equipment')}
                     </span>
                   </td>
                   {boats.map((boat) => (
@@ -181,20 +175,21 @@ const Comparer: React.FC = () => {
                           ))}
                         </ul>
                       ) : (
-                        <span className="text-gray-400 dark:text-gray-500 text-xs italic">Non renseigné</span>
+                        <span className="text-gray-400 dark:text-gray-500 text-xs italic">
+                          {t('compare.notProvided')}
+                        </span>
                       )}
                     </td>
                   ))}
                 </tr>
 
-                {/* CTA */}
                 <tr>
                   <td className="pt-6" />
                   {boats.map((boat) => (
                     <td key={boat.id} className="pt-6 px-4 text-center">
                       <Link to={`/bateaux/${boat.id}`}>
                         <Button variant="primary" className="w-full">
-                          Voir l'annonce
+                          {t('compare.viewListing')}
                         </Button>
                       </Link>
                     </td>
@@ -208,8 +203,6 @@ const Comparer: React.FC = () => {
     </div>
   )
 }
-
-// ─── En-tête colonne bateau ────────────────────────────────────────────────────
 
 const BoatHeader: React.FC<{ boat: Boat }> = ({ boat }) => (
   <div className="flex flex-col items-center gap-2">
@@ -231,8 +224,6 @@ const BoatHeader: React.FC<{ boat: Boat }> = ({ boat }) => (
     </p>
   </div>
 )
-
-// ─── Ligne de comparaison ─────────────────────────────────────────────────────
 
 interface CompareRowProps {
   label: string

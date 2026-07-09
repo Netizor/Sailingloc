@@ -1,78 +1,42 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
-
 import { Helmet } from 'react-helmet-async'
-
 import { useSearchParams } from 'react-router-dom'
-
 import { useQuery } from '@tanstack/react-query'
-
 import { Anchor, ChevronDown, LayoutGrid, Ship, Sailboat, X } from 'lucide-react'
-
 import { useTranslation } from 'react-i18next'
-
 import { boatsApi } from '../api/boats.api'
-
+import { getFavorites } from '../api/favorites.api'
 import type { Boat, BoatType } from '../types'
-
 import { BoatType as BoatTypeEnum } from '../types'
-
 import { DEMO_BOATS } from '../data/demoBoats'
-
 import {
-
   filterBoatsLocally,
-
   sortBoats,
-
   parseTypeParam,
-
   type BoatSortValue,
-
 } from '../lib/boatSearch'
-
+import { useAuthStore } from '../store/auth.store'
+import { useCompareStore } from '../store/compare.store'
+import { useFavoriteBoat } from '../hooks/useFavoriteBoat'
 import SearchBar from '../components/boats/SearchBar'
-
 import ListingBoatCard from '../components/boats/ListingBoatCard'
-
 import MapView from '../components/boats/MapView'
-
 import Spinner from '../components/ui/Spinner'
-
-
 
 const PAGE_SIZE = 6
 
-
-
 type TypeFilter = 'all' | BoatTypeEnum.YACHT | BoatTypeEnum.SAILBOAT | BoatTypeEnum.CATAMARAN
 
-
-
-const TYPE_FILTERS: { id: TypeFilter; label: string; Icon: React.FC<{ className?: string }> }[] = [
-
-  { id: 'all', label: 'Tout voir', Icon: LayoutGrid },
-
-  { id: BoatTypeEnum.YACHT, label: 'Yacht', Icon: Ship },
-
-  { id: BoatTypeEnum.SAILBOAT, label: 'Voilier', Icon: Sailboat },
-
-  { id: BoatTypeEnum.CATAMARAN, label: 'Catamaran', Icon: Ship },
-
-]
-
-
-
-const SORT_OPTIONS: { value: BoatSortValue; label: string }[] = [
-
-  { value: 'price_asc', label: 'Prix croissant' },
-
-  { value: 'price_desc', label: 'Prix décroissant' },
-
-  { value: 'rating_desc', label: 'Mieux notés' },
-
-  { value: 'created_desc', label: 'Plus récents' },
-
-]
+const SearchBoatCard: React.FC<{ boat: Boat; isFavorite: boolean }> = ({ boat, isFavorite }) => {
+  const { toggle } = useFavoriteBoat(isFavorite)
+  return (
+    <ListingBoatCard
+      boat={boat}
+      isFavorite={isFavorite}
+      onFavoriteToggle={() => toggle(boat.id)}
+    />
+  )
+}
 
 
 
@@ -97,12 +61,25 @@ const SkeletonCard: React.FC = () => (
 
 
 const Search: React.FC = () => {
-
   const [searchParams, setSearchParams] = useSearchParams()
-
   const { t } = useTranslation()
-
+  const { isAuthenticated } = useAuthStore()
+  const compareIds = useCompareStore((s) => s.ids)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+
+  const TYPE_FILTERS: { id: TypeFilter; label: string; Icon: React.FC<{ className?: string }> }[] = [
+    { id: 'all', label: t('search.viewAll'), Icon: LayoutGrid },
+    { id: BoatTypeEnum.YACHT, label: t('boat.type.YACHT'), Icon: Ship },
+    { id: BoatTypeEnum.SAILBOAT, label: t('boat.type.SAILBOAT'), Icon: Sailboat },
+    { id: BoatTypeEnum.CATAMARAN, label: t('boat.type.CATAMARAN'), Icon: Ship },
+  ]
+
+  const SORT_OPTIONS: { value: BoatSortValue; label: string }[] = [
+    { value: 'price_asc', label: t('filters.priceAsc') },
+    { value: 'price_desc', label: t('filters.priceDesc') },
+    { value: 'rating_desc', label: t('filters.topRated') },
+    { value: 'created_desc', label: t('filters.newest') },
+  ]
 
 
 
@@ -173,16 +150,23 @@ const Search: React.FC = () => {
 
 
   const { data, isLoading, isError } = useQuery({
-
     queryKey: ['boats', 'search', queryParams],
-
     queryFn: () => boatsApi.search(queryParams),
-
     staleTime: 2 * 60 * 1000,
-
     retry: false,
-
   })
+
+  const { data: favorites } = useQuery({
+    queryKey: ['favorites'],
+    queryFn: getFavorites,
+    enabled: isAuthenticated,
+    staleTime: 60 * 1000,
+  })
+
+  const favoriteIds = useMemo(
+    () => new Set(favorites?.map((f) => f.boatId) ?? []),
+    [favorites],
+  )
 
 
 
@@ -299,16 +283,11 @@ const Search: React.FC = () => {
 
 
   const searchTitle = location
-
-    ? `Bateaux à ${location} - SailingLoc`
-
-    : 'Nos bateaux - SailingLoc'
-
-
+    ? t('search.titleWithLocation', { location })
+    : t('search.pageTitle')
 
   return (
-
-    <div className="min-h-screen bg-white">
+    <div className={`min-h-screen bg-white ${compareIds.length > 0 ? 'pb-20' : ''}`}>
 
       <Helmet>
 
@@ -407,9 +386,7 @@ const Search: React.FC = () => {
               <div className="flex items-center gap-2 flex-shrink-0">
 
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#8A94A6]">
-
-                  Trier par :
-
+                  {t('search.sortByLabel')}
                 </span>
 
                 <div className="relative">
@@ -469,29 +446,14 @@ const Search: React.FC = () => {
                     <h1 className="text-xl sm:text-2xl font-bold text-[#003366] mb-1">
 
                       {location ? (
-
-                        <>
-
-                          {total} bateau{total > 1 ? 'x' : ''} à{' '}
-
-                          <span className="text-[#2563FF]">{location}</span>
-
-                        </>
-
+                        t('search.boatsAtLocation', { count: total, location })
                       ) : (
-
                         t('search.adventures_other', { count: total })
-
                       )}
-
                     </h1>
-
                     <p className="text-sm text-[#8A94A6]">
-
                       {hasActiveFilters
-
-                        ? 'Résultats selon vos critères de recherche.'
-
+                        ? t('search.resultsByCriteria')
                         : t('search.subtitle')}
 
                     </p>
@@ -544,7 +506,7 @@ const Search: React.FC = () => {
 
                           <X size={12} />
 
-                          Effacer les filtres
+                          {t('search.clearFilters')}
 
                         </button>
 
@@ -637,9 +599,11 @@ const Search: React.FC = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
 
                     {visibleBoats.map((boat) => (
-
-                      <ListingBoatCard key={boat.id} boat={boat} />
-
+                      <SearchBoatCard
+                        key={boat.id}
+                        boat={boat}
+                        isFavorite={favoriteIds.has(boat.id)}
+                      />
                     ))}
 
                   </div>
