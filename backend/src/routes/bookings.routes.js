@@ -396,6 +396,20 @@ router.patch('/:id/status', authenticate, async (req, res) => {
 
   const { data: updated, error } = await supabase.from('bookings').update(updates).eq('id', req.params.id).select('*, boats(id, title, images, city, port, price_per_day)').single()
   if (error) return res.status(500).json({ message: error.message })
+
+  const fmtDate = (d) => new Date(d).toLocaleDateString('fr-FR')
+  const boatTitle = updated.boats?.title || 'un bateau'
+  const period = `du ${fmtDate(updated.start_date)} au ${fmtDate(updated.end_date)}`
+  const notifData = { bookingId: updated.id, boatId: updated.boat_id }
+
+  if (finalStatus === 'CONFIRMED') {
+    notifyUser(updated.renter_id, 'BOOKING_CONFIRMED', 'Réservation acceptée', `Votre réservation pour "${boatTitle}" ${period} a été acceptée.`, notifData).catch(() => {})
+  } else if (finalStatus === 'CANCELLED') {
+    notifyUser(updated.renter_id, 'BOOKING_CANCELLED', 'Réservation refusée', `Votre réservation pour "${boatTitle}" ${period} a été refusée par le propriétaire.`, notifData).catch(() => {})
+  } else if (finalStatus === 'COMPLETED') {
+    notifyUser(updated.renter_id, 'BOOKING_COMPLETED', 'Réservation terminée', `Votre réservation pour "${boatTitle}" est terminée. Laissez un avis !`, notifData).catch(() => {})
+  }
+
   return res.json(formatBooking(updated))
 })
 
@@ -475,6 +489,19 @@ router.post('/:id/cancel', authenticate, async (req, res, next) => {
       console.error('[Email] Erreur envoi annulation:', emailErr.message)
     }
 
+    const cancelTitle   = booking.boats?.title || 'un bateau'
+    const cancelFmtDate = (d) => new Date(d).toLocaleDateString('fr-FR')
+    const cancelPeriod  = `du ${cancelFmtDate(booking.start_date)} au ${cancelFmtDate(booking.end_date)}`
+    const cancelData    = { bookingId: booking.id, boatId: booking.boat_id }
+
+    if (isOwner) {
+      notifyUser(booking.renter_id, 'BOOKING_CANCELLED', 'Réservation annulée', `Le propriétaire a annulé votre réservation pour "${cancelTitle}" ${cancelPeriod}.`, cancelData).catch(() => {})
+    } else {
+      const ownerId = booking.boats?.owner_id
+      if (ownerId) notifyUser(ownerId, 'BOOKING_CANCELLED', 'Réservation annulée', `Un locataire a annulé sa réservation pour "${cancelTitle}" ${cancelPeriod}.`, cancelData).catch(() => {})
+    }
+    notifyAdmins('BOOKING_CANCELLED', 'Réservation annulée', `Réservation #${booking.id} annulée`, cancelData).catch(() => {})
+
     return res.json({ ...formatBooking(updated), refundAmount, refundPercent })
   } catch (err) {
     next(err)
@@ -545,9 +572,19 @@ router.post('/confirm-payment', authenticate, async (req, res) => {
     status: 'CONFIRMED',
     stripe_payment_intent_id: paymentIntentId,
     updated_at: new Date().toISOString(),
-  }).eq('id', bookingId).eq('status', 'PENDING').select('*, boats(id, title, images, city, port, price_per_day)').single()
+  }).eq('id', bookingId).eq('status', 'PENDING').select('*, boats(id, title, images, city, port, price_per_day, owner_id)').single()
 
   if (error || !updated) return res.status(409).json({ message: 'Réservation déjà traitée ou introuvable' })
+
+  const payFmtDate = (d) => new Date(d).toLocaleDateString('fr-FR')
+  const payTitle = updated.boats?.title || 'un bateau'
+  const payPeriod = `du ${payFmtDate(updated.start_date)} au ${payFmtDate(updated.end_date)}`
+  const payData = { bookingId: updated.id, boatId: updated.boat_id }
+
+  const ownerId = updated.boats?.owner_id
+  if (ownerId) notifyUser(ownerId, 'PAYMENT_RECEIVED', 'Paiement reçu', `Paiement reçu pour "${payTitle}" ${payPeriod}.`, payData).catch(() => {})
+  notifyUser(updated.renter_id, 'BOOKING_CONFIRMED', 'Réservation confirmée', `Votre réservation pour "${payTitle}" ${payPeriod} est confirmée. Bon voyage !`, payData).catch(() => {})
+
   return res.json(formatBooking(updated))
 })
 

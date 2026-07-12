@@ -1,35 +1,48 @@
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
-const RESEND_API_KEY = process.env.RESEND_API_KEY?.trim()
-const RESEND_FROM = (process.env.RESEND_FROM || 'SailingLoc <onboarding@resend.dev>').trim()
-const RESEND_TO_EMAIL = (process.env.RESEND_TO_EMAIL || process.env.CONTACT_EMAIL || 'your-email@outlook.com').trim()
 
-const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null
+function createTransporter() {
+  const host = process.env.SMTP_HOST
+  const port = parseInt(process.env.SMTP_PORT || '587', 10)
+  const user = process.env.SMTP_USER
+  const pass = process.env.SMTP_PASS
+  const from = process.env.MAIL_FROM || user
 
-async function sendMail({ to, subject, html, replyTo }) {
-  if (!resend) {
-    throw new Error('RESEND_API_KEY is not configured')
+  if (!host || !user || !pass) {
+    throw new Error(
+      'SMTP non configuré — vérifiez SMTP_HOST, SMTP_USER et SMTP_PASS dans .env',
+    )
   }
 
-  const response = await resend.emails.send({
-    from: RESEND_FROM,
-    to: [to],
-    replyTo,
-    subject,
-    html,
+  const transporter = nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,   // true uniquement pour le port SSL direct
+    auth: { user, pass },
+    tls: { rejectUnauthorized: false },  // évite les erreurs de cert en dev
   })
 
-  if (response?.error) {
-    const message = response.error?.message || 'Resend rejected the email'
-    throw new Error(message)
-  }
+  return { transporter, from }
+}
 
-  if (!response?.data?.id) {
-    throw new Error('Resend did not return a message id')
-  }
+async function sendMail({ to, subject, html, replyTo }) {
+  const { transporter, from } = createTransporter()
 
-  return response.data
+  try {
+    const info = await transporter.sendMail({
+      from: `SailingLoc <${from}>`,
+      to,
+      subject,
+      html,
+      ...(replyTo ? { replyTo } : {}),
+    })
+    return info
+  } catch (err) {
+    // Enrichit le message d'erreur avec le contexte SMTP
+    const detail = err?.response || err?.message || String(err)
+    throw new Error(`Échec envoi SMTP vers ${to} : ${detail}`)
+  }
 }
 
 function escapeHtml(str) {
@@ -41,17 +54,19 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;')
 }
 
+// ─── Emails publics ────────────────────────────────────────
+
 export async function sendContactMessage({ firstName, lastName, email, subject, message }) {
+  const to = process.env.RESEND_TO_EMAIL || process.env.CONTACT_EMAIL || process.env.MAIL_FROM || process.env.SMTP_USER
   const safe = {
     firstName: escapeHtml(firstName),
-    lastName: escapeHtml(lastName),
-    email: escapeHtml(email),
-    subject: escapeHtml(subject),
-    message: escapeHtml(message).replace(/\n/g, '<br>'),
+    lastName:  escapeHtml(lastName),
+    email:     escapeHtml(email),
+    subject:   escapeHtml(subject),
+    message:   escapeHtml(message).replace(/\n/g, '<br>'),
   }
-
   await sendMail({
-    to: RESEND_TO_EMAIL,
+    to,
     replyTo: email,
     subject: `[Contact] ${safe.subject} – ${safe.firstName} ${safe.lastName}`,
     html: `
@@ -66,23 +81,19 @@ export async function sendContactMessage({ firstName, lastName, email, subject, 
   })
 }
 
-export async function sendContactConfirmation({ firstName, lastName, email, subject, message }) {
+export async function sendContactConfirmation({ firstName, email, subject, message }) {
   const safe = {
     firstName: escapeHtml(firstName),
-    lastName: escapeHtml(lastName),
-    subject: escapeHtml(subject),
-    message: escapeHtml(message).replace(/\n/g, '<br>'),
+    subject:   escapeHtml(subject),
+    message:   escapeHtml(message).replace(/\n/g, '<br>'),
   }
-
   await sendMail({
     to: email,
     subject: 'Nous avons bien reçu votre message – SailingLoc',
     html: `
       <h2>Bonjour ${safe.firstName},</h2>
       <p>Merci de nous avoir contactés. Voici un récapitulatif de votre demande :</p>
-      <ul>
-        <li><strong>Objet :</strong> ${safe.subject}</li>
-      </ul>
+      <ul><li><strong>Objet :</strong> ${safe.subject}</li></ul>
       <p>${safe.message}</p>
       <p>Notre équipe vous répondra dans les meilleurs délais.</p>
     `,
@@ -90,7 +101,7 @@ export async function sendContactConfirmation({ firstName, lastName, email, subj
 }
 
 export async function sendEmailVerification(to, firstName, token) {
-  const link = `${FRONTEND_URL}/verifier-email?token=${token}`;
+  const link = `${FRONTEND_URL}/verifier-email?token=${token}`
   await sendMail({
     to,
     subject: 'Vérifiez votre adresse email – SailingLoc',
@@ -101,11 +112,11 @@ export async function sendEmailVerification(to, firstName, token) {
       <p>Ce lien est valable 24 heures.</p>
       <p>Si vous n'avez pas créé de compte, ignorez cet email.</p>
     `,
-  });
+  })
 }
 
 export async function sendPasswordReset(to, firstName, token) {
-  const link = `${FRONTEND_URL}/reinitialiser-mot-de-passe?token=${token}`;
+  const link = `${FRONTEND_URL}/reinitialiser-mot-de-passe?token=${token}`
   await sendMail({
     to,
     subject: 'Réinitialisation de votre mot de passe – SailingLoc',
@@ -115,7 +126,7 @@ export async function sendPasswordReset(to, firstName, token) {
       <p><a href="${link}" style="background:#0ea5e9;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;">Réinitialiser mon mot de passe</a></p>
       <p>Ce lien est valable 1 heure. Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.</p>
     `,
-  });
+  })
 }
 
 export async function sendCancellationEmail({
@@ -154,16 +165,17 @@ export async function sendCancellationEmail({
       ${refundMsg}
       <p><a href="${FRONTEND_URL}/mon-espace/reservations" style="background:#0ea5e9;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;">Mes réservations</a></p>
     `,
-  });
+  })
 }
 
 export async function sendBookingNotification(to, firstName, { type, boatTitle, startDate, endDate }) {
   const messages = {
-    confirmed: { subject: 'Réservation confirmée – SailingLoc', intro: 'Votre réservation a été confirmée !' },
-    cancelled: { subject: 'Réservation annulée – SailingLoc', intro: 'Une réservation a été annulée.' },
+    confirmed:   { subject: 'Réservation confirmée – SailingLoc',           intro: 'Votre réservation a été confirmée !' },
+    cancelled:   { subject: 'Réservation annulée – SailingLoc',             intro: 'Une réservation a été annulée.' },
     new_request: { subject: 'Nouvelle demande de réservation – SailingLoc', intro: 'Vous avez reçu une nouvelle demande de réservation.' },
   }
   const msg = messages[type] || { subject: 'Mise à jour de réservation', intro: 'Votre réservation a été mise à jour.' }
+
   await sendMail({
     to,
     subject: msg.subject,
@@ -175,7 +187,7 @@ export async function sendBookingNotification(to, firstName, { type, boatTitle, 
         <li><strong>Du :</strong> ${startDate}</li>
         <li><strong>Au :</strong> ${endDate}</li>
       </ul>
-      <p><a href="${FRONTEND_URL}/dashboard" style="background:#0ea5e9;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;">Voir mes réservations</a></p>
+      <p><a href="${FRONTEND_URL}/mon-espace/reservations" style="background:#0ea5e9;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;">Voir mes réservations</a></p>
     `,
-  });
+  })
 }

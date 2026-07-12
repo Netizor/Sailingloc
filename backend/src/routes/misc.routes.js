@@ -62,8 +62,11 @@ notificationsRouter.get('/unread-count', authenticate, async (req, res) => {
 notificationsRouter.get('/', authenticate, async (req, res) => {
   const page  = Math.max(1, parseInt(req.query.page)  || 1)
   const limit = Math.min(50, parseInt(req.query.limit) || 20)
-  const { data, count } = await supabase.from('notifications').select('*', { count: 'exact' }).eq('user_id', req.user.id).order('created_at', { ascending: false }).range((page - 1) * limit, page * limit - 1)
-  return res.json({ notifications: data || [], unreadCount: count || 0, pagination: { page, limit, total: count || 0, totalPages: Math.ceil((count || 0) / limit) } })
+  const [{ data, count }, { count: unreadCount }] = await Promise.all([
+    supabase.from('notifications').select('*', { count: 'exact' }).eq('user_id', req.user.id).order('created_at', { ascending: false }).range((page - 1) * limit, page * limit - 1),
+    supabase.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', req.user.id).eq('is_read', false),
+  ])
+  return res.json({ notifications: data || [], unreadCount: unreadCount || 0, pagination: { page, limit, total: count || 0, totalPages: Math.ceil((count || 0) / limit) } })
 })
 
 notificationsRouter.get('/:id', authenticate, async (req, res) => {
@@ -78,7 +81,8 @@ notificationsRouter.get('/:id', authenticate, async (req, res) => {
 })
 
 notificationsRouter.patch('/:id/read', authenticate, async (req, res) => {
-  const { data } = await supabase.from('notifications').update({ is_read: true }).eq('id', req.params.id).eq('user_id', req.user.id).select().single()
+  const { data, error } = await supabase.from('notifications').update({ is_read: true }).eq('id', req.params.id).eq('user_id', req.user.id).select().single()
+  if (error || !data) return res.status(404).json({ message: 'Notification introuvable' })
   return res.json(data)
 })
 

@@ -171,21 +171,41 @@ router.get('/me', authenticate, (req, res) => {
 
 // ─── POST /auth/forgot-password ───────────────────────────
 router.post('/forgot-password', resetLimiter, async (req, res) => {
-  const { email } = req.body
-  // Anti-énumération : toujours 200
-  if (!email) return res.json({ message: 'Si cet email existe, un lien a été envoyé.' })
+  try {
+    const { email } = req.body
+    if (!email) return res.json({ message: 'Si cet email existe, un lien a été envoyé.' })
 
-  const { data: user } = await supabase.from('users').select('id, first_name').eq('email', email.toLowerCase()).single()
-  if (user) {
-    // Invalider les anciens tokens
-    await supabase.from('password_reset_tokens').delete().eq('user_id', user.id)
-    const token = uuidv4()
-    await supabase.from('password_reset_tokens').insert({
-      token,
-      user_id: user.id,
-      expires_at: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-    })
-    try { await sendPasswordReset(email, user.first_name, token) } catch (err) { console.error('[Email] sendPasswordReset:', err?.message ?? err) }
+    const { data: user, error: userErr } = await supabase
+      .from('users')
+      .select('id, first_name')
+      .eq('email', email.toLowerCase())
+      .single()
+
+    if (userErr && userErr.code !== 'PGRST116') {
+      console.error('[ForgotPassword] DB error:', userErr.message)
+    }
+
+    if (user) {
+      await supabase.from('password_reset_tokens').delete().eq('user_id', user.id)
+      const token = uuidv4()
+      const { error: insertErr } = await supabase.from('password_reset_tokens').insert({
+        token,
+        user_id: user.id,
+        expires_at: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+      })
+      if (insertErr) {
+        console.error('[ForgotPassword] Token insert error:', insertErr.message)
+      } else {
+        try {
+          await sendPasswordReset(email, user.first_name, token)
+          console.log('[ForgotPassword] Email envoyé à', email)
+        } catch (emailErr) {
+          console.error('[ForgotPassword] Échec envoi email:', emailErr?.message ?? emailErr)
+        }
+      }
+    }
+  } catch (err) {
+    console.error('[ForgotPassword] Erreur inattendue:', err?.message ?? err)
   }
   return res.json({ message: 'Si cet email existe, un lien a été envoyé.' })
 })
