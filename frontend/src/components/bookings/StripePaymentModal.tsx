@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { loadStripe } from '@stripe/stripe-js'
 import {
   Elements,
@@ -210,8 +211,10 @@ const StripePaymentModal: React.FC<StripePaymentModalProps> = ({
     },
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  // Portal + z-index élevé : Leaflet utilise des panes jusqu'à z-index 800 et peut
+  // passer au-dessus d'une modale rendue dans l'arbre de la page (surtout Windows/GPU).
+  return createPortal(
+    <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
       {/* Issue #6 - overlay désactivé pendant le traitement */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -263,7 +266,8 @@ const StripePaymentModal: React.FC<StripePaymentModalProps> = ({
           </Elements>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 

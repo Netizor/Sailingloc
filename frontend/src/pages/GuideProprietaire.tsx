@@ -79,7 +79,7 @@ const DAILY_RATES: Record<string, number> = {
 
 // #10 - Constantes nommées pour les valeurs magiques du calcul
 /** Taux de commission prélevé par SailingLoc sur chaque location */
-const PLATFORM_COMMISSION = 0.15
+const PLATFORM_COMMISSION = 0.10
 /** Durée indicative de la saison nautique (en mois) */
 const SEASON_MONTHS = 10
 

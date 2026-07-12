@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Facebook, Instagram, Twitter } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { openCookiePreferences } from '../ui/CookieBanner'
+import StoreBadges from '../ui/StoreBadges'
 
 const Footer: React.FC = () => {
   const { t } = useTranslation()
@@ -40,8 +41,19 @@ const Footer: React.FC = () => {
             <Link to="/" className="inline-flex mb-4">
               <img src="/logo.jpeg" alt="SailingLoc" className="h-10 w-auto max-w-[180px] object-contain" />
             </Link>
-            <p className="text-sm text-brand-slate leading-relaxed max-w-xs">
+            <p className="text-sm text-brand-slate dark:text-gray-400 leading-relaxed max-w-xs">
               {t('footer.taglineListing')}
+            </p>
+
+            <div className="mt-5">
+              <p className="text-xs font-bold uppercase tracking-wider text-brand-navy dark:text-gray-100 mb-3">
+                {t('footer.mobileAppHeading')}
+              </p>
+              <StoreBadges size="sm" />
+            </div>
+
+            <p className="mt-3 text-xs text-brand-muted dark:text-gray-500 leading-relaxed max-w-xs">
+              {t('footer.pwaHint')}
             </p>
             <p className="mt-3 text-xs font-semibold text-amber-700 dark:text-amber-400">
               {t('footer.copyright')}

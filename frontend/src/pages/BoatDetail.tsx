@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate } from 'react-router-dom'
@@ -148,6 +148,13 @@ const BoatDetail: React.FC = () => {
   })
 
   const boat = apiBoat ?? getDemoBoat(Number(id))
+
+  // Défense: en dev (Fast Refresh / PWA) ou après navigation, on s'assure que la page
+  // d'un bateau ne démarre jamais avec une modale de paiement "restée ouverte".
+  useEffect(() => {
+    setStripePayment(null)
+    setBookingPanelOpen(false)
+  }, [id])
 
   const { data: favData } = useQuery({
     queryKey: ['favorites', 'check', id],

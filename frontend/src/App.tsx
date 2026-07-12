@@ -51,7 +51,6 @@ const NotFound = React.lazy(() => import('./pages/NotFound'))
 const MyPayments = React.lazy(() => import('./pages/dashboard/MyPayments'))
 const PaymentMethods = React.lazy(() => import('./pages/dashboard/PaymentMethods'))
 const KycVerification = React.lazy(() => import('./pages/dashboard/KycVerification'))
-const MyDocuments = React.lazy(() => import('./pages/dashboard/MyDocuments'))
 const SavedSearches = React.lazy(() => import('./pages/dashboard/SavedSearches'))
 const OwnerProfile = React.lazy(() => import('./pages/OwnerProfile'))
 const Destination = React.lazy(() => import('./pages/Destination'))
@@ -184,8 +183,6 @@ export default function App() {
                 <Route path="cartes" element={<PaymentMethods />} />
                 {/* C1 - KYC */}
                 <Route path="verification" element={<KycVerification />} />
-                {/* Upload de documents contractuels */}
-                <Route path="documents" element={<MyDocuments />} />
                 {/* C9 - Recherches sauvegardées */}
                 <Route path="alertes" element={<SavedSearches />} />
                 </Route>

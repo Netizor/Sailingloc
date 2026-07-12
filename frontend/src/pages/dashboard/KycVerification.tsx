@@ -29,7 +29,7 @@ const STATUS_CONFIG: Record<KycStatus, {
   NOT_SUBMITTED: {
     icon: <ShieldAlert size={24} />,
     title: 'Identité non vérifiée',
-    description: "Soumettez votre pièce d'identité pour accéder à toutes les fonctionnalités de la plateforme.",
+    description: "Soumettez votre pièce d'identité (CNI, passeport). Notre équipe valide chaque dossier sous 24-48 h.",
     color: 'text-gray-500 dark:text-gray-400',
     bg: 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600',
   },
@@ -49,8 +49,8 @@ const STATUS_CONFIG: Record<KycStatus, {
   },
   REJECTED: {
     icon: <ShieldAlert size={24} />,
-    title: 'Vérification refusée',
-    description: 'Votre dossier a été rejeté. Veuillez soumettre à nouveau vos documents.',
+    title: 'Renouvellement requis',
+    description: 'Votre administrateur vous demande de soumettre une nouvelle pièce d\'identité valide.',
     color: 'text-brand-navy dark:text-red-200',
     bg: 'badge-variant-danger border',
   },
@@ -140,7 +140,7 @@ const KycVerification: React.FC = () => {
       <DashboardBanner
         icon={<ShieldCheck size={18} className="opacity-80" />}
         title="Vérification d'identité"
-        subtitle="La vérification d'identité est requise pour effectuer des réservations et recevoir des paiements."
+        subtitle="Renforcez la confiance sur SailingLoc : pièce d'identité vérifiée par notre équipe, avec renouvellement si le document expire."
       />
 
       {isLoading ? (
@@ -171,6 +171,11 @@ const KycVerification: React.FC = () => {
                   Vérifié le {formatDate(kycData.reviewedAt)}
                 </p>
               )}
+              {kycData?.documentExpiresAt && status === 'APPROVED' && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Pièce valide jusqu&apos;au {formatDate(kycData.documentExpiresAt)}
+                </p>
+              )}
             </div>
           </div>
 
@@ -178,7 +183,7 @@ const KycVerification: React.FC = () => {
           {canSubmit && (
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 space-y-5">
               <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                Soumettre votre pièce d'identité
+                {status === 'REJECTED' ? 'Envoyer une nouvelle pièce d\'identité' : 'Soumettre votre pièce d\'identité'}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Formats acceptés : JPEG, PNG, PDF - max. 10 Mo par fichier.

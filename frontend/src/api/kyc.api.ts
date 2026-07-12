@@ -7,6 +7,7 @@ export interface KycStatusResponse {
   submittedAt?: string
   reviewedAt?: string
   rejectionReason?: string
+  documentExpiresAt?: string
 }
 
 /**
@@ -63,9 +64,17 @@ export const getPendingKycUsers = async (): Promise<PendingKycUser[]> => {
 
 export const reviewKyc = async (
   userId: number,
-  payload: { status: 'APPROVED' | 'REJECTED'; rejectionReason?: string },
+  payload: { status: 'APPROVED' | 'REJECTED'; rejectionReason?: string; documentExpiresAt?: string },
 ): Promise<KycStatusResponse> => {
   const { data } = await api.patch<KycStatusResponse>(`/kyc/admin/${userId}`, payload)
+  return data
+}
+
+export const requestKycRenewal = async (
+  userId: number,
+  reason: string,
+): Promise<KycStatusResponse> => {
+  const { data } = await api.post<KycStatusResponse>(`/kyc/admin/${userId}/request-renewal`, { reason })
   return data
 }
 
@@ -74,4 +83,5 @@ export const kycApi = {
   submit: submitKyc,
   getPendingUsers: getPendingKycUsers,
   review: reviewKyc,
+  requestRenewal: requestKycRenewal,
 }

@@ -11,15 +11,19 @@ import Badge from '../../components/ui/Badge'
 const KycCard: React.FC<{ user: PendingKycUser }> = ({ user }) => {
   const queryClient = useQueryClient()
   const [rejectOpen, setRejectOpen] = useState(false)
+  const [approveOpen, setApproveOpen] = useState(false)
   const [rejectionReason, setRejectionReason] = useState('')
+  const [documentExpiresAt, setDocumentExpiresAt] = useState('')
 
   const reviewMutation = useMutation({
-    mutationFn: (payload: { status: 'APPROVED' | 'REJECTED'; rejectionReason?: string }) =>
+    mutationFn: (payload: { status: 'APPROVED' | 'REJECTED'; rejectionReason?: string; documentExpiresAt?: string }) =>
       kycApi.review(user.id, payload),
     onSuccess: (_, { status }) => {
       toast.success(status === 'APPROVED' ? 'Identité approuvée' : 'Identité refusée')
       setRejectOpen(false)
+      setApproveOpen(false)
       setRejectionReason('')
+      setDocumentExpiresAt('')
       queryClient.invalidateQueries({ queryKey: ['admin', 'kyc', 'pending'] })
     },
     onError: () => toast.error('Erreur lors de la validation KYC'),
@@ -71,7 +75,7 @@ const KycCard: React.FC<{ user: PendingKycUser }> = ({ user }) => {
             variant="primary"
             size="sm"
             loading={reviewMutation.isPending}
-            onClick={() => reviewMutation.mutate({ status: 'APPROVED' })}
+            onClick={() => { setApproveOpen(true); setRejectOpen(false) }}
             leftIcon={<CheckCircle size={14} />}
           >
             Approuver
@@ -80,13 +84,46 @@ const KycCard: React.FC<{ user: PendingKycUser }> = ({ user }) => {
             variant="danger"
             size="sm"
             disabled={reviewMutation.isPending}
-            onClick={() => setRejectOpen(true)}
+            onClick={() => { setRejectOpen(true); setApproveOpen(false) }}
             leftIcon={<XCircle size={14} />}
           >
             Refuser
           </Button>
         </div>
       </div>
+
+      {approveOpen && (
+        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Date de fin de validité (indiquée sur la pièce)
+          </label>
+          <input
+            type="date"
+            value={documentExpiresAt}
+            onChange={(e) => setDocumentExpiresAt(e.target.value)}
+            className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+          />
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Lisez la date sur le recto ou verso de la CNI / passeport (souvent 10 ou 15 ans).
+          </p>
+          <div className="flex gap-2">
+            <Button variant="secondary" size="sm" onClick={() => setApproveOpen(false)}>
+              Annuler
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              loading={reviewMutation.isPending}
+              onClick={() => reviewMutation.mutate({
+                status: 'APPROVED',
+                documentExpiresAt: documentExpiresAt || undefined,
+              })}
+            >
+              Confirmer l&apos;approbation
+            </Button>
+          </div>
+        </div>
+      )}
 
       {rejectOpen && (
         <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">

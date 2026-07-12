@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Search, UserCheck, UserX, Shield, User as UserIcon, Ship, Eye, X, FileCheck } from 'lucide-react'
+import { Search, UserCheck, UserX, Shield, User as UserIcon, Ship, Eye, X, FileCheck, ShieldCheck, ExternalLink, AlertTriangle } from 'lucide-react'
 import { adminApi } from '../../api/admin.api'
 import { formatDate } from '../../lib/utils'
 import Badge from '../../components/ui/Badge'
@@ -21,12 +21,38 @@ const roleConfig: Record<string, { label: string; variant: BadgeVariant; icon: R
   RENTER: { label: 'Locataire', variant: 'default', icon: <UserIcon size={11} /> },
 }
 
+function kycStatusLabel(status?: string) {
+  switch (status) {
+    case 'APPROVED': return 'Vérifiée'
+    case 'PENDING': return 'En attente'
+    case 'REJECTED': return 'À renouveler / refusée'
+    default: return 'Non soumise'
+  }
+}
+
+function kycStatusVariant(status?: string): BadgeVariant {
+  switch (status) {
+    case 'APPROVED': return 'success'
+    case 'PENDING': return 'warning'
+    case 'REJECTED': return 'danger'
+    default: return 'default'
+  }
+}
+
+function isKycDocumentExpired(expiresAt?: string | null) {
+  if (!expiresAt) return false
+  const expiry = new Date(expiresAt)
+  expiry.setHours(23, 59, 59, 999)
+  return expiry.getTime() < Date.now()
+}
+
 const AdminUsers: React.FC = () => {
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState<string>('ALL')
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
   const [sailorCvRejectionReason, setSailorCvRejectionReason] = useState('')
+  const [kycRenewalReason, setKycRenewalReason] = useState('')
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin', 'users', { search, roleFilter }],
@@ -64,6 +90,18 @@ const AdminUsers: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'user', selectedUserId] })
     },
     onError: () => toast.error('Erreur lors de la validation du CV marin'),
+  })
+
+  const requestKycRenewalMutation = useMutation({
+    mutationFn: ({ userId, reason }: { userId: number; reason: string }) =>
+      adminApi.requestKycRenewal(userId, reason),
+    onSuccess: () => {
+      toast.success('Demande de renouvellement envoyée à l\'utilisateur')
+      setKycRenewalReason('')
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'user', selectedUserId] })
+    },
+    onError: () => toast.error('Erreur lors de la demande de renouvellement'),
   })
 
   const { data: userDetail } = useQuery({
@@ -234,7 +272,7 @@ const AdminUsers: React.FC = () => {
 
       {selectedUserId && userDetail && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setSelectedUserId(null)}>
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-5">
               <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">Profil utilisateur</h2>
               <button onClick={() => setSelectedUserId(null)} className="text-gray-400 hover:text-gray-600"><X size={18} /></button>
@@ -249,6 +287,93 @@ const AdminUsers: React.FC = () => {
               {(userDetail as AdminUser).boatsCount != null && (
                 <p><span className="text-gray-500">Bateaux :</span> {(userDetail as AdminUser).boatsCount}</p>
               )}
+
+              <div className="pt-4 mt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                    <ShieldCheck size={16} className="text-ocean-600" />
+                    Pièce d&apos;identité (KYC)
+                  </p>
+                  <Badge variant={kycStatusVariant(userDetail.kycStatus)} size="sm">
+                    {kycStatusLabel(userDetail.kycStatus)}
+                  </Badge>
+                </div>
+
+                {userDetail.kycSubmittedAt && (
+                  <p><span className="text-gray-500">Soumis le :</span> {formatDate(userDetail.kycSubmittedAt)}</p>
+                )}
+                {userDetail.kycReviewedAt && userDetail.kycStatus === 'APPROVED' && (
+                  <p><span className="text-gray-500">Vérifié le :</span> {formatDate(userDetail.kycReviewedAt)}</p>
+                )}
+                {userDetail.kycDocumentExpiresAt && (
+                  <p>
+                    <span className="text-gray-500">Valide jusqu&apos;au :</span>{' '}
+                    <strong className={isKycDocumentExpired(userDetail.kycDocumentExpiresAt) ? 'text-red-600 dark:text-red-400' : ''}>
+                      {formatDate(userDetail.kycDocumentExpiresAt)}
+                    </strong>
+                  </p>
+                )}
+                {userDetail.kycStatus === 'APPROVED' && isKycDocumentExpired(userDetail.kycDocumentExpiresAt) && (
+                  <p className="flex items-start gap-2 text-amber-700 dark:text-amber-400 text-xs bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
+                    <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
+                    La date de validité indiquée sur la pièce est dépassée. Demandez un renouvellement à l&apos;utilisateur.
+                  </p>
+                )}
+                {userDetail.kycRejectionReason && (
+                  <p className="text-red-600 dark:text-red-400">Motif : {userDetail.kycRejectionReason}</p>
+                )}
+
+                <div className="flex flex-wrap gap-3">
+                  {userDetail.kycFrontDoc && (
+                    <a
+                      href={userDetail.kycFrontDoc}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-ocean-600 dark:text-ocean-400 hover:underline"
+                    >
+                      <ExternalLink size={12} /> Recto
+                    </a>
+                  )}
+                  {userDetail.kycBackDoc && (
+                    <a
+                      href={userDetail.kycBackDoc}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-ocean-600 dark:text-ocean-400 hover:underline"
+                    >
+                      <ExternalLink size={12} /> Verso
+                    </a>
+                  )}
+                  {!userDetail.kycFrontDoc && !userDetail.kycBackDoc && (
+                    <p className="text-gray-500">Aucun document enregistré.</p>
+                  )}
+                </div>
+
+                {(userDetail.kycStatus === 'APPROVED' || (userDetail.kycFrontDoc && userDetail.kycStatus !== 'PENDING')) && (
+                  <div className="space-y-3">
+                    <textarea
+                      value={kycRenewalReason}
+                      onChange={(e) => setKycRenewalReason(e.target.value)}
+                      placeholder="Ex. : Votre pièce d'identité a expiré le … — merci d'envoyer un document valide."
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                      rows={2}
+                    />
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      loading={requestKycRenewalMutation.isPending}
+                      disabled={!kycRenewalReason.trim()}
+                      onClick={() => requestKycRenewalMutation.mutate({
+                        userId: userDetail.id,
+                        reason: kycRenewalReason.trim(),
+                      })}
+                    >
+                      Demander une nouvelle pièce
+                    </Button>
+                  </div>
+                )}
+              </div>
+
               {(userDetail.role === 'OWNER' || userDetail.role === 'ADMIN') && (
                 <div className="pt-4 mt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">
                   <div className="flex items-center justify-between gap-3">

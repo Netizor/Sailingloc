@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next'
 import SearchBar from '../components/boats/SearchBar'
 import FeaturedBoatCard from '../components/boats/FeaturedBoatCard'
 import EngagementSection from '../components/home/EngagementSection'
+import MobileAppSection from '../components/home/MobileAppSection'
 import TestimonialCard from '../components/testimonials/TestimonialCard'
 import Spinner from '../components/ui/Spinner'
 import type { SearchParams } from '../components/boats/SearchBar'
@@ -299,6 +300,8 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+
+      <MobileAppSection />
 
       {/* Popular boats */}
       <section className="py-14 bg-white" aria-labelledby="featured-boats-title">

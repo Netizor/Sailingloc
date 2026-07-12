@@ -103,7 +103,7 @@ const MapView: React.FC<MapViewProps> = ({ boats, className, dark = false, fullH
     located.length === 1 ? 13 : located.length > 0 ? 8 : DEFAULT_ZOOM
 
   return (
-    <div className={dark ? `map-teal-blueprint ${className ?? ''}` : className}>
+    <div className={[dark ? `map-teal-blueprint ${className ?? ''}` : className, 'relative isolate z-0'].filter(Boolean).join(' ')}>
       {located.length === 0 && boats.length > 0 && (
         <p className="text-xs text-gray-400 mb-2 text-center">
           Aucun bateau dans ces résultats n'a de coordonnées GPS.

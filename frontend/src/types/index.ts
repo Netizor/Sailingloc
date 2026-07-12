@@ -75,6 +75,14 @@ export interface User {
   bio?: string
   role: UserRole
   kycVerified: boolean
+  /** Champs KYC exposés côté admin */
+  kycStatus?: 'NOT_SUBMITTED' | 'PENDING' | 'APPROVED' | 'REJECTED'
+  kycFrontDoc?: string | null
+  kycBackDoc?: string | null
+  kycSubmittedAt?: string | null
+  kycReviewedAt?: string | null
+  kycRejectionReason?: string | null
+  kycDocumentExpiresAt?: string | null
   isActive: boolean
   sailingExperienceYears?: number | null
   sailingQualifications?: string | null

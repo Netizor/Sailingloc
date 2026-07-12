@@ -298,6 +298,12 @@
     z-index: 450;
   }
 
+  /* Limite le stacking context Leaflet (panes jusqu'à z-index 800) au conteneur carte */
+  .leaflet-container {
+    position: relative;
+    z-index: 0;
+  }
+
   .map-teal-blueprint .leaflet-container {
     background: transparent;
   }
