@@ -134,7 +134,12 @@
     "banner": {
       "ariaLabel": "Cookie consent banner",
       "title": "We use cookies",
+      "hookTitle": "Fancy cookies for your sea trips?",
+      "hookDescription": "At SailingLoc, we use cookies to keep browsing smooth, remember your preferences and improve the experience. Analytics and marketing cookies are only enabled with your consent. See our",
       "description": "Essential cookies keep the site working (session, preferences). Analytics and marketing cookies are only enabled with your consent. See our",
+      "continueWithout": "Continue without accepting",
+      "choose": "I choose",
+      "okForMe": "OK for me",
       "customize": "Customize",
       "essentialOnly": "Essential only",
       "acceptAll": "Accept all",

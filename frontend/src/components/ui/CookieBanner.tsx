@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { AlertTriangle, Cookie } from 'lucide-react'
+import { X } from 'lucide-react'
 
 interface CookieConsent {
   version: string
@@ -16,7 +16,7 @@ const CONSENT_KEY = 'sailingloc-cookie-consent'
 const CONSENT_COOKIE = 'sailingloc_consent'
 const CONSENT_MAX_AGE_DAYS = 395
 /** Incrémenter si le modal ou le format de consentement change */
-const CONSENT_VERSION = '2'
+const CONSENT_VERSION = '3'
 
 let openPreferencesHandler: (() => void) | null = null
 
@@ -81,6 +81,8 @@ function needsConsentPrompt(): boolean {
 const CookieBanner: React.FC = () => {
   const { t } = useTranslation()
   const [visible, setVisible] = useState(() => needsConsentPrompt())
+  const [entered, setEntered] = useState(false)
+  const [leaving, setLeaving] = useState(false)
   const [showDetail, setShowDetail] = useState(false)
   const [analytical, setAnalytical] = useState(false)
   const [marketing, setMarketing] = useState(false)
@@ -90,6 +92,7 @@ const CookieBanner: React.FC = () => {
     setAnalytical(existing?.analytical ?? false)
     setMarketing(existing?.marketing ?? false)
     setShowDetail(false)
+    setLeaving(false)
     setVisible(true)
   }, [])
 
@@ -101,147 +104,173 @@ const CookieBanner: React.FC = () => {
   }, [openModal])
 
   useEffect(() => {
-    if (needsConsentPrompt()) {
-      setVisible(true)
-    }
+    if (needsConsentPrompt()) setVisible(true)
   }, [])
 
   useEffect(() => {
-    if (!visible) return
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = prev
+    if (!visible) {
+      setEntered(false)
+      return
     }
+    const id = requestAnimationFrame(() => setEntered(true))
+    return () => cancelAnimationFrame(id)
   }, [visible])
 
-  const accept = (all: boolean) => {
-    saveConsent(all, all)
-    setVisible(false)
+  const dismiss = (analyticalValue: boolean, marketingValue: boolean) => {
+    saveConsent(analyticalValue, marketingValue)
+    setLeaving(true)
+    window.setTimeout(() => {
+      setVisible(false)
+      setLeaving(false)
+      setShowDetail(false)
+    }, 320)
   }
 
-  const saveCustom = () => {
-    saveConsent(analytical, marketing)
-    setVisible(false)
-  }
+  const accept = (all: boolean) => dismiss(all, all)
+
+  const saveCustom = () => dismiss(analytical, marketing)
 
   if (!visible) return null
 
-  const modal = (
+  const panel = (
     <div
-      className="fixed inset-0 z-[100000] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm"
+      className={[
+        'cookie-banner-root fixed inset-0 z-[100000]',
+        entered && !leaving ? 'cookie-banner-root--open' : '',
+        leaving ? 'cookie-banner-root--leave' : '',
+      ].join(' ')}
       role="presentation"
     >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="cookie-modal-title"
-        className="w-full max-w-lg bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200"
-      >
-        <div className="bg-amber-500 border-b-2 border-amber-600 px-5 py-4 flex gap-3">
-          <AlertTriangle size={22} className="text-amber-950 flex-shrink-0 mt-0.5" aria-hidden />
-          <div>
-            <p className="text-sm font-bold text-amber-950">{t('studentNotice.title')}</p>
-            <p className="text-sm text-amber-950/90 mt-1 leading-relaxed">{t('studentNotice.message')}</p>
-          </div>
-        </div>
+      <div className="cookie-banner-scrim absolute inset-0 bg-black/45" aria-hidden />
 
-        {!showDetail ? (
-          <div className="p-5 sm:p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="bg-ocean-50 dark:bg-ocean-900/30 p-2.5 rounded-xl">
-                <Cookie size={24} className="text-ocean-600 dark:text-ocean-400" />
-              </div>
-              <h2 id="cookie-modal-title" className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                {t('cookies.banner.title')}
-              </h2>
-            </div>
-
-            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
-              {t('cookies.banner.description')}{' '}
-              <Link
-                to="/cookies"
-                className="text-ocean-600 dark:text-ocean-400 underline hover:text-ocean-700"
-              >
-                {t('footer.legal.cookies')}
-              </Link>
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-              <button
-                type="button"
-                onClick={() => setShowDetail(true)}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-              >
-                {t('cookies.banner.customize')}
-              </button>
+      <div className="absolute bottom-4 left-4 right-4 sm:right-auto sm:bottom-6 sm:left-6 sm:w-[min(100%,26rem)]">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cookie-modal-title"
+          aria-label={t('cookies.banner.ariaLabel')}
+          className="cookie-banner-panel relative overflow-hidden rounded-2xl bg-[#003366] text-white shadow-2xl shadow-black/40"
+        >
+          {!showDetail ? (
+            <div className="p-5 sm:p-6">
               <button
                 type="button"
                 onClick={() => accept(false)}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-gray-500 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="text-xs text-white/80 underline underline-offset-2 hover:text-white transition-colors"
               >
-                {t('cookies.banner.essentialOnly')}
+                {t('cookies.banner.continueWithout')}
               </button>
-              <button
-                type="button"
-                onClick={() => accept(true)}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-ocean-600 hover:bg-ocean-700 rounded-xl transition-colors"
-              >
-                {t('cookies.banner.acceptAll')}
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="p-5 sm:p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-              {t('cookies.banner.customizeTitle')}
-            </h2>
 
-            <div className="space-y-3 mb-6">
-              <CookieToggle
-                label={t('cookies.banner.essentialLabel')}
-                description={t('cookies.banner.essentialDesc')}
-                checked={true}
-                disabled
-                onChange={() => {}}
-              />
-              <CookieToggle
-                label={t('cookies.banner.analyticalLabel')}
-                description={t('cookies.banner.analyticalDesc')}
-                checked={analytical}
-                onChange={setAnalytical}
-              />
-              <CookieToggle
-                label={t('cookies.banner.marketingLabel')}
-                description={t('cookies.banner.marketingDesc')}
-                checked={marketing}
-                onChange={setMarketing}
-              />
-            </div>
+              <div className="mt-3 flex items-start gap-3">
+                <h2
+                  id="cookie-modal-title"
+                  className="font-serif text-[1.55rem] sm:text-[1.7rem] font-bold leading-[1.2] tracking-tight flex-1 min-w-0"
+                >
+                  {t('cookies.banner.hookTitle')}
+                </h2>
+                <img
+                  src="/cookie-banner.jpg"
+                  alt=""
+                  width={88}
+                  height={88}
+                  className="cookie-banner-photo w-[4.75rem] h-[4.75rem] sm:w-[5.25rem] sm:h-[5.25rem] rounded-xl object-cover flex-shrink-0 ring-2 ring-white/15"
+                />
+              </div>
 
-            <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
-              <button
-                type="button"
-                onClick={() => setShowDetail(false)}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-              >
-                {t('cookies.banner.back')}
-              </button>
-              <button
-                type="button"
-                onClick={saveCustom}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-ocean-600 hover:bg-ocean-700 rounded-xl transition-colors"
-              >
-                {t('cookies.banner.save')}
-              </button>
+              <p className="mt-3 text-sm text-white/85 leading-relaxed">
+                {t('cookies.banner.hookDescription')}{' '}
+                <Link
+                  to="/cookies"
+                  className="underline underline-offset-2 text-sky-200 hover:text-white"
+                >
+                  {t('footer.legal.cookies')}
+                </Link>
+                .
+              </p>
+
+              <p className="mt-3 text-[11px] text-amber-200/90 leading-snug">
+                {t('studentNotice.title')} — {t('studentNotice.message')}
+              </p>
+
+              <div className="mt-5 flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowDetail(true)}
+                  className="px-3 py-2.5 text-sm font-medium text-white/95 hover:text-white transition-colors"
+                >
+                  {t('cookies.banner.choose')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => accept(true)}
+                  className="flex-1 px-4 py-3 text-sm font-semibold text-white bg-[#2563FF] hover:bg-[#3b76ff] rounded-xl transition-colors"
+                >
+                  {t('cookies.banner.okForMe')}
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="p-5 sm:p-6">
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <h2 className="font-serif text-xl font-bold leading-tight">
+                  {t('cookies.banner.customizeTitle')}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setShowDetail(false)}
+                  className="p-1.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                  aria-label={t('cookies.banner.back')}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="space-y-2.5 mb-5">
+                <CookieToggle
+                  label={t('cookies.banner.essentialLabel')}
+                  description={t('cookies.banner.essentialDesc')}
+                  checked
+                  disabled
+                  onChange={() => {}}
+                />
+                <CookieToggle
+                  label={t('cookies.banner.analyticalLabel')}
+                  description={t('cookies.banner.analyticalDesc')}
+                  checked={analytical}
+                  onChange={setAnalytical}
+                />
+                <CookieToggle
+                  label={t('cookies.banner.marketingLabel')}
+                  description={t('cookies.banner.marketingDesc')}
+                  checked={marketing}
+                  onChange={setMarketing}
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowDetail(false)}
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-white/90 border border-white/25 rounded-xl hover:bg-white/10 transition-colors"
+                >
+                  {t('cookies.banner.back')}
+                </button>
+                <button
+                  type="button"
+                  onClick={saveCustom}
+                  className="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-[#2563FF] hover:bg-[#3b76ff] rounded-xl transition-colors"
+                >
+                  {t('cookies.banner.save')}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
 
-  return createPortal(modal, document.body)
+  return createPortal(panel, document.body)
 }
 
 interface CookieToggleProps {
@@ -253,10 +282,10 @@ interface CookieToggleProps {
 }
 
 const CookieToggle: React.FC<CookieToggleProps> = ({ label, description, checked, disabled, onChange }) => (
-  <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800">
+  <div className="flex items-start gap-3 p-3 rounded-xl bg-white/10 border border-white/10">
     <div className="flex-1 min-w-0">
-      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{label}</p>
-      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">{description}</p>
+      <p className="text-sm font-semibold text-white">{label}</p>
+      <p className="text-xs text-white/65 mt-0.5 leading-relaxed">{description}</p>
     </div>
     <button
       type="button"
@@ -265,8 +294,8 @@ const CookieToggle: React.FC<CookieToggleProps> = ({ label, description, checked
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={[
-        'relative flex-shrink-0 w-10 h-5 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-ocean-500 focus:ring-offset-1',
-        checked ? 'bg-ocean-600' : 'bg-gray-300 dark:bg-gray-600',
+        'relative flex-shrink-0 w-10 h-5 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-1 focus:ring-offset-[#003366]',
+        checked ? 'bg-[#2563FF]' : 'bg-white/25',
         disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer',
       ].join(' ')}
     >
