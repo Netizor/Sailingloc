@@ -273,7 +273,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               )}>
                 <p className="text-[10px] font-bold uppercase tracking-wider mb-0.5">{t('booking.startDate')}</p>
                 <p className="font-medium">
-                  {range?.from ? format(range.from, 'd MMM yyyy', { locale: dateLocale }) : '—'}
+                  {range?.from ? format(range.from, 'd MMM yyyy', { locale: dateLocale }) : '-'}
                 </p>
               </div>
               <div className={cn(
@@ -282,7 +282,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               )}>
                 <p className="text-[10px] font-bold uppercase tracking-wider mb-0.5">{t('booking.endDate')}</p>
                 <p className="font-medium">
-                  {range?.to ? format(range.to, 'd MMM yyyy', { locale: dateLocale }) : '—'}
+                  {range?.to ? format(range.to, 'd MMM yyyy', { locale: dateLocale }) : '-'}
                 </p>
               </div>
             </div>

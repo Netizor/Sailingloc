@@ -155,7 +155,7 @@ const OwnerProfile: React.FC = () => {
           </div>
         </div>
 
-        {/* Avis des locataires — toujours visible */}
+        {/* Avis des locataires - toujours visible */}
         <OwnerReviewsSection
           reviews={reviews}
           rating={rating}

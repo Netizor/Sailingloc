@@ -24,7 +24,14 @@ const FAQ_DATA: FaqQuestion[] = [
     category: 'reservations',
     question: 'Comment réserver un bateau sur SailingLoc ?',
     answer:
-      'Recherchez un bateau via notre moteur de recherche en indiquant votre port, vos dates et le nombre de personnes. Consultez les annonces disponibles, choisissez celle qui vous convient et cliquez sur "Réserver". Vous serez guidé étape par étape jusqu\'au paiement sécurisé.',
+      'Inscrivez-vous, puis recherchez un bateau (port, dates, nombre de personnes) en France, en Europe ou à l\'international. Choisissez une annonce et cliquez sur « Réserver » : vous êtes guidé jusqu\'au paiement sécurisé. La réservation confirmée constitue un contrat de location entre vous et le propriétaire.',
+  },
+  {
+    id: 'res-contrat',
+    category: 'reservations',
+    question: 'Comment fonctionnent les contrats de location ?',
+    answer:
+      'SailingLoc est une plateforme de location entre particuliers inscrits uniquement. Toute réservation confirmée établit un contrat de location entre le locataire et le propriétaire. SailingLoc agit comme intermédiaire et ne remplace pas les obligations de chaque partie.',
   },
   {
     id: 'res-annuler',
@@ -89,7 +96,7 @@ const FAQ_DATA: FaqQuestion[] = [
     category: 'paiements',
     question: 'Quels sont les frais de service ?',
     answer:
-      'SailingLoc prélève des frais de service sur chaque transaction : environ 10 % à la charge du locataire et une commission prélevée sur le versement du propriétaire. Ces montants sont toujours affichés clairement avant la confirmation de réservation.',
+      'SailingLoc encaisse 10 % de chaque transaction confirmée. Le montant exact des frais de service est toujours affiché clairement avant la confirmation de réservation.',
   },
 
   // Propriétaires
@@ -98,7 +105,7 @@ const FAQ_DATA: FaqQuestion[] = [
     category: 'proprietaires',
     question: 'Comment mettre mon bateau en location ?',
     answer:
-      'Créez un compte, sélectionnez le rôle "Propriétaire" puis accédez à votre espace propriétaire. Cliquez sur "Ajouter un bateau", renseignez les informations (type, capacité, équipements, tarif) et ajoutez des photos. Votre annonce sera visible dès validation.',
+      'Créez un compte particulier, sélectionnez le rôle « Propriétaire », puis ajoutez votre bateau (type, capacité, équipements, tarif, photos). Après vérification, votre annonce est publiée : vous louez uniquement à d\'autres particuliers inscrits, via un contrat de location établi à chaque réservation.',
   },
   {
     id: 'pro-documents',
@@ -112,7 +119,7 @@ const FAQ_DATA: FaqQuestion[] = [
     category: 'proprietaires',
     question: 'Comment sont calculées les commissions SailingLoc ?',
     answer:
-      'SailingLoc prélève une commission sur chaque réservation confirmée, déduite du montant reversé. Le taux est affiché dans votre espace propriétaire. Plus vous louez, plus vous pouvez bénéficier de tarifs préférentiels.',
+      'SailingLoc encaisse 10 % de chaque transaction confirmée. Le détail est affiché avant validation de la réservation et dans votre espace propriétaire (revenus).',
   },
   {
     id: 'pro-paiements',
@@ -135,7 +142,7 @@ const FAQ_DATA: FaqQuestion[] = [
     category: 'securite',
     question: 'Les bateaux sont-ils couverts par une assurance ?',
     answer:
-      'Chaque propriétaire doit fournir une assurance navigation valide couvrant la location à tiers. SailingLoc vérifie ces documents avant la mise en ligne. Nous vous recommandons de vérifier les conditions de couverture directement avec le propriétaire avant votre départ.',
+      'Chaque propriétaire doit fournir une assurance navigation valide couvrant la location à tiers. SailingLoc vérifie ces documents avant la mise en ligne et collabore avec des partenaires assurance. Vérifiez aussi les conditions de couverture avec le propriétaire avant le départ.',
   },
   {
     id: 'sec-dommages',
@@ -149,7 +156,7 @@ const FAQ_DATA: FaqQuestion[] = [
     category: 'securite',
     question: 'Comment SailingLoc vérifie-t-il les locataires ?',
     answer:
-      'Lors de l\'inscription, les locataires doivent fournir une pièce d\'identité valide. Un système d\'évaluation permet aux propriétaires de consulter les avis laissés par d\'autres membres. Les profils non vérifiés sont signalés aux propriétaires.',
+      'Seuls les utilisateurs inscrits peuvent réserver. Lors de l\'inscription, les locataires doivent fournir une pièce d\'identité valide. Un système d\'évaluation permet aux propriétaires de consulter les avis laissés par d\'autres membres. Les profils non vérifiés sont signalés aux propriétaires.',
   },
   {
     id: 'sec-permis',
@@ -262,7 +269,8 @@ const Faq: React.FC = () => {
             Questions fréquentes
           </h1>
           <p className="text-lg text-white/85 leading-relaxed">
-            Retrouvez les réponses aux questions les plus posées sur SailingLoc.
+            Réservations, contrats entre particuliers, paiements et sécurité :
+            les réponses essentielles pour louer ou proposer un bateau sur SailingLoc.
             Vous ne trouvez pas ce que vous cherchez ?{' '}
             <Link to="/contact" className="text-teal-300 hover:text-teal-200 underline underline-offset-2">
               Contactez-nous

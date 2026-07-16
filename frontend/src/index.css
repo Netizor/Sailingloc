@@ -11,7 +11,7 @@
     --sl-muted: #8a94a6;
     --sl-light: #eef3fb;
 
-    /* Statuts — palette standard */
+    /* Statuts - palette standard */
     --status-success-bg: #dcfce7;
     --status-success-text: #166534;
     --status-success-dot: #22c55e;
@@ -66,7 +66,7 @@
     background-color: #111827;
   }
 
-  /* Mode sombre — surfaces et textes courants sans dark: explicite */
+  /* Mode sombre - surfaces et textes courants sans dark: explicite */
   .dark .bg-white {
     background-color: #1f2937;
   }
@@ -108,7 +108,7 @@
     background-color: #111827;
   }
 
-  /* Mode sombre — couleurs hex hardcodées (contraste daltonien) */
+  /* Mode sombre - couleurs hex hardcodées (contraste daltonien) */
   .dark .text-\[\#003366\],
   .dark .text-\[\#071d49\] {
     color: #f3f4f6 !important;
@@ -216,7 +216,7 @@
     border-color: #374151;
   }
 
-  /* Badges — couleurs via variables (compatible daltonien) */
+  /* Badges - couleurs via variables (compatible daltonien) */
   .badge-variant-success {
     background-color: var(--status-success-bg);
     color: var(--status-success-text);
@@ -481,7 +481,7 @@
     }
   }
 
-  /* Cookie banner — entrée style widget (bas gauche) */
+  /* Cookie banner - entrée style widget (bas gauche) */
   @keyframes cookie-scrim-in {
     from { opacity: 0; }
     to { opacity: 1; }

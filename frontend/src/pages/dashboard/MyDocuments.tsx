@@ -481,17 +481,17 @@ export default function MyDocuments() {
                           {b.boat?.title ?? `Bateau #${b.boatId}`}
                         </p>
                         <p className="text-xs text-gray-400">
-                          {b.renter ? `${b.renter.firstName} ${b.renter.lastName}` : '—'}
+                          {b.renter ? `${b.renter.firstName} ${b.renter.lastName}` : '-'}
                         </p>
                       </td>
                       <td className="py-3 pr-4 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                         {b.startDate
                           ? format(new Date(b.startDate), 'd MMM', { locale: fr })
-                          : '—'}
-                        {' – '}
+                          : '-'}
+                        {' - '}
                         {b.endDate
                           ? format(new Date(b.endDate), 'd MMM yyyy', { locale: fr })
-                          : '—'}
+                          : '-'}
                       </td>
                       <td className="py-3 text-right">
                         <button

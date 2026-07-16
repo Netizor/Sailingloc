@@ -9,6 +9,7 @@ import {
   Calendar,
   ChevronDown,
   CreditCard,
+  FileText,
   Headphones,
   MessageCircle,
   MessageSquareQuote,
@@ -39,9 +40,9 @@ const STEP_KEYS = ['1', '2', '3', '4'] as const
 
 const FEATURE_ITEMS = [
   { icon: Calendar, titleKey: 'aboutPage.features.booking.title', descKey: 'aboutPage.features.booking.desc' },
+  { icon: FileText, titleKey: 'aboutPage.features.contract.title', descKey: 'aboutPage.features.contract.desc' },
   { icon: MessageCircle, titleKey: 'aboutPage.features.messaging.title', descKey: 'aboutPage.features.messaging.desc' },
   { icon: UserCheck, titleKey: 'aboutPage.features.kyc.title', descKey: 'aboutPage.features.kyc.desc' },
-  { icon: Anchor, titleKey: 'aboutPage.features.skipper.title', descKey: 'aboutPage.features.skipper.desc' },
 ] as const
 
 const AUDIENCE_KEYS = ['renter', 'owner'] as const
@@ -53,7 +54,7 @@ const BADGE_ITEMS = [
   { icon: Star, key: 'rating' },
 ] as const
 
-const FAQ_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8'] as const
+const FAQ_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as const
 
 function SectionHeading({ label, title, subtitle }: { label: string; title: string; subtitle?: string }) {
   return (
@@ -90,7 +91,7 @@ const APropos: React.FC = () => {
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold leading-[1.1]">
               {t('aboutPage.heroTitle')}
               <br />
-              <span className="italic text-brand-blue">{t('aboutPage.heroTitleAccent')}</span>
+              <span className="italic text-white">{t('aboutPage.heroTitleAccent')}</span>
             </h1>
             <p className="mt-6 text-white/90 text-base sm:text-lg leading-relaxed max-w-xl">
               {t('aboutPage.heroSubtitle')}

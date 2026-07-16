@@ -182,7 +182,7 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
   const { mutate: cancel, isPending: isCancelling } = useMutation({
     mutationFn: (reason: string) => bookingsApi.cancel(booking.id, { cancellationReason: reason }),
     onSuccess: () => {
-      toast.success('Réservation annulée — le locataire sera intégralement remboursé', { id: 'cancel-booking' })
+      toast.success('Réservation annulée : le locataire sera intégralement remboursé', { id: 'cancel-booking' })
       setCancelOpen(false)
       queryClient.invalidateQueries({ queryKey: ['owner', 'bookings'] })
     },

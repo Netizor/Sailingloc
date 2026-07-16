@@ -236,14 +236,14 @@ const AdminReviews: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total avis" value={stats?.total ?? data?.total ?? '—'} sub="+2% ce mois" />
+        <StatCard label="Total avis" value={stats?.total ?? data?.total ?? '-'} sub="+2% ce mois" />
         <StatCard
           label="Moyenne plateforme"
-          value={stats?.avgRating != null ? stats.avgRating.toFixed(1) : '—'}
+          value={stats?.avgRating != null ? stats.avgRating.toFixed(1) : '-'}
           sub="Avis publiés"
           accent="blue"
         />
-        <StatCard label="En attente" value={stats?.hiddenCount ?? '—'} sub="À modérer" accent="amber" />
+        <StatCard label="En attente" value={stats?.hiddenCount ?? '-'} sub="À modérer" accent="amber" />
         <StatCard label="Signalés" value={0} sub="Aucun signalement" accent="red" />
       </div>
 
@@ -345,7 +345,7 @@ const AdminReviews: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-5 py-4 max-w-[240px]">
-                        <p className="font-medium text-gray-900 dark:text-gray-100 truncate">{r.boatTitle ?? '—'}</p>
+                        <p className="font-medium text-gray-900 dark:text-gray-100 truncate">{r.boatTitle ?? '-'}</p>
                         <p className="text-xs text-gray-400 truncate mt-0.5">{r.comment ?? ''}</p>
                       </td>
                       <td className="px-5 py-4">

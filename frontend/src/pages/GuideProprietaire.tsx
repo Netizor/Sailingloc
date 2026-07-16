@@ -4,7 +4,6 @@ import {
   Anchor,
   Camera,
   CalendarDays,
-  CreditCard,
   Star,
   CheckCircle,
   FileText,
@@ -29,13 +28,13 @@ const STEPS: Step[] = [
     number: '01',
     icon: Anchor,
     title: 'Créez votre compte propriétaire',
-    desc: 'Inscrivez-vous gratuitement et sélectionnez le rôle "Propriétaire". Complétez votre profil avec vos informations et votre RIB pour préparer les futurs versements.',
+    desc: 'Inscrivez-vous gratuitement en tant que particulier et sélectionnez le rôle « Propriétaire ». Sur SailingLoc, vous louez uniquement à d\'autres particuliers inscrits.',
   },
   {
     number: '02',
     icon: Camera,
     title: 'Publiez votre annonce',
-    desc: 'Renseignez les caractéristiques de votre bateau (type, longueur, capacité, équipements) et ajoutez de belles photos. Une annonce complète attire 3× plus de locataires.',
+    desc: 'Renseignez les caractéristiques de votre voilier ou bateau à moteur (type, longueur, capacité, équipements) et ajoutez de belles photos. Une annonce complète attire davantage de locataires, en France, en Europe et à l\'international.',
   },
   {
     number: '03',
@@ -45,9 +44,9 @@ const STEPS: Step[] = [
   },
   {
     number: '04',
-    icon: CreditCard,
-    title: 'Recevez vos paiements',
-    desc: "Dès qu'une réservation est confirmée, le paiement locataire est sécurisé via Stripe. Consultez vos revenus dans l'espace dédié.",
+    icon: FileText,
+    title: 'Concluez des contrats de location',
+    desc: 'Chaque réservation confirmée établit un contrat de location entre vous et le locataire. SailingLoc agit comme intermédiaire ; le paiement est sécurisé via Stripe (10 % de frais de service sur chaque transaction).',
   },
   {
     number: '05',
@@ -65,7 +64,8 @@ const DOCUMENTS = [
   "Attestation d'assurance navigation valide (responsabilité civile + dommages)",
   'Photos récentes du bateau (extérieur, intérieur, cockpit)',
   'Certificat de conformité ou procès-verbal de visite (si applicable)',
-  'IBAN pour les futurs virements (Stripe Connect — phase 2)',
+  'Contrat de location (modèle ou document propriétaire, si vous en disposez)',
+  'IBAN pour les futurs virements (Stripe Connect, phase 2)',
 ]
 
 // ─── Estimateur de revenus ────────────────────────────────────────────────────
@@ -78,7 +78,7 @@ const DAILY_RATES: Record<string, number> = {
 }
 
 // #10 - Constantes nommées pour les valeurs magiques du calcul
-/** Taux de commission prélevé par SailingLoc sur chaque location */
+/** Part encaissée par SailingLoc sur chaque transaction confirmée (10 %) */
 const PLATFORM_COMMISSION = 0.10
 /** Durée indicative de la saison nautique (en mois) */
 const SEASON_MONTHS = 10
@@ -103,15 +103,16 @@ const GuideProprietaire: React.FC = () => {
       <PageHero
         icon={TrendingUp}
         badge="Guide propriétaire"
-        title="Louez votre bateau, gagnez en sérénité"
-        subtitle="Tout ce qu'il faut savoir pour mettre votre bateau en location sur SailingLoc et maximiser vos revenus."
+        title="Louez votre bateau entre particuliers"
+        subtitle="Publiez votre voilier ou bateau à moteur, établissez des contrats de location avec des locataires inscrits, et estimez vos revenus après les 10 % de frais SailingLoc."
+        backgroundImage="/view-luxurious-yacht.jpg"
       >
         <div className="mt-8">
           <Link
             to="/inscription"
             className="inline-flex items-center gap-2 bg-white text-ocean-800 font-semibold px-7 py-3 rounded-xl hover:bg-ocean-50 transition-colors text-sm"
           >
-            Devenir propriétaire - c'est gratuit
+            Devenir propriétaire, c'est gratuit
           </Link>
         </div>
       </PageHero>
@@ -216,8 +217,8 @@ const GuideProprietaire: React.FC = () => {
               </div>
             </div>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
-              * Estimation indicative après déduction de la commission SailingLoc (~{PLATFORM_COMMISSION * 100} %).
-              Hors charges liées au bateau (entretien, port, assurance).
+              * Estimation indicative après déduction des 10 % encaissés par SailingLoc sur chaque
+              transaction (~{PLATFORM_COMMISSION * 100} %). Hors charges liées au bateau (entretien, port, assurance).
             </p>
           </div>
         </section>
@@ -247,8 +248,8 @@ const GuideProprietaire: React.FC = () => {
           <Anchor size={36} className="text-ocean-600 dark:text-ocean-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">Prêt à louer votre bateau ?</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto mb-6">
-            L'inscription est gratuite et sans engagement. Publiez votre première annonce en moins
-            de 15 minutes.
+            Inscription gratuite pour les particuliers. Publiez votre annonce et concluez vos
+            contrats de location en quelques minutes.
           </p>
           <Link
             to="/inscription"

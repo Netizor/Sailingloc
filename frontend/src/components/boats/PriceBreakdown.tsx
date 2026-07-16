@@ -88,7 +88,7 @@ const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
           <span className="text-xl font-bold text-ocean-700">{formatPrice(total)}</span>
         </div>
 
-        {/* Deposit note — informational only */}
+        {/* Deposit note - informational only */}
         {depositAmount > 0 && (
           <div className="mt-1 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2.5 flex items-start gap-2">
             <Shield size={15} className="text-amber-500 flex-shrink-0 mt-0.5" />

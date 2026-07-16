@@ -68,9 +68,9 @@
     "english": "English"
   },
   "footer": {
-    "tagline": "The peer-to-peer boat rental platform. Sail with confidence, rent or list your boat in a few clicks.",
-    "taglineShort": "The premium peer-to-peer boat rental platform. Sail with confidence.",
-    "taglineListing": "Discover the freedom to sail with our selection of exceptional boats.",
+    "tagline": "The boat rental platform for registered individuals. Simple rental contracts in France, across Europe and worldwide.",
+    "taglineShort": "Peer-to-peer boat rental for registered users. Sail with confidence.",
+    "taglineListing": "Rent or list a boat between individuals, in France, across Europe and worldwide.",
     "mobileApp": "iOS and Android mobile app, coming soon.",
     "mobileAppHeading": "Mobile app",
     "pwaHint": "Install SailingLoc on your phone today (installable web app).",
@@ -126,10 +126,10 @@
     }
   },
   "studentNotice": {
-    "title": "Student project — no payments accepted",
+    "title": "Student project: no payments accepted",
     "message": "SailingLoc is an educational project (DSP4 O24). No real payments are accepted on this site: booking and payment features are simulated.",
     "dismiss": "Close this message",
-    "footerTitle": "Student project DSP4 O24 — demonstration only",
+    "footerTitle": "Student project DSP4 O24: demonstration only",
     "footerMessage": "No real payments are accepted on this site. Bookings and transactions are fictional, for educational purposes."
   },
   "cookies": {
@@ -158,19 +158,19 @@
     }
   },
   "home": {
-    "badge": "Peer-to-peer boat rental",
+    "badge": "Peer-to-peer boat rental for registered users",
     "heroTitle": "The elegance of the sea within reach",
-    "heroSubtitle": "Sailboats, catamarans and exceptional yachts. Book in a few clicks among the world's most beautiful destinations.",
+    "heroSubtitle": "Rent a sailboat or motorboat between individuals in France, across Europe and worldwide. Book online and enter into a rental contract in a few clicks.",
     "statsBoats": "available boats",
     "statsPorts": "ports covered",
     "statsRenters": "happy renters",
-    "howTitle": "Book in three steps",
-    "howSubtitle": "A seamless experience, from search to sailing.",
+    "howTitle": "From search to contract",
+    "howSubtitle": "Three steps to enter into a rental contract between registered individuals.",
     "conceptLabel": "Simplicity",
     "step1Title": "Find your boat",
-    "step1Desc": "Explore our selection of exceptional boats in the most beautiful ports.",
-    "step2Title": "Book online",
-    "step2Desc": "Book securely with protected payment and instant confirmation.",
+    "step1Desc": "Browse sailboats and motorboats in ports across France, Europe and the world.",
+    "step2Title": "Book and contract",
+    "step2Desc": "Confirm online: the booking forms a rental contract between you and the owner, with secure payment.",
     "step3Title": "Set sail",
     "step3Desc": "Embark and live an unforgettable nautical experience.",
     "mobileAppLabel": "Mobile app",
@@ -200,28 +200,28 @@
     "exploreBoats": "Find a boat",
     "noBoats": "No boats available at the moment.",
     "destinationsTitle": "Most popular destinations",
-    "destinationsSubtitle": "Explore the most beautiful sailing spots",
+    "destinationsSubtitle": "From the Mediterranean to the Caribbean, Europe to Asia and Oceania",
     "seeAllDestinations": "See all destinations",
     "featuresTitle": "Sail with peace of mind",
     "featuresLabel": "Commitment",
-    "feature1Title": "Premium Insurance Included",
-    "feature1Desc": "Every rental is covered by our AXA Marine partner, protecting you against the unexpected.",
+    "feature1Title": "Partner insurance",
+    "feature1Desc": "Every rental benefits from a maritime insurance partner to support you if the unexpected happens.",
     "feature2Title": "24/7 Assistance",
-    "feature2Desc": "A team of maritime experts at your service, whether you're at port or in the middle of the ocean.",
-    "feature3Title": "Verified Boats",
-    "feature3Desc": "Over 50 inspection points on every vessel to guarantee your safety and comfort.",
+    "feature2Desc": "A team at your service before, during and after the rental, whether you're at port or at sea.",
+    "feature3Title": "Verified boats & profiles",
+    "feature3Desc": "Checked listings and registered users: rental contracts between individuals with confidence.",
     "milesStat": "15k+",
     "milesStatLabel": "Nautical miles sailed",
     "testimonialsTitle": "They sailed with us",
     "testimonialsRating": "4.9 / 5 average",
     "testimonialsSeeAll": "See all testimonials →",
     "ctaTitle": "Ready to explore the sea?",
-    "ctaSubtitle": "Join thousands of sailors who chose SailingLoc for their nautical adventures.",
+    "ctaSubtitle": "Sign up and enter into peer-to-peer rental contracts on SailingLoc.",
     "ctaRentBoat": "Rent a boat",
     "ctaFindBoat": "Find a boat",
     "ownerBadge": "For owners",
     "ownerTitle": "Monetize your boat",
-    "ownerDesc": "List your boat for rent and generate income when you're not using it. Free to list, you decide your availability.",
+    "ownerDesc": "List your boat for rent between registered individuals and earn when you're not using it. Free to list, you decide your availability.",
     "ownerPerk1": "Publish your listing in under 10 minutes",
     "ownerPerk2": "Keep full control of your availability",
     "ownerPerk3": "Secure payment within 48h after each rental",
@@ -278,11 +278,11 @@
     "heroBadge": "Our story",
     "heroTitle": "The sea,",
     "heroTitleAccent": "within everyone's reach",
-    "heroSubtitle": "SailingLoc connects renters and boat owners in France. A simple, secure and transparent platform to rent or list a boat between individuals.",
+    "heroSubtitle": "SailingLoc connects renters and boat owners in France, across Europe and worldwide. A simple, secure and transparent platform for registered individuals to enter into peer-to-peer rental contracts.",
     "heroCta": "Discover the platform",
     "missionTitle": "Our mission",
-    "missionP1": "SailingLoc was born from a simple observation: thousands of boats stay docked every summer, while sea lovers dream of sailing without owning their own vessel.",
-    "missionP2": "Founded in Marseille, our platform connects renters and owners across 50+ French ports. Sailboats, catamarans, motorboats or RIBs — every listing is verified and every rental includes partner insurance.",
+    "missionP1": "Passionate about travel and the sea, Mr Voisin created SailingLoc to share that passion: help everyone sail, and help owners share their boat. The platform connects registered individuals only, who enter into rental agreements with each other.",
+    "missionP2": "From Marseille, SailingLoc partners with ports in France, across Europe and around the world, from the Mediterranean to the Caribbean, Asia and Oceania. Sailboats, catamarans, motorboats or RIBs: every listing is verified, every booking forms a clear contract between the parties, and every rental benefits from an insurance partner.",
     "stats": {
       "ports": "Ports covered",
       "rating": "User satisfaction",
@@ -300,10 +300,10 @@
     },
     "journeyLabel": "How it works",
     "journeyTitle": "From search to sailing",
-    "journeySubtitle": "Four simple steps to book a boat on SailingLoc.",
+    "journeySubtitle": "Four simple steps to conclude a rental contract on SailingLoc.",
     "steps": {
       "1": { "title": "Search for a boat", "desc": "Browse listings by port, boat type, dates and budget. Filter with or without skipper." },
-      "2": { "title": "Book online", "desc": "Choose your dates, review the detailed price and confirm your booking in a few clicks." },
+      "2": { "title": "Book and contract", "desc": "Choose your dates, review the detailed price and confirm: the booking forms a rental contract between you and the owner." },
       "3": { "title": "Chat with the owner", "desc": "Via built-in messaging, get all practical info: meeting at the port, equipment, guidelines." },
       "4": { "title": "Sail & leave a review", "desc": "Enjoy your time at sea, then share your experience to help the community." }
     },
@@ -312,9 +312,9 @@
     "featuresSubtitle": "Real features, available right now on the site.",
     "features": {
       "booking": { "title": "Online booking", "desc": "Check availability, daily rate, service fees and book directly from the site." },
+      "contract": { "title": "Rental contracts", "desc": "Every booking creates a contract between registered individuals. SailingLoc acts as an intermediary: the contract binds the renter and the owner." },
       "messaging": { "title": "Built-in messaging", "desc": "Contact the owner before the rental to ask questions and arrange the meeting at the port." },
-      "kyc": { "title": "Identity verification", "desc": "Users can verify their identity (KYC) to build trust between renters and owners." },
-      "skipper": { "title": "Skipper optional", "desc": "Some boats offer a skipper. Use search filters to find the right offer for your level." }
+      "kyc": { "title": "Identity verification", "desc": "Users can verify their identity (KYC) to build trust between renters and owners." }
     },
     "audienceLabel": "Who is it for?",
     "audienceTitle": "Renters and owners",
@@ -325,17 +325,17 @@
         "name": "Renters",
         "tagline": "Find and book a boat",
         "cta": "Rent a boat",
-        "features": ["Search by port, dates and type", "Secure online payment", "Rental insurance included", "Messaging with the owner", "Reviews after each rental"]
+        "features": ["Search by port, dates and type", "Peer-to-peer rental contract", "Secure online payment", "Rental insurance included", "Messaging with the owner"]
       },
       "owner": {
         "name": "Owners",
         "tagline": "Rent your boat between individuals",
         "cta": "Become an owner",
-        "features": ["Free listing publication", "Availability calendar management", "Secure payment reception", "Revenue & bookings dashboard", "Dedicated owner support"]
+        "features": ["Free listing publication", "Rental contracts with renters", "Availability calendar management", "Secure payment reception", "Revenue & bookings dashboard"]
       }
     },
     "quote": "The sea should not be an inaccessible luxury.",
-    "quoteBody": "Our ambition is to democratize boating: make sailing accessible, safe and simple, whether you are a renter or an owner.",
+    "quoteBody": "Like Mr Voisin, we believe in passing on a love of the sea: making sailing accessible, safe and simple between individuals, whether you are a renter or an owner.",
     "badges": {
       "verified": "Verified profiles & listings",
       "secure": "Secure Stripe payments",
@@ -350,10 +350,11 @@
       "2": { "q": "Can I cancel my booking?", "a": "Yes, from « My bookings ». Refunds depend on the owner's cancellation policy and how far in advance you cancel." },
       "3": { "q": "Are boats insured?", "a": "Each owner must provide valid navigation insurance. SailingLoc checks these documents before publishing the listing." },
       "4": { "q": "Can I rent a boat with a skipper?", "a": "Yes, if the owner offers it. Use the « with skipper » filter in search to find suitable listings." },
-      "5": { "q": "What are the service fees?", "a": "SailingLoc charges around 10% service fees to the renter. The exact amount is always shown before confirmation." },
+      "5": { "q": "What are the service fees?", "a": "SailingLoc collects 10% of each confirmed transaction. The exact amount is always shown before confirmation." },
       "6": { "q": "How does the deposit work?", "a": "The owner may set a deposit amount in the listing. It is shown for information only; the actual hold or deposit is arranged directly between renter and owner before departure." },
       "7": { "q": "How do I list my boat for rent?", "a": "Create an owner account, click « Add a boat », fill in the details and add photos. The listing goes live after verification." },
-      "8": { "q": "When does the owner receive payment?", "a": "The renter pays online via Stripe when booking. Owner payouts are tracked in the Revenues dashboard. Automatic payouts via Stripe Connect are planned for phase 2." }
+      "8": { "q": "When does the owner receive payment?", "a": "The renter pays online via Stripe when booking. Owner payouts are tracked in the Revenues dashboard. Automatic payouts via Stripe Connect are planned for phase 2." },
+      "9": { "q": "How do rental contracts work?", "a": "Only registered users can rent or list a boat. Every confirmed booking forms a rental contract between the renter and the owner. SailingLoc acts as an intermediary and does not replace each party's obligations." }
     },
     "testimonialLabel": "They trust us",
     "testimonialCta": "See testimonials",
@@ -385,8 +386,8 @@
     "mobileFilters": "Filters",
     "sortBy": "Sort",
     "results": "Results",
-    "demoApiError": "API unavailable — search applied to demo boats.",
-    "demoNoResults": "No API results for these criteria — showing matching demo boats.",
+    "demoApiError": "API unavailable: search applied to demo boats.",
+    "demoNoResults": "No API results for these criteria: showing matching demo boats.",
     "demoFallback": "Showing demo boats.",
     "sortByLabel": "Sort by:",
     "pageTitle": "Our boats - SailingLoc",
@@ -617,7 +618,7 @@
       "paymentConfirmed": "Payment confirmed!",
       "bookingError": "Error creating booking",
       "rentMeta": "Rent {{title}} in {{port}}.",
-      "noMapCoordinates": "Map unavailable — GPS coordinates not provided for this boat."
+      "noMapCoordinates": "Map unavailable: GPS coordinates not provided for this boat."
     }
   },
   "booking": {

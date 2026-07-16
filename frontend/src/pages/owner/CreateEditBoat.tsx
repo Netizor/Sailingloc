@@ -189,7 +189,7 @@ const CreateEditBoat: React.FC = () => {
     )
   }, [boatData])
 
-  // Restore draft (create mode only — en édition les données serveur font foi)
+  // Restore draft (create mode only - en édition les données serveur font foi)
   useEffect(() => {
     if (isEditing) return
     try {

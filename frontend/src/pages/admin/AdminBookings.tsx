@@ -66,7 +66,7 @@ function Pagination({ page, totalPages, total, onPage }: {
   const pages = Array.from({ length: Math.min(totalPages, 7) }, (_, i) => i + 1)
   return (
     <div className="flex items-center justify-between mt-4 text-sm text-gray-600 dark:text-gray-400">
-      <span>Page {page} / {totalPages} — {total} résultat(s)</span>
+      <span>Page {page} / {totalPages} : {total} résultat(s)</span>
       <div className="flex gap-1">
         <button onClick={() => onPage(Math.max(1, page - 1))} disabled={page === 1}
           className={cn('p-1.5 rounded-lg border border-gray-200 dark:border-gray-600',
@@ -114,11 +114,11 @@ function DetailModal({ booking, onClose }: { booking: Booking; onClose: () => vo
 
         <dl className="text-sm divide-y divide-gray-50 dark:divide-gray-700">
           {[
-            { label: 'Bateau',        value: booking.boat?.title ?? '—' },
-            { label: 'Ville',         value: booking.boat?.city  ?? '—' },
-            { label: 'Locataire',     value: `${booking.renter?.firstName ?? ''} ${booking.renter?.lastName ?? ''}`.trim() || '—' },
-            { label: 'Email',         value: (booking.renter as { email?: string })?.email ?? '—' },
-            { label: 'Propriétaire',  value: `${booking.owner?.firstName ?? ''} ${booking.owner?.lastName ?? ''}`.trim() || '—' },
+            { label: 'Bateau',        value: booking.boat?.title ?? '-' },
+            { label: 'Ville',         value: booking.boat?.city  ?? '-' },
+            { label: 'Locataire',     value: `${booking.renter?.firstName ?? ''} ${booking.renter?.lastName ?? ''}`.trim() || '-' },
+            { label: 'Email',         value: (booking.renter as { email?: string })?.email ?? '-' },
+            { label: 'Propriétaire',  value: `${booking.owner?.firstName ?? ''} ${booking.owner?.lastName ?? ''}`.trim() || '-' },
             { label: 'Arrivée',       value: formatDate(booking.startDate) },
             { label: 'Départ',        value: formatDate(booking.endDate) },
             { label: 'Durée',         value: `${booking.totalDays} jour(s)` },
@@ -185,7 +185,7 @@ function ResolveDisputeModal({ booking, onClose, onResolved }: {
 
         <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 mb-5 text-sm text-gray-600 dark:text-gray-300">
           <p className="font-medium text-gray-800 dark:text-gray-200 mb-0.5">{booking.boat?.title ?? ''}</p>
-          <p>{booking.renter?.firstName} {booking.renter?.lastName}, {formatDate(booking.startDate)} — {formatDate(booking.endDate)}</p>
+          <p>{booking.renter?.firstName} {booking.renter?.lastName}, {formatDate(booking.startDate)} au {formatDate(booking.endDate)}</p>
           <p className="font-semibold text-gray-900 dark:text-gray-100 mt-1">{formatPrice(booking.totalAmount)}</p>
         </div>
 
@@ -379,12 +379,12 @@ const AdminBookings: React.FC = () => {
                             <img src={booking.boat.images[0]} alt={booking.boat.title ?? ''} className="h-full w-full object-cover" />
                           ) : (
                             <div className="h-full w-full bg-ocean-50 dark:bg-ocean-900/30 flex items-center justify-center">
-                              <span className="text-[10px] text-ocean-300">—</span>
+                              <span className="text-[10px] text-ocean-300">-</span>
                             </div>
                           )}
                         </div>
                         <p className="font-medium text-gray-900 dark:text-gray-100 truncate max-w-[140px]">
-                          {booking.boat?.title ?? '—'}
+                          {booking.boat?.title ?? '-'}
                         </p>
                       </div>
                     </td>
@@ -413,7 +413,7 @@ const AdminBookings: React.FC = () => {
                       <BookingStatusBadge status={booking.status} />
                     </td>
 
-                    {/* Actions — 3 slots fixes */}
+                    {/* Actions - 3 slots fixes */}
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-1.5">
                         <ActionBtn
@@ -432,7 +432,7 @@ const AdminBookings: React.FC = () => {
                             <option key={s} value={s}>{getBookingStatusLabel(s)}</option>
                           ))}
                         </select>
-                        {/* Litige — invisible si non litigieux */}
+                        {/* Litige - invisible si non litigieux */}
                         <ActionBtn
                           icon={<AlertTriangle size={14} />}
                           title="Résoudre le litige"

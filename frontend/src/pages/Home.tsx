@@ -256,7 +256,7 @@ const Home: React.FC = () => {
   return (
     <div className="flex flex-col bg-white">
       <Helmet>
-        <title>SailingLoc{TITLE_SEP}Location de bateaux entre particuliers</title>
+        <title>SailingLoc{TITLE_SEP}Location de bateaux entre particuliers inscrits</title>
         <meta name="description" content="Louez un voilier, catamaran ou yacht d'exception dans les plus beaux ports de France et d'Europe." />
       </Helmet>
 
@@ -288,6 +288,9 @@ const Home: React.FC = () => {
             <h2 id="how-it-works-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy">
               {t('home.howTitle')}
             </h2>
+            <p className="mt-4 text-brand-slate text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+              {t('home.howSubtitle')}
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">

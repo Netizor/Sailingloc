@@ -1,5 +1,5 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   ShieldCheck,
   ConciergeBell,
@@ -68,12 +68,12 @@ const DevenirProprietaire: React.FC = () => {
             >
               Commencer
             </button>
-            <a
-              href="#pourquoi"
+            <Link
+              to="/guide-proprietaire"
               className="px-8 py-3.5 text-sm font-semibold text-white border-2 border-white/50 hover:bg-white/10 rounded-full transition-colors text-center"
             >
-              En savoir plus
-            </a>
+              Voir le guide propriétaire
+            </Link>
           </div>
         </div>
       </section>

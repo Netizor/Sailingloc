@@ -69,7 +69,7 @@ const Rgpd: React.FC = () => {
 
       <LegalSection title="7. Contact DPO">
         <p>
-          dpo@sailingloc.fr — réponse sous un mois.
+          dpo@sailingloc.fr : réponse sous un mois.
         </p>
       </LegalSection>
     </LegalPageLayout>

@@ -333,7 +333,7 @@ const BookingDetail: React.FC = () => {
                     : ''}
                 </p>
               ) : (
-                <p>Aucun remboursement — annulation à moins de 48h du départ.</p>
+                <p>Aucun remboursement : annulation à moins de 48h du départ.</p>
               )}
             </div>
           </div>

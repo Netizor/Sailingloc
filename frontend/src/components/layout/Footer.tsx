@@ -11,6 +11,7 @@ const Footer: React.FC = () => {
   const navLinks = [
     { label: t('footer.rentBoat'), to: '/bateaux' },
     { label: t('footer.becomeOwner'), to: '/devenir-proprietaire' },
+    { label: t('footer.ownerGuide'), to: '/guide-proprietaire' },
     { label: t('nav.destinationsShort'), to: '/destinations' },
   ]
 
@@ -18,6 +19,7 @@ const Footer: React.FC = () => {
     { label: t('footer.contactUs'), to: '/contact' },
     { label: t('footer.testimonials'), to: '/temoignages' },
     { label: t('footer.faq'), to: '/faq' },
+    { label: t('footer.estimateRevenue'), to: '/guide-proprietaire#revenus' },
   ]
 
   const legalLinks = [

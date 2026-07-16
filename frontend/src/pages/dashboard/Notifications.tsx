@@ -300,7 +300,7 @@ const Notifications: React.FC = () => {
       {disabledCount > 0 && !showPrefs && (
         <div className="mb-4 flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
           <EyeOff size={13} />
-          {disabledCount} type{disabledCount > 1 ? 's' : ''} de notification masqué{disabledCount > 1 ? 's' : ''} —{' '}
+          {disabledCount} type{disabledCount > 1 ? 's' : ''} de notification masqué{disabledCount > 1 ? 's' : ''} :{' '}
           <button
             className="underline hover:text-gray-600 dark:hover:text-gray-300"
             onClick={() => setShowPrefs(true)}
@@ -321,7 +321,7 @@ const Notifications: React.FC = () => {
           <p className="text-gray-500 dark:text-gray-400 font-medium">Aucune notification pour l'instant</p>
           <p className="text-sm text-gray-400 dark:text-gray-500">
             {disabledCount > 0
-              ? 'Certains types sont masqués — vérifiez vos préférences.'
+              ? 'Certains types sont masqués : vérifiez vos préférences.'
               : 'Vous serez notifié des activités importantes ici.'}
           </p>
         </div>

@@ -268,7 +268,7 @@ const PendingBookingCard: React.FC<{
         <p className="font-medium text-gray-900 dark:text-gray-100 text-sm">{booking.boat?.title ?? t('ownerDashboard.boatFallback')}</p>
         <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1 mt-0.5">
           <Clock size={11} />
-          {formatDate(booking.startDate)} — {formatDate(booking.endDate)}
+          {formatDate(booking.startDate)} au {formatDate(booking.endDate)}
         </p>
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           {t('ownerDashboard.renter')}: {booking.renter?.firstName} {booking.renter?.lastName}

@@ -91,7 +91,7 @@ function Pagination({ page, totalPages, total, onPage }: {
   const pages = Array.from({ length: Math.min(totalPages, 7) }, (_, i) => i + 1)
   return (
     <div className="flex items-center justify-between mt-4 text-sm text-gray-600 dark:text-gray-400">
-      <span>Page {page} / {totalPages} — {total} résultat(s)</span>
+      <span>Page {page} / {totalPages} : {total} résultat(s)</span>
       <div className="flex gap-1">
         <button onClick={() => onPage(Math.max(1, page - 1))} disabled={page === 1}
           className={cn('p-1.5 rounded-lg border border-gray-200 dark:border-gray-600',
@@ -231,7 +231,7 @@ const AdminBoats: React.FC = () => {
                               <img src={boat.images[0]} alt={boat.title} className="h-full w-full object-cover" />
                             ) : (
                               <div className="h-full w-full bg-ocean-50 dark:bg-ocean-900/30 flex items-center justify-center">
-                                <span className="text-[10px] text-ocean-300">—</span>
+                                <span className="text-[10px] text-ocean-300">-</span>
                               </div>
                             )}
                           </div>
@@ -252,7 +252,7 @@ const AdminBoats: React.FC = () => {
                         {boat.owner?.firstName} {boat.owner?.lastName}
                       </td>
 
-                      <td className="px-5 py-4 text-gray-500 dark:text-gray-400">{boat.city ?? '—'}</td>
+                      <td className="px-5 py-4 text-gray-500 dark:text-gray-400">{boat.city ?? '-'}</td>
 
                       <td className="px-5 py-4 font-medium text-gray-900 dark:text-gray-100">
                         {formatPrice(boat.dailyRate)}
@@ -267,7 +267,7 @@ const AdminBoats: React.FC = () => {
                             </span>
                           </div>
                         ) : (
-                          <span className="text-gray-300 dark:text-gray-600">—</span>
+                          <span className="text-gray-300 dark:text-gray-600">-</span>
                         )}
                       </td>
 
@@ -277,7 +277,7 @@ const AdminBoats: React.FC = () => {
                         </Badge>
                       </td>
 
-                      {/* Actions — 3 slots fixes */}
+                      {/* Actions - 3 slots fixes */}
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-1.5">
                           <Button

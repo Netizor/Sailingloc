@@ -18,7 +18,7 @@ interface NotificationListParams {
   unreadOnly?: boolean
 }
 
-// Backend returns snake_case Supabase columns — map to the frontend camelCase type
+// Backend returns snake_case Supabase columns - map to the frontend camelCase type
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapNotification(raw: any): Notification {
   return {

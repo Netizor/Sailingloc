@@ -189,7 +189,7 @@ const CookieBanner: React.FC = () => {
               </p>
 
               <p className="mt-3 text-[11px] text-amber-200/90 leading-snug">
-                {t('studentNotice.title')} — {t('studentNotice.message')}
+                {t('studentNotice.title')}. {t('studentNotice.message')}
               </p>
 
               <div className="mt-5 flex items-center gap-3">

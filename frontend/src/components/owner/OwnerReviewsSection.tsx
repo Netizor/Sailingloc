@@ -159,7 +159,7 @@ const OwnerReviewsSection: React.FC<OwnerReviewsSectionProps> = ({
               {hasReviews ? (
                 <AnimatedRating value={rating} active={inView} />
               ) : (
-                '—'
+                '-'
               )}
             </div>
             <div>
