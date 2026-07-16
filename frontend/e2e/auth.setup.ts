@@ -17,11 +17,11 @@ const __dirname  = path.dirname(__filename)
  * Les tests utilisent ensuite ces fichiers via loginAs() sans
  * refaire de vraie connexion formulaire.
  *
- * Prérequis : backend Symfony + fixtures chargées (doctrine:fixtures:load).
+ * Prérequis : backend Node/Express (port 3000) + comptes demo seedés.
  */
 
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:5173'
-const API_URL  = process.env.PLAYWRIGHT_API_URL  ?? 'http://localhost:8000'
+const API_URL  = process.env.PLAYWRIGHT_API_URL  ?? 'http://127.0.0.1:3000'
 
 const ACCOUNTS = {
   renter: { email: 'renter@demo.fr',       password: 'Renter@Sail2026!' },
@@ -47,7 +47,7 @@ async function globalSetup() {
     console.warn(
       `\n⚠️  Backend non joignable (${API_URL}). ` +
       `Les tests nécessitant l'authentification seront ignorés.\n` +
-      `Lancez le backend avec : cd backend && symfony serve\n`,
+      `Lancez le backend avec : cd backend && npm run dev\n`,
     )
     // Sauvegarde des états vides pour que les tests puissent démarrer
     for (const role of Object.keys(ACCOUNTS)) {
@@ -77,12 +77,24 @@ async function globalSetup() {
       }
 
       const json = await res.json()
-      // L'enveloppe Symfony renvoie { success, data: { user, accessToken, refreshToken } }
-      const { user, accessToken, refreshToken } = json.data ?? json
+      const { user, accessToken, refreshToken } = json
 
       // ── 3. Injecte l'état dans localStorage via un contexte navigateur ──
       const context = await browser.newContext()
       const page    = await context.newPage()
+
+      await page.addInitScript(() => {
+        localStorage.setItem(
+          'sailingloc-cookie-consent',
+          JSON.stringify({
+            version: '2',
+            essential: true,
+            analytical: false,
+            marketing: false,
+            date: new Date().toISOString(),
+          }),
+        )
+      })
 
       await page.goto(BASE_URL)
 

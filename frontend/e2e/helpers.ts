@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname  = path.dirname(__filename)
 
 /**
- * Comptes de démonstration créés par `php bin/console doctrine:fixtures:load`.
+ * Comptes de démonstration créés par `npm run db:seed` (backend).
  */
 export const DEMO_ACCOUNTS = {
   renter: { email: 'renter@demo.fr',       password: 'Renter@Sail2026!' },
@@ -87,8 +87,19 @@ export function isAuthAvailable(role: keyof typeof DEMO_ACCOUNTS): boolean {
   try {
     const state = JSON.parse(fs.readFileSync(authFile, 'utf-8')) as {
       state?: { isAuthenticated?: boolean }
+      origins?: Array<{
+        localStorage?: Array<{ name: string; value: string }>
+      }>
     }
-    return !!state.state?.isAuthenticated
+    if (state.state?.isAuthenticated) return true
+    const authItem = state.origins
+      ?.flatMap((o) => o.localStorage ?? [])
+      .find((item) => item.name === 'sailingloc-auth')
+    if (!authItem) return false
+    const parsed = JSON.parse(authItem.value) as {
+      state?: { isAuthenticated?: boolean }
+    }
+    return !!parsed.state?.isAuthenticated
   } catch {
     return false
   }

@@ -248,6 +248,7 @@ const Home: React.FC = () => {
     const qs = new URLSearchParams()
     if (params.location) qs.set('location', params.location)
     if (params.startDate) qs.set('startDate', params.startDate)
+    if (params.endDate) qs.set('endDate', params.endDate)
     if (params.boatType) qs.append('type', params.boatType)
     navigate(`/bateaux?${qs.toString()}`)
   }

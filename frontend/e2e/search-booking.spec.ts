@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { loginAs, isAuthAvailable } from './helpers'
 
 /**
@@ -11,34 +11,29 @@ import { loginAs, isAuthAvailable } from './helpers'
 test.describe('Recherche de bateaux', () => {
   test('la page /bateaux se charge correctement', async ({ page }) => {
     await page.goto('/bateaux')
-    // La barre de recherche est visible
-    await expect(page.getByPlaceholder(/port|destination|location/i).first()).toBeVisible()
+    await expect(
+      page.getByPlaceholder(/où naviguez|port ou ville|marseille|la rochelle/i).first(),
+    ).toBeVisible()
   })
 
   test('affiche les bateaux disponibles ou le message vide', async ({ page }) => {
     await page.goto('/bateaux')
-    // Attend la fin du chargement (squelette → résultats ou message vide)
     await expect(
-      page.getByText(/bateau(x)? trouvé|aucun résultat|aucun bateau/i).first()
+      page.getByText(/bateau(x)? trouvé|aventures maritimes|aucun bateau/i).first(),
     ).toBeVisible({ timeout: 10_000 })
   })
 
   test('recherche par localisation met à jour l\'URL', async ({ page }) => {
     await page.goto('/bateaux')
-    const locationInput = page.getByPlaceholder(/port|destination|location/i).first()
+    const locationInput = page.getByPlaceholder(/où naviguez|port ou ville|marseille/i).first()
     await locationInput.fill('Marseille')
-    // Soumet la recherche (Entrée ou bouton rechercher)
     await locationInput.press('Enter')
     await expect(page).toHaveURL(/location=Marseille/)
   })
 
-  test('toggle vue carte est fonctionnel', async ({ page }) => {
+  test('la carte est affichée sur la page recherche', async ({ page }) => {
     await page.goto('/bateaux')
-    const carteBtn = page.getByRole('button', { name: /carte/i })
-    await expect(carteBtn).toBeVisible()
-    await carteBtn.click()
-    // La vue carte doit être active (aria-pressed="true")
-    await expect(carteBtn).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.locator('.leaflet-container').first()).toBeVisible({ timeout: 10_000 })
   })
 })
 

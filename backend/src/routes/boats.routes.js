@@ -20,6 +20,35 @@ function parseArrayParam(query, key) {
   return Array.isArray(raw) ? raw : [raw]
 }
 
+function parseAvailabilityRange(startDate, endDate) {
+  if (!startDate || !endDate) return null
+  const start = new Date(`${startDate}T12:00:00`)
+  const end = new Date(`${endDate}T12:00:00`)
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || start >= end) return null
+  return { startDate, endDate }
+}
+
+async function getUnavailableBoatIdsForRange(startDate, endDate) {
+  const [{ data: bookings }, { data: blocks }] = await Promise.all([
+    supabase
+      .from('bookings')
+      .select('boat_id')
+      .in('status', ['PENDING', 'CONFIRMED'])
+      .lt('start_date', endDate)
+      .gt('end_date', startDate),
+    supabase
+      .from('availabilities')
+      .select('boat_id')
+      .lt('start_date', endDate)
+      .gte('end_date', startDate),
+  ])
+
+  const ids = new Set()
+  for (const row of bookings || []) ids.add(row.boat_id)
+  for (const row of blocks || []) ids.add(row.boat_id)
+  return [...ids]
+}
+
 function applyBoatSearchFilters(query, reqQuery) {
   const countries = parseArrayParam(reqQuery, 'countries')
   const locations = parseArrayParam(reqQuery, 'locations')
@@ -125,6 +154,17 @@ router.get('/', optionalAuth, async (req, res) => {
     .eq('status', 'active')
 
   query = applyBoatSearchFilters(query, req.query)
+
+  const dateRange = parseAvailabilityRange(
+    req.query.startDate || req.query.start_date,
+    req.query.endDate || req.query.end_date,
+  )
+  if (dateRange) {
+    const unavailableIds = await getUnavailableBoatIdsForRange(dateRange.startDate, dateRange.endDate)
+    if (unavailableIds.length > 0) {
+      query = query.not('id', 'in', `(${unavailableIds.join(',')})`)
+    }
+  }
 
   const sort = req.query.sort
   if (sort === 'price_asc')   query = query.order('price_per_day', { ascending: true })

@@ -1,11 +1,5 @@
-import { test, expect } from '@playwright/test'
-import { loginAs, DEMO_ACCOUNTS } from './helpers'
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname  = path.dirname(__filename)
+import { test, expect } from './fixtures'
+import { loginAs, DEMO_ACCOUNTS, isAuthAvailable } from './helpers'
 
 /**
  * G5 — Tests E2E : Authentification
@@ -19,12 +13,7 @@ const __dirname  = path.dirname(__filename)
  */
 
 function isBackendAvailable(role: 'renter' | 'owner' | 'admin'): boolean {
-  const authFile = path.join(__dirname, `../.auth/${role}.json`)
-  if (!fs.existsSync(authFile)) return false
-  const state = JSON.parse(fs.readFileSync(authFile, 'utf-8')) as {
-    state?: { isAuthenticated?: boolean }
-  }
-  return !!state.state?.isAuthenticated
+  return isAuthAvailable(role)
 }
 
 test.describe('Authentification', () => {
@@ -42,8 +31,9 @@ test.describe('Authentification', () => {
     await page.locator('input[type="password"]').fill('mauvaismdp123')
     await page.locator('button[type="submit"]').click()
 
-    // Le message d'erreur global apparaît dans le div[role="alert"]
-    await expect(page.locator('[role="alert"]')).toBeVisible({ timeout: 5_000 })
+    await expect(
+      page.getByText(/email ou mot de passe incorrect|identifiants incorrects/i),
+    ).toBeVisible({ timeout: 5_000 })
     // Reste sur la page de connexion
     await expect(page).toHaveURL('/connexion')
   })

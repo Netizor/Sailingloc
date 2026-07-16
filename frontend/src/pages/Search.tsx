@@ -141,7 +141,7 @@ const Search: React.FC = () => {
 
   const apiBoats: Boat[] = data?.data ?? []
 
-  const usingDemo = isError || (!isLoading && apiBoats.length === 0)
+  const usingDemo = isError
 
 
 
@@ -151,13 +151,13 @@ const Search: React.FC = () => {
 
     const filtered = usingDemo
 
-      ? filterBoatsLocally(source, { location, type: boatType, capacity })
+      ? filterBoatsLocally(source, { location, type: boatType, capacity, startDate, endDate })
 
       : source
 
     return sortBoats(filtered, sortBy)
 
-  }, [usingDemo, apiBoats, location, boatType, capacity, sortBy])
+  }, [usingDemo, apiBoats, location, boatType, capacity, startDate, endDate, sortBy])
 
 
 
