@@ -41,42 +41,42 @@ const AdminDashboard: React.FC = () => {
 
   const statCards = [
     {
-      label: 'Utilisateurs',
+      label: 'Users',
       value: stats?.totalUsers ?? 0,
       icon: <Users size={22} />,
       color: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
       to: '/admin/utilisateurs',
     },
     {
-      label: 'Bateaux actifs',
+      label: 'Active boats',
       value: stats?.activeBoats ?? stats?.totalBoats ?? 0,
       icon: <Ship size={22} />,
       color: 'bg-ocean-50 text-ocean-600 dark:bg-ocean-900/30 dark:text-ocean-400',
       to: '/admin/bateaux',
     },
     {
-      label: 'Réservations',
+      label: 'Bookings',
       value: stats?.totalBookings ?? 0,
       icon: <CalendarCheck size={22} />,
       color: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
       to: '/admin/reservations',
     },
     {
-      label: 'Revenus plateforme',
+      label: 'Platform revenue',
       value: stats?.platformRevenue != null ? formatPrice(stats.platformRevenue) : EMPTY_VALUE,
       icon: <Euro size={22} />,
       color: 'bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400',
       to: '/admin/reservations',
     },
     {
-      label: 'Volume total',
+      label: 'Total volume',
       value: stats?.totalRevenue != null ? formatPrice(stats.totalRevenue) : EMPTY_VALUE,
       icon: <TrendingUp size={22} />,
       color: 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
       to: '/admin/reservations',
     },
     {
-      label: 'Avis',
+      label: 'Reviews',
       value: stats?.pendingReviews ?? 0,
       icon: <Star size={22} />,
       color: 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
@@ -89,9 +89,9 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Tableau de bord</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Dashboard</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Vue d&apos;ensemble de la plateforme SailingLoc
+          Overview of the SailingLoc platform
         </p>
       </div>
 
@@ -126,7 +126,7 @@ const AdminDashboard: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <section>
             <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">
-              Revenus par mois ({new Date().getFullYear()})
+              Revenue by month ({new Date().getFullYear()})
             </h2>
             <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm px-4 pt-5 pb-2">
               <ResponsiveContainer width="100%" height={220}>
@@ -149,7 +149,7 @@ const AdminDashboard: React.FC = () => {
 
           <section>
             <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">
-              Réservations par mois ({new Date().getFullYear()})
+              Bookings by month ({new Date().getFullYear()})
             </h2>
             <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm px-4 pt-5 pb-2">
               <ResponsiveContainer width="100%" height={220}>
@@ -157,7 +157,7 @@ const AdminDashboard: React.FC = () => {
                   <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} width={30} allowDecimals={false} />
-                  <Tooltip formatter={(value) => [value ?? 0, 'Réservations']} />
+                  <Tooltip formatter={(value) => [value ?? 0, 'Bookings']} />
                   <Bar dataKey="bookings" fill="#2563FF" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -169,10 +169,10 @@ const AdminDashboard: React.FC = () => {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
-            Réservations récentes
+            Recent bookings
           </h2>
           <Link to="/admin/reservations" className="text-sm text-ocean-600 dark:text-ocean-400 hover:text-ocean-800 flex items-center gap-1">
-            Tout voir <ArrowRight size={13} />
+            View all <ArrowRight size={13} />
           </Link>
         </div>
 
@@ -184,7 +184,7 @@ const AdminDashboard: React.FC = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-50 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
-                    {['Bateau', 'Locataire', 'Dates', 'Montant', 'Statut'].map((h) => (
+                    {['Boat', 'Renter', 'Dates', 'Amount', 'Status'].map((h) => (
                       <th key={h} className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
                     ))}
                   </tr>
@@ -194,13 +194,13 @@ const AdminDashboard: React.FC = () => {
                     <tr key={booking.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
                       <td className="px-5 py-3.5 font-medium text-gray-900 dark:text-gray-100">{booking.boat?.title ?? 'N/A'}</td>
                       <td className="px-5 py-3.5 text-gray-600 dark:text-gray-400">{booking.renter?.firstName} {booking.renter?.lastName}</td>
-                      <td className="px-5 py-3.5 text-gray-500">{formatDate(booking.startDate)} au {formatDate(booking.endDate)}</td>
+                      <td className="px-5 py-3.5 text-gray-500">{formatDate(booking.startDate)} to {formatDate(booking.endDate)}</td>
                       <td className="px-5 py-3.5 font-medium">{formatPrice(booking.totalAmount ?? 0)}</td>
                       <td className="px-5 py-3.5"><BookingStatusBadge status={booking.status} /></td>
                     </tr>
                   ))}
                   {(!recentBookings || recentBookings.length === 0) && (
-                    <tr><td colSpan={5} className="text-center py-10 text-gray-400 text-sm">Aucune réservation</td></tr>
+                    <tr><td colSpan={5} className="text-center py-10 text-gray-400 text-sm">No bookings</td></tr>
                   )}
                 </tbody>
               </table>

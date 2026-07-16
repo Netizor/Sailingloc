@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
   Anchor,
   Camera,
@@ -13,98 +14,68 @@ import type { LucideIcon } from 'lucide-react'
 import PageHero from '../components/ui/PageHero'
 import { usePageTitle } from '../hooks/usePageTitle'
 
-// ─── Étapes pour mettre un bateau en location ─────────────────────────────────
+// ─── Steps to list a boat for rent ────────────────────────────────────────────
 
-// #1 - Référence de composant au lieu de JSX pré-rendu dans les données
+// #1 - Component reference instead of pre-rendered JSX in data
 interface Step {
   number: string
   icon: LucideIcon
-  title: string
-  desc: string
+  titleKey: string
+  descKey: string
 }
 
 const STEPS: Step[] = [
-  {
-    number: '01',
-    icon: Anchor,
-    title: 'Créez votre compte propriétaire',
-    desc: 'Inscrivez-vous gratuitement en tant que particulier et sélectionnez le rôle « Propriétaire ». Sur SailingLoc, vous louez uniquement à d\'autres particuliers inscrits.',
-  },
-  {
-    number: '02',
-    icon: Camera,
-    title: 'Publiez votre annonce',
-    desc: 'Renseignez les caractéristiques de votre voilier ou bateau à moteur (type, longueur, capacité, équipements) et ajoutez de belles photos. Une annonce complète attire davantage de locataires, en France, en Europe et à l\'international.',
-  },
-  {
-    number: '03',
-    icon: CalendarDays,
-    title: 'Gérez vos disponibilités',
-    desc: "Définissez votre calendrier de disponibilités, vos tarifs (journée, semaine) et votre politique d'annulation. Vous restez maître de votre planning à tout moment.",
-  },
-  {
-    number: '04',
-    icon: FileText,
-    title: 'Concluez des contrats de location',
-    desc: 'Chaque réservation confirmée établit un contrat de location entre vous et le locataire. SailingLoc agit comme intermédiaire ; le paiement est sécurisé via Stripe (10 % de frais de service sur chaque transaction).',
-  },
-  {
-    number: '05',
-    icon: Star,
-    title: 'Construisez votre réputation',
-    desc: 'Les avis des locataires boostent la visibilité de votre annonce. Un profil bien noté peut multiplier ses revenus par 2 en quelques mois.',
-  },
+  { number: '01', icon: Anchor, titleKey: 'ownerGuidePage.steps.1.title', descKey: 'ownerGuidePage.steps.1.desc' },
+  { number: '02', icon: Camera, titleKey: 'ownerGuidePage.steps.2.title', descKey: 'ownerGuidePage.steps.2.desc' },
+  { number: '03', icon: CalendarDays, titleKey: 'ownerGuidePage.steps.3.title', descKey: 'ownerGuidePage.steps.3.desc' },
+  { number: '04', icon: FileText, titleKey: 'ownerGuidePage.steps.4.title', descKey: 'ownerGuidePage.steps.4.desc' },
+  { number: '05', icon: Star, titleKey: 'ownerGuidePage.steps.5.title', descKey: 'ownerGuidePage.steps.5.desc' },
 ]
 
-// ─── Checklist documents requis ───────────────────────────────────────────────
+// ─── Required documents checklist ─────────────────────────────────────────────
 
-const DOCUMENTS = [
-  'Carte de circulation / Acte de francisation du bateau',
-  "Pièce d'identité en cours de validité du propriétaire",
-  "Attestation d'assurance navigation valide (responsabilité civile + dommages)",
-  'Photos récentes du bateau (extérieur, intérieur, cockpit)',
-  'Certificat de conformité ou procès-verbal de visite (si applicable)',
-  'Contrat de location (modèle ou document propriétaire, si vous en disposez)',
-  'IBAN pour les futurs virements (Stripe Connect, phase 2)',
-]
+const DOCUMENT_KEYS = [0, 1, 2, 3, 4, 5, 6]
 
-// ─── Estimateur de revenus ────────────────────────────────────────────────────
+// ─── Revenue estimator ────────────────────────────────────────────────────────
 
-const DAILY_RATES: Record<string, number> = {
-  'Semi-rigide': 120,
-  'Bateau à moteur': 250,
-  Voilier: 350,
-  Catamaran: 600,
+type BoatTypeKey = 'INFLATABLE' | 'MOTORBOAT' | 'SAILBOAT' | 'CATAMARAN'
+
+const DAILY_RATES: Record<BoatTypeKey, number> = {
+  INFLATABLE: 120,
+  MOTORBOAT: 250,
+  SAILBOAT: 350,
+  CATAMARAN: 600,
 }
 
-// #10 - Constantes nommées pour les valeurs magiques du calcul
-/** Part encaissée par SailingLoc sur chaque transaction confirmée (10 %) */
+// #10 - Named constants for magic calculation values
+/** Share collected by SailingLoc on each confirmed transaction (10%) */
 const PLATFORM_COMMISSION = 0.10
-/** Durée indicative de la saison nautique (en mois) */
+/** Indicative length of the sailing season (in months) */
 const SEASON_MONTHS = 10
 
-// ─── Page Guide propriétaire ──────────────────────────────────────────────────
+// ─── Owner guide page ─────────────────────────────────────────────────────────
 
 const GuideProprietaire: React.FC = () => {
-  // #6 - Titre de l'onglet pour le SEO et l'accessibilité
-  usePageTitle('Guide propriétaire')
+  const { t } = useTranslation()
+  // #6 - Tab title for SEO and accessibility
+  usePageTitle(t('ownerGuidePage.pageTitle'))
 
-  const [boatType, setBoatType] = useState('Voilier')
+  const [boatType, setBoatType] = useState<BoatTypeKey>('SAILBOAT')
   const [daysPerMonth, setDaysPerMonth] = useState(8)
 
   const dailyRate = DAILY_RATES[boatType] ?? 350
-  // #10 - Utilisation des constantes nommées
+  // #10 - Use named constants
   const monthlyNet = Math.round(dailyRate * daysPerMonth * (1 - PLATFORM_COMMISSION))
   const yearlyNet = monthlyNet * SEASON_MONTHS
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
-      {/* #2 - Hero extrait en composant partagé PageHero */}
+      {/* #2 - Hero extracted into shared PageHero component */}
       <PageHero
         icon={TrendingUp}
-        badge="Guide propriétaire"
-        title="Louez votre bateau entre particuliers"
-        subtitle="Publiez votre voilier ou bateau à moteur, établissez des contrats de location avec des locataires inscrits, et estimez vos revenus après les 10 % de frais SailingLoc."
+        badge={t('ownerGuidePage.heroBadge')}
+        title={t('ownerGuidePage.heroTitle')}
+        subtitle={t('ownerGuidePage.heroSubtitle')}
         backgroundImage="/view-luxurious-yacht.jpg"
       >
         <div className="mt-8">
@@ -112,16 +83,16 @@ const GuideProprietaire: React.FC = () => {
             to="/inscription"
             className="inline-flex items-center gap-2 bg-white text-ocean-800 font-semibold px-7 py-3 rounded-xl hover:bg-ocean-50 transition-colors text-sm"
           >
-            Devenir propriétaire, c'est gratuit
+            {t('ownerGuidePage.heroCta')}
           </Link>
         </div>
       </PageHero>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14 space-y-14">
-        {/* Étapes */}
+        {/* Steps */}
         <section>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8 text-center">
-            5 étapes pour commencer à louer
+            {t('ownerGuidePage.stepsTitle')}
           </h2>
           <div className="space-y-4">
             {STEPS.map((step) => (
@@ -132,55 +103,55 @@ const GuideProprietaire: React.FC = () => {
                 <div className="shrink-0 flex flex-col items-center gap-2">
                   <span className="text-2xl font-black text-ocean-200 dark:text-ocean-700">{step.number}</span>
                   <div className="bg-ocean-50 dark:bg-ocean-900/30 p-2 rounded-xl">
-                    {/* #1 - Instanciation à la volée depuis la référence de composant */}
+                    {/* #1 - Instantiate on the fly from the component reference */}
                     <step.icon size={22} className="text-ocean-600 dark:text-ocean-400" />
                   </div>
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900 dark:text-gray-100 mb-1">{step.title}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{step.desc}</p>
+                  <p className="font-semibold text-gray-900 dark:text-gray-100 mb-1">{t(step.titleKey)}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{t(step.descKey)}</p>
                 </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Estimateur de revenus */}
+        {/* Revenue estimator */}
         <section id="revenus" className="scroll-mt-20">
           <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-8">
             <div className="flex items-center gap-3 mb-6">
               <div className="bg-ocean-100 dark:bg-ocean-800/40 p-2.5 rounded-xl">
                 <TrendingUp size={20} className="text-ocean-700 dark:text-ocean-400" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Estimez vos revenus</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('ownerGuidePage.estimatorTitle')}</h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
-              {/* Type de bateau */}
+              {/* Boat type */}
               <div>
-                {/* #5 - htmlFor/id pour l'accessibilité WCAG 2.1 */}
+                {/* #5 - htmlFor/id for WCAG 2.1 accessibility */}
                 <label htmlFor="boat-type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  Type de bateau
+                  {t('ownerGuidePage.boatTypeLabel')}
                 </label>
                 <select
                   id="boat-type"
                   value={boatType}
-                  onChange={(e) => setBoatType(e.target.value)}
+                  onChange={(e) => setBoatType(e.target.value as BoatTypeKey)}
                   className="w-full rounded-xl border border-gray-200 dark:border-gray-600 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-ocean-500 focus:border-transparent bg-white dark:bg-gray-900"
                 >
-                  {Object.keys(DAILY_RATES).map((type) => (
+                  {(Object.keys(DAILY_RATES) as BoatTypeKey[]).map((type) => (
                     <option key={type} value={type}>
-                      {type}
+                      {t(`ownerGuidePage.boatTypes.${type}`)}
                     </option>
                   ))}
                 </select>
               </div>
 
-              {/* Jours par mois */}
+              {/* Days per month */}
               <div>
-                {/* #5 - htmlFor/id + attributs ARIA sur le range */}
+                {/* #5 - htmlFor/id + ARIA attributes on the range */}
                 <label htmlFor="days-per-month" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  Jours loués par mois : <span className="text-ocean-700 dark:text-ocean-400 font-bold">{daysPerMonth}</span>
+                  {t('ownerGuidePage.daysPerMonthLabel')} <span className="text-ocean-700 dark:text-ocean-400 font-bold">{daysPerMonth}</span>
                 </label>
                 <input
                   id="days-per-month"
@@ -195,67 +166,65 @@ const GuideProprietaire: React.FC = () => {
                   className="w-full accent-ocean-600"
                 />
                 <div className="flex justify-between text-xs text-gray-400 dark:text-gray-500 mt-1">
-                  <span>1 j</span>
-                  <span>25 j</span>
+                  <span>{t('ownerGuidePage.daysMin')}</span>
+                  <span>{t('ownerGuidePage.daysMax')}</span>
                 </div>
               </div>
             </div>
 
-            {/* Résultats */}
+            {/* Results */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 text-center border border-gray-100 dark:border-gray-600">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Tarif journalier moyen</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('ownerGuidePage.avgDailyRate')}</p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{dailyRate} €</p>
               </div>
               <div className="bg-ocean-50 dark:bg-ocean-900/30 rounded-xl p-4 text-center border border-ocean-100 dark:border-ocean-800">
-                <p className="text-xs text-ocean-600 dark:text-ocean-400 mb-1">Revenus nets / mois</p>
+                <p className="text-xs text-ocean-600 dark:text-ocean-400 mb-1">{t('ownerGuidePage.netMonthly')}</p>
                 <p className="text-2xl font-bold text-ocean-800 dark:text-ocean-300">{monthlyNet} €</p>
               </div>
               <div className="bg-ocean-700 rounded-xl p-4 text-center">
-                <p className="text-xs text-ocean-100 mb-1">Revenus nets / an ({SEASON_MONTHS} mois)</p>
-                <p className="text-2xl font-bold text-white">{yearlyNet.toLocaleString('fr-FR')} €</p>
+                <p className="text-xs text-ocean-100 mb-1">{t('ownerGuidePage.netYearly', { months: SEASON_MONTHS })}</p>
+                <p className="text-2xl font-bold text-white">{yearlyNet.toLocaleString('en-US')} €</p>
               </div>
             </div>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
-              * Estimation indicative après déduction des 10 % encaissés par SailingLoc sur chaque
-              transaction (~{PLATFORM_COMMISSION * 100} %). Hors charges liées au bateau (entretien, port, assurance).
+              {t('ownerGuidePage.estimatorNote', { percent: PLATFORM_COMMISSION * 100 })}
             </p>
           </div>
         </section>
 
-        {/* Checklist documents */}
+        {/* Documents checklist */}
         <section>
           <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-8">
             <div className="flex items-center gap-3 mb-6">
               <div className="bg-ocean-100 dark:bg-ocean-800/40 p-2.5 rounded-xl">
                 <FileText size={20} className="text-ocean-700 dark:text-ocean-400" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Documents requis</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('ownerGuidePage.documentsTitle')}</h2>
             </div>
             <ul className="space-y-3">
-              {DOCUMENTS.map((doc) => (
-                <li key={doc} className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300">
+              {DOCUMENT_KEYS.map((index) => (
+                <li key={index} className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300">
                   <CheckCircle size={17} className="shrink-0 text-ocean-500 mt-0.5" />
-                  {doc}
+                  {t(`ownerGuidePage.documents.${index}`)}
                 </li>
               ))}
             </ul>
           </div>
         </section>
 
-        {/* CTA final */}
+        {/* Final CTA */}
         <section className="text-center bg-ocean-50 dark:bg-ocean-900/30 rounded-2xl border border-ocean-100 dark:border-ocean-800 p-10">
           <Anchor size={36} className="text-ocean-600 dark:text-ocean-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">Prêt à louer votre bateau ?</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">{t('ownerGuidePage.ctaTitle')}</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto mb-6">
-            Inscription gratuite pour les particuliers. Publiez votre annonce et concluez vos
-            contrats de location en quelques minutes.
+            {t('ownerGuidePage.ctaSubtitle')}
           </p>
           <Link
             to="/inscription"
             className="inline-flex items-center gap-2 bg-ocean-700 hover:bg-ocean-800 text-white font-semibold px-7 py-3 rounded-xl transition-colors text-sm"
           >
-            Créer mon compte propriétaire
+            {t('ownerGuidePage.ctaButton')}
           </Link>
         </section>
       </div>

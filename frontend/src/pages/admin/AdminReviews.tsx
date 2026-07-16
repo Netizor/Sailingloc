@@ -27,12 +27,12 @@ type RatingFilter = 'all' | '5' | '4' | '3' | '2' | '1'
 const PAGE_SIZE = 15
 
 const TYPE_LABELS: Record<string, string> = {
-  RENTER_TO_BOAT: 'Locataire → Bateau',
-  OWNER_TO_RENTER: 'Propriétaire → Locataire',
+  RENTER_TO_BOAT: 'Renter → Boat',
+  OWNER_TO_RENTER: 'Owner → Renter',
 }
 
 function exportCsv(reviews: Review[]) {
-  const header = ['ID', 'Auteur', 'Bateau', 'Type', 'Note', 'Commentaire', 'Statut', 'Date']
+  const header = ['ID', 'Author', 'Boat', 'Type', 'Rating', 'Comment', 'Status', 'Date']
   const rows = reviews.map((r) => [
     r.id,
     r.reviewer ? `${r.reviewer.firstName} ${r.reviewer.lastName}` : `#${r.reviewerId}`,
@@ -40,7 +40,7 @@ function exportCsv(reviews: Review[]) {
     TYPE_LABELS[r.type] ?? r.type,
     r.rating,
     `"${(r.comment ?? '').replace(/"/g, '""')}"`,
-    r.isPublished ? 'Publié' : 'Masqué',
+    r.isPublished ? 'Published' : 'Hidden',
     formatDate(r.createdAt),
   ])
   const csv = [header, ...rows].map((row) => row.join(';')).join('\n')
@@ -48,7 +48,7 @@ function exportCsv(reviews: Review[]) {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = `avis-sailingloc-${new Date().toISOString().slice(0, 10)}.csv`
+  a.download = `reviews-sailingloc-${new Date().toISOString().slice(0, 10)}.csv`
   a.click()
   URL.revokeObjectURL(url)
 }
@@ -75,7 +75,7 @@ const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
     }`}
   >
     {isPublished ? <Eye size={9} /> : <EyeOff size={9} />}
-    {isPublished ? 'Publié' : 'En attente'}
+    {isPublished ? 'Published' : 'Pending'}
   </span>
 )
 
@@ -172,29 +172,29 @@ const AdminReviews: React.FC = () => {
       adminApi.moderateReview(id, isPublished, note),
     onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: ['admin', 'reviews'] })
-      toast.success(vars.isPublished ? 'Avis approuvé & publié' : 'Avis masqué')
+      toast.success(vars.isPublished ? 'Review approved & published' : 'Review hidden')
       setHideTarget(null)
       setAdminNote('')
       if (selected?.id === vars.id) setSelected(null)
     },
-    onError: () => toast.error('Erreur lors de la modération'),
+    onError: () => toast.error('Error during moderation'),
   })
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => adminApi.deleteReview(id),
     onSuccess: (_, id) => {
       qc.invalidateQueries({ queryKey: ['admin', 'reviews'] })
-      toast.success('Avis supprimé')
+      toast.success('Review deleted')
       if (selected?.id === id) setSelected(null)
     },
-    onError: () => toast.error('Erreur lors de la suppression'),
+    onError: () => toast.error('Error during deletion'),
   })
 
   const flagMutation = useMutation({
     mutationFn: (id: number) =>
       api.post('/reports', { targetType: 'REVIEW', targetId: id, reason: 'INAPPROPRIATE_CONTENT' }),
-    onSuccess: () => toast.success('Avis signalé'),
-    onError: () => toast.error('Erreur lors du signalement'),
+    onSuccess: () => toast.success('Review reported'),
+    onError: () => toast.error('Error reporting review'),
   })
 
   const handleTabChange = (tab: StatusFilter) => {
@@ -209,7 +209,7 @@ const AdminReviews: React.FC = () => {
   }
 
   const confirmDelete = (r: Review) => {
-    if (window.confirm('Supprimer définitivement cet avis ? Cette action est irréversible.')) {
+    if (window.confirm('Permanently delete this review? This action cannot be undone.')) {
       deleteMutation.mutate(r.id)
     }
   }
@@ -219,10 +219,10 @@ const AdminReviews: React.FC = () => {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Avis &amp; Commentaires
+            Reviews &amp; Comments
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Modérez et analysez les retours d'expérience de la communauté SailingLoc.
+            Moderate and analyze feedback from the SailingLoc community.
           </p>
         </div>
         <Button
@@ -231,20 +231,20 @@ const AdminReviews: React.FC = () => {
           leftIcon={<Download size={14} />}
           onClick={() => exportCsv(filtered)}
         >
-          Exporter CSV
+          Export CSV
         </Button>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total avis" value={stats?.total ?? data?.total ?? '-'} sub="+2% ce mois" />
+        <StatCard label="Total reviews" value={stats?.total ?? data?.total ?? '-'} sub="+2% this month" />
         <StatCard
-          label="Moyenne plateforme"
+          label="Platform average"
           value={stats?.avgRating != null ? stats.avgRating.toFixed(1) : '-'}
-          sub="Avis publiés"
+          sub="Published reviews"
           accent="blue"
         />
-        <StatCard label="En attente" value={stats?.hiddenCount ?? '-'} sub="À modérer" accent="amber" />
-        <StatCard label="Signalés" value={0} sub="Aucun signalement" accent="red" />
+        <StatCard label="Pending" value={stats?.hiddenCount ?? '-'} sub="To moderate" accent="amber" />
+        <StatCard label="Reported" value={0} sub="No reports" accent="red" />
       </div>
 
       <div className="flex flex-wrap gap-3 items-center">
@@ -252,7 +252,7 @@ const AdminReviews: React.FC = () => {
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Rechercher par client, bateau ou avis…"
+            placeholder="Search by customer, boat, or review…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-ocean-500"
@@ -264,17 +264,17 @@ const AdminReviews: React.FC = () => {
           onChange={(e) => setRatingFilter(e.target.value as RatingFilter)}
           className="px-3 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-ocean-500"
         >
-          <option value="all">Toutes les notes</option>
+          <option value="all">All ratings</option>
           {[5, 4, 3, 2, 1].map((n) => (
-            <option key={n} value={n}>{n} étoile{n > 1 ? 's' : ''}</option>
+            <option key={n} value={n}>{n} star{n > 1 ? 's' : ''}</option>
           ))}
         </select>
 
         <div className="flex bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1 gap-0.5">
           {([
-            { key: 'all', label: 'Tous' },
-            { key: 'published', label: 'Publiés' },
-            { key: 'hidden', label: 'Masqués' },
+            { key: 'all', label: 'All' },
+            { key: 'published', label: 'Published' },
+            { key: 'hidden', label: 'Hidden' },
           ] as { key: StatusFilter; label: string }[]).map((tab) => (
             <button
               key={tab.key}
@@ -298,7 +298,7 @@ const AdminReviews: React.FC = () => {
       ) : filtered.length === 0 ? (
         <div className="text-center py-20 text-gray-400">
           <Star size={40} className="mx-auto mb-3 opacity-30" />
-          <p>Aucun avis trouvé.</p>
+          <p>No reviews found.</p>
         </div>
       ) : (
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden">
@@ -306,11 +306,11 @@ const AdminReviews: React.FC = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 text-left">
-                  <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">Client</th>
-                  <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">Bateau &amp; Résumé</th>
-                  <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">Note</th>
+                  <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">Customer</th>
+                  <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">Boat &amp; Summary</th>
+                  <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">Rating</th>
                   <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">Date</th>
-                  <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">Statut</th>
+                  <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">Status</th>
                   <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase text-right">Actions</th>
                 </tr>
               </thead>
@@ -338,7 +338,7 @@ const AdminReviews: React.FC = () => {
                             <p className="font-medium text-gray-900 dark:text-gray-100 leading-tight">
                               {r.reviewer
                                 ? `${r.reviewer.firstName} ${r.reviewer.lastName}`
-                                : `Utilisateur #${r.reviewerId}`}
+                                : `User #${r.reviewerId}`}
                             </p>
                             <p className="text-[11px] text-gray-400">{TYPE_LABELS[r.type] ?? r.type}</p>
                           </div>
@@ -362,25 +362,25 @@ const AdminReviews: React.FC = () => {
                           {r.isPublished ? (
                             <ActionBtn
                               icon={<EyeOff size={14} />}
-                              title="Masquer"
+                              title="Hide"
                               onClick={() => { setHideTarget(r); setAdminNote('') }}
                             />
                           ) : (
                             <ActionBtn
                               icon={<Eye size={14} />}
-                              title="Approuver & publier"
+                              title="Approve & publish"
                               onClick={() => moderateMutation.mutate({ id: r.id, isPublished: true })}
                             />
                           )}
                           <ActionBtn
                             icon={<Flag size={14} />}
-                            title="Signaler"
+                            title="Report"
                             className="text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20"
                             onClick={() => flagMutation.mutate(r.id)}
                           />
                           <ActionBtn
                             icon={<Trash2 size={14} />}
-                            title="Supprimer"
+                            title="Delete"
                             className="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
                             onClick={() => confirmDelete(r)}
                           />
@@ -394,15 +394,15 @@ const AdminReviews: React.FC = () => {
                           <div className="flex flex-col sm:flex-row gap-5">
                             <div className="flex-1">
                               <p className="text-[11px] font-bold tracking-wider text-gray-400 uppercase mb-2">
-                                Commentaire du client
+                                Customer comment
                               </p>
                               <blockquote className="text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 italic leading-relaxed">
-                                « {r.comment || 'Aucun commentaire.'} »
+                                « {r.comment || 'No comment.'} »
                               </blockquote>
                               {r.adminNote && (
                                 <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 flex items-start gap-1">
                                   <AlertTriangle size={11} className="mt-0.5 shrink-0" />
-                                  Note admin : {r.adminNote}
+                                  Admin note: {r.adminNote}
                                 </p>
                               )}
                             </div>
@@ -415,7 +415,7 @@ const AdminReviews: React.FC = () => {
                                   loading={moderateMutation.isPending}
                                   onClick={() => moderateMutation.mutate({ id: r.id, isPublished: true })}
                                 >
-                                  Approuver &amp; Publier
+                                  Approve &amp; Publish
                                 </Button>
                               ) : (
                                 <Button
@@ -424,7 +424,7 @@ const AdminReviews: React.FC = () => {
                                   leftIcon={<EyeOff size={14} />}
                                   onClick={() => { setHideTarget(r); setAdminNote('') }}
                                 >
-                                  Masquer l'avis
+                                  Hide review
                                 </Button>
                               )}
                               <Button
@@ -434,7 +434,7 @@ const AdminReviews: React.FC = () => {
                                 loading={deleteMutation.isPending}
                                 onClick={() => confirmDelete(r)}
                               >
-                                Supprimer
+                                Delete
                               </Button>
                             </div>
                           </div>
@@ -450,7 +450,7 @@ const AdminReviews: React.FC = () => {
           {totalPages > 1 && (
             <div className="flex items-center justify-between px-5 py-4 border-t border-gray-100 dark:border-gray-700">
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                Page {page} sur {totalPages}
+                Page {page} of {totalPages}
               </span>
               <div className="flex gap-2">
                 <Button
@@ -460,7 +460,7 @@ const AdminReviews: React.FC = () => {
                   disabled={page <= 1}
                   onClick={() => setPage((p) => p - 1)}
                 >
-                  Précédent
+                  Previous
                 </Button>
                 <Button
                   variant="secondary"
@@ -469,7 +469,7 @@ const AdminReviews: React.FC = () => {
                   disabled={page >= totalPages}
                   onClick={() => setPage((p) => p + 1)}
                 >
-                  Suivant
+                  Next
                 </Button>
               </div>
             </div>
@@ -480,14 +480,14 @@ const AdminReviews: React.FC = () => {
       <Modal
         isOpen={!!hideTarget}
         onClose={() => { setHideTarget(null); setAdminNote('') }}
-        title="Masquer cet avis"
+        title="Hide this review"
         size="sm"
       >
         <div className="p-6 space-y-4">
           <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/40 rounded-xl p-4">
             <AlertTriangle size={18} className="text-amber-500 shrink-0 mt-0.5" />
             <p className="text-sm text-amber-700 dark:text-amber-400">
-              L'avis sera masqué du site public. Il restera visible ici et pourra être restauré.
+              The review will be hidden from the public site. It will remain visible here and can be restored.
             </p>
           </div>
           {hideTarget?.comment && (
@@ -497,13 +497,13 @@ const AdminReviews: React.FC = () => {
           )}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-              Note interne <span className="text-gray-400 font-normal">(optionnel)</span>
+              Internal note <span className="text-gray-400 font-normal">(optional)</span>
             </label>
             <textarea
               value={adminNote}
               onChange={(e) => setAdminNote(e.target.value)}
               rows={3}
-              placeholder="Raison du masquage, visible uniquement par les admins…"
+              placeholder="Reason for hiding, visible only to admins…"
               className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ocean-500 resize-none bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
             />
           </div>
@@ -514,7 +514,7 @@ const AdminReviews: React.FC = () => {
               onClick={() => { setHideTarget(null); setAdminNote('') }}
               disabled={moderateMutation.isPending}
             >
-              Annuler
+              Cancel
             </Button>
             <Button
               variant="danger"
@@ -523,7 +523,7 @@ const AdminReviews: React.FC = () => {
               loading={moderateMutation.isPending}
               onClick={confirmHide}
             >
-              Masquer l'avis
+              Hide review
             </Button>
           </div>
         </div>

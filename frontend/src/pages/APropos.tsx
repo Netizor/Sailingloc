@@ -18,7 +18,7 @@ import {
   Star,
   UserCheck,
 } from 'lucide-react'
-import { FEATURED_TESTIMONIAL } from '../data/testimonials'
+import { FEATURED_TESTIMONIAL, pickLocale } from '../data/testimonials'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { cn } from '../lib/utils'
 
@@ -67,7 +67,8 @@ function SectionHeading({ label, title, subtitle }: { label: string; title: stri
 }
 
 const APropos: React.FC = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language
   const [openFaq, setOpenFaq] = useState<string | null>('1')
 
   usePageTitle(t('aboutPage.pageTitle'))
@@ -306,7 +307,7 @@ const APropos: React.FC = () => {
             <MessageSquareQuote size={100} className="absolute -right-2 -bottom-2 text-white/5 pointer-events-none" strokeWidth={1} />
             <p className="text-brand-blue text-xs font-bold uppercase tracking-widest mb-4">{t('aboutPage.testimonialLabel')}</p>
             <blockquote className="font-serif text-lg sm:text-xl leading-relaxed max-w-3xl mb-6">
-              &ldquo;{FEATURED_TESTIMONIAL.text}&rdquo;
+              &ldquo;{pickLocale(FEATURED_TESTIMONIAL.text, lang)}&rdquo;
             </blockquote>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
@@ -315,7 +316,7 @@ const APropos: React.FC = () => {
                 </div>
                 <div>
                   <p className="font-semibold text-sm">{FEATURED_TESTIMONIAL.name}</p>
-                  <p className="text-xs text-ocean-200">{FEATURED_TESTIMONIAL.role}</p>
+                  <p className="text-xs text-ocean-200">{pickLocale(FEATURED_TESTIMONIAL.role, lang)}</p>
                 </div>
               </div>
               <Link

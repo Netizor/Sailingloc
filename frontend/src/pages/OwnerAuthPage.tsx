@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, LogIn, UserPlus } from 'lucide-react'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 const OwnerAuthPage: React.FC = () => {
-  usePageTitle('Connexion & Inscription Propriétaire')
+  usePageTitle('Owner Login & Registration')
   const navigate = useNavigate()
 
   return (
@@ -15,16 +15,16 @@ const OwnerAuthPage: React.FC = () => {
           className="inline-flex items-center gap-1.5 text-sm text-brand-slate dark:text-gray-400 hover:text-brand-navy dark:hover:text-white mb-8 transition-colors"
         >
           <ArrowLeft size={15} />
-          Retour
+          Back
         </Link>
 
         <div className="text-center mb-10">
-          <p className="text-brand-blue text-sm font-medium mb-2">Espace propriétaire</p>
+          <p className="text-brand-blue text-sm font-medium mb-2">Owner space</p>
           <h1 className="text-2xl sm:text-3xl font-serif font-bold text-brand-navy dark:text-white mb-2">
-            Rejoignez SailingLoc
+            Join SailingLoc
           </h1>
           <p className="text-brand-slate dark:text-gray-400 text-sm sm:text-base max-w-lg mx-auto">
-            Connectez-vous ou créez votre compte propriétaire pour commencer.
+            Sign in or create your owner account to get started.
           </p>
         </div>
 
@@ -34,17 +34,17 @@ const OwnerAuthPage: React.FC = () => {
               <LogIn size={22} />
             </div>
             <h2 className="text-xl font-bold text-brand-navy dark:text-white mb-2">
-              Déjà propriétaire ?
+              Already an owner?
             </h2>
             <p className="text-sm text-brand-slate dark:text-gray-400 leading-relaxed mb-8 flex-1">
-              Connectez-vous à votre espace pour gérer vos bateaux, vos réservations et vos revenus.
+              Sign in to your space to manage your boats, bookings, and earnings.
             </p>
             <button
               type="button"
               onClick={() => navigate('/connexion', { state: { from: { pathname: '/proprietaire' } } })}
               className="inline-flex items-center justify-center gap-2 w-full px-6 py-3.5 text-sm font-semibold text-white bg-brand-blue hover:bg-ocean-600 rounded-full transition-colors"
             >
-              Se connecter
+              Sign in
               <ArrowRight size={16} />
             </button>
           </div>
@@ -53,25 +53,25 @@ const OwnerAuthPage: React.FC = () => {
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 text-brand-blue mb-5">
               <UserPlus size={22} />
             </div>
-            <h2 className="text-xl font-bold mb-2">Nouveau propriétaire ?</h2>
+            <h2 className="text-xl font-bold mb-2">New owner?</h2>
             <p className="text-sm text-white/75 leading-relaxed mb-8 flex-1">
-              Créez votre compte en quelques minutes et publiez votre première annonce sur la plateforme.
+              Create your account in a few minutes and publish your first listing on the platform.
             </p>
             <button
               type="button"
               onClick={() => navigate('/inscription?role=owner')}
               className="inline-flex items-center justify-center gap-2 w-full px-6 py-3.5 text-sm font-semibold text-brand-navy bg-white hover:bg-gray-100 rounded-full transition-colors"
             >
-              Créer un compte
+              Create an account
               <ArrowRight size={16} />
             </button>
           </div>
         </div>
 
         <p className="text-center mt-8 text-sm text-brand-slate dark:text-gray-400">
-          Vous souhaitez louer un bateau ?{' '}
+          Looking to rent a boat?{' '}
           <Link to="/inscription" className="font-semibold text-brand-blue hover:text-ocean-600 transition-colors">
-            Créer un compte locataire
+            Create a renter account
           </Link>
         </p>
       </div>

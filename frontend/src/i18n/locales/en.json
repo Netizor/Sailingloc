@@ -159,6 +159,10 @@
   },
   "home": {
     "badge": "Peer-to-peer boat rental for registered users",
+    "metaTitle": "Peer-to-peer boat rental for registered users",
+    "metaDescription": "Rent a sailboat, catamaran or motorboat between individuals in France, across Europe and worldwide.",
+    "heroAria": "Main banner",
+    "heroImageAlt": "Marina at sunset",
     "heroTitle": "The elegance of the sea within reach",
     "heroSubtitle": "Rent a sailboat or motorboat between individuals in France, across Europe and worldwide. Book online and enter into a rental contract in a few clicks.",
     "statsBoats": "available boats",
@@ -1028,42 +1032,181 @@
     "viewListing": "View listing"
   },
   "contactPage": {
-    "pageTitle": "Contact us",
-    "badge": "Contact us",
-    "title": "Contact us",
-    "subtitle": "A question, an issue or an idea? Our team will get back to you quickly.",
-    "email": "Email",
-    "emailValue": "contact@sailingloc.fr",
-    "emailDetail": "Reply within 24 business hours",
-    "phone": "Phone",
-    "phoneValue": "+33 1 23 45 67 89",
-    "phoneDetail": "Mon-Fri, 9 AM to 6 PM",
-    "address": "Address",
-    "addressValue": "12 Quai de la Joliette, 13002 Marseille",
-    "addressDetail": "Head office (no walk-in service)",
-    "availability": "Availability",
-    "availabilityValue": "Mon-Fri, 9 AM to 6 PM",
-    "availabilityDetail": "Excluding public holidays",
-    "faqTitle": "Check the FAQ first",
-    "faqHint": "Your answer might already be there.",
-    "faqLink": "View FAQ →",
+    "pageTitle": "Contact - SailingLoc",
+    "heroTitleLine1": "Let's talk about your",
+    "heroTitleLine2": "next stopover.",
+    "heroSubtitle": "A specific request, a tailored escape, or a technical question? Our maritime concierge team is entirely at your disposal.",
+    "formTitle": "Send us a message",
     "sentTitle": "Message sent!",
-    "sentHint": "Thank you for contacting us. We will reply within 24 business hours.",
+    "sentHint": "Thank you for your request. Our team will get back to you shortly.",
     "sendAnother": "Send another message",
-    "nameLabel": "Full name",
-    "namePlaceholder": "John Doe",
-    "emailLabel": "Email address",
-    "emailPlaceholder": "you@example.com",
-    "subjectLabel": "Subject",
+    "firstNameLabel": "First name",
+    "firstNamePlaceholder": "John",
+    "lastNameLabel": "Last name",
+    "lastNamePlaceholder": "Smith",
+    "emailLabel": "Email",
+    "emailPlaceholder": "john.smith@email.com",
+    "subjectLabel": "Subject of your request",
     "messageLabel": "Message",
-    "messagePlaceholder": "Describe your request in detail…",
-    "submit": "Send message",
+    "messagePlaceholder": "Describe your escape project...",
+    "submit": "Send request",
+    "submitting": "Sending...",
+    "error": "Something went wrong. Please try again.",
     "subjects": {
-      "booking": "Booking question",
-      "technical": "Technical issue",
-      "report": "Report a listing",
-      "partnership": "Partnership / Press",
-      "other": "Other"
+      "booking": "Premium booking",
+      "technical": "Technical question",
+      "owner": "Become an owner",
+      "other": "Other request"
+    },
+    "info": {
+      "contact": {
+        "title": "Contact us",
+        "text": "Monday to Friday, 9am to 5pm."
+      },
+      "office": {
+        "title": "Main Office",
+        "text": "12 rue de la Paix, 75002 Paris",
+        "action": "DIRECTIONS"
+      },
+      "support": {
+        "title": "24/7 Support",
+        "text": "For our members at sea only.",
+        "action": "VIP Exclusive Line"
+      }
+    },
+    "faqSectionTitle": "Frequently Asked Questions",
+    "faqs": {
+      "license": {
+        "question": "How do I book without a boat license?",
+        "answer": "Part of our fleet consists of “pleasure craft license” boats that are accessible without a license (up to 6 horsepower and a limited length under current regulations). Filter listings with the “No license required” criterion to find them easily."
+      },
+      "cancellation": {
+        "question": "What are the cancellation terms?",
+        "answer": "Free cancellation is available up to 7 days before departure. Between 7 and 3 days, 50% of the amount is refunded. Within 3 days, no refund applies, except in cases of force majeure."
+      },
+      "delivery": {
+        "question": "Do you deliver to the marina?",
+        "answer": "Depending on the listing, the boat can be delivered directly to your pontoon or preferred departure point. This option is shown on the boat page and may involve an extra fee depending on distance."
+      }
+    },
+    "mapAlt": "Port of Cannes",
+    "promo": {
+      "boats": {
+        "title": "Our boats",
+        "text": "Discover excellence."
+      },
+      "destinations": {
+        "title": "Destinations",
+        "text": "The gems of the Mediterranean."
+      },
+      "services": {
+        "title": "Our services",
+        "text": "Service without limits."
+      }
+    }
+  },
+  "faqPage": {
+    "pageTitle": "FAQ - SailingLoc",
+    "heroBadge": "Help Center",
+    "heroTitle": "Frequently asked questions",
+    "heroSubtitle": "Bookings, peer-to-peer contracts, payments, and safety: the essential answers for renting or listing a boat on SailingLoc. Can't find what you're looking for?",
+    "categoriesLabel": "Question categories",
+    "categories": {
+      "all": "All",
+      "reservations": "Bookings",
+      "paiements": "Payments",
+      "proprietaires": "Owners",
+      "securite": "Safety"
+    },
+    "empty": "No questions in this category.",
+    "ctaTitle": "Still looking for an answer?",
+    "ctaSubtitle": "Our team is available to help Monday through Friday, 9am to 6pm.",
+    "ctaButton": "Contact us",
+    "items": {
+      "res-comment-reserver": {
+        "q": "How do I book a boat on SailingLoc?",
+        "a": "Sign up, then search for a boat (port, dates, number of people) in France, Europe, or internationally. Choose a listing and click \"Book\": you are guided through to secure payment. A confirmed booking constitutes a rental contract between you and the owner."
+      },
+      "res-contrat": {
+        "q": "How do rental contracts work?",
+        "a": "SailingLoc is a peer-to-peer rental platform for registered individuals only. Every confirmed booking establishes a rental contract between the renter and the owner. SailingLoc acts as an intermediary and does not replace the obligations of either party."
+      },
+      "res-annuler": {
+        "q": "Can I cancel my booking?",
+        "a": "Yes, you can cancel from your \"My bookings\" area. Refund terms depend on the cancellation policy chosen by the owner (flexible, moderate, or strict) and how far in advance you cancel before departure."
+      },
+      "res-refus": {
+        "q": "What happens if the owner declines my request?",
+        "a": "If your request is declined, no amount is charged and the request is closed. You receive a notification and can immediately search for another boat. SailingLoc does not charge anything when a request is declined."
+      },
+      "res-delai": {
+        "q": "How far in advance should I book?",
+        "a": "SailingLoc does not impose a minimum lead time, but each owner can set a minimum notice period (for example 24 or 48 hours). This period is shown on the listing. We recommend booking at least one week ahead in peak season."
+      },
+      "res-modifier-dates": {
+        "q": "Can I change the dates after confirmation?",
+        "a": "Changing dates after confirmation requires the owner's agreement. Contact them via the built-in messaging. If you reach an agreement, the booking will be cancelled and recreated with the new dates, subject to the applicable cancellation policy."
+      },
+      "pai-modes": {
+        "q": "Which payment methods are accepted?",
+        "a": "SailingLoc accepts major credit and debit cards (Visa, Mastercard, American Express) via Stripe, our secure payment partner. Bank transfers and cash are not accepted on the platform."
+      },
+      "pai-debit": {
+        "q": "When am I charged?",
+        "a": "The full amount is charged online via Stripe as soon as you confirm your booking. The booking automatically moves to \"Confirmed\" status after a successful payment."
+      },
+      "pai-caution": {
+        "q": "How does the security deposit work?",
+        "a": "The owner can set a security deposit amount in their listing. This amount is shown for information only: the actual handling (card hold or deposit) is arranged directly between renter and owner before departure."
+      },
+      "pai-remboursement": {
+        "q": "Can I get a refund if I cancel?",
+        "a": "Yes, subject to the owner's cancellation policy. With a flexible policy, you are fully refunded up to 24 hours before departure. With a strict policy, only 50% may be refunded. SailingLoc service fees are non-refundable."
+      },
+      "pai-frais": {
+        "q": "What are the service fees?",
+        "a": "SailingLoc takes 10% of each confirmed transaction. The exact service fee amount is always clearly shown before you confirm a booking."
+      },
+      "pro-mettre-en-location": {
+        "q": "How do I list my boat for rent?",
+        "a": "Create an individual account, select the \"Owner\" role, then add your boat (type, capacity, equipment, rate, photos). After verification, your listing goes live: you rent only to other registered individuals, under a rental contract created with each booking."
+      },
+      "pro-documents": {
+        "q": "What documents are required to publish a listing?",
+        "a": "You must provide the boat's registration documents, your ID, and a valid navigation insurance certificate. These documents are reviewed by our team before your listing goes online."
+      },
+      "pro-commissions": {
+        "q": "How are SailingLoc commissions calculated?",
+        "a": "SailingLoc takes 10% of each confirmed transaction. The breakdown is shown before booking confirmation and in your owner dashboard (earnings)."
+      },
+      "pro-paiements": {
+        "q": "How and when do I receive my payments?",
+        "a": "The renter pays online via Stripe when booking. Payouts to the owner are tracked in the \"Earnings\" area. Automatic transfers via Stripe Connect are planned for phase 2."
+      },
+      "pro-bloquer-dates": {
+        "q": "Can I block dates on my calendar?",
+        "a": "Yes. From your owner dashboard, open \"Availability\" for each boat. You can block periods for personal use, maintenance, or any other reason. Those dates will not appear as available to renters."
+      },
+      "sec-assurance": {
+        "q": "Are boats covered by insurance?",
+        "a": "Each owner must provide valid navigation insurance covering rental to third parties. SailingLoc checks these documents before listings go live and works with insurance partners. Also review coverage terms with the owner before departure."
+      },
+      "sec-dommages": {
+        "q": "What happens if there is damage during the rental?",
+        "a": "If damage occurs, report it immediately via messaging and fill out the incident form available in your booking. SailingLoc mediates between renter and owner. Any security deposit is handled directly between the parties based on the findings."
+      },
+      "sec-verification-locataires": {
+        "q": "How does SailingLoc verify renters?",
+        "a": "Only registered users can book. During sign-up, renters must provide a valid ID. A review system lets owners see feedback left by other members. Unverified profiles are flagged to owners."
+      },
+      "sec-permis": {
+        "q": "Is a boating license required?",
+        "a": "It depends on the boat type and sailing area. For boats over 6 HP at sea or on regulated lakes, a recreational boating license is required. The owner indicates in their listing whether a license is needed."
+      },
+      "sec-verification-proprietaires": {
+        "q": "Does SailingLoc verify owners' identity?",
+        "a": "Yes. Before any listing is published, owners go through identity and document verification (ID, proof of ownership or boat management contract, insurance). This process helps ensure the reliability of published listings."
+      }
     }
   },
   "createEditBoat": {
@@ -1122,6 +1265,178 @@
       "welcomeMessage": "Welcome message",
       "photos": "Boat photos",
       "documents": "Official documents"
+    }
+  },
+  "ownerGuidePage": {
+    "pageTitle": "Owner guide",
+    "heroBadge": "Owner guide",
+    "heroTitle": "Rent your boat peer to peer",
+    "heroSubtitle": "List your sailboat or motorboat, sign rental contracts with registered renters, and estimate your earnings after SailingLoc's 10% fee.",
+    "heroCta": "Become an owner — it's free",
+    "stepsTitle": "5 steps to start renting",
+    "steps": {
+      "1": { "title": "Create your owner account", "desc": "Sign up for free as an individual and select the \"Owner\" role. On SailingLoc, you only rent to other registered individuals." },
+      "2": { "title": "Publish your listing", "desc": "Enter the details of your sailboat or motorboat (type, length, capacity, equipment) and add great photos. A complete listing attracts more renters in France, across Europe, and internationally." },
+      "3": { "title": "Manage your availability", "desc": "Set your availability calendar, your rates (daily, weekly), and your cancellation policy. You stay in control of your schedule at all times." },
+      "4": { "title": "Sign rental contracts", "desc": "Each confirmed booking creates a rental contract between you and the renter. SailingLoc acts as intermediary; payment is secured via Stripe (10% service fee on each transaction)." },
+      "5": { "title": "Build your reputation", "desc": "Renter reviews boost your listing's visibility. A well-rated profile can double its earnings within a few months." }
+    },
+    "boatTypes": {
+      "INFLATABLE": "RIB / Inflatable",
+      "MOTORBOAT": "Motorboat",
+      "SAILBOAT": "Sailboat",
+      "CATAMARAN": "Catamaran"
+    },
+    "estimatorTitle": "Estimate your earnings",
+    "boatTypeLabel": "Boat type",
+    "daysPerMonthLabel": "Days rented per month:",
+    "daysMin": "1 d",
+    "daysMax": "25 d",
+    "avgDailyRate": "Average daily rate",
+    "netMonthly": "Net earnings / month",
+    "netYearly": "Net earnings / year ({{months}} months)",
+    "estimatorNote": "* Indicative estimate after deducting the 10% collected by SailingLoc on each transaction (~{{percent}}%). Excludes boat-related costs (maintenance, marina, insurance).",
+    "documentsTitle": "Required documents",
+    "documents": [
+      "Boat registration / certificate of nationality",
+      "Valid photo ID of the owner",
+      "Valid navigation insurance certificate (liability + damage)",
+      "Recent photos of the boat (exterior, interior, cockpit)",
+      "Certificate of conformity or inspection report (if applicable)",
+      "Rental contract (template or owner document, if you have one)",
+      "IBAN for future payouts (Stripe Connect, phase 2)"
+    ],
+    "ctaTitle": "Ready to rent out your boat?",
+    "ctaSubtitle": "Free signup for individuals. Publish your listing and sign your rental contracts in a few minutes.",
+    "ctaButton": "Create my owner account"
+  },
+  "becomeOwnerPage": {
+    "pageTitle": "Become an owner",
+    "heroBadge": "Exclusivity & Peace of mind",
+    "heroTitle": "Optimize the management of your exceptional boat.",
+    "heroSubtitle": "Join SailingLoc and turn your passion for sailing into a calm, high-performing investment.",
+    "heroCtaStart": "Get started",
+    "heroCtaGuide": "View the owner guide",
+    "stats": {
+      "boats": "Boats under management",
+      "rating": "Owner rating",
+      "revenue": "Revenue generated",
+      "support": "Owner support"
+    },
+    "whyLabel": "Our commitments",
+    "whyTitle": "Why entrust your boat to SailingLoc?",
+    "whySubtitle": "Turnkey management, optimized earnings, and complete peace of mind for demanding owners.",
+    "why": {
+      "income": { "title": "Optimized rental income", "desc": "Dynamic pricing algorithms to maximize your returns by season and demand." },
+      "secure": { "title": "Secure rentals", "desc": "Careful renter screening, navigation insurance, and secure payments via Stripe." },
+      "concierge": { "title": "Dedicated concierge", "desc": "Maintenance, renter welcome, and day-to-day operations handled by our teams." }
+    },
+    "journeyTitle": "Your path to peace of mind",
+    "steps": {
+      "1": { "title": "Free assessment", "desc": "Our experts analyze the rental potential of your boat within 48 hours." },
+      "2": { "title": "Go live", "desc": "Professional photo shoot and a listing optimized for search visibility." },
+      "3": { "title": "Earn & sail", "desc": "Earn income while keeping the dates you want to sail for yourself." }
+    },
+    "ctaTitle": "Ready to set sail toward success?",
+    "ctaSubtitle": "Join the Mediterranean's most prestigious fleet and get started today.",
+    "ctaButton": "Start now"
+  },
+  "legalPages": {
+    "cgu": {
+      "pageTitle": "Terms of Use",
+      "title": "Terms of Use",
+      "lastUpdated": "Last updated: July 16, 2026",
+      "articles": {
+        "1": { "title": "Article 1 - Purpose", "body": "These Terms of Use govern access to and use of the SailingLoc platform, available at sailingloc.fr and published by SailingLoc SAS. SailingLoc is an intermediary platform that enables registered individuals to enter into peer-to-peer rental contracts for sailboats and motorboats in France, Europe, and internationally. By accessing the platform, the user unreservedly accepts these Terms of Use." },
+        "2": { "title": "Article 2 - Nature of the service", "body": "SailingLoc acts exclusively as a technical intermediary. Rentals are concluded solely between registered individuals. SailingLoc does not own the boats listed and is not a party to the rental contract, except for the matching, payment, and support services associated with the platform." },
+        "3": { "title": "Article 3 - Access to the platform", "body": "Browsing the site is free. Registration is required to rent a boat, publish a listing, or enter into a rental contract. Access is reserved for adults. The Company reserves the right to suspend any user in the event of a breach of these Terms of Use." },
+        "4": { "title": "Article 4 - Registration and user account", "body": "The user agrees to provide accurate and up-to-date information. Identity theft is prohibited. The user is solely responsible for the confidentiality of their credentials. Only registered and active accounts may enter into rental contracts via the platform." },
+        "5": { "title": "Article 5 - User obligations", "body": "The user agrees to use the platform in accordance with applicable laws and to offer only peer-to-peer rentals between individuals. It is prohibited to circumvent SailingLoc's payment systems or to use the platform for a professional rental activity that is not declared as such." },
+        "6": { "title": "Article 6 - Bookings and rental contracts", "body": "Any confirmed booking constitutes a rental contract between the renter and the owner, both of whom are registered individuals. SailingLoc acts as an intermediary. The owner has 24 hours to accept or decline a request. In the event of no response, the booking is automatically cancelled." },
+        "7": { "title": "Article 7 - Payments and commissions", "body": "Payments are processed by Stripe. SailingLoc collects 10% of each confirmed transaction as platform service fees. The exact amount is displayed before the booking is confirmed. Refunds are subject to the owner's cancellation policy." },
+        "8": { "title": "Article 8 - Insurance", "body": "Each owner agrees to hold valid navigation insurance covering rental to third parties. SailingLoc may collaborate with insurance partners; this does not relieve the owner of their obligations, nor the renter of the duty to verify coverage terms before departure." },
+        "9": { "title": "Article 9 - Termination", "body": "The user may delete their account from their settings. Financial obligations arising before termination remain due." },
+        "10": { "title": "Article 10 - Governing law", "body": "These Terms of Use are governed by French law. In the event of a dispute, the competent courts of Marseille shall have jurisdiction." }
+      }
+    },
+    "mentions": {
+      "pageTitle": "Legal Notice",
+      "title": "Legal Notice",
+      "lastUpdated": "Last updated: January 1, 2026",
+      "publisherTitle": "Website publisher",
+      "publisherP1Before": "The website sailingloc.fr is published by ",
+      "publisherP1After": ", a simplified joint-stock company (société par actions simplifiée) with share capital of €10,000, registered with the Marseille Trade and Companies Register under number RCS 123 456 789.",
+      "publisherOffice": "Registered office: 12 Quai de la Joliette, 13002 Marseille, France.",
+      "publisherDirector": "Publication director: Lucas Martin, President of SailingLoc SAS.",
+      "publisherContact": "Contact: contact@sailingloc.fr",
+      "hostingTitle": "Hosting",
+      "hostingP1Before": "The website is hosted by ",
+      "hostingP1After": ", 340 Pine Street, Suite 900, San Francisco, CA 94104, USA — for the frontend.",
+      "hostingP2Before": "The backend is hosted by ",
+      "hostingP2After": ", 340 S Lemon Ave #4133, Walnut, CA 91789, USA.",
+      "hostingP3Before": "Media (boat photos) are hosted by ",
+      "hostingP3After": ", 3400 Central Expy Suite 110, Santa Clara, CA 95051, USA.",
+      "ipTitle": "Intellectual property",
+      "ipP1": "All elements of the website (texts, images, logos, graphics, source code) are the exclusive property of SailingLoc SAS, unless otherwise stated.",
+      "ipP2": "Any reproduction, representation, modification, or exploitation, in whole or in part, of the website content, by any means whatsoever, without the express prior authorization of SailingLoc SAS, is strictly prohibited and would constitute infringement under Articles L.335-2 et seq. of the French Intellectual Property Code.",
+      "cookiesTitle": "Cookies",
+      "cookiesTextBefore": "The website uses cookies for technical, analytics, and advertising purposes. To learn more, please see our",
+      "cookiesLink": "Cookie Policy",
+      "dataProtectionTitle": "Data protection - CNIL",
+      "dataProtectionP1": "In accordance with French Law No. 78-17 of January 6, 1978 on information technology, files, and civil liberties (the French Data Protection Act) and the General Data Protection Regulation (GDPR), you have the right to access, rectify, erase, and port your personal data.",
+      "dataProtectionP2Before": "To exercise these rights, send your request to:",
+      "dataProtectionP3Before": "For more information, please see our",
+      "dataProtectionLink": "GDPR Policy"
+    },
+    "rgpd": {
+      "pageTitle": "Data Protection Policy (GDPR)",
+      "title": "Data Protection Policy (GDPR)",
+      "lastUpdated": "Last updated: January 1, 2026",
+      "sections": {
+        "1": { "title": "1. Data controller", "body": "SailingLoc SAS, 12 Quai de la Joliette, 13002 Marseille — contact@sailingloc.fr. DPO: dpo@sailingloc.fr" },
+        "2": { "title": "2. Data collected", "body": "Identity (last name, first name, date of birth, ID document), Contact (email, phone), Account (username, role), Financial (owners' IBAN, card via Stripe), Browsing (IP, technical cookies), User-generated content (listings, reviews, messages, photos)." },
+        "3": { "title": "3. Purposes", "body": "Account management and authentication, matching and bookings, payment processing via Stripe, transactional notifications, fraud prevention, service improvement, and legal obligations." },
+        "4": { "title": "4. Retention period", "body": "Active account for the duration of the contractual relationship; deleted account retained for 3 years after deletion; payment data for 5 years (French Commercial Code); browsing logs for a maximum of 12 months." },
+        "5": { "title": "5. Your rights", "bodyBefore": "Right of access, rectification, erasure (right to be forgotten), portability, objection, and restriction. You may lodge a complaint with the CNIL at", "bodyAfter": "." },
+        "6": { "title": "6. Transfers outside the EU", "body": "Vercel Inc. (USA) frontend hosting, Railway Corp. (USA) backend hosting, Cloudinary Ltd. (USA) photo storage, Stripe Inc. (USA) PCI-DSS certified payments, Resend Inc. (USA) transactional emails. All are governed by Standard Contractual Clauses (SCCs)." },
+        "7": { "title": "7. DPO contact", "body": "dpo@sailingloc.fr: response within one month." }
+      }
+    },
+    "cookies": {
+      "pageTitle": "Cookie Policy",
+      "title": "Cookie Policy",
+      "lastUpdated": "Last updated: January 1, 2026",
+      "section1Title": "1. What is a cookie?",
+      "section1P1": "A cookie is a small text file placed on your device (computer, smartphone, or tablet) when you visit a website. It allows the site to remember your preferences and improve your browsing experience.",
+      "section1P2": "Cookies do not contain viruses and cannot read other files on your device. They are strictly limited to the purposes described below.",
+      "section2Title": "2. Types of cookies used",
+      "section2Intro": "SailingLoc uses three categories of cookies:",
+      "table": {
+        "typeHeader": "Type",
+        "purposeHeader": "Purpose",
+        "durationHeader": "Duration",
+        "consentHeader": "Consent",
+        "required": "Required",
+        "notRequired": "Not required"
+      },
+      "types": {
+        "essential": { "type": "Essential cookies", "purpose": "Authentication, security, user session", "duration": "Session / 7 days", "consent": "notRequired" },
+        "analytics": { "type": "Analytics cookies", "purpose": "Audience measurement, page improvement (anonymized)", "duration": "13 months", "consent": "required" },
+        "marketing": { "type": "Marketing cookies", "purpose": "Ad personalization, retargeting", "duration": "30 days", "consent": "required" }
+      },
+      "section3Title": "3. Cookie lifetime",
+      "section3P1": "Session cookies expire automatically when you close your browser. Persistent cookies have a lifetime set out in the table above, starting from when they are placed. At the end of that period, they are automatically deleted.",
+      "section4Title": "4. How to manage your cookies",
+      "section4Intro": "You can accept or refuse non-essential cookies at any time from the consent banner shown on your first visit, or via your browser settings:",
+      "browsers": {
+        "chrome": "Settings → Privacy and security → Cookies",
+        "firefox": "Options → Privacy & Security → Cookies",
+        "safari": "Preferences → Privacy",
+        "edge": "Settings → Cookies and site permissions"
+      },
+      "section4Note": "Please note that refusing essential cookies may impair the platform's functionality (unable to sign in, loss of preferences).",
+      "section5Title": "5. Contact",
+      "section5TextBefore": "For any question about our use of cookies, contact our DPO at"
     }
   }
 }

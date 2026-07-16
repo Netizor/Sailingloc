@@ -14,6 +14,7 @@ import {
   FEATURED_TESTIMONIAL,
   TESTIMONIAL_STATS,
   TESTIMONIALS,
+  pickLocale,
   type TestimonialCategory,
 } from '../data/testimonials'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -39,7 +40,8 @@ const TRUST_PILLARS = [
 ] as const
 
 const Temoignages: React.FC = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language
   const [filter, setFilter] = useState<FilterKey>('all')
 
   usePageTitle(t('testimonials.pageTitle'))
@@ -134,7 +136,7 @@ const Temoignages: React.FC = () => {
               {t('testimonials.featuredLabel')}
             </p>
             <blockquote className="font-serif text-xl sm:text-2xl leading-relaxed mb-8">
-              &ldquo;{FEATURED_TESTIMONIAL.text}&rdquo;
+              &ldquo;{pickLocale(FEATURED_TESTIMONIAL.text, lang)}&rdquo;
             </blockquote>
             <div className="flex items-center gap-4">
               <div className="h-12 w-12 rounded-full bg-white/15 flex items-center justify-center text-sm font-bold">
@@ -143,7 +145,7 @@ const Temoignages: React.FC = () => {
               <div>
                 <p className="font-semibold">{FEATURED_TESTIMONIAL.name}</p>
                 <p className="text-sm text-ocean-200">
-                  {FEATURED_TESTIMONIAL.role} · {FEATURED_TESTIMONIAL.location}
+                  {pickLocale(FEATURED_TESTIMONIAL.role, lang)} · {FEATURED_TESTIMONIAL.location}
                 </p>
               </div>
             </div>

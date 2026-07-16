@@ -47,7 +47,7 @@ import { BOAT_TYPE_LABELS } from '../lib/labels'
 import { getBoatEquipment, getEnrichedDescription } from '../lib/boatContent'
 import { reportBoat } from '../api/reports.api'
 import type { ReportReason } from '../api/reports.api'
-import { getDemoBoat } from '../data/demoBoats'
+import { getBoatDescription, getDemoBoat, resolveLang } from '../data/demoBoats'
 import BoatDetailGallery from '../components/boats/BoatDetailGallery'
 import BoatAvailabilityCalendar from '../components/boats/BoatAvailabilityCalendar'
 import BoatOwnerCard from '../components/boats/BoatOwnerCard'
@@ -60,22 +60,35 @@ import Button from '../components/ui/Button'
 import Spinner from '../components/ui/Spinner'
 import toast from 'react-hot-toast'
 
-const DEMO_REVIEWS: Partial<Review>[] = [
+interface DemoReview extends Partial<Review> {
+  commentFr: string
+  commentEn: string
+}
+
+const DEMO_REVIEWS: DemoReview[] = [
   {
     id: 9001,
     rating: 5,
-    comment: 'Une expérience formidable ! Le propriétaire était super accueillant et le voilier en parfait état. Nous reviendrons sans hésiter.',
+    commentFr: "Une expérience incroyable ! Le propriétaire était très accueillant et le voilier en parfait état. Nous reviendrons sans hésiter.",
+    commentEn: 'An amazing experience! The owner was very welcoming and the sailboat was in perfect condition. We will definitely come back.',
+    comment: 'An amazing experience! The owner was very welcoming and the sailboat was in perfect condition. We will definitely come back.',
     createdAt: '2024-04-12',
     reviewer: { id: 1, firstName: 'Marc-Antoine', lastName: 'D.', email: '', role: UserRole.RENTER, kycVerified: true, isActive: true, createdAt: '' },
   },
   {
     id: 9002,
     rating: 5,
-    comment: 'Week-end parfait en famille. Le bateau est spacieux, bien équipé et idéalement situé. Communication fluide avec le propriétaire.',
+    commentFr: "Week-end en famille parfait. Le bateau est spacieux, bien équipé et idéalement situé. Communication fluide avec le propriétaire.",
+    commentEn: 'Perfect family weekend. The boat is spacious, well equipped and ideally located. Smooth communication with the owner.',
+    comment: 'Perfect family weekend. The boat is spacious, well equipped and ideally located. Smooth communication with the owner.',
     createdAt: '2024-03-28',
     reviewer: { id: 2, firstName: 'Sophie', lastName: 'L.', email: '', role: UserRole.RENTER, kycVerified: true, isActive: true, createdAt: '' },
   },
 ]
+
+function getDemoReviewComment(review: DemoReview, lang: string): string {
+  return resolveLang(lang) === 'en' ? review.commentEn : review.commentFr
+}
 
 // Associe chaque équipement à une icône pertinente (recherche par mot-clé)
 const EQUIPMENT_ICONS: { match: RegExp; icon: LucideIcon }[] = [
@@ -214,7 +227,11 @@ const BoatDetail: React.FC = () => {
   })
   const apiReviews = reviewsData?.data ?? []
   const reviewTotal = reviewsData?.total ?? boat?.reviewCount ?? 0
-  const displayReviews = apiReviews.length > 0 ? apiReviews : DEMO_REVIEWS
+  const localizedDemoReviews = useMemo(
+    () => DEMO_REVIEWS.map((review) => ({ ...review, comment: getDemoReviewComment(review, i18n.language) })),
+    [i18n.language],
+  )
+  const displayReviews = apiReviews.length > 0 ? apiReviews : localizedDemoReviews
 
   const reportMutation = useMutation({
     mutationFn: () => reportBoat({ boatId: boat!.id, reason: reportReason, details: reportDetails || undefined }),
@@ -269,14 +286,15 @@ const BoatDetail: React.FC = () => {
     const { bookingId } = stripePayment
     setStripePayment(null)
     try {
-      await bookingsApi.cancel(bookingId, { cancellationReason: 'Paiement abandonné' })
+      await bookingsApi.cancel(bookingId, { cancellationReason: 'Payment abandoned' })
     } catch {
       // La réservation a peut-être déjà été traitée
     }
   }
 
   const locationLabel = boat.city ? `${boat.city}, ${boat.country}` : `${boat.port}, ${boat.country}`
-  const description = getEnrichedDescription(boat)
+  const localizedDescription = getBoatDescription(boat, i18n.language)
+  const description = getEnrichedDescription({ ...boat, description: localizedDescription })
   const shortDesc = description.length > 900 ? description.slice(0, 900) + '…' : description
   const equipment = getBoatEquipment(boat)
   const interestedCount = Math.max(48, boat.reviewCount * 14 + (boat.id % 37) * 3)

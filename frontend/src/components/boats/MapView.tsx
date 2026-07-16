@@ -106,7 +106,7 @@ const MapView: React.FC<MapViewProps> = ({ boats, className, dark = false, fullH
     <div className={[dark ? `map-teal-blueprint ${className ?? ''}` : className, 'relative isolate z-0'].filter(Boolean).join(' ')}>
       {located.length === 0 && boats.length > 0 && (
         <p className="text-xs text-gray-400 mb-2 text-center">
-          Aucun bateau dans ces résultats n'a de coordonnées GPS.
+          None of the boats in these results have GPS coordinates.
         </p>
       )}
 
@@ -183,10 +183,10 @@ const PopupContent: React.FC<{ boat: Boat }> = ({ boat }) => (
     {/* Prix - formatPrice pour la cohérence avec le reste de l'UI */}
     <p style={{ fontWeight: 700, fontSize: '16px', color: '#f97316', marginBottom: '8px' }}>
       {formatPrice(boat.dailyRate)}
-      <span style={{ fontWeight: 400, fontSize: '12px', color: '#9ca3af' }}> /jour</span>
+      <span style={{ fontWeight: 400, fontSize: '12px', color: '#9ca3af' }}> /day</span>
     </p>
 
-    {/* Lien */}
+    {/* Link */}
     <Link
       to={`/bateaux/${boat.id}`}
       style={{
@@ -201,7 +201,7 @@ const PopupContent: React.FC<{ boat: Boat }> = ({ boat }) => (
         textDecoration: 'none',
       }}
     >
-      Voir l'annonce →
+      View listing →
     </Link>
   </div>
 )

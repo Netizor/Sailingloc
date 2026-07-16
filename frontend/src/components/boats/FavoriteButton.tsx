@@ -23,7 +23,7 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({ boatId, size = 'md', cl
       type="button"
       onClick={toggle}
       disabled={isPending}
-      aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+      aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
       aria-pressed={isFavorite}
       className={cn(
         'rounded-full transition-all duration-150 shadow-sm',

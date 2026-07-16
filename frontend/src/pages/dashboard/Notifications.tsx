@@ -57,29 +57,29 @@ const NOTIF_COLORS: Record<string, string> = {
 }
 
 const NOTIF_LABELS: Record<string, string> = {
-  BOOKING_REQUEST:    'Demande de réservation',
-  BOOKING_CONFIRMED:  'Réservation confirmée',
-  BOOKING_CANCELLED:  'Réservation annulée',
-  BOOKING_COMPLETED:  'Réservation terminée',
-  PAYMENT_RECEIVED:   'Paiement reçu',
-  NEW_REVIEW:         'Nouvel avis',
-  NEW_MESSAGE:        'Nouveau message',
-  KYC_APPROVED:       'Vérification approuvée',
-  KYC_REJECTED:       'Vérification rejetée',
-  BOAT_APPROVED:      'Annonce approuvée',
-  BOAT_REJECTED:      'Annonce rejetée',
-  BOAT_CREATED:       'Nouvelle annonce',
-  BOAT_STATUS_CHANGED:'Annonce mise à jour',
-  BOAT_DELETED:       'Annonce supprimée',
+  BOOKING_REQUEST:    'Booking request',
+  BOOKING_CONFIRMED:  'Booking confirmed',
+  BOOKING_CANCELLED:  'Booking cancelled',
+  BOOKING_COMPLETED:  'Booking completed',
+  PAYMENT_RECEIVED:   'Payment received',
+  NEW_REVIEW:         'New review',
+  NEW_MESSAGE:        'New message',
+  KYC_APPROVED:       'Verification approved',
+  KYC_REJECTED:       'Verification rejected',
+  BOAT_APPROVED:      'Listing approved',
+  BOAT_REJECTED:      'Listing rejected',
+  BOAT_CREATED:       'New listing',
+  BOAT_STATUS_CHANGED:'Listing updated',
+  BOAT_DELETED:       'Listing deleted',
 }
 
 const PREF_GROUPS = [
   {
-    label: 'Réservations',
+    label: 'Bookings',
     types: ['BOOKING_REQUEST', 'BOOKING_CONFIRMED', 'BOOKING_CANCELLED', 'BOOKING_COMPLETED'],
   },
   {
-    label: 'Paiements & Avis',
+    label: 'Payments & Reviews',
     types: ['PAYMENT_RECEIVED', 'NEW_REVIEW'],
   },
   {
@@ -87,17 +87,17 @@ const PREF_GROUPS = [
     types: ['NEW_MESSAGE'],
   },
   {
-    label: 'Annonces',
+    label: 'Listings',
     types: ['BOAT_APPROVED', 'BOAT_REJECTED', 'BOAT_CREATED', 'BOAT_STATUS_CHANGED', 'BOAT_DELETED'],
   },
   {
-    label: 'Compte',
+    label: 'Account',
     types: ['KYC_APPROVED', 'KYC_REJECTED'],
   },
 ] as const
 
 function formatDate(date: string): string {
-  return new Date(date).toLocaleDateString('fr-FR', {
+  return new Date(date).toLocaleDateString('en-US', {
     day: 'numeric', month: 'long', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
   })
@@ -188,10 +188,10 @@ const Notifications: React.FC = () => {
           {total > 0 && (
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
               {total} notification{total > 1 ? 's' : ''}
-              {unreadCount > 0 && ` · ${unreadCount} non lue${unreadCount > 1 ? 's' : ''}`}
+              {unreadCount > 0 && ` · ${unreadCount} unread`}
               {disabledCount > 0 && (
                 <span className="ml-1 text-gray-400">
-                  · {disabledCount} type{disabledCount > 1 ? 's' : ''} masqué{disabledCount > 1 ? 's' : ''}
+                  · {disabledCount} type{disabledCount > 1 ? 's' : ''} hidden
                 </span>
               )}
             </p>
@@ -206,7 +206,7 @@ const Notifications: React.FC = () => {
               disabled={readAllMutation.isPending}
             >
               <CheckCheck size={15} className="mr-1.5" />
-              Tout marquer comme lu
+              Mark all as read
             </Button>
           )}
           <button
@@ -217,7 +217,7 @@ const Notifications: React.FC = () => {
                 ? 'bg-ocean-100 dark:bg-ocean-900/30 text-ocean-700 dark:text-ocean-400'
                 : 'text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-600 dark:hover:text-gray-300',
             )}
-            title="Préférences de notifications"
+            title="Notification preferences"
           >
             <Settings size={17} />
           </button>
@@ -229,10 +229,10 @@ const Notifications: React.FC = () => {
         <div className="mb-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
           <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 dark:border-gray-800">
             <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-              Préférences de notifications
+              Notification preferences
             </p>
             <p className="text-xs text-gray-400">
-              Masque les types sélectionnés sur cette page
+              Hide selected types on this page
             </p>
           </div>
           <div className="p-5 grid sm:grid-cols-2 gap-x-8 gap-y-5">
@@ -273,8 +273,8 @@ const Notifications: React.FC = () => {
             <Bell size={16} className="text-ocean-600 dark:text-ocean-400 flex-shrink-0" />
             <p className="text-sm text-ocean-800 dark:text-ocean-300">
               {push.isSubscribed
-                ? 'Notifications push activées sur cet appareil'
-                : 'Activez les notifications push pour ne rien manquer'}
+                ? 'Push notifications enabled on this device'
+                : 'Enable push notifications so you never miss an update'}
             </p>
           </div>
           <button
@@ -288,9 +288,9 @@ const Notifications: React.FC = () => {
             )}
           >
             {push.isLoading ? '…' : push.isSubscribed ? (
-              <span className="flex items-center gap-1"><BellOff size={12} /> Désactiver</span>
+              <span className="flex items-center gap-1"><BellOff size={12} /> Disable</span>
             ) : (
-              <span className="flex items-center gap-1"><Bell size={12} /> Activer</span>
+              <span className="flex items-center gap-1"><Bell size={12} /> Enable</span>
             )}
           </button>
         </div>
@@ -300,12 +300,12 @@ const Notifications: React.FC = () => {
       {disabledCount > 0 && !showPrefs && (
         <div className="mb-4 flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
           <EyeOff size={13} />
-          {disabledCount} type{disabledCount > 1 ? 's' : ''} de notification masqué{disabledCount > 1 ? 's' : ''} :{' '}
+          {disabledCount} notification type{disabledCount > 1 ? 's' : ''} hidden:{' '}
           <button
             className="underline hover:text-gray-600 dark:hover:text-gray-300"
             onClick={() => setShowPrefs(true)}
           >
-            modifier
+            edit
           </button>
         </div>
       )}
@@ -318,11 +318,11 @@ const Notifications: React.FC = () => {
       ) : notifications.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
           <Bell size={40} strokeWidth={1.5} className="text-gray-200 dark:text-gray-700" />
-          <p className="text-gray-500 dark:text-gray-400 font-medium">Aucune notification pour l'instant</p>
+          <p className="text-gray-500 dark:text-gray-400 font-medium">No notifications yet</p>
           <p className="text-sm text-gray-400 dark:text-gray-500">
             {disabledCount > 0
-              ? 'Certains types sont masqués : vérifiez vos préférences.'
-              : 'Vous serez notifié des activités importantes ici.'}
+              ? 'Some types are hidden — check your preferences.'
+              : 'You will be notified here about important activity.'}
           </p>
         </div>
       ) : (
@@ -342,13 +342,13 @@ const Notifications: React.FC = () => {
       {totalPages > 1 && (
         <div className="flex items-center justify-between mt-6">
           <Button variant="secondary" size="sm" onClick={() => setPage(p => p - 1)} disabled={page <= 1}>
-            <ChevronLeft size={15} className="mr-1" /> Précédent
+            <ChevronLeft size={15} className="mr-1" /> Previous
           </Button>
           <span className="text-sm text-gray-500 dark:text-gray-400">
-            Page {page} sur {totalPages}
+            Page {page} of {totalPages}
           </span>
           <Button variant="secondary" size="sm" onClick={() => setPage(p => p + 1)} disabled={page >= totalPages}>
-            Suivant <ChevronRight size={15} className="ml-1" />
+            Next <ChevronRight size={15} className="ml-1" />
           </Button>
         </div>
       )}
@@ -400,12 +400,12 @@ const NotifRow: React.FC<NotifRowProps> = ({ notif, onRead, onDelete }) => {
               onClick={onRead}
               className="text-xs text-ocean-600 dark:text-ocean-400 hover:text-ocean-800 font-medium px-2.5 py-1.5 rounded-lg hover:bg-ocean-50 dark:hover:bg-ocean-900/30 transition-colors whitespace-nowrap"
             >
-              Afficher les détails
+              View details
             </Link>
             <button
               onClick={onDelete}
               className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-100 hover:text-red-500 text-gray-300 dark:text-gray-600 transition-all"
-              aria-label="Supprimer"
+              aria-label="Delete"
             >
               <X size={14} />
             </button>

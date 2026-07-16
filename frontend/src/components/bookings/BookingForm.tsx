@@ -504,7 +504,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
         {savedAt && (
           <p className="text-xs text-center text-gray-400">
-            Sélection sauvegardée à {savedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+            Selection saved at {savedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
           </p>
         )}
 

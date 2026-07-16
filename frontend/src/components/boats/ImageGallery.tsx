@@ -24,7 +24,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, title, className })
         )}
       >
         <Anchor size={52} className="text-blue-200" strokeWidth={1.5} />
-        <span className="text-sm text-blue-300 font-medium">Aucune photo disponible</span>
+        <span className="text-sm text-blue-300 font-medium">No photos available</span>
       </div>
     )
   }
@@ -48,7 +48,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, title, className })
         onClick={() => setLightboxOpen(true)}
         role="button"
         tabIndex={0}
-        aria-label="Agrandir l'image"
+        aria-label="Enlarge image"
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setLightboxOpen(true) }}
       >
         <img
@@ -60,7 +60,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, title, className })
         {/* Zoom hint */}
         <div className="absolute bottom-3 right-3 bg-black/50 text-white rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 text-xs opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
           <ZoomIn size={13} />
-          Agrandir
+          Enlarge
         </div>
 
         {/* Arrow nav on main */}
@@ -98,7 +98,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, title, className })
             >
               <img
                 src={img}
-                alt={`${title} - miniature ${i + 1}`}
+                alt={`${title} - thumbnail ${i + 1}`}
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
@@ -161,13 +161,13 @@ const Lightbox: React.FC<LightboxProps> = ({
       className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center"
       role="dialog"
       aria-modal="true"
-      aria-label="Galerie photo"
+      aria-label="Photo gallery"
     >
       {/* Close button */}
       <button
         onClick={onClose}
         className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-10"
-        aria-label="Fermer"
+        aria-label="Close"
       >
         <X size={22} />
       </button>
@@ -228,7 +228,7 @@ const NavArrow: React.FC<{ direction: 'left' | 'right'; onClick: (e: React.Mouse
       'absolute top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/40 hover:bg-black/60 text-white transition-colors backdrop-blur-sm z-10',
       direction === 'left' ? 'left-3' : 'right-3'
     )}
-    aria-label={direction === 'left' ? 'Image précédente' : 'Image suivante'}
+    aria-label={direction === 'left' ? 'Previous image' : 'Next image'}
   >
     {direction === 'left' ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
   </button>

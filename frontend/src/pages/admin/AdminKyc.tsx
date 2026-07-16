@@ -19,14 +19,14 @@ const KycCard: React.FC<{ user: PendingKycUser }> = ({ user }) => {
     mutationFn: (payload: { status: 'APPROVED' | 'REJECTED'; rejectionReason?: string; documentExpiresAt?: string }) =>
       kycApi.review(user.id, payload),
     onSuccess: (_, { status }) => {
-      toast.success(status === 'APPROVED' ? 'Identité approuvée' : 'Identité refusée')
+      toast.success(status === 'APPROVED' ? 'Identity approved' : 'Identity rejected')
       setRejectOpen(false)
       setApproveOpen(false)
       setRejectionReason('')
       setDocumentExpiresAt('')
       queryClient.invalidateQueries({ queryKey: ['admin', 'kyc', 'pending'] })
     },
-    onError: () => toast.error('Erreur lors de la validation KYC'),
+    onError: () => toast.error('Error during KYC validation'),
   })
 
   return (
@@ -37,13 +37,13 @@ const KycCard: React.FC<{ user: PendingKycUser }> = ({ user }) => {
             <h3 className="font-semibold text-gray-900 dark:text-gray-100">
               {user.firstName} {user.lastName}
             </h3>
-            <Badge variant="warning">En attente</Badge>
+            <Badge variant="warning">Pending</Badge>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-            Rôle : {user.role}
+            Role: {user.role}
             {user.kycSubmittedAt && (
-              <> · Soumis le {formatDate(user.kycSubmittedAt)}</>
+              <> · Submitted on {formatDate(user.kycSubmittedAt)}</>
             )}
           </p>
           <div className="flex flex-wrap gap-3 mt-3">
@@ -54,7 +54,7 @@ const KycCard: React.FC<{ user: PendingKycUser }> = ({ user }) => {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-xs text-ocean-600 dark:text-ocean-400 hover:underline"
               >
-                <ExternalLink size={12} /> Recto
+                <ExternalLink size={12} /> Front
               </a>
             )}
             {user.kycBackDoc && (
@@ -64,7 +64,7 @@ const KycCard: React.FC<{ user: PendingKycUser }> = ({ user }) => {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-xs text-ocean-600 dark:text-ocean-400 hover:underline"
               >
-                <ExternalLink size={12} /> Verso
+                <ExternalLink size={12} /> Back
               </a>
             )}
           </div>
@@ -78,7 +78,7 @@ const KycCard: React.FC<{ user: PendingKycUser }> = ({ user }) => {
             onClick={() => { setApproveOpen(true); setRejectOpen(false) }}
             leftIcon={<CheckCircle size={14} />}
           >
-            Approuver
+            Approve
           </Button>
           <Button
             variant="danger"
@@ -87,7 +87,7 @@ const KycCard: React.FC<{ user: PendingKycUser }> = ({ user }) => {
             onClick={() => { setRejectOpen(true); setApproveOpen(false) }}
             leftIcon={<XCircle size={14} />}
           >
-            Refuser
+            Reject
           </Button>
         </div>
       </div>
@@ -95,7 +95,7 @@ const KycCard: React.FC<{ user: PendingKycUser }> = ({ user }) => {
       {approveOpen && (
         <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Date de fin de validité (indiquée sur la pièce)
+            Expiry date (shown on the document)
           </label>
           <input
             type="date"
@@ -104,11 +104,11 @@ const KycCard: React.FC<{ user: PendingKycUser }> = ({ user }) => {
             className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
           />
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            Lisez la date sur le recto ou verso de la CNI / passeport (souvent 10 ou 15 ans).
+            Read the date on the front or back of the ID / passport (often 10 or 15 years).
           </p>
           <div className="flex gap-2">
             <Button variant="secondary" size="sm" onClick={() => setApproveOpen(false)}>
-              Annuler
+              Cancel
             </Button>
             <Button
               variant="primary"
@@ -119,7 +119,7 @@ const KycCard: React.FC<{ user: PendingKycUser }> = ({ user }) => {
                 documentExpiresAt: documentExpiresAt || undefined,
               })}
             >
-              Confirmer l&apos;approbation
+              Confirm approval
             </Button>
           </div>
         </div>
@@ -128,18 +128,18 @@ const KycCard: React.FC<{ user: PendingKycUser }> = ({ user }) => {
       {rejectOpen && (
         <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Motif du refus
+            Rejection reason
           </label>
           <textarea
             value={rejectionReason}
             onChange={(e) => setRejectionReason(e.target.value)}
             rows={3}
-            placeholder="Document illisible, expiré, informations incohérentes…"
+            placeholder="Document unreadable, expired, inconsistent information…"
             className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm resize-none bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
           />
           <div className="flex gap-2">
             <Button variant="secondary" size="sm" onClick={() => setRejectOpen(false)}>
-              Annuler
+              Cancel
             </Button>
             <Button
               variant="danger"
@@ -148,7 +148,7 @@ const KycCard: React.FC<{ user: PendingKycUser }> = ({ user }) => {
               disabled={!rejectionReason.trim()}
               onClick={() => reviewMutation.mutate({ status: 'REJECTED', rejectionReason: rejectionReason.trim() })}
             >
-              Confirmer le refus
+              Confirm rejection
             </Button>
           </div>
         </div>
@@ -169,10 +169,10 @@ const AdminKyc: React.FC = () => {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
           <ShieldCheck size={22} className="text-ocean-600" />
-          Vérifications d&apos;identité (KYC)
+          Identity verifications (KYC)
         </h1>
         <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-          {pending.length} demande(s) en attente de validation
+          {pending.length} request(s) pending validation
         </p>
       </div>
 
@@ -182,12 +182,12 @@ const AdminKyc: React.FC = () => {
         </div>
       ) : isError ? (
         <div className="bg-white dark:bg-gray-800 rounded-2xl border p-8 text-center text-red-500 text-sm">
-          Impossible de charger les demandes KYC.
+          Unable to load KYC requests.
         </div>
       ) : pending.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-10 text-center">
           <ShieldCheck size={40} className="mx-auto text-gray-300 dark:text-gray-600 mb-3" />
-          <p className="text-gray-500 dark:text-gray-400 text-sm">Aucune vérification en attente.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">No pending verifications.</p>
         </div>
       ) : (
         <div className="flex flex-col gap-4">

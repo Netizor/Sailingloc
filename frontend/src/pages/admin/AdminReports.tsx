@@ -10,18 +10,18 @@ import Spinner from '../../components/ui/Spinner'
 import toast from 'react-hot-toast'
 
 const REASON_LABELS: Record<string, string> = {
-  INAPPROPRIATE_CONTENT: 'Contenu inapproprié',
-  FRAUD:                 'Fraude',
-  DUPLICATE:             'Annonce dupliquée',
-  WRONG_CATEGORY:        'Mauvaise catégorie',
-  OTHER:                 'Autre',
+  INAPPROPRIATE_CONTENT: 'Inappropriate content',
+  FRAUD:                 'Fraud',
+  DUPLICATE:             'Duplicate listing',
+  WRONG_CATEGORY:        'Wrong category',
+  OTHER:                 'Other',
 }
 
 const STATUS_CONFIG: Record<string, { label: string; icon: React.ReactNode; variant: 'warning' | 'success' | 'default' }> = {
-  PENDING:   { label: 'En attente', icon: <Clock size={12} />,       variant: 'warning' },
-  PROCESSED: { label: 'Traité',     icon: <CheckCircle size={12} />, variant: 'success' },
-  DISMISSED: { label: 'Ignoré',     icon: <XCircle size={12} />,     variant: 'default' },
-  RESOLVED:  { label: 'Traité',     icon: <CheckCircle size={12} />, variant: 'success' },
+  PENDING:   { label: 'Pending',   icon: <Clock size={12} />,       variant: 'warning' },
+  PROCESSED: { label: 'Processed', icon: <CheckCircle size={12} />, variant: 'success' },
+  DISMISSED: { label: 'Dismissed', icon: <XCircle size={12} />,     variant: 'default' },
+  RESOLVED:  { label: 'Processed', icon: <CheckCircle size={12} />, variant: 'success' },
 }
 
 const PAGE_SIZE = 15
@@ -43,7 +43,7 @@ const AdminReports: React.FC = () => {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin', 'reports'] })
     },
-    onError: () => toast.error('Erreur lors de la mise à jour'),
+    onError: () => toast.error('Error updating report'),
   })
 
   const reports: Report[]  = data?.data ?? []
@@ -53,14 +53,14 @@ const AdminReports: React.FC = () => {
   const handleProcess = (report: Report) => {
     updateMutation.mutate(
       { id: report.id, payload: { status: 'PROCESSED' } },
-      { onSuccess: () => toast.success('Signalement marqué traité') },
+      { onSuccess: () => toast.success('Report marked as processed') },
     )
   }
 
   const handleDismiss = (report: Report) => {
     updateMutation.mutate(
       { id: report.id, payload: { status: 'DISMISSED' } },
-      { onSuccess: () => toast.success('Signalement ignoré') },
+      { onSuccess: () => toast.success('Report dismissed') },
     )
   }
 
@@ -69,18 +69,18 @@ const AdminReports: React.FC = () => {
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
             <Flag size={22} className="text-red-500" />
-            Signalements
+            Reports
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{total} signalement(s)</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{total} report(s)</p>
         </div>
 
-        {/* Filtre statut */}
+        {/* Status filter */}
         <div className="flex gap-2 mb-6">
           {[
-            { value: '',          label: 'Tous' },
-            { value: 'PENDING',   label: 'En attente' },
-            { value: 'PROCESSED', label: 'Traités' },
-            { value: 'DISMISSED', label: 'Ignorés' },
+            { value: '',          label: 'All' },
+            { value: 'PENDING',   label: 'Pending' },
+            { value: 'PROCESSED', label: 'Processed' },
+            { value: 'DISMISSED', label: 'Dismissed' },
           ].map((opt) => (
             <button
               key={opt.value}
@@ -104,14 +104,14 @@ const AdminReports: React.FC = () => {
             </div>
           ) : reports.length === 0 ? (
             <div className="text-center py-16 text-gray-400 dark:text-gray-500 text-sm">
-              Aucun signalement trouvé
+              No reports found
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-gray-50/60 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700">
-                    {['Annonce', 'Signalé par', 'Raison', 'Détails', 'Statut', 'Date', 'Actions'].map((h) => (
+                    {['Listing', 'Reported by', 'Reason', 'Details', 'Status', 'Date', 'Actions'].map((h) => (
                       <th
                         key={h}
                         className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap"
@@ -157,7 +157,7 @@ const AdminReports: React.FC = () => {
                                 loading={updateMutation.isPending}
                                 leftIcon={<CheckCircle size={12} />}
                               >
-                                Traité
+                                Processed
                               </Button>
                               <Button
                                 variant="ghost"
@@ -165,7 +165,7 @@ const AdminReports: React.FC = () => {
                                 onClick={() => handleDismiss(report)}
                                 loading={updateMutation.isPending}
                               >
-                                Ignorer
+                                Dismiss
                               </Button>
                             </div>
                           )}
@@ -183,11 +183,11 @@ const AdminReports: React.FC = () => {
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-6">
             <Button variant="secondary" size="sm" onClick={() => setPage((p) => p - 1)} disabled={page <= 1}>
-              <ChevronLeft size={15} className="mr-1" /> Précédent
+              <ChevronLeft size={15} className="mr-1" /> Previous
             </Button>
-            <span className="text-sm text-gray-500 dark:text-gray-400">Page {page} sur {totalPages}</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Page {page} of {totalPages}</span>
             <Button variant="secondary" size="sm" onClick={() => setPage((p) => p + 1)} disabled={page >= totalPages}>
-              Suivant <ChevronRight size={15} className="ml-1" />
+              Next <ChevronRight size={15} className="ml-1" />
             </Button>
           </div>
         )}

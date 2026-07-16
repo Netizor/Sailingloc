@@ -60,13 +60,13 @@ const AvatarSection: React.FC = () => {
     mutationFn: uploadAvatar,
     onSuccess: (updated) => {
       updateUser({ avatar: updated.avatar })
-      toast.success('Photo de profil mise à jour')
+      toast.success('Profile photo updated')
     },
     onError: (err: unknown) => {
       const msg = axios.isAxiosError(err)
         ? (err.response?.data as { message?: string })?.message
         : undefined
-      toast.error(msg || 'Erreur lors du téléchargement de la photo')
+      toast.error(msg || 'Error uploading photo')
     },
   })
 
@@ -76,12 +76,12 @@ const AvatarSection: React.FC = () => {
 
     // Validation côté client pour un retour immédiat, miroir des règles backend
     if (!ALLOWED_TYPES.includes(file.type)) {
-      toast.error('Format accepté : JPG, PNG ou WebP')
+      toast.error('Accepted formats: JPG, PNG, or WebP')
       e.target.value = ''
       return
     }
     if (file.size > MAX_AVATAR_SIZE) {
-      toast.error('La photo ne doit pas dépasser 5 Mo')
+      toast.error('Photo must not exceed 5 MB')
       e.target.value = ''
       return
     }
@@ -95,7 +95,7 @@ const AvatarSection: React.FC = () => {
 
   return (
     <div className={CARD}>
-      <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-6">Photo de profil</h2>
+      <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-6">Profile photo</h2>
       <div className="flex items-center gap-6">
         <div className="flex-shrink-0">
           <div className="h-24 w-24 rounded-full overflow-hidden bg-ocean-100 dark:bg-ocean-800/40 flex items-center justify-center ring-4 ring-ocean-50 dark:ring-ocean-900/40">
@@ -123,7 +123,7 @@ const AvatarSection: React.FC = () => {
             disabled={mutation.isPending}
             onClick={() => fileInputRef.current?.click()}
           >
-            Changer la photo
+            Change photo
           </Button>
           <p className="text-xs text-gray-400 dark:text-gray-500">JPG, PNG ou WebP · Max 5 Mo</p>
         </div>
@@ -182,10 +182,10 @@ const PersonalInfoSection: React.FC = () => {
         phone:     updated.phone,
         bio:       updated.bio,
       })
-      toast.success('Profil mis à jour')
+      toast.success('Profile updated')
     },
     onError: () => {
-      toast.error('Erreur lors de la mise à jour du profil')
+      toast.error('Error updating profile')
     },
   })
 
@@ -214,12 +214,12 @@ const PersonalInfoSection: React.FC = () => {
     <div className={CARD}>
       <div className="mb-6 flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Informations personnelles</h2>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Vos données visibles et modifiables en un seul endroit.</p>
+          <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Personal information</h2>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Your visible and editable details in one place.</p>
         </div>
         {!isEditing && (
           <Button type="button" variant="secondary" size="sm" leftIcon={<PencilLine size={14} />} onClick={() => setIsEditing(true)}>
-            Modifier
+            Edit
           </Button>
         )}
       </div>
@@ -227,13 +227,13 @@ const PersonalInfoSection: React.FC = () => {
       {!isEditing ? (
         <div className="space-y-4">
           <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
-            <p className="text-sm font-semibold text-gray-900">Nom complet</p>
+            <p className="text-sm font-semibold text-gray-900">Full name</p>
             <p className="mt-1 text-sm text-gray-600">{user?.firstName} {user?.lastName}</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
-              <p className="text-sm font-semibold text-gray-900">Téléphone</p>
-              <p className="mt-1 text-sm text-gray-600">{user?.phone || 'Non renseigné'}</p>
+              <p className="text-sm font-semibold text-gray-900">Phone</p>
+              <p className="mt-1 text-sm text-gray-600">{user?.phone || 'Not provided'}</p>
             </div>
             <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
               <p className="text-sm font-semibold text-gray-900">Email</p>
@@ -241,27 +241,27 @@ const PersonalInfoSection: React.FC = () => {
             </div>
           </div>
           <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
-            <p className="text-sm font-semibold text-gray-900">Biographie</p>
-            <p className="mt-1 text-sm text-gray-600">{user?.bio || 'Aucune biographie ajoutée.'}</p>
+            <p className="text-sm font-semibold text-gray-900">Bio</p>
+            <p className="mt-1 text-sm text-gray-600">{user?.bio || 'No bio added.'}</p>
           </div>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Input label="Prénom" name="firstName" value={form.firstName} onChange={handleChange} required />
-            <Input label="Nom" name="lastName" value={form.lastName} onChange={handleChange} required />
+            <Input label="First name" name="firstName" value={form.firstName} onChange={handleChange} required />
+            <Input label="Last name" name="lastName" value={form.lastName} onChange={handleChange} required />
           </div>
 
-          <Input label="Téléphone" name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder="+33 6 12 34 56 78" />
+          <Input label="Phone" name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder="+33 6 12 34 56 78" />
 
-          <Textarea label="Biographie" name="bio" rows={3} value={form.bio} onChange={handleChange} placeholder="Présentez-vous en quelques mots…" />
+          <Textarea label="Bio" name="bio" rows={3} value={form.bio} onChange={handleChange} placeholder="Tell us a bit about yourself…" />
 
           <div className="flex flex-wrap justify-end gap-2 pt-1">
             <Button type="button" variant="secondary" onClick={() => { setIsEditing(false); setForm({ firstName: user?.firstName ?? '', lastName: user?.lastName ?? '', phone: user?.phone ?? '', bio: user?.bio ?? '' }) }}>
-              Annuler
+              Cancel
             </Button>
             <Button type="submit" loading={mutation.isPending}>
-              Enregistrer
+              Save
             </Button>
           </div>
         </form>
@@ -315,10 +315,10 @@ const SailorCvSection: React.FC = () => {
       setForm(sailorCvToForm(updated))
       queryClient.invalidateQueries({ queryKey: ['owner-profile', String(user?.id)] })
       queryClient.invalidateQueries({ queryKey: ['boat'] })
-      toast.success('Informations enregistrées sur votre profil public.')
+      toast.success('Details saved to your public profile.')
     },
     onError: () => {
-      toast.error('Erreur lors de la mise à jour du CV de marin')
+      toast.error('Error updating sailor CV')
     },
   })
 
@@ -332,10 +332,10 @@ const SailorCvSection: React.FC = () => {
         sailorCvReviewedAt: updated.sailorCvReviewedAt,
         sailorCvRejectionReason: updated.sailorCvRejectionReason,
       })
-      toast.success('Justificatif envoyé pour validation')
+      toast.success('Supporting document submitted for review')
     },
     onError: () => {
-      toast.error("Erreur lors de l'envoi du justificatif")
+      toast.error('Error uploading supporting document')
     },
   })
 
@@ -361,12 +361,12 @@ const SailorCvSection: React.FC = () => {
     if (!file) return
     const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png']
     if (!allowedTypes.includes(file.type)) {
-      toast.error('Format accepté : PDF, JPG ou PNG')
+      toast.error('Accepted formats: PDF, JPG, or PNG')
       e.target.value = ''
       return
     }
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Le justificatif ne doit pas dépasser 5 Mo')
+      toast.error('Supporting document must not exceed 5 MB')
       e.target.value = ''
       return
     }
@@ -376,10 +376,10 @@ const SailorCvSection: React.FC = () => {
 
   const status = user?.sailorCvStatus ?? 'NOT_SUBMITTED'
   const statusLabel = {
-    NOT_SUBMITTED: 'Non vérifié',
-    PENDING: 'En attente de validation',
-    APPROVED: 'Vérifié par SailingLoc',
-    REJECTED: 'Refusé',
+    NOT_SUBMITTED: 'Not verified',
+    PENDING: 'Pending review',
+    APPROVED: 'Verified by SailingLoc',
+    REJECTED: 'Rejected',
   }[status]
   const statusClass = {
     NOT_SUBMITTED: 'bg-gray-50 text-gray-600 border-gray-200',
@@ -392,10 +392,10 @@ const SailorCvSection: React.FC = () => {
     <div className={CARD}>
       <div className="flex items-center gap-2.5 mb-1">
         <SectionIcon icon={<Anchor size={17} />} />
-        <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">CV de marin</h2>
+        <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Sailor CV</h2>
       </div>
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 ml-[46px]">
-        Ces informations sont affichées sur votre profil public et rassurent les locataires.
+        This information appears on your public profile and helps reassure renters.
       </p>
       <div className="mb-5 space-y-2">
         <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${statusClass}`}>
@@ -404,67 +404,67 @@ const SailorCvSection: React.FC = () => {
         </div>
         {status === 'NOT_SUBMITTED' && (
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            Enregistrer le formulaire sauvegarde vos informations sur votre profil public.
-            Le statut « Vérifié » nécessite l&apos;envoi d&apos;un justificatif (permis, diplôme…) validé par SailingLoc.
+            Saving the form updates your public profile.
+            A &quot;Verified&quot; status requires submitting a supporting document (license, diploma…) reviewed by SailingLoc.
           </p>
         )}
       </div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Input
-          label="Années d'expérience en navigation"
+          label="Years of sailing experience"
           name="sailingExperienceYears"
           type="number"
           min={0}
           max={100}
           value={form.sailingExperienceYears}
           onChange={handleChange}
-          placeholder="Ex : 12"
+          placeholder="e.g. 12"
         />
 
         <Textarea
-          label="Permis et qualifications"
+          label="Licenses and qualifications"
           name="sailingQualifications"
           rows={2}
           value={form.sailingQualifications}
           onChange={handleChange}
-          placeholder="Ex : Permis côtier, permis hauturier, certificat restreint de radiotéléphoniste…"
+          placeholder="e.g. Coastal license, offshore license, restricted radio certificate…"
         />
 
         <Textarea
-          label="Zones de navigation"
+          label="Sailing areas"
           name="sailingAreas"
           rows={2}
           value={form.sailingAreas}
           onChange={handleChange}
-          placeholder="Ex : Méditerranée, Atlantique, Manche…"
+          placeholder="e.g. Mediterranean, Atlantic, English Channel…"
         />
 
         <Textarea
-          label="Présentation de marin"
+          label="Sailor introduction"
           name="sailorBio"
           rows={4}
           value={form.sailorBio}
           onChange={handleChange}
-          placeholder="Décrivez votre parcours de marin, vos navigations marquantes, votre approche…"
+          placeholder="Describe your sailing background, notable trips, and approach…"
         />
 
         <div className="flex justify-end pt-1">
           <Button type="submit" loading={mutation.isPending}>
-            Enregistrer
+            Save
           </Button>
         </div>
       </form>
 
       <div className="mt-5 pt-5 border-t border-gray-100 dark:border-gray-700">
         <p className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">
-          Justificatif pour validation
+          Supporting document for verification
         </p>
         <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-          Envoyez un permis, diplôme, certificat ou attestation nautique. Un admin SailingLoc pourra vérifier votre CV.
+          Upload a license, diploma, certificate, or nautical attestation. A SailingLoc admin can verify your CV.
         </p>
         {user?.sailorCvRejectionReason && status === 'REJECTED' && (
           <p className="text-xs text-red-600 dark:text-red-400 mb-3">
-            Motif du refus : {user.sailorCvRejectionReason}
+            Rejection reason: {user.sailorCvRejectionReason}
           </p>
         )}
         <input
@@ -482,7 +482,7 @@ const SailorCvSection: React.FC = () => {
           loading={documentMutation.isPending}
           onClick={() => documentInputRef.current?.click()}
         >
-          Envoyer un justificatif
+          Upload supporting document
         </Button>
       </div>
     </div>
@@ -520,7 +520,7 @@ const SecuritySection: React.FC = () => {
   const mutation = useMutation({
     mutationFn: changePassword,
     onSuccess: () => {
-      toast.success('Mot de passe modifié avec succès')
+      toast.success('Password changed successfully')
       setForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
       setFieldError('')
     },
@@ -529,7 +529,7 @@ const SecuritySection: React.FC = () => {
       const msg = axios.isAxiosError(err)
         ? (err.response?.data as { message?: string })?.message
         : undefined
-      setFieldError(msg ?? 'Erreur lors du changement de mot de passe')
+      setFieldError(msg ?? 'Error changing password')
     },
   })
 
@@ -545,12 +545,12 @@ const SecuritySection: React.FC = () => {
     // Validation côté client - miroir des règles backend pour un retour immédiat
     if (form.newPassword.length < MIN_PASSWORD_LEN) {
       setFieldError(
-        `Le nouveau mot de passe doit contenir au moins ${MIN_PASSWORD_LEN} caractères`,
+        `New password must be at least ${MIN_PASSWORD_LEN} characters`,
       )
       return
     }
     if (form.newPassword.length > MAX_PASSWORD_LEN) {
-      setFieldError(`Le mot de passe ne doit pas dépasser ${MAX_PASSWORD_LEN} caractères`)
+      setFieldError(`Password must not exceed ${MAX_PASSWORD_LEN} characters`)
       return
     }
     if (
@@ -560,12 +560,12 @@ const SecuritySection: React.FC = () => {
       !/[^A-Za-z0-9]/.test(form.newPassword)
     ) {
       setFieldError(
-        'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial',
+        'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character',
       )
       return
     }
     if (form.newPassword !== form.confirmPassword) {
-      setFieldError('Les mots de passe ne correspondent pas')
+      setFieldError('Passwords do not match')
       return
     }
 
@@ -579,11 +579,11 @@ const SecuritySection: React.FC = () => {
     <div className={CARD}>
       <div className="flex items-center gap-2.5 mb-6">
         <SectionIcon icon={<Lock size={16} />} />
-        <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Sécurité</h2>
+        <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Security</h2>
       </div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Input
-          label="Mot de passe actuel"
+          label="Current password"
           name="currentPassword"
           type={visible.current ? 'text' : 'password'}
           value={form.currentPassword}
@@ -594,18 +594,18 @@ const SecuritySection: React.FC = () => {
           onRightIconClick={() => toggle('current')}
         />
         <Input
-          label="Nouveau mot de passe"
+          label="New password"
           name="newPassword"
           type={visible.new ? 'text' : 'password'}
           value={form.newPassword}
           onChange={handleChange}
-          helperText={`${MIN_PASSWORD_LEN}+ car. · majuscule · chiffre`}
+          helperText={`${MIN_PASSWORD_LEN}+ chars · uppercase · number`}
           required
           rightIcon={visible.new ? <EyeOff size={16} /> : <Eye size={16} />}
           onRightIconClick={() => toggle('new')}
         />
         <Input
-          label="Confirmer le nouveau mot de passe"
+          label="Confirm new password"
           name="confirmPassword"
           type={visible.confirm ? 'text' : 'password'}
           value={form.confirmPassword}
@@ -616,7 +616,7 @@ const SecuritySection: React.FC = () => {
         />
         <div className="flex justify-end pt-1">
           <Button type="submit" loading={mutation.isPending}>
-            Changer le mot de passe
+            Change password
           </Button>
         </div>
       </form>
@@ -655,7 +655,7 @@ const AddCardModal: React.FC<AddCardModalProps> = ({ isOpen, onClose, onSuccess 
       } catch {
         if (!isCancelled) {
           setSetupClientSecret(null)
-          setError("Impossible d'initialiser l'ajout de carte pour le moment.")
+          setError('Unable to start card setup right now.')
         }
       }
     }
@@ -667,7 +667,7 @@ const AddCardModal: React.FC<AddCardModalProps> = ({ isOpen, onClose, onSuccess 
   }, [isOpen])
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Ajouter une carte" size="md">
+    <Modal isOpen={isOpen} onClose={onClose} title="Add a card" size="md">
       <div className="p-6">
         {error ? (
           <p className="text-sm text-red-600">{error}</p>
@@ -714,7 +714,7 @@ const AddCardForm: React.FC<AddCardFormProps> = ({ onSuccess, onCancel }) => {
     setLoading(false)
 
     if (stripeError) {
-      setError(stripeError.message ?? 'Une erreur est survenue.')
+      setError(stripeError.message ?? 'Something went wrong.')
     } else {
       onSuccess()
     }
@@ -726,10 +726,10 @@ const AddCardForm: React.FC<AddCardFormProps> = ({ onSuccess, onCancel }) => {
       {error && <p className="text-sm text-red-600">{error}</p>}
       <div className="flex flex-wrap gap-3">
         <Button type="submit" loading={loading} disabled={!stripe}>
-          Enregistrer la carte
+          Save card
         </Button>
         <Button type="button" variant="secondary" onClick={onCancel} disabled={loading}>
-          Annuler
+          Cancel
         </Button>
       </div>
     </form>
@@ -742,7 +742,7 @@ const PaymentSection: React.FC = () => {
 
   const handleCardSaved = () => {
     setIsAddCardOpen(false)
-    toast.success('Carte ajoutée avec succès')
+    toast.success('Card added successfully')
   }
 
   return (
@@ -750,8 +750,8 @@ const PaymentSection: React.FC = () => {
       <div className={CARD}>
         <div className="flex items-start justify-between gap-3 mb-6">
           <div>
-            <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Paiement</h2>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Gérez votre moyen de paiement et profitez d’un flux sécurisé pour vos réservations.</p>
+            <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Payment</h2>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Manage your payment method and enjoy a secure checkout for your bookings.</p>
           </div>
           <div className="rounded-2xl bg-ocean-50 p-2 text-ocean-700">
             <CreditCard size={18} />
@@ -761,7 +761,7 @@ const PaymentSection: React.FC = () => {
         <div className="rounded-3xl border border-gray-100 bg-gradient-to-br from-[#071d49] via-[#0A737A] to-[#0f8e9d] p-5 text-white shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-white/70">Compte de paiement</p>
+              <p className="text-sm text-white/70">Payment account</p>
               <p className="mt-1 text-lg font-semibold">{user?.email}</p>
             </div>
             <div className="rounded-2xl bg-white/15 p-3">
@@ -769,24 +769,24 @@ const PaymentSection: React.FC = () => {
             </div>
           </div>
           <div className="mt-6 rounded-2xl bg-white/10 p-4 backdrop-blur-sm">
-            <p className="text-sm text-white/70">Statut</p>
-            <p className="mt-1 text-base font-semibold">Paiements sécurisés via Stripe</p>
+            <p className="text-sm text-white/70">Status</p>
+            <p className="mt-1 text-base font-semibold">Secure payments via Stripe</p>
           </div>
         </div>
 
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
-            <p className="text-sm font-semibold text-gray-900">Ajouter une carte</p>
-            <p className="mt-1 text-sm text-gray-600">Sauvegardez une carte pour accélérer vos réservations et payer en toute sécurité.</p>
+            <p className="text-sm font-semibold text-gray-900">Add a card</p>
+            <p className="mt-1 text-sm text-gray-600">Save a card to speed up bookings and pay securely.</p>
             <Button onClick={() => setIsAddCardOpen(true)} size="sm" className="mt-4">
-              Ajouter une carte
+              Add a card
             </Button>
           </div>
           <div className="rounded-2xl border border-gray-100 bg-white p-4">
-            <p className="text-sm font-semibold text-gray-900">Paiement Stripe</p>
-            <p className="mt-1 text-sm text-gray-600">Vos réservations utilisent Stripe comme méthode de paiement principale, avec une expérience sécurisée.</p>
+            <p className="text-sm font-semibold text-gray-900">Stripe payments</p>
+            <p className="mt-1 text-sm text-gray-600">Your bookings use Stripe as the primary payment method, with a secure experience.</p>
             <div className="mt-3 inline-flex rounded-full bg-ocean-50 px-3 py-1 text-xs font-semibold text-ocean-700">
-              Sécurisé
+              Secure
             </div>
           </div>
         </div>
@@ -818,24 +818,24 @@ const DataPrivacySection: React.FC = () => {
       a.download = `sailingloc-mes-donnees-${new Date().toISOString().slice(0, 10)}.json`
       a.click()
       URL.revokeObjectURL(url)
-      toast.success('Export téléchargé')
+      toast.success('Export downloaded')
     },
-    onError: () => toast.error("Erreur lors de l'export"),
+    onError: () => toast.error('Error exporting data'),
   })
 
   const deleteMutation = useMutation({
     mutationFn: deleteAccount,
     onSuccess: () => {
-      toast.success('Compte supprimé. Vos données ont été effacées.')
+      toast.success('Account deleted. Your data has been erased.')
       logout()
       navigate('/', { replace: true })
     },
-    onError: () => toast.error('Erreur lors de la suppression du compte'),
+    onError: () => toast.error('Error deleting account'),
   })
 
   const handleDelete = () => {
     if (confirmEmail !== user?.email) {
-      toast.error('L\'adresse e-mail saisie ne correspond pas')
+      toast.error('The email address entered does not match')
       return
     }
     deleteMutation.mutate()
@@ -845,18 +845,18 @@ const DataPrivacySection: React.FC = () => {
     <div className={CARD}>
       <div className="flex items-center gap-2.5 mb-1">
         <SectionIcon icon={<ShieldAlert size={17} />} />
-        <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Données &amp; vie privée</h2>
+        <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Data &amp; privacy</h2>
       </div>
       <p className="text-xs text-gray-500 dark:text-gray-400 mb-6 ml-[46px]">
-        Conformément au RGPD, vous disposez d'un droit d'accès, de portabilité et d'effacement de vos données.
+        Under GDPR, you have the right to access, port, and erase your personal data.
       </p>
 
       {/* Export */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-gray-100 dark:border-gray-700">
         <div>
-          <p className="text-sm font-medium text-gray-800 dark:text-gray-200">Exporter mes données</p>
+          <p className="text-sm font-medium text-gray-800 dark:text-gray-200">Export my data</p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            Téléchargez une copie de toutes vos données personnelles au format JSON.
+            Download a copy of all your personal data as JSON.
           </p>
         </div>
         <Button
@@ -866,16 +866,16 @@ const DataPrivacySection: React.FC = () => {
           loading={exportMutation.isPending}
           onClick={() => exportMutation.mutate()}
         >
-          Exporter
+          Export
         </Button>
       </div>
 
-      {/* Suppression de compte */}
+      {/* Account deletion */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-5">
         <div>
-          <p className="text-sm font-medium text-red-600 dark:text-red-400">Supprimer mon compte</p>
+          <p className="text-sm font-medium text-red-600 dark:text-red-400">Delete my account</p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            Action irréversible. Vos données personnelles seront anonymisées (Art. 17 RGPD).
+            This cannot be undone. Your personal data will be anonymized (GDPR Art. 17).
           </p>
         </div>
         <button
@@ -883,26 +883,26 @@ const DataPrivacySection: React.FC = () => {
           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex-shrink-0"
         >
           <Trash2 size={14} />
-          Supprimer
+          Delete
         </button>
       </div>
 
-      {/* Modale de confirmation */}
+      {/* Confirmation modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6 max-w-md w-full">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              Supprimer mon compte
+              Delete my account
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Cette action est <strong>irréversible</strong>. Vos données personnelles seront anonymisées.
-              Pour confirmer, saisissez votre adresse e-mail : <strong>{user?.email}</strong>
+              This action is <strong>irreversible</strong>. Your personal data will be anonymized.
+              To confirm, enter your email address: <strong>{user?.email}</strong>
             </p>
             <input
               type="email"
               value={confirmEmail}
               onChange={(e) => setConfirmEmail(e.target.value)}
-              placeholder="Votre adresse e-mail"
+              placeholder="Your email address"
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 mb-4 focus:outline-none focus:ring-2 focus:ring-red-500"
             />
             <div className="flex gap-3 justify-end">
@@ -912,14 +912,14 @@ const DataPrivacySection: React.FC = () => {
                 onClick={() => { setShowDeleteModal(false); setConfirmEmail('') }}
                 disabled={deleteMutation.isPending}
               >
-                Annuler
+                Cancel
               </Button>
               <button
                 onClick={handleDelete}
                 disabled={deleteMutation.isPending || confirmEmail !== user?.email}
                 className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {deleteMutation.isPending ? 'Suppression…' : 'Supprimer définitivement'}
+                {deleteMutation.isPending ? 'Deleting…' : 'Delete permanently'}
               </button>
             </div>
           </div>
@@ -941,10 +941,10 @@ const UserProfile: React.FC = () => {
   const publicProfilePath = getPublicProfilePath(user)
 
   const tabs: { id: SettingsTab; label: string; icon: React.ReactNode; ownerOnly?: boolean }[] = [
-    { id: 'compte', label: 'Mon compte', icon: <UserCircle size={18} /> },
-    { id: 'marin', label: 'CV de marin', icon: <Anchor size={18} />, ownerOnly: true },
-    { id: 'securite', label: 'Sécurité', icon: <Shield size={18} /> },
-    { id: 'donnees', label: 'Paiement', icon: <CreditCard size={18} /> },
+    { id: 'compte', label: 'My account', icon: <UserCircle size={18} /> },
+    { id: 'marin', label: 'Sailor CV', icon: <Anchor size={18} />, ownerOnly: true },
+    { id: 'securite', label: 'Security', icon: <Shield size={18} /> },
+    { id: 'donnees', label: 'Payment', icon: <CreditCard size={18} /> },
   ]
 
   const visibleTabs = tabs.filter((t) => !t.ownerOnly || isOwner)
@@ -963,7 +963,7 @@ const UserProfile: React.FC = () => {
               )}
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-gray-900">Mon profil</h1>
+              <h1 className="text-lg font-semibold text-gray-900">My profile</h1>
               <p className="text-sm text-gray-500">{user.firstName} {user.lastName} · {user.email}</p>
             </div>
           </div>
@@ -973,7 +973,7 @@ const UserProfile: React.FC = () => {
               className="inline-flex items-center justify-center gap-2 text-sm font-medium text-ocean-700 hover:text-ocean-800"
             >
               <ExternalLink size={15} />
-              Voir mon profil public
+              View my public profile
             </Link>
           )}
         </div>

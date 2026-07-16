@@ -9,7 +9,7 @@ interface PriceBreakdownProps {
   depositAmount: number
   withSkipper?: boolean
   skipperPrice?: number
-  /** Pourcentage de remise dégressive appliquée (E2) */
+  /** Progressive discount percentage applied (E2) */
   discountPercent?: number
   className?: string
 }
@@ -36,20 +36,20 @@ const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
   return (
     <div className={cn('bg-gray-50 rounded-xl border border-gray-100 overflow-hidden', className)}>
       <div className="px-4 py-3 border-b border-gray-100 bg-white">
-        <h3 className="text-sm font-semibold text-gray-900">Détail du prix</h3>
+        <h3 className="text-sm font-semibold text-gray-900">Price details</h3>
       </div>
 
       <div className="px-4 py-4 flex flex-col gap-2.5">
         {/* Daily rate × days */}
         <LineItem
-          label={`${formatPrice(dailyRate)} × ${totalDays} jour${totalDays > 1 ? 's' : ''}`}
+          label={`${formatPrice(dailyRate)} × ${totalDays} day${totalDays > 1 ? 's' : ''}`}
           amount={boatSubtotal}
         />
 
-        {/* Remise dégressive */}
+        {/* Progressive discount */}
         {discountAmount > 0 && (
           <LineItem
-            label={<span className="text-green-700 dark:text-green-400">Remise longue durée (-{discountPercent}%)</span>}
+            label={<span className="text-green-700 dark:text-green-400">Long-stay discount (-{discountPercent}%)</span>}
             amount={-discountAmount}
             className="text-green-700 dark:text-green-400"
           />
@@ -58,7 +58,7 @@ const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
         {/* Skipper */}
         {withSkipper && skipperPrice > 0 && (
           <LineItem
-            label={`Skipper ${formatPrice(skipperPrice)}/jour × ${totalDays}j`}
+            label={`Skipper ${formatPrice(skipperPrice)}/day × ${totalDays}d`}
             amount={skipperSubtotal}
           />
         )}
@@ -67,10 +67,10 @@ const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
         <LineItem
           label={
             <span className="flex items-center gap-1.5">
-              Frais de service ({platformFeePercent}%)
+              Service fee ({platformFeePercent}%)
               <span
                 className="text-gray-400 cursor-help"
-                title="Les frais de service couvrent l'assurance, le support client et la maintenance de la plateforme."
+                title="The service fee covers insurance, customer support, and platform maintenance."
               >
                 <Info size={13} />
               </span>
@@ -84,7 +84,7 @@ const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
 
         {/* Total */}
         <div className="flex items-center justify-between">
-          <span className="font-bold text-gray-900">Total à payer</span>
+          <span className="font-bold text-gray-900">Total to pay</span>
           <span className="text-xl font-bold text-ocean-700">{formatPrice(total)}</span>
         </div>
 
@@ -94,10 +94,10 @@ const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
             <Shield size={15} className="text-amber-500 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-xs font-semibold text-amber-800">
-                Caution indicative : {formatPrice(depositAmount)}
+                Indicative deposit: {formatPrice(depositAmount)}
               </p>
               <p className="text-xs text-amber-700 mt-0.5">
-                Montant convenu avec le propriétaire avant le départ. Non prélevé en ligne sur SailingLoc.
+                Amount agreed with the owner before departure. Not charged online on SailingLoc.
               </p>
             </div>
           </div>

@@ -155,11 +155,11 @@ const Register: React.FC<RegisterProps> = ({
   }
 
   const criteriaItems = [
-    { key: 'minLength', label: '12 caractères min.' },
-    { key: 'hasUpper', label: 'Une majuscule' },
-    { key: 'hasLower', label: 'Une minuscule' },
-    { key: 'hasDigit', label: 'Un chiffre' },
-    { key: 'hasSpecial', label: 'Un caractère spécial' },
+    { key: 'minLength', label: '12 characters min.' },
+    { key: 'hasUpper', label: 'One uppercase letter' },
+    { key: 'hasLower', label: 'One lowercase letter' },
+    { key: 'hasDigit', label: 'One digit' },
+    { key: 'hasSpecial', label: 'One special character' },
   ] as { key: keyof PasswordCriteria; label: string }[]
 
   const formContent = (
@@ -170,7 +170,7 @@ const Register: React.FC<RegisterProps> = ({
             <img src={LOGO_IMAGE} alt="SailingLoc" className="h-11 w-auto" />
           </Link>
           <Link to="/" className="text-sm font-medium text-brand-slate dark:text-gray-400 hover:text-brand-navy dark:hover:text-white transition-colors">
-            ← Retour d'accueil
+            ← Back to home
           </Link>
         </>
       )}
@@ -183,25 +183,25 @@ const Register: React.FC<RegisterProps> = ({
         'font-serif font-bold leading-tight text-brand-navy dark:text-white',
         embedded ? 'text-2xl sm:text-3xl' : 'mt-10 text-5xl',
       )}>
-        Créer un compte
+        Create an account
       </h1>
 
       <p className="mt-2 text-sm text-brand-slate dark:text-gray-400">
-        {embedded ? 'Inscrivez-vous en tant que propriétaire.' : 'Rejoignez la communauté SailingLoc.'}
+        {embedded ? 'Sign up as an owner.' : 'Join the SailingLoc community.'}
       </p>
 
       <div className="mt-6 grid grid-cols-2 gap-4">
         <button type="button" className="h-11 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 font-semibold text-brand-navy dark:text-gray-200 text-sm">
-          Continuer avec Google
+          Continue with Google
         </button>
         <button type="button" className="h-11 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 font-semibold text-brand-navy dark:text-gray-200 text-sm">
-          Continuer avec Facebook
+          Continue with Facebook
         </button>
       </div>
 
       <div className="my-7 flex items-center gap-5">
         <div className="h-px flex-1 bg-gray-200" />
-        <span className="text-xs font-semibold text-gray-400">OU</span>
+        <span className="text-xs font-semibold text-gray-400">OR</span>
         <div className="h-px flex-1 bg-gray-200" />
       </div>
 
@@ -215,9 +215,9 @@ const Register: React.FC<RegisterProps> = ({
 
         <div className="grid grid-cols-2 gap-5">
           <Input
-            label="Prénom"
+            label="First name"
             type="text"
-            placeholder="Votre prénom"
+            placeholder="Your first name"
             value={form.firstName}
             onChange={(e) => setField('firstName', e.target.value)}
             error={errors.firstName}
@@ -226,9 +226,9 @@ const Register: React.FC<RegisterProps> = ({
           />
 
           <Input
-            label="Nom"
+            label="Last name"
             type="text"
-            placeholder="Votre nom"
+            placeholder="Your last name"
             value={form.lastName}
             onChange={(e) => setField('lastName', e.target.value)}
             error={errors.lastName}
@@ -240,7 +240,7 @@ const Register: React.FC<RegisterProps> = ({
         <Input
           label="Email"
           type="email"
-          placeholder="Votre email"
+          placeholder="Your email"
           value={form.email}
           onChange={(e) => setField('email', e.target.value)}
           error={errors.email}
@@ -249,9 +249,9 @@ const Register: React.FC<RegisterProps> = ({
         />
 
         <Input
-          label="Téléphone (optionnel)"
+          label="Phone (optional)"
           type="tel"
-          placeholder="Votre numéro de téléphone"
+          placeholder="Your phone number"
           value={form.phone}
           onChange={(e) => setField('phone', e.target.value)}
           leftIcon={<Phone size={16} />}
@@ -259,7 +259,7 @@ const Register: React.FC<RegisterProps> = ({
 
         {!hideRoleToggle && (
           <div>
-            <p className="mb-2 text-sm font-bold text-brand-navy dark:text-white">Je suis</p>
+            <p className="mb-2 text-sm font-bold text-brand-navy dark:text-white">I am a</p>
             <div className="grid grid-cols-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800">
               <button
                 type="button"
@@ -271,7 +271,7 @@ const Register: React.FC<RegisterProps> = ({
                     : 'text-brand-slate dark:text-gray-400',
                 )}
               >
-                Locataire
+                Renter
               </button>
               <button
                 type="button"
@@ -283,7 +283,7 @@ const Register: React.FC<RegisterProps> = ({
                     : 'text-brand-slate dark:text-gray-400',
                 )}
               >
-                Propriétaire
+                Owner
               </button>
             </div>
           </div>
@@ -291,7 +291,7 @@ const Register: React.FC<RegisterProps> = ({
 
         <div className="grid grid-cols-2 gap-5">
           <Input
-            label="Mot de passe"
+            label="Password"
             type={showPassword ? 'text' : 'password'}
             placeholder="••••••••••••"
             value={form.password}
@@ -304,7 +304,7 @@ const Register: React.FC<RegisterProps> = ({
           />
 
           <Input
-            label="Confirmer le mot de passe"
+            label="Confirm password"
             type={showConfirm ? 'text' : 'password'}
             placeholder="••••••••••••"
             value={form.confirmPassword}
@@ -319,7 +319,7 @@ const Register: React.FC<RegisterProps> = ({
 
         <div>
           <p className="mb-3 text-sm font-semibold text-gray-500">
-            Le mot de passe doit contenir :
+            Password must contain:
           </p>
 
           <div className="flex flex-wrap gap-2">
@@ -353,13 +353,13 @@ const Register: React.FC<RegisterProps> = ({
             </button>
 
             <span className="text-sm text-brand-slate dark:text-gray-400">
-              J'accepte les{' '}
+              I accept the{' '}
               <Link to="/cgu" className="font-semibold text-brand-blue hover:text-ocean-600">
-                Conditions Générales d'Utilisation
+                Terms of Use
               </Link>{' '}
-              et la{' '}
+              and the{' '}
               <Link to="/rgpd" className="font-semibold text-brand-blue hover:text-ocean-600">
-                Politique de Confidentialité.
+                Privacy Policy.
               </Link>
             </span>
           </label>
@@ -370,15 +370,15 @@ const Register: React.FC<RegisterProps> = ({
         </div>
 
         <Button type="submit" variant="primary" size="lg" fullWidth loading={registerMutation.isPending}>
-          Créer mon compte
+          Create my account
         </Button>
       </form>
 
       {!embedded && (
         <p className="mt-7 text-center text-sm text-brand-slate dark:text-gray-400">
-          Vous avez déjà un compte ?{' '}
+          Already have an account?{' '}
           <Link to="/connexion" className="font-bold text-brand-blue hover:text-ocean-600">
-            Se connecter
+            Sign in
           </Link>
         </p>
       )}
@@ -408,21 +408,21 @@ const Register: React.FC<RegisterProps> = ({
 />
           <div className="max-w-xl">
             <h2 className="text-2xl font-serif font-bold leading-tight">
-              La mer est un espace de liberté infinie,
+              The sea is a space of infinite freedom,
               <br />
-              nous en sommes les gardiens pour vos plus beaux souvenirs.
+              we are its guardians for your finest memories.
             </h2>
 
             <p className="mt-6 text-xs font-bold tracking-widest">
-              CAPITAINE MARC L, SAILINGLOC EXPERT
+              CAPTAIN MARC L, SAILINGLOC EXPERT
             </p>
 
             <div className="my-10 h-px w-16 bg-white/60" />
 
             <p className="mt-6 text-sm">
-              <span className="font-bold">+1,200 Propriétaires</span>
+              <span className="font-bold">+1,200 Owners</span>
               <br />
-              Nous font confiance chaque jour
+              Trust us every day
             </p>
           </div>
         </section>

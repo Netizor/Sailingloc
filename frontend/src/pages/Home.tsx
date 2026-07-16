@@ -256,14 +256,14 @@ const Home: React.FC = () => {
   return (
     <div className="flex flex-col bg-white">
       <Helmet>
-        <title>SailingLoc{TITLE_SEP}Location de bateaux entre particuliers inscrits</title>
-        <meta name="description" content="Louez un voilier, catamaran ou yacht d'exception dans les plus beaux ports de France et d'Europe." />
+        <title>SailingLoc{TITLE_SEP}{t('home.metaTitle')}</title>
+        <meta name="description" content={t('home.metaDescription')} />
       </Helmet>
 
-      {/* Hero - coucher de soleil */}
-      <section className="relative min-h-[calc(100vh-72px)] flex flex-col" aria-label="Bannière principale">
+      {/* Hero */}
+      <section className="relative min-h-[calc(100vh-72px)] flex flex-col" aria-label={t('home.heroAria')}>
         <div className="absolute inset-0 overflow-hidden">
-          <img src={IMAGES.hero} alt="Marina au coucher du soleil" className="w-full h-full object-cover" loading="eager" />
+          <img src={IMAGES.hero} alt={t('home.heroImageAlt')} className="w-full h-full object-cover" loading="eager" />
           <div className="absolute inset-0 bg-black/60" />
         </div>
 
@@ -322,7 +322,7 @@ const Home: React.FC = () => {
                 type="button"
                 onClick={() => setCarouselIndex((i) => Math.max(0, i - 1))}
                 disabled={!canPrev}
-                aria-label="Précédent"
+                aria-label="Previous"
                 className="h-9 w-9 rounded-full border border-gray-200 bg-white text-brand-navy flex items-center justify-center disabled:opacity-30"
               >
                 <ChevronLeft size={18} />
@@ -331,7 +331,7 @@ const Home: React.FC = () => {
                 type="button"
                 onClick={() => setCarouselIndex((i) => i + 1)}
                 disabled={!canNext}
-                aria-label="Suivant"
+                aria-label="Next"
                 className="h-9 w-9 rounded-full border border-gray-200 bg-white text-brand-navy flex items-center justify-center disabled:opacity-30"
               >
                 <ChevronRight size={18} />

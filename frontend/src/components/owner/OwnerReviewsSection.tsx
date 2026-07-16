@@ -103,7 +103,7 @@ function ReviewCard({
           </p>
         ) : (
           <p className="text-sm text-gray-400 dark:text-gray-500 italic flex-1">
-            Avis sans commentaire
+            Review with no comment
           </p>
         )}
 
@@ -140,10 +140,10 @@ const OwnerReviewsSection: React.FC<OwnerReviewsSectionProps> = ({
           <div>
             <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
               <Star size={18} className="text-amber-400 fill-amber-400 owner-reviews-star" />
-              Avis des locataires
+              Renter reviews
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Retours laissés après des locations sur ses bateaux
+              Feedback left after rentals on their boats
             </p>
           </div>
 
@@ -165,7 +165,7 @@ const OwnerReviewsSection: React.FC<OwnerReviewsSectionProps> = ({
             <div>
               <Stars rating={hasReviews ? rating : 0} size="sm" />
               <p className="text-xs text-amber-800/70 dark:text-amber-300/70 mt-0.5 font-medium">
-                {reviewCount} avis{reviewCount > 1 ? '' : ''}
+                {reviewCount} review{reviewCount !== 1 ? 's' : ''}
               </p>
             </div>
           </div>
@@ -208,10 +208,10 @@ const OwnerReviewsSection: React.FC<OwnerReviewsSectionProps> = ({
               <MessageSquareQuote size={24} className="text-amber-500" />
             </div>
             <p className="font-medium text-gray-700 dark:text-gray-300">
-              Aucun avis pour le moment
+              No reviews yet
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-sm mx-auto">
-              Les locataires pourront laisser un avis après une location terminée sur l&apos;un de ses bateaux.
+              Renters will be able to leave a review after completing a rental on one of their boats.
             </p>
             <div className="flex justify-center gap-1 mt-4 owner-reviews-empty-stars">
               {[1, 2, 3, 4, 5].map((i) => (

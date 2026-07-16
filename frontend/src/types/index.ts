@@ -106,6 +106,10 @@ export interface Boat {
   owner?: Partial<User>
   title: string
   description: string
+  /** Bilingual demo content only (French) - real listings only use `description` */
+  descriptionFr?: string
+  /** Bilingual demo content only (English) - real listings only use `description` */
+  descriptionEn?: string
   type: BoatType
   manufacturer?: string
   model?: string

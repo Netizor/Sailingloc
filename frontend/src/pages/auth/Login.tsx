@@ -57,11 +57,11 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
       authApi.checkPasswordHibp(form.password).then(({ compromised, count }) => {
         if (compromised) {
           toast.error(
-            `⚠️ Votre mot de passe a été compromis (${(count ?? 0).toLocaleString('fr-FR')} fuite${(count ?? 0) > 1 ? 's' : ''}). Changez-le dès maintenant dans votre profil.`,
+            `⚠️ Your password has been compromised (${(count ?? 0).toLocaleString('en-US')} breach${(count ?? 0) > 1 ? 'es' : ''}). Change it now in your profile.`,
             { duration: 10000, id: 'hibp-warning' },
           )
         }
-      }).catch(() => { /* silencieux */ })
+      }).catch(() => { /* silent */ })
     },
     onError: (err: any) => {
       const message = err?.response?.data?.message ?? t('auth.login.errorCredentials')
@@ -94,25 +94,25 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
     <div className={embedded ? 'w-full' : 'w-full max-w-[430px]'}>
       {!embedded && (
         <Link to="/" className="text-xs text-brand-slate dark:text-gray-400 hover:text-brand-navy dark:hover:text-white transition-colors">
-          ← Retour d'accueil
+          ← Back to home
         </Link>
       )}
 
       <h1 className={embedded ? 'text-2xl sm:text-3xl font-serif font-bold text-brand-navy dark:text-white' : 'mt-8 text-5xl font-serif font-bold text-brand-navy dark:text-white'}>
-        Bienvenue
+        Welcome
       </h1>
 
       <p className="mt-2 text-sm text-brand-slate dark:text-gray-400">
-        {embedded ? 'Connectez-vous à votre espace propriétaire.' : "L'excellence maritime à votre portée."}
+        {embedded ? 'Sign in to your owner space.' : 'Maritime excellence within your reach.'}
       </p>
 
       {!embedded && (
         <div className="mt-10 flex gap-8 border-b border-gray-200 dark:border-gray-700">
           <button type="button" className="pb-3 text-sm font-bold border-b-2 border-brand-navy dark:border-brand-blue text-brand-navy dark:text-white">
-            Se connecter
+            Sign in
           </button>
           <Link to="/inscription" className="pb-3 text-sm text-brand-slate dark:text-gray-400 hover:text-brand-blue transition-colors">
-            Créer un compte
+            Create an account
           </Link>
         </div>
       )}
@@ -126,10 +126,10 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
         )}
 
         <Input
-          label="ADRESSE EMAIL"
+          label="EMAIL ADDRESS"
           type="email"
           autoComplete="email"
-          placeholder="nom@exemple.com"
+          placeholder="name@example.com"
           value={form.email}
           onChange={handleChange('email')}
           error={errors.email}
@@ -137,7 +137,7 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
         />
 
         <Input
-          label="MOT DE PASSE"
+          label="PASSWORD"
           type={showPassword ? 'text' : 'password'}
           autoComplete="current-password"
           placeholder="••••••••"
@@ -151,12 +151,12 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
 
         <div className="flex justify-end">
           <Link to="/mot-de-passe-oublie" className="text-xs text-brand-blue hover:text-ocean-600 transition-colors">
-            Mot de passe oublié ?
+            Forgot password?
           </Link>
         </div>
 
         <Button type="submit" variant="primary" size="lg" fullWidth loading={loginMutation.isPending}>
-          Se connecter
+          Sign in
         </Button>
       </form>
 
@@ -164,7 +164,7 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
         <>
           <div className="my-8 flex items-center gap-4">
             <div className="h-px bg-gray-200 dark:bg-gray-700 flex-1" />
-            <span className="text-[10px] text-brand-slate dark:text-gray-500 uppercase">Ou continuer avec</span>
+            <span className="text-[10px] text-brand-slate dark:text-gray-500 uppercase">Or continue with</span>
             <div className="h-px bg-gray-200 dark:bg-gray-700 flex-1" />
           </div>
 
@@ -197,15 +197,15 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
           <Ship size={130} className="absolute right-20 top-16 text-white/25" />
           <div className="text-white max-w-md mb-8">
             <p className="text-2xl font-serif font-bold leading-relaxed">
-              "La mer est un espace de liberté infinie, nous en sommes les gardiens pour vos plus beaux souvenirs."
+              "The sea is a space of infinite freedom — we are its guardians for your finest memories."
             </p>
             <p className="mt-6 text-xs font-bold tracking-widest text-white/80">
-              CAPITAINE MARC L, SAILINGLOC EXPERT
+              CAPTAIN MARC L, SAILINGLOC EXPERT
             </p>
             <p className="mt-6 text-sm">
-              <span className="font-bold">+1,200 Propriétaires</span>
+              <span className="font-bold">+1,200 Owners</span>
               <br />
-              nous font confiance chaque jour
+              trust us every day
             </p>
           </div>
         </section>

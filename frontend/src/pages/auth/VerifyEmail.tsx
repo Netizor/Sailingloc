@@ -16,13 +16,13 @@ const VerifyEmail: React.FC = () => {
 
   const [state, setState] = useState<State>('loading')
   const [message, setMessage] = useState('')
-  // Empêche un double appel en mode StrictMode (double montage en dev)
+  // Prevents a double call in StrictMode (double mount in dev)
   const calledRef = useRef(false)
 
   useEffect(() => {
     if (!token) {
       setState('error')
-      setMessage('Lien de vérification manquant ou invalide.')
+      setMessage('Missing or invalid verification link.')
       return
     }
     if (calledRef.current) return
@@ -30,13 +30,13 @@ const VerifyEmail: React.FC = () => {
 
     authApi.verifyEmail(token)
       .then((res) => {
-        // Met à jour le store avec le user vérifié + nouveaux tokens
+        // Update the store with the verified user + new tokens
         setAuth(res.user, res.accessToken, res.refreshToken)
         setState('success')
-        setMessage('Votre adresse email a été vérifiée avec succès.')
+        setMessage('Your email address has been verified successfully.')
       })
       .catch((err) => {
-        const msg: string = err?.response?.data?.message ?? 'Lien invalide ou expiré.'
+        const msg: string = err?.response?.data?.message ?? 'Invalid or expired link.'
         setState('error')
         setMessage(msg)
       })
@@ -56,14 +56,14 @@ const VerifyEmail: React.FC = () => {
               </div>
               <span className="text-2xl font-bold text-white tracking-tight">SailingLoc</span>
             </Link>
-            <h1 className="text-xl font-bold text-white">Vérification de l'email</h1>
+            <h1 className="text-xl font-bold text-white">Email verification</h1>
           </div>
 
           <div className="px-8 py-10 flex flex-col items-center gap-6 text-center">
             {state === 'loading' && (
               <>
                 <Loader2 size={48} className="text-ocean-600 animate-spin" />
-                <p className="text-gray-600 dark:text-gray-400">Vérification en cours…</p>
+                <p className="text-gray-600 dark:text-gray-400">Verifying…</p>
               </>
             )}
 
@@ -72,7 +72,7 @@ const VerifyEmail: React.FC = () => {
                 <CheckCircle size={56} className="text-green-500" />
                 <div>
                   <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
-                    Email vérifié !
+                    Email verified!
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">{message}</p>
                 </div>
@@ -80,7 +80,7 @@ const VerifyEmail: React.FC = () => {
                   variant="primary"
                   onClick={() => navigate(isAuthenticated ? redirectPath : '/connexion')}
                 >
-                  {isAuthenticated ? 'Accéder à mon espace' : 'Se connecter'}
+                  {isAuthenticated ? 'Go to my space' : 'Sign in'}
                 </Button>
               </>
             )}
@@ -90,22 +90,22 @@ const VerifyEmail: React.FC = () => {
                 <XCircle size={56} className="text-red-500" />
                 <div>
                   <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
-                    Lien invalide
+                    Invalid link
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">{message}</p>
                 </div>
                 <div className="flex flex-col gap-3 w-full">
                   {isAuthenticated ? (
                     <Button variant="primary" onClick={() => navigate(redirectPath)}>
-                      Retourner à mon espace
+                      Back to my space
                     </Button>
                   ) : (
                     <Button variant="primary" onClick={() => navigate('/connexion')}>
-                      Se connecter
+                      Sign in
                     </Button>
                   )}
                   <p className="text-xs text-gray-400 dark:text-gray-500">
-                    Une fois connecté, vous pouvez renvoyer un email de vérification depuis votre profil.
+                    Once signed in, you can resend a verification email from your profile.
                   </p>
                 </div>
               </>

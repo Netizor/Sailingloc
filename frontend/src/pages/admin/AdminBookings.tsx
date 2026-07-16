@@ -15,12 +15,12 @@ import Spinner from '../../components/ui/Spinner'
 type StatusFilter = 'ALL' | BookingStatus
 
 const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
-  { value: 'ALL',                   label: 'Tous les statuts' },
-  { value: BookingStatus.PENDING,   label: 'En attente' },
-  { value: BookingStatus.CONFIRMED, label: 'Confirmées' },
-  { value: BookingStatus.COMPLETED, label: 'Terminées' },
-  { value: BookingStatus.CANCELLED, label: 'Annulées' },
-  { value: BookingStatus.DISPUTED,  label: 'Litigieuses' },
+  { value: 'ALL',                   label: 'All statuses' },
+  { value: BookingStatus.PENDING,   label: 'Pending' },
+  { value: BookingStatus.CONFIRMED, label: 'Confirmed' },
+  { value: BookingStatus.COMPLETED, label: 'Completed' },
+  { value: BookingStatus.CANCELLED, label: 'Cancelled' },
+  { value: BookingStatus.DISPUTED,  label: 'Disputed' },
 ]
 
 const ALL_STATUSES = [
@@ -66,7 +66,7 @@ function Pagination({ page, totalPages, total, onPage }: {
   const pages = Array.from({ length: Math.min(totalPages, 7) }, (_, i) => i + 1)
   return (
     <div className="flex items-center justify-between mt-4 text-sm text-gray-600 dark:text-gray-400">
-      <span>Page {page} / {totalPages} : {total} résultat(s)</span>
+      <span>Page {page} / {totalPages} · {total} result(s)</span>
       <div className="flex gap-1">
         <button onClick={() => onPage(Math.max(1, page - 1))} disabled={page === 1}
           className={cn('p-1.5 rounded-lg border border-gray-200 dark:border-gray-600',
@@ -99,7 +99,7 @@ function DetailModal({ booking, onClose }: { booking: Booking; onClose: () => vo
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between mb-5">
           <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-            Réservation #{booking.id}
+            Booking #{booking.id}
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
             <X size={18} />
@@ -114,16 +114,16 @@ function DetailModal({ booking, onClose }: { booking: Booking; onClose: () => vo
 
         <dl className="text-sm divide-y divide-gray-50 dark:divide-gray-700">
           {[
-            { label: 'Bateau',        value: booking.boat?.title ?? '-' },
-            { label: 'Ville',         value: booking.boat?.city  ?? '-' },
-            { label: 'Locataire',     value: `${booking.renter?.firstName ?? ''} ${booking.renter?.lastName ?? ''}`.trim() || '-' },
-            { label: 'Email',         value: (booking.renter as { email?: string })?.email ?? '-' },
-            { label: 'Propriétaire',  value: `${booking.owner?.firstName ?? ''} ${booking.owner?.lastName ?? ''}`.trim() || '-' },
-            { label: 'Arrivée',       value: formatDate(booking.startDate) },
-            { label: 'Départ',        value: formatDate(booking.endDate) },
-            { label: 'Durée',         value: `${booking.totalDays} jour(s)` },
-            { label: 'Montant total', value: formatPrice(booking.totalAmount) },
-            { label: 'Créée le',      value: formatDate(booking.createdAt) },
+            { label: 'Boat',         value: booking.boat?.title ?? '-' },
+            { label: 'City',         value: booking.boat?.city  ?? '-' },
+            { label: 'Renter',       value: `${booking.renter?.firstName ?? ''} ${booking.renter?.lastName ?? ''}`.trim() || '-' },
+            { label: 'Email',        value: (booking.renter as { email?: string })?.email ?? '-' },
+            { label: 'Owner',        value: `${booking.owner?.firstName ?? ''} ${booking.owner?.lastName ?? ''}`.trim() || '-' },
+            { label: 'Check-in',     value: formatDate(booking.startDate) },
+            { label: 'Check-out',    value: formatDate(booking.endDate) },
+            { label: 'Duration',     value: `${booking.totalDays} day(s)` },
+            { label: 'Total amount', value: formatPrice(booking.totalAmount) },
+            { label: 'Created',      value: formatDate(booking.createdAt) },
           ].map(({ label, value }) => (
             <div key={label} className="flex justify-between py-2">
               <dt className="text-gray-500 dark:text-gray-400">{label}</dt>
@@ -131,7 +131,7 @@ function DetailModal({ booking, onClose }: { booking: Booking; onClose: () => vo
             </div>
           ))}
           <div className="flex justify-between py-2">
-            <dt className="text-gray-500 dark:text-gray-400">Statut</dt>
+            <dt className="text-gray-500 dark:text-gray-400">Status</dt>
             <dd><BookingStatusBadge status={booking.status} /></dd>
           </div>
         </dl>
@@ -149,8 +149,8 @@ function ResolveDisputeModal({ booking, onClose, onResolved }: {
 
   const mutation = useMutation({
     mutationFn: (status: BookingStatus) => adminApi.updateBookingStatus(booking.id, status),
-    onSuccess: () => { toast.success('Litige résolu'); onResolved() },
-    onError:   () => toast.error('Erreur lors de la résolution'),
+    onSuccess: () => { toast.success('Dispute resolved'); onResolved() },
+    onError:   () => toast.error('Error resolving dispute'),
   })
 
   useEffect(() => {
@@ -175,7 +175,7 @@ function ResolveDisputeModal({ booking, onClose, onResolved }: {
           <div className="flex items-center gap-2">
             <AlertTriangle size={20} className="text-amber-500 flex-shrink-0" />
             <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
-              Résoudre le litige #{booking.id}
+              Resolve dispute #{booking.id}
             </h2>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
@@ -185,11 +185,11 @@ function ResolveDisputeModal({ booking, onClose, onResolved }: {
 
         <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 mb-5 text-sm text-gray-600 dark:text-gray-300">
           <p className="font-medium text-gray-800 dark:text-gray-200 mb-0.5">{booking.boat?.title ?? ''}</p>
-          <p>{booking.renter?.firstName} {booking.renter?.lastName}, {formatDate(booking.startDate)} au {formatDate(booking.endDate)}</p>
+          <p>{booking.renter?.firstName} {booking.renter?.lastName}, {formatDate(booking.startDate)} to {formatDate(booking.endDate)}</p>
           <p className="font-semibold text-gray-900 dark:text-gray-100 mt-1">{formatPrice(booking.totalAmount)}</p>
         </div>
 
-        <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Décision :</p>
+        <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Decision:</p>
         <div className="flex gap-3 mb-4">
           {(['complete', 'cancel'] as const).map((r) => {
             const isComplete = r === 'complete'
@@ -207,7 +207,7 @@ function ResolveDisputeModal({ booking, onClose, onResolved }: {
                       : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-red-300',
                 )}>
                 {isComplete ? <CheckCircle size={16} /> : <XCircle size={16} />}
-                {isComplete ? 'Terminer' : 'Annuler'}
+                {isComplete ? 'Complete' : 'Cancel'}
               </button>
             )
           })}
@@ -215,13 +215,13 @@ function ResolveDisputeModal({ booking, onClose, onResolved }: {
 
         <div className="mb-5">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-            Note interne <span className="font-normal text-gray-400">(optionnel)</span>
+            Internal note <span className="font-normal text-gray-400">(optional)</span>
           </label>
           <textarea
             value={adminNote}
             onChange={(e) => setAdminNote(e.target.value)}
             rows={2} maxLength={500}
-            placeholder="Motif de la décision, remarques…"
+            placeholder="Reason for the decision, notes…"
             className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-ocean-500 resize-none"
           />
         </div>
@@ -229,14 +229,14 @@ function ResolveDisputeModal({ booking, onClose, onResolved }: {
         <div className="flex gap-3">
           <button type="button" onClick={onClose} disabled={mutation.isPending}
             className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50">
-            Annuler
+            Cancel
           </button>
           <button
             type="button"
             onClick={() => resolution && mutation.mutate(resolution === 'complete' ? BookingStatus.COMPLETED : BookingStatus.CANCELLED)}
             disabled={!resolution || mutation.isPending}
             className="flex-1 py-2.5 rounded-xl bg-ocean-700 hover:bg-ocean-800 text-white text-sm font-medium disabled:opacity-50">
-            {mutation.isPending ? 'Traitement…' : 'Confirmer'}
+            {mutation.isPending ? 'Processing…' : 'Confirm'}
           </button>
         </div>
       </div>
@@ -244,7 +244,7 @@ function ResolveDisputeModal({ booking, onClose, onResolved }: {
   )
 }
 
-// ─── Page principale ──────────────────────────────────────────
+// ─── Main page ────────────────────────────────────────────────
 const AdminBookings: React.FC = () => {
   const queryClient = useQueryClient()
 
@@ -276,10 +276,10 @@ const AdminBookings: React.FC = () => {
     mutationFn: ({ id, status }: { id: number; status: BookingStatus }) =>
       adminApi.updateBookingStatus(id, status),
     onSuccess: () => {
-      toast.success('Statut mis à jour')
+      toast.success('Status updated')
       queryClient.invalidateQueries({ queryKey: ['admin', 'bookings'] })
     },
-    onError: () => toast.error('Erreur lors de la mise à jour'),
+    onError: () => toast.error('Error updating status'),
   })
 
   const bookings: Booking[] = data?.data ?? []
@@ -291,24 +291,24 @@ const AdminBookings: React.FC = () => {
     <div>
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Gestion des réservations</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Booking management</h1>
         <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-          {total} réservation(s)
+          {total} booking(s)
           {disputedCount != null && disputedCount > 0 && (
             <span className="ml-2 inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium">
-              <AlertTriangle size={13} /> {disputedCount} litige(s)
+              <AlertTriangle size={13} /> {disputedCount} dispute(s)
             </span>
           )}
         </p>
       </div>
 
-      {/* Filtres */}
+      {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-6">
         <div className="relative flex-1 min-w-[180px] max-w-xs">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
           <input
             type="text"
-            placeholder="Locataire, email, n° résa…"
+            placeholder="Renter, email, booking #…"
             value={search}
             onChange={(e) => { setSearch(e.target.value); resetPage() }}
             className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-ocean-500"
@@ -327,19 +327,19 @@ const AdminBookings: React.FC = () => {
 
         <div className="flex items-center gap-2">
           <CalendarDays size={15} className="text-gray-400 flex-shrink-0" />
-          <input type="date" value={startDate} title="Du"
+          <input type="date" value={startDate} title="From"
             onChange={(e) => { setStartDate(e.target.value); resetPage() }}
             className="border border-gray-300 dark:border-gray-600 rounded-xl px-3 py-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-ocean-500"
           />
           <span className="text-gray-400 text-xs">→</span>
-          <input type="date" value={endDate} title="Au"
+          <input type="date" value={endDate} title="To"
             onChange={(e) => { setEndDate(e.target.value); resetPage() }}
             className="border border-gray-300 dark:border-gray-600 rounded-xl px-3 py-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-ocean-500"
           />
           {(startDate || endDate) && (
             <button onClick={() => { setStartDate(''); setEndDate(''); resetPage() }}
               className="text-xs text-gray-400 hover:text-gray-600 underline">
-              Effacer
+              Clear
             </button>
           )}
         </div>
@@ -350,17 +350,17 @@ const AdminBookings: React.FC = () => {
         {isLoading ? (
           <div className="flex justify-center py-16"><Spinner size="lg" /></div>
         ) : isError ? (
-          <div className="text-center py-16 text-red-400 text-sm">Erreur lors du chargement</div>
+          <div className="text-center py-16 text-red-400 text-sm">Error loading data</div>
         ) : bookings.length === 0 ? (
           <div className="text-center py-16 text-gray-400 dark:text-gray-500 text-sm">
-            Aucune réservation trouvée
+            No bookings found
           </div>
         ) : (
           <div className={cn('overflow-x-auto transition-opacity', isPlaceholderData && 'opacity-60')}>
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-50/60 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700">
-                  {['Bateau', 'Locataire', 'Propriétaire', 'Dates', 'Jours', 'Montant', 'Statut', 'Actions'].map((h) => (
+                  {['Boat', 'Renter', 'Owner', 'Dates', 'Days', 'Amount', 'Status', 'Actions'].map((h) => (
                     <th key={h} className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
                       {h}
                     </th>
@@ -371,7 +371,7 @@ const AdminBookings: React.FC = () => {
                 {bookings.map((booking) => (
                   <tr key={booking.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
 
-                    {/* Bateau */}
+                    {/* Boat */}
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div className="h-12 w-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex-shrink-0">
@@ -413,12 +413,12 @@ const AdminBookings: React.FC = () => {
                       <BookingStatusBadge status={booking.status} />
                     </td>
 
-                    {/* Actions - 3 slots fixes */}
+                    {/* Actions - 3 fixed slots */}
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-1.5">
                         <ActionBtn
                           icon={<Eye size={14} />}
-                          title="Voir le détail"
+                          title="View details"
                           onClick={() => setDetailBooking(booking)}
                         />
                         <select
@@ -432,10 +432,10 @@ const AdminBookings: React.FC = () => {
                             <option key={s} value={s}>{getBookingStatusLabel(s)}</option>
                           ))}
                         </select>
-                        {/* Litige - invisible si non litigieux */}
+                        {/* Dispute - invisible if not disputed */}
                         <ActionBtn
                           icon={<AlertTriangle size={14} />}
-                          title="Résoudre le litige"
+                          title="Resolve dispute"
                           onClick={() => setDisputeBooking(booking)}
                           invisible={booking.status !== BookingStatus.DISPUTED}
                           className="text-amber-500 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/20"
