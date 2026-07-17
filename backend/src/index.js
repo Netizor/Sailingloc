@@ -41,7 +41,7 @@ app.use(cors({
 // Rate limit global : 200 req / 15 min par IP
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 200,
+  max: 100000,
   standardHeaders: true,
   legacyHeaders: false,
 }))
