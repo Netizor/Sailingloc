@@ -1018,7 +1018,7 @@
     "faqHint": "Your answer might already be there.",
     "faqLink": "View FAQ →",
     "sentTitle": "Message sent!",
-    "sentHint": "Thank you for contacting us. We will reply within 24 business hours.",
+    "sentHint": "Thank you for contacting us. We will reply within 48 hours.",
     "sendAnother": "Send another message",
     "nameLabel": "Full name",
     "namePlaceholder": "John Doe",
@@ -1028,12 +1028,13 @@
     "messageLabel": "Message",
     "messagePlaceholder": "Describe your request in detail…",
     "submit": "Send message",
+    "submitting": "Sending…",
+    "errorGeneric": "Unable to send the message. Please try again later.",
     "subjects": {
-      "booking": "Booking question",
-      "technical": "Technical issue",
-      "report": "Report a listing",
-      "partnership": "Partnership / Press",
-      "other": "Other"
+      "location": "Boat rental",
+      "listBoat": "List your boat",
+      "bookingIssue": "Booking issue",
+      "autre": "Other"
     }
   },
   "createEditBoat": {

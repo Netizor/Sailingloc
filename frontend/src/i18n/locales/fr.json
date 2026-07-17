@@ -1018,7 +1018,7 @@
     "faqHint": "La réponse à votre question s'y trouve peut-être déjà.",
     "faqLink": "Voir la FAQ →",
     "sentTitle": "Message envoyé !",
-    "sentHint": "Merci de nous avoir contactés. Nous vous répondrons dans les 24 h ouvrées.",
+    "sentHint": "Merci de nous avoir contactés. Nous vous répondrons sous 48 h.",
     "sendAnother": "Envoyer un autre message",
     "nameLabel": "Nom complet",
     "namePlaceholder": "Jean Dupont",
@@ -1028,12 +1028,13 @@
     "messageLabel": "Message",
     "messagePlaceholder": "Décrivez votre demande en détail…",
     "submit": "Envoyer le message",
+    "submitting": "Envoi en cours…",
+    "errorGeneric": "Impossible d'envoyer le message. Réessayez plus tard.",
     "subjects": {
-      "booking": "Question sur une réservation",
-      "technical": "Problème technique",
-      "report": "Signalement d'annonce",
-      "partnership": "Partenariat / Presse",
-      "other": "Autre"
+      "location": "Location",
+      "listBoat": "Mise en location",
+      "bookingIssue": "Problème de réservation",
+      "autre": "Autre"
     }
   },
   "createEditBoat": {
