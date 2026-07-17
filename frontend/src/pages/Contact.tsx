@@ -37,6 +37,7 @@ const Contact: React.FC = () => {
     email: '',
     subject: SUBJECT_KEYS[0] as string,
     message: '',
+    website: '',
   })
 
   const [sent, setSent] = useState(false)
@@ -56,8 +57,12 @@ const Contact: React.FC = () => {
     setLoading(true)
     try {
       await sendContactMessage({
-        ...form,
+        firstName: form.firstName.trim(),
+        lastName: form.lastName.trim(),
+        email: form.email.trim(),
         subject: t(`contactPage.subjects.${form.subject}`),
+        message: form.message.trim(),
+        website: form.website,
       })
       setSent(true)
     } catch {
@@ -69,7 +74,6 @@ const Contact: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-brand-navy dark:text-gray-100">
-      {/* Hero */}
       <section
         className="relative min-h-[430px] bg-cover bg-center flex items-center px-4 sm:px-6 lg:px-8 pt-24 pb-20"
         style={{
@@ -91,7 +95,6 @@ const Contact: React.FC = () => {
         </div>
       </section>
 
-      {/* Form + info cards */}
       <section className="relative -mt-24 px-4 sm:px-6 lg:px-8 pb-24">
         <div className="max-w-6xl mx-auto grid grid-cols-1 gap-8 lg:grid-cols-5">
           <div className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-8 sm:p-10 shadow-xl lg:col-span-3">
@@ -117,7 +120,20 @@ const Contact: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="relative space-y-6">
+                <div className="absolute -left-[9999px] opacity-0 h-0 overflow-hidden" aria-hidden="true">
+                  <label htmlFor="website">Website</label>
+                  <input
+                    id="website"
+                    name="website"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={form.website}
+                    onChange={handleChange}
+                  />
+                </div>
+
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <label className="mb-2 block text-xs font-bold uppercase tracking-widest text-brand-slate dark:text-gray-400">
@@ -168,6 +184,7 @@ const Contact: React.FC = () => {
                   </label>
                   <select
                     name="subject"
+                    required
                     value={form.subject}
                     onChange={handleChange}
                     className={inputClass}
@@ -190,6 +207,7 @@ const Contact: React.FC = () => {
                     onChange={handleChange}
                     placeholder={t('contactPage.messagePlaceholder')}
                     required
+                    minLength={10}
                     rows={6}
                     className={cn(inputClass, 'resize-none')}
                   />
@@ -235,7 +253,6 @@ const Contact: React.FC = () => {
         </div>
       </section>
 
-      {/* FAQ */}
       <section className="bg-[#f8f9fa] dark:bg-gray-800/50 px-4 sm:px-6 lg:px-8 py-24">
         <div className="max-w-6xl mx-auto grid grid-cols-1 items-center gap-14 lg:grid-cols-2">
           <div>
@@ -288,7 +305,6 @@ const Contact: React.FC = () => {
         </div>
       </section>
 
-      {/* Promo cards */}
       <section className="px-4 sm:px-6 lg:px-8 py-20 bg-white dark:bg-gray-900">
         <div className="max-w-6xl mx-auto grid grid-cols-1 gap-6 md:grid-cols-3">
           {PROMO_KEYS.map(({ key, to, image }) => (

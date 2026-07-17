@@ -17,11 +17,19 @@ const contactLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 5, message: { 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 contactRouter.post('/', contactLimiter, async (req, res) => {
+  // Honeypot anti-bot
+  if (typeof req.body?.website === 'string' && req.body.website.trim() !== '') {
+    return res.status(201).json({ success: true, message: 'Message envoyé' })
+  }
+
   const { firstName, lastName, email, subject, message } = req.body
   if (!firstName?.trim() || !lastName?.trim() || !email?.trim() || !subject?.trim() || !message?.trim()) {
     return res.status(400).json({ message: 'Tous les champs sont requis' })
   }
   if (!EMAIL_RE.test(email.trim())) return res.status(400).json({ message: 'Email invalide' })
+  if (message.trim().length < 10) {
+    return res.status(400).json({ message: 'Le message doit contenir au moins 10 caractères' })
+  }
 
   const payload = {
     firstName: firstName.trim(),

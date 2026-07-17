@@ -6,6 +6,8 @@ export interface ContactPayload {
   email: string
   subject: string
   message: string
+  /** Honeypot anti-spam — doit rester vide */
+  website?: string
 }
 
 /** Envoie un message depuis le formulaire de contact. */
