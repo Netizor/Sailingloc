@@ -17,8 +17,11 @@ const contactLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 5, message: { 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 contactRouter.post('/', contactLimiter, async (req, res) => {
-  // Honeypot anti-bot
-  if (typeof req.body?.website === 'string' && req.body.website.trim() !== '') {
+  console.log('[Contact] POST reçu')
+
+  // Honeypot anti-bot (nom volontairement non autofill)
+  if (typeof req.body?.company_url_hp === 'string' && req.body.company_url_hp.trim() !== '') {
+    console.log('[Contact] honeypot rempli → faux succès (pas d\'envoi)')
     return res.status(201).json({ success: true, message: 'Message envoyé' })
   }
 
@@ -41,6 +44,7 @@ contactRouter.post('/', contactLimiter, async (req, res) => {
 
   try {
     await sendContactMessage(payload)
+    console.log('[Contact] email équipe envoyé')
   } catch (error) {
     console.error('[Contact] Erreur envoi email:', error)
     return res.status(500).json({ success: false, message: 'Impossible d\'envoyer le message pour le moment' })
@@ -48,6 +52,7 @@ contactRouter.post('/', contactLimiter, async (req, res) => {
 
   try {
     await sendContactConfirmation(payload)
+    console.log('[Contact] email confirmation envoyé')
   } catch (error) {
     console.error('[Contact] Erreur envoi email de confirmation:', error)
   }

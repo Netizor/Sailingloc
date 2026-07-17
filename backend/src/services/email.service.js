@@ -6,27 +6,24 @@
  * - CONTACT_EMAIL ou RESEND_TO_EMAIL
  */
 
-const RAW_FROM =
-  process.env.MAIL_FROM ||
-  process.env.EMAIL_FROM ||
-  'noreply@sailingloc.fr'
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
+const NAVY = '#003366'
+const OCEAN = '#2563FF'
 
-function resolveFromAddress(raw) {
-  const value = String(raw || '').trim()
+function resolveFromAddress() {
+  const raw =
+    process.env.MAIL_FROM ||
+    process.env.EMAIL_FROM ||
+    'noreply@sailingloc.fr'
+  const value = String(raw).trim()
   if (!value) return 'noreply@sailingloc.fr'
   if (value.includes('<') && value.includes('>')) return value
   return `SailingLoc <${value}>`
 }
 
-const MAIL_FROM = resolveFromAddress(RAW_FROM)
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
-const CONTACT_TO =
-  process.env.CONTACT_EMAIL ||
-  process.env.RESEND_TO_EMAIL ||
-  null
-
-const NAVY = '#003366'
-const OCEAN = '#2563FF'
+function resolveContactTo() {
+  return process.env.CONTACT_EMAIL || process.env.RESEND_TO_EMAIL || null
+}
 
 export function escapeHtml(str) {
   return String(str ?? '')
@@ -38,18 +35,22 @@ export function escapeHtml(str) {
 }
 
 async function sendMail({ to, subject, html, replyTo }) {
-  if (process.env.RESEND_API_KEY) {
+  const apiKey = process.env.RESEND_API_KEY
+  const from = resolveFromAddress()
+
+  if (apiKey) {
     const payload = {
-      from: MAIL_FROM,
+      from,
       to: Array.isArray(to) ? to : [to],
       subject,
       html,
       ...(replyTo ? { reply_to: replyTo } : {}),
     }
+    console.log(`[Email] Resend → to=${payload.to} from=${from} subject=${subject}`)
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
@@ -59,15 +60,17 @@ async function sendMail({ to, subject, html, replyTo }) {
       console.error('[Email] Resend error:', err)
       throw new Error(`Échec envoi email Resend : ${err}`)
     }
+    const data = await res.json().catch(() => ({}))
+    console.log('[Email] Resend OK', data?.id || '')
     return
   }
 
-  console.log(`[Email DEV] to=${to} | subject=${subject}${replyTo ? ` | replyTo=${replyTo}` : ''}`)
+  console.log(`[Email DEV] (pas de RESEND_API_KEY) to=${to} | subject=${subject}${replyTo ? ` | replyTo=${replyTo}` : ''}`)
   console.log(html.replace(/<[^>]+>/g, '').substring(0, 300))
 }
 
 export async function sendContactMessage({ firstName, lastName, email, subject, message }) {
-  const to = CONTACT_TO
+  const to = resolveContactTo()
   if (!to) throw new Error('CONTACT_EMAIL (ou RESEND_TO_EMAIL) non configuré')
 
   const name = `${firstName} ${lastName}`.trim()
@@ -120,6 +123,34 @@ export async function sendContactConfirmation({ firstName, email, subject }) {
           <p style="margin:0 0 12px">Nous avons bien reçu votre message concernant <strong>${safeSubject}</strong>.</p>
           <p style="margin:0 0 12px">Notre équipe vous répondra sous <strong>48 h</strong>.</p>
           <p style="margin:0;color:#6b7280;font-size:13px">Ceci est un message automatique, merci de ne pas y répondre.</p>
+        </div>
+        <div style="background:#EEF3FB;padding:12px 20px;font-size:12px;color:${NAVY}">
+          <a href="${FRONTEND_URL}" style="color:${OCEAN};text-decoration:none">sailingloc.fr</a>
+        </div>
+      </div>
+    `,
+  })
+}
+
+export async function sendAccountDeletedEmail({ to, firstName }) {
+  const safeName = escapeHtml(firstName || 'utilisateur')
+
+  await sendMail({
+    to,
+    subject: 'Confirmation de suppression de compte – SailingLoc',
+    html: `
+      <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">
+        <div style="background:${NAVY};color:#fff;padding:16px 20px">
+          <h1 style="margin:0;font-size:18px">SailingLoc</h1>
+        </div>
+        <div style="padding:20px;color:#111827;background:#fff">
+          <p style="margin:0 0 12px">Bonjour ${safeName},</p>
+          <p style="margin:0 0 12px">Nous confirmons que votre compte SailingLoc a bien été <strong>supprimé</strong>.</p>
+          <p style="margin:0 0 12px">Vos données personnelles ont été anonymisées conformément au RGPD.</p>
+          <p style="margin:0 0 12px">Si vous n'êtes pas à l'origine de cette demande, contactez-nous immédiatement à
+            <a href="mailto:sailingloc-entreprise@outlook.fr" style="color:${OCEAN}">sailingloc-entreprise@outlook.fr</a>.
+          </p>
+          <p style="margin:0;color:#6b7280;font-size:13px">Ceci est un message automatique.</p>
         </div>
         <div style="background:#EEF3FB;padding:12px 20px;font-size:12px;color:${NAVY}">
           <a href="${FRONTEND_URL}" style="color:${OCEAN};text-decoration:none">sailingloc.fr</a>

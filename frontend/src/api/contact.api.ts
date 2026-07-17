@@ -6,11 +6,15 @@ export interface ContactPayload {
   email: string
   subject: string
   message: string
-  /** Honeypot anti-spam — doit rester vide */
   website?: string
 }
 
 /** Envoie un message depuis le formulaire de contact. */
 export const sendContactMessage = async (payload: ContactPayload): Promise<void> => {
-  await api.post('/contact', payload)
+  const { website, ...rest } = payload
+  await api.post('/contact', {
+    ...rest,
+    // honeypot côté API (ne doit jamais être rempli par un humain)
+    company_url_hp: website || '',
+  })
 }

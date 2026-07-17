@@ -122,13 +122,13 @@ const Contact: React.FC = () => {
             ) : (
               <form onSubmit={handleSubmit} className="relative space-y-6">
                 <div className="absolute -left-[9999px] opacity-0 h-0 overflow-hidden" aria-hidden="true">
-                  <label htmlFor="website">Website</label>
+                  <label htmlFor="company_url_hp">Company</label>
                   <input
-                    id="website"
+                    id="company_url_hp"
                     name="website"
                     type="text"
                     tabIndex={-1}
-                    autoComplete="off"
+                    autoComplete="new-password"
                     value={form.website}
                     onChange={handleChange}
                   />

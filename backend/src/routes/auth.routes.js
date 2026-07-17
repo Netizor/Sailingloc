@@ -8,6 +8,7 @@ import { authenticate } from '../middleware/auth.middleware.js'
 import {
   sendEmailVerification,
   sendPasswordReset,
+  sendAccountDeletedEmail,
 } from '../services/email.service.js'
 
 const router = Router()
@@ -276,6 +277,28 @@ router.delete('/account', authenticate, async (req, res, next) => {
   try {
     const userId = req.user.id
 
+    // Récupérer email + prénom AVANT anonymisation (pour le mail de confirmation)
+    const { data: userRow, error: fetchError } = await supabase
+      .from('users')
+      .select('id, email, first_name')
+      .eq('id', userId)
+      .single()
+
+    if (fetchError || !userRow) {
+      return res.status(404).json({ message: 'Utilisateur introuvable' })
+    }
+
+    const emailToNotify = userRow.email
+    const firstName = userRow.first_name || 'utilisateur'
+
+    // Envoyer le mail de confirmation tant que l'email est encore valide
+    try {
+      await sendAccountDeletedEmail({ to: emailToNotify, firstName })
+    } catch (mailErr) {
+      console.error('[Auth] Email confirmation suppression échoué:', mailErr)
+      // On continue la suppression même si le mail échoue
+    }
+
     // Invalider tous les refresh tokens
     await supabase.from('refresh_tokens').delete().eq('user_id', userId)
 
@@ -294,7 +317,7 @@ router.delete('/account', authenticate, async (req, res, next) => {
 
     if (error) return res.status(500).json({ message: 'Erreur lors de la suppression du compte' })
 
-    return res.json({ message: 'Compte supprimé' })
+    return res.json({ message: 'Compte supprimé. Un email de confirmation vous a été envoyé.' })
   } catch (err) {
     next(err)
   }

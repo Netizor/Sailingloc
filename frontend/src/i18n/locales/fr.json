@@ -552,6 +552,20 @@
       "errorTokenInvalid": "Ce lien est invalide ou a expiré.",
       "requestNewLink": "Demander un nouveau lien"
     },
+    "verifyEmail": {
+      "pageTitle": "Vérification de l'email",
+      "heading": "Vérification de l'email",
+      "loading": "Vérification en cours…",
+      "successTitle": "Email vérifié !",
+      "successMessage": "Votre adresse email a bien été confirmée.",
+      "errorTitle": "Lien invalide",
+      "errorMissingToken": "Lien de vérification manquant ou invalide.",
+      "errorDefault": "Lien invalide ou expiré.",
+      "goToSpace": "Accéder à mon espace",
+      "signIn": "Se connecter",
+      "backToSpace": "Retour à mon espace",
+      "resendHint": "Une fois connecté, vous pourrez renvoyer un email de vérification depuis votre profil."
+    },
     "register": {
       "title": "Créer un compte",
       "subtitle": "Rejoignez la communauté nautique",

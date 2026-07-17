@@ -29,7 +29,7 @@ import { getInitials, cn } from '../../lib/utils'
 import { UserRole } from '../../types'
 import { MY_PUBLIC_PROFILE_ROUTE, getPublicProfilePath } from '../../lib/profilePaths'
 
-type SettingsTab = 'compte' | 'marin' | 'securite' | 'donnees'
+type SettingsTab = 'compte' | 'marin' | 'securite' | 'donnees' | 'confidentialite'
 
 // ─── Constantes partagées entre sections ─────────────────────────────────────
 
@@ -818,24 +818,29 @@ const DataPrivacySection: React.FC = () => {
       a.download = `sailingloc-mes-donnees-${new Date().toISOString().slice(0, 10)}.json`
       a.click()
       URL.revokeObjectURL(url)
-      toast.success('Export downloaded')
+      toast.success('Export téléchargé')
     },
-    onError: () => toast.error('Error exporting data'),
+    onError: () => toast.error("Erreur lors de l'export"),
   })
 
   const deleteMutation = useMutation({
     mutationFn: deleteAccount,
     onSuccess: () => {
-      toast.success('Account deleted. Your data has been erased.')
+      toast.success('Compte supprimé. Un email de confirmation vous a été envoyé.')
       logout()
       navigate('/', { replace: true })
     },
-    onError: () => toast.error('Error deleting account'),
+    onError: (err: unknown) => {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        'Erreur lors de la suppression du compte'
+      toast.error(msg)
+    },
   })
 
   const handleDelete = () => {
-    if (confirmEmail !== user?.email) {
-      toast.error('The email address entered does not match')
+    if (confirmEmail.trim().toLowerCase() !== user?.email?.trim().toLowerCase()) {
+      toast.error("L'adresse email saisie ne correspond pas")
       return
     }
     deleteMutation.mutate()
@@ -845,18 +850,18 @@ const DataPrivacySection: React.FC = () => {
     <div className={CARD}>
       <div className="flex items-center gap-2.5 mb-1">
         <SectionIcon icon={<ShieldAlert size={17} />} />
-        <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Data &amp; privacy</h2>
+        <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Données &amp; confidentialité</h2>
       </div>
       <p className="text-xs text-gray-500 dark:text-gray-400 mb-6 ml-[46px]">
-        Under GDPR, you have the right to access, port, and erase your personal data.
+        Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de portabilité et d&apos;effacement de vos données.
       </p>
 
       {/* Export */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-gray-100 dark:border-gray-700">
         <div>
-          <p className="text-sm font-medium text-gray-800 dark:text-gray-200">Export my data</p>
+          <p className="text-sm font-medium text-gray-800 dark:text-gray-200">Exporter mes données</p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            Download a copy of all your personal data as JSON.
+            Téléchargez une copie de vos données personnelles au format JSON.
           </p>
         </div>
         <Button
@@ -866,16 +871,16 @@ const DataPrivacySection: React.FC = () => {
           loading={exportMutation.isPending}
           onClick={() => exportMutation.mutate()}
         >
-          Export
+          Exporter
         </Button>
       </div>
 
       {/* Account deletion */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-5">
         <div>
-          <p className="text-sm font-medium text-red-600 dark:text-red-400">Delete my account</p>
+          <p className="text-sm font-medium text-red-600 dark:text-red-400">Supprimer mon compte</p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            This cannot be undone. Your personal data will be anonymized (GDPR Art. 17).
+            Action irréversible. Vos données personnelles seront anonymisées (RGPD art. 17).
           </p>
         </div>
         <button
@@ -883,7 +888,7 @@ const DataPrivacySection: React.FC = () => {
           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex-shrink-0"
         >
           <Trash2 size={14} />
-          Delete
+          Supprimer
         </button>
       </div>
 
@@ -892,17 +897,17 @@ const DataPrivacySection: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6 max-w-md w-full">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              Delete my account
+              Supprimer mon compte
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              This action is <strong>irreversible</strong>. Your personal data will be anonymized.
-              To confirm, enter your email address: <strong>{user?.email}</strong>
+              Cette action est <strong>irréversible</strong>. Vos données personnelles seront anonymisées.
+              Pour confirmer, saisissez votre adresse email : <strong>{user?.email}</strong>
             </p>
             <input
               type="email"
               value={confirmEmail}
               onChange={(e) => setConfirmEmail(e.target.value)}
-              placeholder="Your email address"
+              placeholder="Votre adresse email"
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 mb-4 focus:outline-none focus:ring-2 focus:ring-red-500"
             />
             <div className="flex gap-3 justify-end">
@@ -912,14 +917,17 @@ const DataPrivacySection: React.FC = () => {
                 onClick={() => { setShowDeleteModal(false); setConfirmEmail('') }}
                 disabled={deleteMutation.isPending}
               >
-                Cancel
+                Annuler
               </Button>
               <button
                 onClick={handleDelete}
-                disabled={deleteMutation.isPending || confirmEmail !== user?.email}
+                disabled={
+                  deleteMutation.isPending ||
+                  confirmEmail.trim().toLowerCase() !== user?.email?.trim().toLowerCase()
+                }
                 className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {deleteMutation.isPending ? 'Deleting…' : 'Delete permanently'}
+                {deleteMutation.isPending ? 'Suppression…' : 'Supprimer définitivement'}
               </button>
             </div>
           </div>
@@ -941,10 +949,11 @@ const UserProfile: React.FC = () => {
   const publicProfilePath = getPublicProfilePath(user)
 
   const tabs: { id: SettingsTab; label: string; icon: React.ReactNode; ownerOnly?: boolean }[] = [
-    { id: 'compte', label: 'My account', icon: <UserCircle size={18} /> },
-    { id: 'marin', label: 'Sailor CV', icon: <Anchor size={18} />, ownerOnly: true },
-    { id: 'securite', label: 'Security', icon: <Shield size={18} /> },
-    { id: 'donnees', label: 'Payment', icon: <CreditCard size={18} /> },
+    { id: 'compte', label: 'Mon compte', icon: <UserCircle size={18} /> },
+    { id: 'marin', label: 'CV marin', icon: <Anchor size={18} />, ownerOnly: true },
+    { id: 'securite', label: 'Sécurité', icon: <Shield size={18} /> },
+    { id: 'donnees', label: 'Paiement', icon: <CreditCard size={18} /> },
+    { id: 'confidentialite', label: 'Confidentialité', icon: <ShieldAlert size={18} /> },
   ]
 
   const visibleTabs = tabs.filter((t) => !t.ownerOnly || isOwner)
@@ -1014,6 +1023,7 @@ const UserProfile: React.FC = () => {
           {activeTab === 'marin' && isOwner && <SailorCvSection />}
           {activeTab === 'securite' && <SecuritySection />}
           {activeTab === 'donnees' && <PaymentSection />}
+          {activeTab === 'confidentialite' && <DataPrivacySection />}
         </div>
       </div>
     </div>
