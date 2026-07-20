@@ -18,8 +18,38 @@ const registerLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 5, message: {
 const resetLimiter    = rateLimit({ windowMs: 60 * 60 * 1000, max: 5, message: { message: 'Trop de tentatives. Réessayez dans une heure.' } })
 const loginLimiter    = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, message: { message: 'Trop de tentatives. Réessayez dans 15 minutes.' } })
 
+// ─── Validation (logique métier pure, testable sans base de données) ──
+export function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+/** Retourne null si le mot de passe est valide, sinon le message d'erreur à renvoyer. */
+export function validatePassword(password) {
+  if (!password || password.length < 12 || password.length > 128) {
+    return 'Le mot de passe doit contenir entre 12 et 128 caractères'
+  }
+  if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+    return 'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial.'
+  }
+  return null
+}
+
+/** Un utilisateur ne peut choisir que RENTER ou OWNER à l'inscription — jamais ADMIN. */
+export function resolveRole(role) {
+  const allowedRoles = ['RENTER', 'OWNER']
+  return allowedRoles.includes(role) ? role : 'RENTER'
+}
+
+/** Parse la réponse de l'API "Have I Been Pwned" (format k-anonymity : SUFFIX:count par ligne). */
+export function parseHibpResponse(text, suffix) {
+  const lines = text.split('\n')
+  const match = lines.find((l) => l.startsWith(suffix))
+  const count = match ? parseInt(match.split(':')[1]) : 0
+  return { compromised: count > 0, count }
+}
+
 // ─── Helper ────────────────────────────────────────────────
-function formatUser(u) {
+export function formatUser(u) {
   return {
     id: u.id,
     email: u.email,
@@ -54,18 +84,13 @@ router.post('/register', registerLimiter, async (req, res) => {
   if (!email || !password || !firstName || !lastName) {
     return res.status(400).json({ message: 'email, password, firstName et lastName sont requis' })
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!isValidEmail(email)) {
     return res.status(400).json({ message: 'Format email invalide' })
   }
-  if (password.length < 12 || password.length > 128) {
-    return res.status(400).json({ message: 'Le mot de passe doit contenir entre 12 et 128 caractères' })
-  }
-  if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
-    return res.status(400).json({ message: 'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial.' })
-  }
+  const passwordError = validatePassword(password)
+  if (passwordError) return res.status(400).json({ message: passwordError })
 
-  const allowedRoles = ['RENTER', 'OWNER']
-  const userRole = allowedRoles.includes(role) ? role : 'RENTER'
+  const userRole = resolveRole(role)
 
   // Vérifier si email déjà utilisé
   const { data: existing } = await supabase.from('users').select('id').eq('email', email.toLowerCase()).single()
@@ -215,7 +240,8 @@ router.post('/forgot-password', resetLimiter, async (req, res) => {
 router.post('/reset-password', async (req, res) => {
   const { token, password } = req.body
   if (!token || !password) return res.status(400).json({ message: 'token et password requis' })
-  if (password.length < 12) return res.status(400).json({ message: 'Mot de passe trop court (12 caractères minimum)' })
+  const passwordError = validatePassword(password)
+  if (passwordError) return res.status(400).json({ message: passwordError })
 
   const { data: tokenRow } = await supabase.from('password_reset_tokens').select('*').eq('token', token).single()
   if (!tokenRow || new Date(tokenRow.expires_at) < new Date()) {
@@ -339,12 +365,9 @@ router.post('/hibp-check', authenticate, async (req, res) => {
     const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`, {
       headers: { 'Add-Padding': 'true' },
     })
-    const text  = await response.text()
-    const lines = text.split('\n')
-    const match = lines.find(l => l.startsWith(suffix))
-    const count = match ? parseInt(match.split(':')[1]) : 0
+    const text = await response.text()
 
-    return res.json({ compromised: count > 0, count })
+    return res.json(parseHibpResponse(text, suffix))
   } catch {
     return res.json({ compromised: false })
   }
