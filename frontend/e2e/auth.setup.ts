@@ -83,26 +83,21 @@ async function globalSetup() {
       const context = await browser.newContext()
       const page    = await context.newPage()
 
-      await page.addInitScript(() => {
-        localStorage.setItem(
-          'sailingloc-cookie-consent',
-          JSON.stringify({
-            version: '2',
-            essential: true,
-            analytical: false,
-            marketing: false,
-            date: new Date().toISOString(),
-          }),
-        )
-      })
-
-      await page.goto(BASE_URL)
-
-      await page.evaluate(
+      await page.addInitScript(
         ({ user, accessToken, refreshToken }) => {
-          // Zustand charge TOUS les champs du state stocké au démarrage,
-          // même ceux absents de partialize (comme accessToken).
-          // Cela évite la boucle 401 → refresh au premier appel API.
+          localStorage.setItem(
+            'sailingloc-cookie-consent',
+            JSON.stringify({
+              version: '2',
+              essential: true,
+              analytical: false,
+              marketing: false,
+              date: new Date().toISOString(),
+            }),
+          )
+          // Requis pour initSessionGuard() : sinon logout immédiat au montage.
+          localStorage.setItem('sailingloc-remember-me', 'true')
+          sessionStorage.setItem('sailingloc-session-active', '1')
           localStorage.setItem(
             'sailingloc-auth',
             JSON.stringify({
@@ -113,6 +108,8 @@ async function globalSetup() {
         },
         { user, accessToken, refreshToken },
       )
+
+      await page.goto(BASE_URL)
 
       // ── 4. Sauvegarde le storageState ────────────────────────────────────
       await context.storageState({ path: path.join(AUTH_DIR, `${role}.json`) })

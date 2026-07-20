@@ -49,13 +49,14 @@ export async function loginAs(page: Page, role: keyof typeof DEMO_ACCOUNTS): Pro
         state?: { isAuthenticated?: boolean; accessToken?: string }
       }
       if (parsed.state?.isAuthenticated) {
-        // Injecte l'état auth dans la page avant de naviguer.
-        // Le accessToken est inclus dans le state → Zustand l'hydrate → les appels API fonctionnent.
-        await page.goto('/')
-        await page.evaluate((authValue) => {
+        // Injecte AVANT le premier chargement React (addInitScript), sinon
+        // initSessionGuard() déconnecte : pas de remember-me + sessionStorage vide.
+        await page.addInitScript((authValue) => {
           localStorage.setItem('sailingloc-auth', authValue)
+          localStorage.setItem('sailingloc-remember-me', 'true')
+          sessionStorage.setItem('sailingloc-session-active', '1')
         }, authItem.value)
-        // Navigue vers le tableau de bord approprié selon le rôle
+
         const destination = role === 'admin' ? '/admin' : role === 'owner' ? '/proprietaire' : '/mon-espace'
         await page.goto(destination)
         return

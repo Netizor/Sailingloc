@@ -24,7 +24,8 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
-function formatKycStatus(user) {
+/** DTO statut KYC (pièce d'identité / permis) renvoyé au frontend. */
+export function formatKycStatus(user) {
   const status = user.kyc_status || (user.kyc_verified_at ? 'APPROVED' : 'NOT_SUBMITTED')
 
   return {
@@ -36,11 +37,52 @@ function formatKycStatus(user) {
   }
 }
 
-function parseDocumentExpiresAt(value) {
+/** Parse une date de validité de document ; null si absente ou invalide. */
+export function parseDocumentExpiresAt(value) {
   if (!value) return null
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return null
   return date.toISOString()
+}
+
+/** Retourne un message d'erreur si le dépôt KYC est bloqué, sinon null. */
+export function validateKycSubmitStatus(kycStatus) {
+  if (kycStatus === 'PENDING') return 'Une vérification est déjà en cours'
+  if (kycStatus === 'APPROVED') return 'Votre identité est déjà vérifiée'
+  return null
+}
+
+/**
+ * Valide la décision admin (APPROVED / REJECTED) et prépare les champs à persister.
+ * @returns {{ error: string } | { updates: object }}
+ */
+export function buildKycReviewUpdates({ status, rejectionReason, documentExpiresAt, reviewedAt = new Date().toISOString() }) {
+  if (!['APPROVED', 'REJECTED'].includes(status)) return { error: 'Statut invalide' }
+  if (status === 'REJECTED' && !rejectionReason?.trim()) return { error: 'Motif de refus requis' }
+
+  const updates = {
+    kyc_status: status,
+    kyc_reviewed_at: reviewedAt,
+    kyc_verified_at: status === 'APPROVED' ? reviewedAt : null,
+    kyc_rejection_reason: status === 'REJECTED' ? rejectionReason.trim() : null,
+    updated_at: reviewedAt,
+  }
+
+  if (status === 'APPROVED') {
+    const expiresAt = parseDocumentExpiresAt(documentExpiresAt)
+    if (documentExpiresAt && !expiresAt) return { error: 'Date de validité invalide' }
+    if (expiresAt) updates.kyc_document_expires_at = expiresAt
+  } else {
+    updates.kyc_document_expires_at = null
+  }
+
+  return { updates }
+}
+
+/** Motif requis pour forcer un renouvellement de pièce. */
+export function validateRenewalReason(reason) {
+  if (!reason?.trim()) return 'Motif requis'
+  return null
 }
 
 function uploadDocument(file, side, userId) {
@@ -86,8 +128,8 @@ router.post('/submit', authenticate, upload.fields([
     .single()
 
   if (currentUserError) return res.status(500).json({ message: currentUserError.message })
-  if (currentUser?.kyc_status === 'PENDING') return res.status(409).json({ message: 'Une vérification est déjà en cours' })
-  if (currentUser?.kyc_status === 'APPROVED') return res.status(409).json({ message: 'Votre identité est déjà vérifiée' })
+  const submitBlocked = validateKycSubmitStatus(currentUser?.kyc_status)
+  if (submitBlocked) return res.status(409).json({ message: submitBlocked })
 
   const [frontUpload, backUpload] = await Promise.all([
     uploadDocument(frontFile, 'front', req.user.id),
@@ -131,31 +173,13 @@ router.get('/admin/pending', authenticate, requireRole('ADMIN'), async (req, res
 // ─── PATCH /kyc/admin/:userId ───────────────────────────────
 router.patch('/admin/:userId', authenticate, requireRole('ADMIN'), async (req, res) => {
   const { status, rejectionReason, documentExpiresAt } = req.body
-  if (!['APPROVED', 'REJECTED'].includes(status)) return res.status(400).json({ message: 'Statut invalide' })
-  if (status === 'REJECTED' && !rejectionReason?.trim()) return res.status(400).json({ message: 'Motif de refus requis' })
-
   const reviewedAt = new Date().toISOString()
-  const updates = {
-    kyc_status: status,
-    kyc_reviewed_at: reviewedAt,
-    kyc_verified_at: status === 'APPROVED' ? reviewedAt : null,
-    kyc_rejection_reason: status === 'REJECTED' ? rejectionReason.trim() : null,
-    updated_at: reviewedAt,
-  }
-
-  if (status === 'APPROVED') {
-    const expiresAt = parseDocumentExpiresAt(documentExpiresAt)
-    if (documentExpiresAt && !expiresAt) {
-      return res.status(400).json({ message: 'Date de validité invalide' })
-    }
-    if (expiresAt) updates.kyc_document_expires_at = expiresAt
-  } else {
-    updates.kyc_document_expires_at = null
-  }
+  const review = buildKycReviewUpdates({ status, rejectionReason, documentExpiresAt, reviewedAt })
+  if (review.error) return res.status(400).json({ message: review.error })
 
   const { data: user, error } = await supabase
     .from('users')
-    .update(updates)
+    .update(review.updates)
     .eq('id', req.params.userId)
     .select(KYC_SELECT)
     .single()
@@ -175,7 +199,8 @@ router.patch('/admin/:userId', authenticate, requireRole('ADMIN'), async (req, r
 // ─── POST /kyc/admin/:userId/request-renewal ────────────────
 router.post('/admin/:userId/request-renewal', authenticate, requireRole('ADMIN'), async (req, res) => {
   const { reason } = req.body
-  if (!reason?.trim()) return res.status(400).json({ message: 'Motif requis' })
+  const renewalError = validateRenewalReason(reason)
+  if (renewalError) return res.status(400).json({ message: renewalError })
 
   const { data: existing, error: fetchError } = await supabase
     .from('users')

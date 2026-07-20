@@ -14,18 +14,121 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
-function parseArrayParam(query, key) {
+export function parseArrayParam(query, key) {
   const raw = query[key] ?? query[`${key}[]`]
   if (!raw) return []
   return Array.isArray(raw) ? raw : [raw]
 }
 
-function parseAvailabilityRange(startDate, endDate) {
+/** Plage de disponibilité pour filtrer la recherche ; null si absente ou invalide. */
+export function parseAvailabilityRange(startDate, endDate) {
   if (!startDate || !endDate) return null
   const start = new Date(`${startDate}T12:00:00`)
   const end = new Date(`${endDate}T12:00:00`)
   if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || start >= end) return null
   return { startDate, endDate }
+}
+
+/** Pagination liste bateaux (page ≥ 1, limit plafonné). */
+export function parseListPagination(query = {}, { defaultLimit = 12, maxLimit = 50 } = {}) {
+  const page = Math.max(1, parseInt(query.page) || 1)
+  const limit = Math.min(maxLimit, parseInt(query.limit) || defaultLimit)
+  const from = (page - 1) * limit
+  return { page, limit, from }
+}
+
+/** Propriétaire ou admin peut gérer l'annonce. */
+export function canManageBoat(boat, user) {
+  if (!boat || !user) return false
+  return boat.owner_id === user.id || user.role === 'ADMIN'
+}
+
+/** Un bateau non actif n'est visible que par son propriétaire ou un admin. */
+export function canViewBoat(boat, user) {
+  if (!boat) return false
+  if (boat.status === 'active') return true
+  return Boolean(user && (user.id === boat.owner_id || user.role === 'ADMIN'))
+}
+
+/** Valide le statut de publication d'une annonce. */
+export function validateBoatStatus(status) {
+  if (!['draft', 'active', 'inactive'].includes(status)) return 'Statut invalide'
+  return null
+}
+
+/**
+ * Valide le body de création d'annonce.
+ * @returns {{ error: string } | { boatStatus: string }}
+ */
+export function validateBoatCreate(body) {
+  const rawStatus = typeof body.status === 'string' ? body.status.toLowerCase() : 'draft'
+  const boatStatus = rawStatus === 'active' ? 'active' : 'draft'
+  const {
+    title, description, type, capacity, dailyRate, city, pricePerDay,
+  } = body
+
+  if (boatStatus === 'active') {
+    if (!title || !description || !type || !capacity || !(dailyRate || pricePerDay) || !city) {
+      return { error: 'title, description, type, capacity, dailyRate et city sont requis pour publier' }
+    }
+  } else if (!title) {
+    return { error: 'Le titre est requis' }
+  }
+
+  return { boatStatus }
+}
+
+/** Mappe un type de document légal vers la colonne Supabase. */
+export function resolveDocumentField(docType) {
+  const fieldMap = {
+    insurance: 'insurance_doc',
+    registration: 'registration_doc',
+    license: 'license_scan_doc',
+    contract: 'contract_doc',
+  }
+  return fieldMap[docType] || null
+}
+
+/** Agrège les destinations actives par chaîne. */
+export function summarizeDestinations(boats) {
+  const byCountry = new Map()
+  for (const boat of boats || []) {
+    const country = (boat.country || 'France').trim()
+    if (!byCountry.has(country)) {
+      byCountry.set(country, { country, count: 0, image: null })
+    }
+    const entry = byCountry.get(country)
+    entry.count += 1
+    if (!entry.image && boat.images?.[0]) entry.image = boat.images[0]
+  }
+  return [...byCountry.values()]
+}
+
+/** Fusionne suggestions autocomplete ville/port/pays (max 8). */
+export function buildAutocompleteSuggestions({ cities = [], ports = [], countries = [] }, limit = 8) {
+  const seen = new Set()
+  const suggestions = []
+
+  for (const row of cities) {
+    if (row.city && !seen.has(row.city.toLowerCase())) {
+      seen.add(row.city.toLowerCase())
+      suggestions.push({ label: row.city, type: 'city' })
+    }
+  }
+  for (const row of ports) {
+    if (row.port && !seen.has(row.port.toLowerCase())) {
+      seen.add(row.port.toLowerCase())
+      suggestions.push({ label: row.port, type: 'port' })
+    }
+  }
+  for (const row of countries) {
+    if (row.country && !seen.has(row.country.toLowerCase())) {
+      seen.add(row.country.toLowerCase())
+      suggestions.push({ label: row.country, type: 'country' })
+    }
+  }
+
+  return suggestions.slice(0, limit)
 }
 
 async function getUnavailableBoatIdsForRange(startDate, endDate) {
@@ -85,7 +188,7 @@ function applyBoatSearchFilters(query, reqQuery) {
 }
 
 // ─── Format réponse (snake_case BDD → camelCase frontend) ──
-function formatBoat(b, withOwner = false) {
+export function formatBoat(b, withOwner = false) {
   const base = {
     id: b.id,
     ownerId: b.owner_id,
@@ -144,9 +247,7 @@ function formatBoat(b, withOwner = false) {
 
 // ─── GET /boats ────────────────────────────────────────────
 router.get('/', optionalAuth, async (req, res) => {
-  const page  = Math.max(1, parseInt(req.query.page)  || 1)
-  const limit = Math.min(50, parseInt(req.query.limit) || 12)
-  const from  = (page - 1) * limit
+  const { page, limit, from } = parseListPagination(req.query, { defaultLimit: 12 })
 
   let query = supabase
     .from('boats')
@@ -188,9 +289,7 @@ router.get('/', optionalAuth, async (req, res) => {
 
 // ─── GET /boats/my ─────────────────────────────────────────
 router.get('/my', authenticate, async (req, res) => {
-  const page  = Math.max(1, parseInt(req.query.page)  || 1)
-  const limit = Math.min(50, parseInt(req.query.limit) || 10)
-  const from  = (page - 1) * limit
+  const { page, limit, from } = parseListPagination(req.query, { defaultLimit: 10 })
 
   const { data, error, count } = await supabase
     .from('boats')
@@ -211,19 +310,7 @@ router.get('/destinations/summary', async (req, res) => {
     .eq('status', 'active')
 
   if (error) return res.status(500).json({ message: error.message })
-
-  const byCountry = new Map()
-  for (const boat of data || []) {
-    const country = (boat.country || 'France').trim()
-    if (!byCountry.has(country)) {
-      byCountry.set(country, { country, count: 0, image: null })
-    }
-    const entry = byCountry.get(country)
-    entry.count += 1
-    if (!entry.image && boat.images?.[0]) entry.image = boat.images[0]
-  }
-
-  return res.json({ countries: [...byCountry.values()] })
+  return res.json({ countries: summarizeDestinations(data) })
 })
 
 // ─── GET /boats/autocomplete ───────────────────────────────
@@ -238,29 +325,13 @@ router.get('/autocomplete', async (req, res, next) => {
       supabase.from('boats').select('country').eq('status', 'active').ilike('country', `%${q}%`).not('country', 'is', null).limit(10),
     ])
 
-    const seen = new Set()
-    const suggestions = []
-
-    for (const row of (cities || [])) {
-      if (row.city && !seen.has(row.city.toLowerCase())) {
-        seen.add(row.city.toLowerCase())
-        suggestions.push({ label: row.city, type: 'city' })
-      }
-    }
-    for (const row of (ports || [])) {
-      if (row.port && !seen.has(row.port.toLowerCase())) {
-        seen.add(row.port.toLowerCase())
-        suggestions.push({ label: row.port, type: 'port' })
-      }
-    }
-    for (const row of (countries || [])) {
-      if (row.country && !seen.has(row.country.toLowerCase())) {
-        seen.add(row.country.toLowerCase())
-        suggestions.push({ label: row.country, type: 'country' })
-      }
-    }
-
-    return res.json({ suggestions: suggestions.slice(0, 8) })
+    return res.json({
+      suggestions: buildAutocompleteSuggestions({
+        cities: cities || [],
+        ports: ports || [],
+        countries: countries || [],
+      }),
+    })
   } catch (err) {
     next(err)
   }
@@ -275,12 +346,7 @@ router.get('/:id', optionalAuth, async (req, res) => {
     .single()
 
   if (error || !boat) return res.status(404).json({ message: 'Bateau introuvable' })
-
-  if (boat.status !== 'active') {
-    if (!req.user || (req.user.id !== boat.owner_id && req.user.role !== 'ADMIN')) {
-      return res.status(404).json({ message: 'Bateau introuvable' })
-    }
-  }
+  if (!canViewBoat(boat, req.user)) return res.status(404).json({ message: 'Bateau introuvable' })
 
   const { data: reviews } = await supabase
     .from('reviews')
@@ -304,18 +370,9 @@ router.post('/', authenticate, requireRole('OWNER', 'ADMIN'), async (req, res) =
     pricePerDay, deposit, amenities, latitude, longitude,
   } = req.body
 
-  const rawStatus = typeof req.body.status === 'string' ? req.body.status.toLowerCase() : 'draft'
-  const boatStatus = rawStatus === 'active' ? 'active' : 'draft'
-
-  if (boatStatus === 'active') {
-    if (!title || !description || !type || !capacity || !(dailyRate || pricePerDay) || !city) {
-      return res.status(400).json({ message: 'title, description, type, capacity, dailyRate et city sont requis pour publier' })
-    }
-  } else {
-    if (!title) {
-      return res.status(400).json({ message: 'Le titre est requis' })
-    }
-  }
+  const createCheck = validateBoatCreate(req.body)
+  if (createCheck.error) return res.status(400).json({ message: createCheck.error })
+  const { boatStatus } = createCheck
 
   const parsedCapacity = capacity ? parseInt(capacity) : 1
   const parsedDailyRate = dailyRate ? parseFloat(dailyRate) : (pricePerDay ? parseFloat(pricePerDay) : 0)
@@ -366,7 +423,7 @@ router.post('/', authenticate, requireRole('OWNER', 'ADMIN'), async (req, res) =
 router.put('/:id', authenticate, async (req, res) => {
   const { data: existing } = await supabase.from('boats').select('owner_id').eq('id', req.params.id).single()
   if (!existing) return res.status(404).json({ message: 'Bateau introuvable' })
-  if (existing.owner_id !== req.user.id && req.user.role !== 'ADMIN') return res.status(403).json({ message: 'Accès refusé' })
+  if (!canManageBoat(existing, req.user)) return res.status(403).json({ message: 'Accès refusé' })
 
   const b = req.body
   const updates = {
@@ -407,10 +464,11 @@ router.put('/:id', authenticate, async (req, res) => {
 router.patch('/:id/status', authenticate, async (req, res) => {
   const { data: existing } = await supabase.from('boats').select('owner_id').eq('id', req.params.id).single()
   if (!existing) return res.status(404).json({ message: 'Bateau introuvable' })
-  if (existing.owner_id !== req.user.id && req.user.role !== 'ADMIN') return res.status(403).json({ message: 'Accès refusé' })
+  if (!canManageBoat(existing, req.user)) return res.status(403).json({ message: 'Accès refusé' })
 
   const status = req.body.status
-  if (!['draft', 'active', 'inactive'].includes(status)) return res.status(400).json({ message: 'Statut invalide' })
+  const statusError = validateBoatStatus(status)
+  if (statusError) return res.status(400).json({ message: statusError })
 
   const { data: updated, error } = await supabase.from('boats').update({ status, updated_at: new Date().toISOString() }).eq('id', req.params.id).select('*, users(id, first_name, last_name, avatar)').single()
   if (error) return res.status(500).json({ message: error.message })
@@ -430,7 +488,7 @@ router.patch('/:id/status', authenticate, async (req, res) => {
 router.delete('/:id', authenticate, async (req, res) => {
   const { data: existing } = await supabase.from('boats').select('owner_id').eq('id', req.params.id).single()
   if (!existing) return res.status(404).json({ message: 'Bateau introuvable' })
-  if (existing.owner_id !== req.user.id && req.user.role !== 'ADMIN') return res.status(403).json({ message: 'Accès refusé' })
+  if (!canManageBoat(existing, req.user)) return res.status(403).json({ message: 'Accès refusé' })
 
   const { data: deleted } = await supabase.from('boats')
     .update({ status: 'inactive', updated_at: new Date().toISOString() })
@@ -453,7 +511,7 @@ router.post('/:id/images', authenticate, async (req, res) => {
   const { imageUrls } = req.body
   const { data: existing } = await supabase.from('boats').select('owner_id, images').eq('id', req.params.id).single()
   if (!existing) return res.status(404).json({ message: 'Bateau introuvable' })
-  if (existing.owner_id !== req.user.id && req.user.role !== 'ADMIN') return res.status(403).json({ message: 'Accès refusé' })
+  if (!canManageBoat(existing, req.user)) return res.status(403).json({ message: 'Accès refusé' })
 
   const newImages = [...(existing.images || []), ...(imageUrls || [])]
   const { data: updated, error } = await supabase.from('boats').update({ images: newImages }).eq('id', req.params.id).select('*, users(id, first_name, last_name, avatar)').single()
@@ -465,18 +523,12 @@ router.post('/:id/images', authenticate, async (req, res) => {
 router.post('/:id/upload-document', authenticate, upload.single('file'), async (req, res) => {
   const { data: existing } = await supabase.from('boats').select('owner_id').eq('id', req.params.id).single()
   if (!existing) return res.status(404).json({ message: 'Bateau introuvable' })
-  if (existing.owner_id !== req.user.id && req.user.role !== 'ADMIN') return res.status(403).json({ message: 'Accès refusé' })
+  if (!canManageBoat(existing, req.user)) return res.status(403).json({ message: 'Accès refusé' })
 
   if (!req.file) return res.status(400).json({ message: 'Fichier requis' })
 
   const docType = req.body.docType || req.body.type || 'document'
-  const fieldMap = {
-    insurance: 'insurance_doc',
-    registration: 'registration_doc',
-    license: 'license_scan_doc',
-    contract: 'contract_doc',
-  }
-  const field = fieldMap[docType]
+  const field = resolveDocumentField(docType)
   if (!field) return res.status(400).json({ message: 'Type de document invalide' })
 
   const result = await new Promise((resolve, reject) => {

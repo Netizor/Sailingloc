@@ -14,6 +14,11 @@ export const test = base.extend({
           date: new Date().toISOString(),
         }),
       )
+      // Évite que initSessionGuard() invalide une session injectée par loginAs()
+      if (localStorage.getItem('sailingloc-auth')) {
+        localStorage.setItem('sailingloc-remember-me', 'true')
+        sessionStorage.setItem('sailingloc-session-active', '1')
+      }
     })
     await use(page)
   },

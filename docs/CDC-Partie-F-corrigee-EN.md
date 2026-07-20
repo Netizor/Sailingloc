@@ -299,19 +299,24 @@ Application testing ensures reliability and prevents regressions. Two categories
 
 ### Unit testing strategy
 
-Modules currently covered (`backend/test/`):
+Modules currently covered (`backend/test/`) — pure business helpers extracted from routes, measured via `npm run test:coverage`:
 
-| Tested file | Measured coverage (lines) |
-|---|---|
-| `lib/jwt.js` (token generation/validation) | 100% |
-| `middleware/auth.middleware.js` (authentication, role check) | 97.5% |
-| `services/email.service.js` | 100% |
-| `services/notifications.service.js` | 100% |
-| `routes/misc.routes.js` (health check, robots.txt, SEO endpoints) | 22.6% (partial) |
+| Tested file | Measured coverage (lines) | Test files |
+|---|---|---|
+| `lib/jwt.js` | 100% | `jwt.test.js` |
+| `middleware/auth.middleware.js` | ~97.5% | `auth.middleware.test.js` |
+| `services/email.service.js` | 100% | `email.service.test.js` |
+| `services/notifications.service.js` | 100% | `notifications.service.test.js` |
+| `routes/auth.routes.js` (validation, tokens, GDPR, HIBP) | ~44% | `auth.validation.test.js`, `auth.security.test.js` |
+| `routes/bookings.routes.js` (pricing, refunds, license, payment, revenues, HTTP handlers) | ~46%+ | `bookings.pricing.test.js`, `bookings.rules.test.js`, `bookings.handlers.test.js` |
+| `routes/boats.routes.js` (search, permissions, create, docs) | ~43% | `boats.routes.test.js` |
+| `routes/kyc.routes.js` (status, admin review, renewal) | ~44% | `kyc.routes.test.js` |
+| `routes/users.routes.js` (profile, password, role) | ~35% | `users.routes.test.js` |
+| `routes/misc.routes.js` (health/SEO, contact, messages, availability, admin, handlers) | rising | `health-seo.test.js`, `misc.helpers.test.js`, `misc.handlers.test.js` |
 
 **Coverage target**: minimum 70% on critical business logic (authentication, booking, payment).
 
-**Current status**: coverage is solid on cross-cutting building blocks (auth, JWT, emails, notifications), but the main business routes — `routes/bookings.routes.js` (booking and payment), `routes/boats.routes.js`, `routes/auth.routes.js`, `routes/users.routes.js`, `routes/kyc.routes.js` — **are not yet covered**. This is identified as the top priority for the next testing iteration, particularly on the booking/payment flow, which concentrates the highest business risk.
+**Current status**: cross-cutting building blocks (JWT, auth middleware, emails, notifications) are covered at ~100%. The CDC priority business routes (`auth`, `bookings`, `boats`, `users`, `kyc`) now have **unit tests on pure logic** (validation, pricing, status/payment/license rules, KYC, profile). Overall route-file line coverage remains below 70% because HTTP handlers (Supabase I/O, Stripe, Cloudinary, multer) are not yet exercised end-to-end — that is the next iteration (handler integration tests with mocks).
 
 Coverage report generated via:
 ```bash

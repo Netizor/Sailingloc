@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import crypto from 'crypto'
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
 import rateLimit from 'express-rate-limit'
@@ -48,6 +49,66 @@ export function parseHibpResponse(text, suffix) {
   return { compromised: count > 0, count }
 }
 
+/**
+ * Valide le payload d'inscription (champs requis + email + mot de passe).
+ * @returns {string|null}
+ */
+export function validateRegisterInput({ email, password, firstName, lastName }) {
+  if (!email || !password || !firstName || !lastName) {
+    return 'email, password, firstName et lastName sont requis'
+  }
+  if (!isValidEmail(email)) return 'Format email invalide'
+  return validatePassword(password)
+}
+
+/**
+ * Contrôle pré-auth sur le compte (existence / suspension).
+ * @returns {string|null} message d'erreur HTTP métier
+ */
+export function validateLoginAccount(user) {
+  if (!user) return 'Identifiants incorrects'
+  if (user.is_blocked) return 'Compte suspendu. Contactez le support.'
+  return null
+}
+
+/** true si le token (refresh / reset / verify) est expiré. */
+export function isTokenExpired(expiresAt, now = new Date()) {
+  if (!expiresAt) return true
+  return new Date(expiresAt) < now
+}
+
+/**
+ * Valide un token opaque stocké en base (reset MDP / vérif email).
+ * @returns {string|null}
+ */
+export function validateStoredToken(tokenRow, now = new Date()) {
+  if (!tokenRow || isTokenExpired(tokenRow.expires_at, now)) {
+    return 'Token invalide ou expiré'
+  }
+  return null
+}
+
+/** Payload d'anonymisation RGPD après suppression de compte. */
+export function buildAccountAnonymization(userId, now = new Date()) {
+  return {
+    email: `deleted_${userId}@sailingloc.deleted`,
+    password: '',
+    first_name: 'Compte',
+    last_name: 'supprimé',
+    phone: null,
+    bio: null,
+    avatar: null,
+    is_blocked: true,
+    updated_at: now.toISOString(),
+  }
+}
+
+/** Découpe SHA-1 pour l'API HIBP (k-anonymity : préfixe 5 + suffixe). */
+export function buildHibpHashParts(password) {
+  const hash = crypto.createHash('sha1').update(password).digest('hex').toUpperCase()
+  return { prefix: hash.slice(0, 5), suffix: hash.slice(5) }
+}
+
 // ─── Helper ────────────────────────────────────────────────
 export function formatUser(u) {
   return {
@@ -81,14 +142,8 @@ export function formatUser(u) {
 router.post('/register', registerLimiter, async (req, res) => {
   const { email, password, firstName, lastName, role } = req.body
 
-  if (!email || !password || !firstName || !lastName) {
-    return res.status(400).json({ message: 'email, password, firstName et lastName sont requis' })
-  }
-  if (!isValidEmail(email)) {
-    return res.status(400).json({ message: 'Format email invalide' })
-  }
-  const passwordError = validatePassword(password)
-  if (passwordError) return res.status(400).json({ message: passwordError })
+  const registerError = validateRegisterInput({ email, password, firstName, lastName })
+  if (registerError) return res.status(400).json({ message: registerError })
 
   const userRole = resolveRole(role)
 
@@ -138,8 +193,12 @@ router.post('/login', loginLimiter, async (req, res, next) => {
 
     const { data: user, error: userError } = await supabase.from('users').select('*').eq('email', email.toLowerCase()).single()
     if (userError && userError.code !== 'PGRST116') return next(userError)
-    if (!user) return res.status(401).json({ message: 'Identifiants incorrects' })
-    if (user.is_blocked) return res.status(403).json({ message: 'Compte suspendu. Contactez le support.' })
+
+    const accountError = validateLoginAccount(user)
+    if (accountError === 'Compte suspendu. Contactez le support.') {
+      return res.status(403).json({ message: accountError })
+    }
+    if (accountError) return res.status(401).json({ message: accountError })
 
     const valid = await bcrypt.compare(password, user.password)
     if (!valid) return res.status(401).json({ message: 'Identifiants incorrects' })
@@ -180,7 +239,7 @@ router.post('/refresh', async (req, res) => {
     .single()
 
   if (!tokenRow) return res.status(401).json({ message: 'Token invalide ou expiré' })
-  if (new Date(tokenRow.expires_at) < new Date()) {
+  if (isTokenExpired(tokenRow.expires_at)) {
     await supabase.from('refresh_tokens').delete().eq('token', refreshToken)
     return res.status(401).json({ message: 'Token expiré' })
   }
@@ -244,9 +303,8 @@ router.post('/reset-password', async (req, res) => {
   if (passwordError) return res.status(400).json({ message: passwordError })
 
   const { data: tokenRow } = await supabase.from('password_reset_tokens').select('*').eq('token', token).single()
-  if (!tokenRow || new Date(tokenRow.expires_at) < new Date()) {
-    return res.status(400).json({ message: 'Token invalide ou expiré' })
-  }
+  const tokenError = validateStoredToken(tokenRow)
+  if (tokenError) return res.status(400).json({ message: tokenError })
 
   const hashed = await bcrypt.hash(password, 12)
   await supabase.from('users').update({ password: hashed }).eq('id', tokenRow.user_id)
@@ -263,9 +321,8 @@ router.get('/verify-email', async (req, res) => {
   if (!token) return res.status(400).json({ message: 'Token requis' })
 
   const { data: tokenRow } = await supabase.from('email_verification_tokens').select('*').eq('token', token).single()
-  if (!tokenRow || new Date(tokenRow.expires_at) < new Date()) {
-    return res.status(400).json({ message: 'Token invalide ou expiré' })
-  }
+  const verifyError = validateStoredToken(tokenRow)
+  if (verifyError) return res.status(400).json({ message: verifyError })
 
   await supabase.from('users').update({ email_verified_at: new Date().toISOString() }).eq('id', tokenRow.user_id)
   await supabase.from('email_verification_tokens').delete().eq('token', token)
@@ -329,17 +386,10 @@ router.delete('/account', authenticate, async (req, res, next) => {
     await supabase.from('refresh_tokens').delete().eq('user_id', userId)
 
     // Anonymisation RGPD : suppression des données personnelles identifiantes
-    const { error } = await supabase.from('users').update({
-      email: `deleted_${userId}@sailingloc.deleted`,
-      password: '',
-      first_name: 'Compte',
-      last_name: 'supprimé',
-      phone: null,
-      bio: null,
-      avatar: null,
-      is_blocked: true,
-      updated_at: new Date().toISOString(),
-    }).eq('id', userId)
+    const { error } = await supabase
+      .from('users')
+      .update(buildAccountAnonymization(userId))
+      .eq('id', userId)
 
     if (error) return res.status(500).json({ message: 'Erreur lors de la suppression du compte' })
 
@@ -351,17 +401,12 @@ router.delete('/account', authenticate, async (req, res, next) => {
 
 // ─── POST /auth/hibp-check ─────────────────────────────────
 // Vérifie le mot de passe via k-anonymity (Have I Been Pwned)
-import crypto from 'crypto'
-
 router.post('/hibp-check', authenticate, async (req, res) => {
   const { password } = req.body
   if (!password) return res.status(400).json({ message: 'password requis' })
 
   try {
-    const hash   = crypto.createHash('sha1').update(password).digest('hex').toUpperCase()
-    const prefix = hash.slice(0, 5)
-    const suffix = hash.slice(5)
-
+    const { prefix, suffix } = buildHibpHashParts(password)
     const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`, {
       headers: { 'Add-Padding': 'true' },
     })

@@ -320,19 +320,24 @@ Les tests applicatifs garantissent la fiabilité et la non-régression de la pla
 
 ### Stratégie de tests unitaires
 
-Modules actuellement couverts (`backend/test/`) :
+Modules actuellement couverts (`backend/test/`) — helpers / logique métier pure extraite des routes, mesurée via `npm run test:coverage` :
 
-| Fichier testé | Couverture mesurée (lignes) |
-|---|---|
-| `lib/jwt.js` (génération/validation des tokens) | 100 % |
-| `middleware/auth.middleware.js` (authentification, contrôle de rôle) | 97,5 % |
-| `services/email.service.js` | 100 % |
-| `services/notifications.service.js` | 100 % |
-| `routes/misc.routes.js` (health check, robots.txt, endpoints SEO) | 22,6 % (partiel) |
+| Fichier testé | Couverture mesurée (lignes) | Fichiers de test |
+|---|---|---|
+| `lib/jwt.js` | 100 % | `jwt.test.js` |
+| `middleware/auth.middleware.js` | ~97,5 % | `auth.middleware.test.js` |
+| `services/email.service.js` | 100 % | `email.service.test.js` |
+| `services/notifications.service.js` | 100 % | `notifications.service.test.js` |
+| `routes/auth.routes.js` (validation, tokens, RGPD, HIBP) | ~44 % | `auth.validation.test.js`, `auth.security.test.js` |
+| `routes/bookings.routes.js` (prix, remboursement, permis, paiement, revenus, handlers HTTP) | ~46 %+ | `bookings.pricing.test.js`, `bookings.rules.test.js`, `bookings.handlers.test.js` |
+| `routes/boats.routes.js` (recherche, droits, création, docs) | ~43 % | `boats.routes.test.js` |
+| `routes/kyc.routes.js` (statut, revue admin, renouvellement) | ~44 % | `kyc.routes.test.js` |
+| `routes/users.routes.js` (profil, mot de passe, rôle) | ~35 % | `users.routes.test.js` |
+| `routes/misc.routes.js` (health/SEO, contact, messages, dispo, admin, handlers) | en hausse | `health-seo.test.js`, `misc.helpers.test.js`, `misc.handlers.test.js` |
 
 **Objectif de couverture** : 70 % minimum sur la logique métier critique (authentification, réservation, paiement).
 
-**État actuel** : la couverture est solide sur les briques transverses (auth, JWT, emails, notifications) mais les routes métier principales — `routes/bookings.routes.js` (réservation et paiement), `routes/boats.routes.js`, `routes/auth.routes.js`, `routes/users.routes.js`, `routes/kyc.routes.js` — **ne sont pas encore couvertes**. C'est identifié comme l'axe prioritaire de la prochaine itération de tests, en particulier sur le flux de réservation/paiement qui concentre le risque métier le plus élevé.
+**État actuel** : les briques transverses (JWT, middleware auth, emails, notifications) sont couvertes à ~100 %. Les routes métier prioritaires du CDC (`auth`, `bookings`, `boats`, `users`, `kyc`) ont des **tests unitaires sur la logique pure** (validation, pricing, règles de statut/paiement/permis, KYC, profil). La couverture « lignes » globale des fichiers routes reste inférieure à 70 % car les handlers HTTP (I/O Supabase, Stripe, Cloudinary, multer) ne sont pas encore exercés de bout en bout — axe de la prochaine itération (tests d'intégration des handlers avec mocks).
 
 Rapport de couverture généré via :
 ```bash
