@@ -13,14 +13,14 @@ const stripe = stripeKey && /^sk_(test|live)_[a-zA-Z0-9]{20,}$/.test(stripeKey)
   : null
 const PLATFORM_FEE_PERCENT = parseFloat(process.env.STRIPE_PLATFORM_FEE_PERCENT || '10')
 
-function computeDays(startDate, endDate) {
+export function computeDays(startDate, endDate) {
   const start = new Date(startDate)
   const end = new Date(endDate)
   const days = Math.round((end - start) / (1000 * 60 * 60 * 24))
   return Math.max(1, days)
 }
 
-function formatBooking(b, hasReview = false) {
+export function formatBooking(b, hasReview = false) {
   const totalDays = computeDays(b.start_date, b.end_date)
   const dailyRate = b.boats?.price_per_day != null ? parseFloat(b.boats.price_per_day) : 0
   const skipperFee = parseFloat(b.skipper_fee || 0)
@@ -75,7 +75,7 @@ function formatBooking(b, hasReview = false) {
   }
 }
 
-async function calculatePrice(boat, startDate, endDate, withSkipper) {
+export async function calculatePrice(boat, startDate, endDate, withSkipper) {
   const start = new Date(startDate)
   const end   = new Date(endDate)
   const days  = Math.round((end - start) / (1000 * 60 * 60 * 24))
@@ -87,6 +87,25 @@ async function calculatePrice(boat, startDate, endDate, withSkipper) {
   const totalPrice = basePrice + skipperFee + serviceFee
 
   return { basePrice, skipperFee, serviceFee, totalPrice, days }
+}
+
+/**
+ * Calcule le pourcentage et le montant remboursés lors de l'annulation d'une réservation.
+ * Politique : annulation par le propriétaire/admin → 100 % ; par le locataire :
+ * plus de 7 jours avant le départ → 100 %, entre 2 et 7 jours → 50 %, moins de 2 jours → 0 %.
+ */
+export function calculateRefund({ startDate, now, isOwnerOrAdmin, totalPrice }) {
+  const daysUntilStart = Math.ceil((new Date(startDate) - now) / (1000 * 60 * 60 * 24))
+  let refundPercent = 0
+  if (isOwnerOrAdmin) {
+    refundPercent = 100
+  } else if (daysUntilStart > 7) {
+    refundPercent = 100
+  } else if (daysUntilStart >= 2) {
+    refundPercent = 50
+  }
+  const refundAmount = Math.round(totalPrice * refundPercent) / 100
+  return { daysUntilStart, refundPercent, refundAmount }
 }
 
 // ─── POST /bookings ────────────────────────────────────────
@@ -189,13 +208,13 @@ const MONTH_LABELS_FR = [
   'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
 ]
 
-function ownerEarnings(booking) {
+export function ownerEarnings(booking) {
   const total = parseFloat(booking.total_price || 0)
   const serviceFee = parseFloat(booking.service_fee || 0)
   return Math.round((total - serviceFee) * 100) / 100
 }
 
-function bookingInYear(booking, year) {
+export function bookingInYear(booking, year) {
   const d = new Date(booking.start_date)
   return d.getFullYear() === year
 }
@@ -442,16 +461,12 @@ router.post('/:id/cancel', authenticate, async (req, res, next) => {
     }
 
     // ── Politique de remboursement ──────────────────────────
-    const daysUntilStart = Math.ceil((startDate - now) / (1000 * 60 * 60 * 24))
-    let refundPercent = 0
-    if (isOwner || req.user.role === 'ADMIN') {
-      refundPercent = 100 // Propriétaire annule → remboursement total
-    } else if (daysUntilStart > 7) {
-      refundPercent = 100
-    } else if (daysUntilStart >= 2) {
-      refundPercent = 50
-    }
-    const refundAmount = Math.round(booking.total_price * refundPercent) / 100
+    const { refundPercent, refundAmount } = calculateRefund({
+      startDate: booking.start_date,
+      now,
+      isOwnerOrAdmin: isOwner || req.user.role === 'ADMIN',
+      totalPrice: booking.total_price,
+    })
 
     // ── Remboursement Stripe ────────────────────────────────
     if (stripe && booking.stripe_payment_intent_id && refundAmount > 0) {
