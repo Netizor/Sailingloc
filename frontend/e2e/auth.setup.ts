@@ -34,14 +34,20 @@ const AUTH_DIR = path.join(__dirname, '../.auth')
 async function globalSetup() {
   fs.mkdirSync(AUTH_DIR, { recursive: true })
 
-  // ── 1. Vérifie que le backend est joignable ──────────────────────────────
+  // ── 1. Vérifie que le backend est joignable (quelques retries) ───────────
   let backendOk = false
-  try {
-    const res = await fetch(`${API_URL}/api/health`, {
-      signal: AbortSignal.timeout(5_000),
-    })
-    backendOk = res.ok
-  } catch { /* backend non démarré */ }
+  for (let attempt = 1; attempt <= 5; attempt++) {
+    try {
+      const res = await fetch(`${API_URL}/api/health`, {
+        signal: AbortSignal.timeout(5_000),
+      })
+      if (res.ok) {
+        backendOk = true
+        break
+      }
+    } catch { /* retry */ }
+    await new Promise((r) => setTimeout(r, 1_000))
+  }
 
   if (!backendOk) {
     console.warn(
@@ -85,16 +91,15 @@ async function globalSetup() {
 
       await page.addInitScript(
         ({ user, accessToken, refreshToken }) => {
-          localStorage.setItem(
-            'sailingloc-cookie-consent',
-            JSON.stringify({
-              version: '2',
-              essential: true,
-              analytical: false,
-              marketing: false,
-              date: new Date().toISOString(),
-            }),
-          )
+          const consent = JSON.stringify({
+            version: '3',
+            essential: true,
+            analytical: false,
+            marketing: false,
+            date: new Date().toISOString(),
+          })
+          localStorage.setItem('sailingloc-cookie-consent', consent)
+          document.cookie = `sailingloc_consent=${encodeURIComponent(consent)};path=/;SameSite=Lax`
           // Requis pour initSessionGuard() : sinon logout immédiat au montage.
           localStorage.setItem('sailingloc-remember-me', 'true')
           sessionStorage.setItem('sailingloc-session-active', '1')

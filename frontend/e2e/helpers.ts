@@ -73,6 +73,17 @@ export async function loginAs(page: Page, role: keyof typeof DEMO_ACCOUNTS): Pro
   await expect(page).toHaveURL(/\/(mon-espace|proprietaire|admin)/, { timeout: 15_000 })
 }
 
+/** Ping rapide de l'API (pour skipper les tests qui appellent le backend). */
+export async function isBackendReachable(): Promise<boolean> {
+  const apiUrl = process.env.PLAYWRIGHT_API_URL ?? 'http://127.0.0.1:3000'
+  try {
+    const res = await fetch(`${apiUrl}/api/health`, { signal: AbortSignal.timeout(3_000) })
+    return res.ok
+  } catch {
+    return false
+  }
+}
+
 /**
  * Retourne true si le backend était disponible au setup et que le role
  * a un état d'authentification valide sauvegardé dans .auth/{role}.json.

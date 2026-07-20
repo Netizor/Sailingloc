@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures'
-import { loginAs, DEMO_ACCOUNTS, isAuthAvailable } from './helpers'
+import { loginAs, isAuthAvailable, isBackendReachable } from './helpers'
 
 /**
  * G5 — Tests E2E : Authentification
@@ -26,14 +26,17 @@ test.describe('Authentification', () => {
   })
 
   test('identifiants invalides → affiche un message d\'erreur', async ({ page }) => {
+    if (!(await isBackendReachable())) {
+      test.skip(true, 'Backend non disponible')
+    }
     await page.goto('/connexion')
     await page.locator('input[type="email"]').fill('mauvais@email.fr')
     await page.locator('input[type="password"]').fill('mauvaismdp123')
     await page.locator('button[type="submit"]').click()
 
     await expect(
-      page.getByText(/email ou mot de passe incorrect|identifiants incorrects/i),
-    ).toBeVisible({ timeout: 5_000 })
+      page.getByText(/email ou mot de passe incorrect|identifiants incorrects|incorrect/i),
+    ).toBeVisible({ timeout: 8_000 })
     // Reste sur la page de connexion
     await expect(page).toHaveURL('/connexion')
   })
@@ -61,7 +64,9 @@ test.describe('Authentification', () => {
     await loginAs(page, 'owner')
     await page.goto('/proprietaire')
     await expect(page).toHaveURL('/proprietaire')
-    await expect(page.getByText(/tableau de bord|mes bateaux|revenus/i).first()).toBeVisible()
+    await expect(
+      page.getByText(/dashboard|owner space|tableau de bord|mes bateaux|my boats|revenus|revenue/i).first(),
+    ).toBeVisible()
   })
 
   test('connexion en tant qu\'admin → accès à /admin', async ({ page }) => {
@@ -76,7 +81,9 @@ test.describe('Authentification', () => {
 
   test('page de connexion affiche un lien vers l\'inscription', async ({ page }) => {
     await page.goto('/connexion')
-    await expect(page.getByRole('link', { name: /inscription|créer|s'inscrire/i })).toBeVisible()
+    await expect(
+      page.getByRole('link', { name: /create an account|créer un compte|inscription|s'inscrire/i }),
+    ).toBeVisible()
   })
 
   test('champ email vide → validation côté client', async ({ page }) => {

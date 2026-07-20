@@ -4,16 +4,17 @@ import { test as base } from '@playwright/test'
 export const test = base.extend({
   page: async ({ page }, use) => {
     await page.addInitScript(() => {
-      localStorage.setItem(
-        'sailingloc-cookie-consent',
-        JSON.stringify({
-          version: '2',
-          essential: true,
-          analytical: false,
-          marketing: false,
-          date: new Date().toISOString(),
-        }),
-      )
+      // Doit matcher CONSENT_VERSION dans CookieBanner.tsx (sinon le modal reste ouvert)
+      const consent = JSON.stringify({
+        version: '3',
+        essential: true,
+        analytical: false,
+        marketing: false,
+        date: new Date().toISOString(),
+      })
+      localStorage.setItem('sailingloc-cookie-consent', consent)
+      document.cookie = `sailingloc_consent=${encodeURIComponent(consent)};path=/;SameSite=Lax`
+
       // Évite que initSessionGuard() invalide une session injectée par loginAs()
       if (localStorage.getItem('sailingloc-auth')) {
         localStorage.setItem('sailingloc-remember-me', 'true')

@@ -39,12 +39,16 @@ app.use(cors({
 }))
 
 // Rate limit global : 200 req / 15 min par IP
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 200,
-  standardHeaders: true,
-  legacyHeaders: false,
-}))
+// Désactivé en development (et si DISABLE_RATE_LIMIT=1) pour permettre k6 / E2E
+// sans saturer le plafond après quelques scénarios (~130–140 req chacun).
+if (process.env.NODE_ENV !== 'development' && process.env.DISABLE_RATE_LIMIT !== '1') {
+  app.use(rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 200,
+    standardHeaders: true,
+    legacyHeaders: false,
+  }))
+}
 
 // ─── Body parsers ──────────────────────────────────────────
 // /stripe/webhook doit recevoir le raw body avant JSON parsing
