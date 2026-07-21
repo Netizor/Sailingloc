@@ -17,13 +17,13 @@ import { adminApi, type RoleDefinition } from '../../api/admin.api'
 import { useAuthStore } from '../../store/auth.store'
 import { getInitials, cn } from '../../lib/utils'
 
-// ─── Constantes ────────────────────────────────────────────
+// ─── Constants ─────────────────────────────────────────────
 const ROLE_HIERARCHY: Record<string, number> = { RENTER: 0, OWNER: 1, ADMIN: 2 }
 
 const FALLBACK_ROLES: RoleDefinition[] = [
-  // { id: 0, name: 'RENTER', label: 'Locataire', description: '', color: 'gray', is_system: true, created_at: '' },
-  // { id: 0, name: 'OWNER', label: 'Propriétaire', description: '', color: 'blue', is_system: true, created_at: '' },
-  // { id: 0, name: 'ADMIN', label: 'Administrateur', description: '', color: 'red', is_system: true, created_at: '' },
+  // { id: 0, name: 'RENTER', label: 'Renter', description: '', color: 'gray', is_system: true, created_at: '' },
+  // { id: 0, name: 'OWNER', label: 'Owner', description: '', color: 'blue', is_system: true, created_at: '' },
+  // { id: 0, name: 'ADMIN', label: 'Administrator', description: '', color: 'red', is_system: true, created_at: '' },
 ]
 
 const COLOR_OPTIONS = [
@@ -72,7 +72,7 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (v: string)
   )
 }
 
-// ─── RoleForm (création / édition) ─────────────────────────
+// ─── RoleForm (create / edit) ──────────────────────────────
 interface RoleFormProps {
   initial?: Partial<RoleDefinition>
   isEdit?: boolean
@@ -98,14 +98,14 @@ function RoleForm({ initial, isEdit, onSubmit, onCancel, isLoading }: RoleFormPr
       className="bg-gray-50 dark:bg-gray-700/40 rounded-2xl border border-gray-200 dark:border-gray-600 p-5 space-y-4"
     >
       <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-        {isEdit ? 'Modifier le rôle' : 'Créer un nouveau rôle'}
+        {isEdit ? 'Edit role' : 'Create a new role'}
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {!isEdit && (
           <div>
             <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-              Identifiant technique *
+              Technical identifier *
             </label>
             <input
               required
@@ -114,19 +114,19 @@ function RoleForm({ initial, isEdit, onSubmit, onCancel, isLoading }: RoleFormPr
               placeholder="EX: MODERATOR"
               className="w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm font-mono uppercase text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-ocean-400"
             />
-            <p className="text-[10px] text-gray-400 mt-1">Lettres majuscules et underscores uniquement</p>
+            <p className="text-[10px] text-gray-400 mt-1">Uppercase letters and underscores only</p>
           </div>
         )}
 
         <div>
           <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-            Nom affiché *
+            Display name *
           </label>
           <input
             required
             value={form.label}
             onChange={set('label')}
-            placeholder="Ex : Modérateur"
+            placeholder="E.g. Moderator"
             className="w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-ocean-400"
           />
         </div>
@@ -140,18 +140,18 @@ function RoleForm({ initial, isEdit, onSubmit, onCancel, isLoading }: RoleFormPr
           rows={2}
           value={form.description}
           onChange={set('description')}
-          placeholder="Ce rôle permet de…"
+          placeholder="This role allows…"
           className="w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-ocean-400 resize-none"
         />
       </div>
 
       <div>
         <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
-          Couleur du badge
+          Badge color
         </label>
         <div className="flex items-center gap-4">
           <ColorPicker value={form.color} onChange={(v) => setForm((f) => ({ ...f, color: v }))} />
-          <RoleBadge label={form.label || 'Aperçu'} color={form.color} />
+          <RoleBadge label={form.label || 'Preview'} color={form.color} />
         </div>
       </div>
 
@@ -162,7 +162,7 @@ function RoleForm({ initial, isEdit, onSubmit, onCancel, isLoading }: RoleFormPr
           className="flex items-center gap-2 bg-ocean-500 hover:bg-ocean-600 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors disabled:opacity-50"
         >
           <Check size={15} />
-          {isEdit ? 'Enregistrer' : 'Créer le rôle'}
+          {isEdit ? 'Save' : 'Create role'}
         </button>
         <button
           type="button"
@@ -170,7 +170,7 @@ function RoleForm({ initial, isEdit, onSubmit, onCancel, isLoading }: RoleFormPr
           className="flex items-center gap-2 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 text-sm font-medium px-4 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         >
           <X size={15} />
-          Annuler
+          Cancel
         </button>
       </div>
     </form>
@@ -194,21 +194,21 @@ function RoleCard({ role, userCount, onEdit, onDelete }: RoleCardProps) {
         {role.is_system ? (
           <span className="flex items-center gap-1 text-[10px] text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-full">
             <Lock size={10} />
-            Système
+            System
           </span>
         ) : (
           <div className="flex gap-1">
             <button
               onClick={onEdit}
               className="p-1.5 rounded-lg text-gray-400 hover:text-ocean-600 hover:bg-ocean-50 dark:hover:bg-ocean-900/20 transition-colors"
-              title="Modifier"
+              title="Edit"
             >
               <Pencil size={14} />
             </button>
             <button
               onClick={onDelete}
               className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-              title="Supprimer"
+              title="Delete"
             >
               <Trash2 size={14} />
             </button>
@@ -226,7 +226,7 @@ function RoleCard({ role, userCount, onEdit, onDelete }: RoleCardProps) {
       <div className="flex items-center gap-1.5 mt-auto pt-2 border-t border-gray-50 dark:border-gray-700/50">
         <Users size={13} className="text-gray-400" />
         <span className="text-xs text-gray-500 dark:text-gray-400">
-          {userCount} utilisateur{userCount !== 1 ? 's' : ''}
+          {userCount} user{userCount !== 1 ? 's' : ''}
         </span>
       </div>
 
@@ -236,14 +236,14 @@ function RoleCard({ role, userCount, onEdit, onDelete }: RoleCardProps) {
           className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-ocean-600 dark:hover:text-ocean-400 transition-colors"
         >
           <Pencil size={12} />
-          Modifier label / description
+          Edit label / description
         </button>
       )}
     </div>
   )
 }
 
-// ─── Page principale ───────────────────────────────────────
+// ─── Main page ─────────────────────────────────────────────
 export default function AdminRoles() {
   const qc = useQueryClient()
   const { user: currentUser } = useAuthStore()
@@ -251,7 +251,7 @@ export default function AdminRoles() {
   const [showCreate, setShowCreate] = useState(false)
   const [editingRole, setEditingRole] = useState<RoleDefinition | null>(null)
 
-  // Attribution
+  // Assignment
   const [roleFilter, setRoleFilter] = useState<string>('')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
@@ -274,36 +274,36 @@ export default function AdminRoles() {
     queryFn: () => adminApi.getUsers({ role: roleFilter || undefined, search, page, limit: 20 }),
   })
 
-  // Mutations rôles
+  // Role mutations
   const createMutation = useMutation({
     mutationFn: adminApi.createRole,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'roles'] }); setShowCreate(false); toast.success('Rôle créé') },
-    onError: (e: any) => toast.error(e?.response?.data?.message || 'Erreur'),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'roles'] }); setShowCreate(false); toast.success('Role created') },
+    onError: (e: any) => toast.error(e?.response?.data?.message || 'Error'),
   })
 
   const updateMutation = useMutation({
     mutationFn: ({ id, ...payload }: { id: number; label?: string; description?: string; color?: string }) =>
       adminApi.updateRole(id, payload),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'roles'] }); setEditingRole(null); toast.success('Rôle modifié') },
-    onError: (e: any) => toast.error(e?.response?.data?.message || 'Erreur'),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'roles'] }); setEditingRole(null); toast.success('Role updated') },
+    onError: (e: any) => toast.error(e?.response?.data?.message || 'Error'),
   })
 
   const deleteMutation = useMutation({
     mutationFn: adminApi.deleteRole,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'roles'] }); qc.invalidateQueries({ queryKey: ['admin', 'role-stats'] }); toast.success('Rôle supprimé') },
-    onError: (e: any) => toast.error(e?.response?.data?.message || 'Erreur'),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'roles'] }); qc.invalidateQueries({ queryKey: ['admin', 'role-stats'] }); toast.success('Role deleted') },
+    onError: (e: any) => toast.error(e?.response?.data?.message || 'Error'),
   })
 
-  // Mutation attribution
+  // Assignment mutation
   const assignMutation = useMutation({
     mutationFn: ({ userId, role }: { userId: number; role: string }) => adminApi.setUserRole(userId, role),
     onSuccess: (_, { userId }) => {
       qc.invalidateQueries({ queryKey: ['admin', 'roles-users'] })
       qc.invalidateQueries({ queryKey: ['admin', 'role-stats'] })
       setPendingRoles((p) => { const n = { ...p }; delete n[userId]; return n })
-      toast.success('Rôle attribué')
+      toast.success('Role assigned')
     },
-    onError: (e: any) => toast.error(e?.response?.data?.message || 'Erreur'),
+    onError: (e: any) => toast.error(e?.response?.data?.message || 'Error'),
   })
 
   const users = (usersData as any)?.users ?? (usersData as any)?.data ?? []
@@ -322,9 +322,9 @@ export default function AdminRoles() {
     return p !== cur && !isSelfDowngrade(userId, p)
   }
 
-  // Tabs dynamiques depuis les rôles DB
+  // Dynamic tabs from DB roles
   const tabs = [
-    { value: '', label: 'Tous', count: Object.values(stats).reduce((a, b) => a + b, 0) },
+    { value: '', label: 'All', count: Object.values(stats).reduce((a, b) => a + b, 0) },
     ...roles.map((r) => ({ value: r.name, label: r.label, count: (stats as any)[r.name] ?? 0 })),
   ]
 
@@ -332,19 +332,19 @@ export default function AdminRoles() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Gestion des rôles</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Role management</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Créez et gérez les rôles de la plateforme, puis attribuez-les aux utilisateurs.
+          Create and manage platform roles, then assign them to users.
         </p>
       </div>
 
-      {/* ── Section 1 : Définition des rôles ─────────────────── */}
+      {/* ── Section 1: Role definitions ─────────────────────── */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2.5">
             <ShieldCheck size={18} className="text-ocean-500" />
             <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
-              Rôles de la plateforme
+              Platform roles
             </h2>
           </div>
           {!showCreate && !editingRole && (
@@ -353,12 +353,12 @@ export default function AdminRoles() {
               className="flex items-center gap-2 bg-ocean-500 hover:bg-ocean-600 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
             >
               <Plus size={15} />
-              Créer un rôle
+              Create a role
             </button>
           )}
         </div>
 
-        {/* Formulaire de création */}
+        {/* Create form */}
         {showCreate && !editingRole && (
           <div className="mb-5">
             <RoleForm
@@ -369,7 +369,7 @@ export default function AdminRoles() {
           </div>
         )}
 
-        {/* Formulaire d'édition */}
+        {/* Edit form */}
         {editingRole && (
           <div className="mb-5">
             <RoleForm
@@ -382,7 +382,7 @@ export default function AdminRoles() {
           </div>
         )}
 
-        {/* Grille des rôles */}
+        {/* Roles grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {roles.map((role) => (
             <RoleCard
@@ -391,7 +391,7 @@ export default function AdminRoles() {
               userCount={(stats as any)[role.name] ?? 0}
               onEdit={() => { setShowCreate(false); setEditingRole(role) }}
               onDelete={() => {
-                if (!window.confirm(`Supprimer le rôle "${role.label}" ?`)) return
+                if (!window.confirm(`Delete the role "${role.label}"?`)) return
                 deleteMutation.mutate(role.id)
               }}
             />
@@ -399,13 +399,13 @@ export default function AdminRoles() {
         </div>
       </div>
 
-      {/* ── Section 2 : Attribution des rôles ────────────────── */}
+      {/* ── Section 2: Role assignment ──────────────────────── */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
         <div className="p-5 border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-2.5 mb-4">
             <Users size={18} className="text-gray-500" />
             <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
-              Attribution des rôles
+              Role assignment
             </h2>
           </div>
 
@@ -434,7 +434,7 @@ export default function AdminRoles() {
               <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Rechercher par nom ou email…"
+                placeholder="Search by name or email…"
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1) }}
                 className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-ocean-400"
@@ -449,13 +449,13 @@ export default function AdminRoles() {
             <div className="animate-spin h-8 w-8 border-4 border-ocean-500 border-t-transparent rounded-full" />
           </div>
         ) : users.length === 0 ? (
-          <p className="text-center text-sm text-gray-400 py-16">Aucun utilisateur trouvé</p>
+          <p className="text-center text-sm text-gray-400 py-16">No users found</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-gray-700">
-                  {['Utilisateur', 'Email', 'Rôle actuel', 'Nouveau rôle', ''].map((col, i) => (
+                  {['User', 'Email', 'Current role', 'New role', ''].map((col, i) => (
                     <th key={i} className={`text-xs font-medium text-gray-400 dark:text-gray-500 px-5 py-3 ${i < 3 ? 'text-left' : 'text-center'}`}>
                       {col}
                     </th>
@@ -479,7 +479,7 @@ export default function AdminRoles() {
                           </div>
                           <p className="text-xs font-medium text-gray-900 dark:text-gray-100">
                             {u.firstName} {u.lastName}
-                            {isSelf && <span className="ml-1.5 text-[10px] text-ocean-500 font-semibold">(vous)</span>}
+                            {isSelf && <span className="ml-1.5 text-[10px] text-ocean-500 font-semibold">(you)</span>}
                           </p>
                         </div>
                       </td>
@@ -503,7 +503,7 @@ export default function AdminRoles() {
                         {downgradeBlocked && (
                           <p className="flex items-center gap-1 text-[10px] text-amber-600 dark:text-amber-400 mt-1">
                             <AlertTriangle size={10} />
-                            Auto-rétrogradation interdite
+                            Self-downgrade not allowed
                           </p>
                         )}
                       </td>
@@ -519,7 +519,7 @@ export default function AdminRoles() {
                           )}
                         >
                           <Check size={13} />
-                          Appliquer
+                          Apply
                         </button>
                       </td>
                     </tr>
@@ -533,7 +533,7 @@ export default function AdminRoles() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="px-5 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
-            <p className="text-xs text-gray-500 dark:text-gray-400">{total} utilisateurs</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{total} users</p>
             <div className="flex gap-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <button

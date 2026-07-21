@@ -20,6 +20,7 @@ import { formatPrice, getBoatStatusLabel } from '../../lib/utils'
 import Badge from '../../components/ui/Badge'
 import Stars from '../../components/ui/Stars'
 import Spinner from '../../components/ui/Spinner'
+import DraftSection from '../../components/ui/DraftSection'
 import type { BadgeVariant } from '../../components/ui/Badge'
 import { useAuthStore } from '../../store/auth.store'
 import { UserRole } from '../../types'
@@ -74,6 +75,9 @@ const MyBoats: React.FC = () => {
             </button>
           </DisabledTooltip>
         </div>
+
+        {/* Brouillons en cours */}
+        <DraftSection type="boats" />
 
         {/* Content */}
         {isLoading ? (

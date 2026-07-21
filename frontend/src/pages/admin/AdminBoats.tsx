@@ -14,20 +14,20 @@ import type { BadgeVariant } from '../../components/ui/Badge'
 import toast from 'react-hot-toast'
 
 const statusConfig: Record<string, { label: string; variant: BadgeVariant }> = {
-  ACTIVE:    { label: 'Actif',      variant: 'success' },
-  PUBLISHED: { label: 'Actif',      variant: 'success' },
-  INACTIVE:  { label: 'Inactif',    variant: 'danger' },
-  SUSPENDED: { label: 'Inactif',    variant: 'danger' },
-  DRAFT:     { label: 'Brouillon',  variant: 'default' },
+  ACTIVE:    { label: 'Active',   variant: 'success' },
+  PUBLISHED: { label: 'Active',   variant: 'success' },
+  INACTIVE:  { label: 'Inactive', variant: 'danger' },
+  SUSPENDED: { label: 'Inactive', variant: 'danger' },
+  DRAFT:     { label: 'Draft',    variant: 'default' },
 }
 
 const boatTypeLabels: Record<string, string> = {
-  SAILBOAT:   'Voilier',
+  SAILBOAT:   'Sailboat',
   CATAMARAN:  'Catamaran',
-  MOTORBOAT:  'Moteur',
-  SEMI_RIGID: 'Semi-rigide',
+  MOTORBOAT:  'Motorboat',
+  SEMI_RIGID: 'RIB',
   YACHT:      'Yacht',
-  OTHER:      'Autre',
+  OTHER:      'Other',
 }
 
 const LIMIT = 20
@@ -54,14 +54,14 @@ function DeleteConfirmModal({
           <div className="h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
             <AlertTriangle size={20} className="text-red-600 dark:text-red-400" />
           </div>
-          <h2 className="text-base font-bold text-gray-900 dark:text-gray-100">Supprimer l'annonce</h2>
+          <h2 className="text-base font-bold text-gray-900 dark:text-gray-100">Delete listing</h2>
           <button onClick={onClose} className="ml-auto text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
             <X size={18} />
           </button>
         </div>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-          Supprimer <strong>« {boatTitle} »</strong> ? Cette action est irréversible et supprimera
-          toutes les données associées.
+          Delete <strong>« {boatTitle} »</strong>? This action cannot be undone and will remove
+          all associated data.
         </p>
         <div className="flex gap-2">
           <button
@@ -69,13 +69,13 @@ function DeleteConfirmModal({
             disabled={isLoading}
             className="flex-1 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors disabled:opacity-50"
           >
-            {isLoading ? 'Suppression…' : 'Supprimer'}
+            {isLoading ? 'Deleting…' : 'Delete'}
           </button>
           <button
             onClick={onClose}
             className="px-4 py-2.5 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 text-sm font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
-            Annuler
+            Cancel
           </button>
         </div>
       </div>
@@ -91,7 +91,7 @@ function Pagination({ page, totalPages, total, onPage }: {
   const pages = Array.from({ length: Math.min(totalPages, 7) }, (_, i) => i + 1)
   return (
     <div className="flex items-center justify-between mt-4 text-sm text-gray-600 dark:text-gray-400">
-      <span>Page {page} / {totalPages} — {total} résultat(s)</span>
+      <span>Page {page} / {totalPages} · {total} result(s)</span>
       <div className="flex gap-1">
         <button onClick={() => onPage(Math.max(1, page - 1))} disabled={page === 1}
           className={cn('p-1.5 rounded-lg border border-gray-200 dark:border-gray-600',
@@ -117,7 +117,7 @@ function Pagination({ page, totalPages, total, onPage }: {
   )
 }
 
-// ─── Page principale ──────────────────────────────────────────
+// ─── Main page ────────────────────────────────────────────────
 const AdminBoats: React.FC = () => {
   const queryClient = useQueryClient()
   const navigate    = useNavigate()
@@ -144,20 +144,20 @@ const AdminBoats: React.FC = () => {
     mutationFn: ({ boatId, action }: { boatId: number; action: 'suspend' | 'activate' }) =>
       adminApi.setBoatStatus(boatId, action === 'activate' ? 'ACTIVE' : 'INACTIVE'),
     onSuccess: (_, { action }) => {
-      toast.success(action === 'activate' ? 'Annonce activée' : 'Annonce suspendue')
+      toast.success(action === 'activate' ? 'Listing activated' : 'Listing suspended')
       queryClient.invalidateQueries({ queryKey: ['admin', 'boats'] })
     },
-    onError: () => toast.error('Erreur lors de la mise à jour'),
+    onError: () => toast.error('Error updating status'),
   })
 
   const deleteMutation = useMutation({
     mutationFn: (boatId: number) => adminApi.deleteBoat(boatId),
     onSuccess: () => {
-      toast.success('Annonce supprimée')
+      toast.success('Listing deleted')
       setDeleteTarget(null)
       queryClient.invalidateQueries({ queryKey: ['admin', 'boats'] })
     },
-    onError: () => toast.error('Erreur lors de la suppression'),
+    onError: () => toast.error('Error deleting listing'),
   })
 
   const boats: any[] = data?.boats ?? []
@@ -168,17 +168,17 @@ const AdminBoats: React.FC = () => {
     <div>
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Gestion des bateaux</h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{total} annonce(s)</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Boat management</h1>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{total} listing(s)</p>
       </div>
 
-      {/* Filtres */}
+      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="relative flex-1 max-w-xs">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
           <input
             type="text"
-            placeholder="Titre, ville…"
+            placeholder="Title, city…"
             value={search}
             onChange={(e) => { setSearch(e.target.value); resetPage() }}
             className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-ocean-500"
@@ -189,10 +189,10 @@ const AdminBoats: React.FC = () => {
           onChange={(e) => { setStatusFilter(e.target.value); resetPage() }}
           className="border border-gray-300 dark:border-gray-600 rounded-xl px-3 py-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-ocean-500"
         >
-          <option value="ALL">Tous les statuts</option>
-          <option value="ACTIVE">Actifs</option>
-          <option value="DRAFT">Brouillons</option>
-          <option value="INACTIVE">Inactifs / Suspendus</option>
+          <option value="ALL">All statuses</option>
+          <option value="ACTIVE">Active</option>
+          <option value="DRAFT">Drafts</option>
+          <option value="INACTIVE">Inactive / Suspended</option>
         </select>
       </div>
 
@@ -202,14 +202,14 @@ const AdminBoats: React.FC = () => {
           <div className="flex justify-center py-16"><Spinner size="lg" /></div>
         ) : boats.length === 0 ? (
           <div className="text-center py-16 text-gray-400 dark:text-gray-500 text-sm">
-            Aucune annonce trouvée
+            No listings found
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-50/60 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700">
-                  {['Annonce', 'Type', 'Propriétaire', 'Ville', 'Tarif/j', 'Note', 'Statut', 'Actions'].map((h) => (
+                  {['Listing', 'Type', 'Owner', 'City', 'Rate/day', 'Rating', 'Status', 'Actions'].map((h) => (
                     <th key={h} className="text-left px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
                       {h}
                     </th>
@@ -223,7 +223,7 @@ const AdminBoats: React.FC = () => {
                   return (
                     <tr key={boat.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
 
-                      {/* Image + titre */}
+                      {/* Image + title */}
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           <div className="h-12 w-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex-shrink-0">
@@ -231,7 +231,7 @@ const AdminBoats: React.FC = () => {
                               <img src={boat.images[0]} alt={boat.title} className="h-full w-full object-cover" />
                             ) : (
                               <div className="h-full w-full bg-ocean-50 dark:bg-ocean-900/30 flex items-center justify-center">
-                                <span className="text-[10px] text-ocean-300">—</span>
+                                <span className="text-[10px] text-ocean-300">-</span>
                               </div>
                             )}
                           </div>
@@ -252,7 +252,7 @@ const AdminBoats: React.FC = () => {
                         {boat.owner?.firstName} {boat.owner?.lastName}
                       </td>
 
-                      <td className="px-5 py-4 text-gray-500 dark:text-gray-400">{boat.city ?? '—'}</td>
+                      <td className="px-5 py-4 text-gray-500 dark:text-gray-400">{boat.city ?? '-'}</td>
 
                       <td className="px-5 py-4 font-medium text-gray-900 dark:text-gray-100">
                         {formatPrice(boat.dailyRate)}
@@ -267,7 +267,7 @@ const AdminBoats: React.FC = () => {
                             </span>
                           </div>
                         ) : (
-                          <span className="text-gray-300 dark:text-gray-600">—</span>
+                          <span className="text-gray-300 dark:text-gray-600">-</span>
                         )}
                       </td>
 
@@ -277,7 +277,7 @@ const AdminBoats: React.FC = () => {
                         </Badge>
                       </td>
 
-                      {/* Actions — 3 slots fixes */}
+                      {/* Actions - 3 fixed slots */}
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-1.5">
                           <Button
@@ -285,7 +285,7 @@ const AdminBoats: React.FC = () => {
                             size="sm"
                             leftIcon={<ExternalLink size={12} />}
                             onClick={() => navigate(`/bateaux/${boat.id}`)}
-                            aria-label="Voir l'annonce"
+                            aria-label="View listing"
                           />
                           <Button
                             variant={isInactive ? 'secondary' : 'danger'}
@@ -299,7 +299,7 @@ const AdminBoats: React.FC = () => {
                             }
                             loading={toggleStatusMutation.isPending}
                           >
-                            {isInactive ? 'Activer' : 'Suspendre'}
+                            {isInactive ? 'Activate' : 'Suspend'}
                           </Button>
                           <Button
                             variant="danger"

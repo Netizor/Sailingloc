@@ -1,8 +1,82 @@
 import { Router } from 'express'
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
+import rateLimit from 'express-rate-limit'
 import supabase from '../lib/supabase.js'
 import { authenticate, requireRole } from '../middleware/auth.middleware.js'
+import { verifyAccessToken } from '../lib/jwt.js'
+import { sendContactMessage, sendContactConfirmation } from '../services/email.service.js'
+
+// ═══════════════════════════════════════════════════════════
+// CONTACT
+// ═══════════════════════════════════════════════════════════
+export const contactRouter = Router()
+
+const contactLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 5, message: { message: 'Trop de messages envoyés. Réessayez plus tard.' } })
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+/** true si le honeypot anti-bot est rempli (bot → faux succès silencieux). */
+export function isContactHoneypotTriggered(body) {
+  return typeof body?.company_url_hp === 'string' && body.company_url_hp.trim() !== ''
+}
+
+/**
+ * Valide et normalise le formulaire contact.
+ * @returns {{ error: string } | { payload: object }}
+ */
+export function validateContactForm(body) {
+  const { firstName, lastName, email, subject, message } = body || {}
+  if (!firstName?.trim() || !lastName?.trim() || !email?.trim() || !subject?.trim() || !message?.trim()) {
+    return { error: 'Tous les champs sont requis' }
+  }
+  if (!EMAIL_RE.test(email.trim())) return { error: 'Email invalide' }
+  if (message.trim().length < 10) {
+    return { error: 'Le message doit contenir au moins 10 caractères' }
+  }
+  return {
+    payload: {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: email.trim(),
+      subject: subject.trim(),
+      message: message.trim(),
+    },
+  }
+}
+
+contactRouter.post('/', contactLimiter, async (req, res) => {
+  console.log('[Contact] POST reçu')
+
+  // Honeypot anti-bot (nom volontairement non autofill)
+  if (isContactHoneypotTriggered(req.body)) {
+    console.log('[Contact] honeypot rempli → faux succès (pas d\'envoi)')
+    return res.status(201).json({ success: true, message: 'Message envoyé' })
+  }
+
+  const contact = validateContactForm(req.body)
+  if (contact.error) return res.status(400).json({ message: contact.error })
+  const payload = contact.payload
+
+  try {
+    await sendContactMessage(payload)
+    console.log('[Contact] email équipe envoyé')
+  } catch (error) {
+    console.error('[Contact] Erreur envoi email:', error)
+    return res.status(500).json({ success: false, message: 'Impossible d\'envoyer le message pour le moment' })
+  }
+
+  try {
+    await sendContactConfirmation(payload)
+    console.log('[Contact] email confirmation envoyé')
+  } catch (error) {
+    console.error('[Contact] Erreur envoi email de confirmation:', error)
+  }
+
+  return res.status(201).json({ success: true, message: 'Message envoyé' })
+})
+
+import { notifyAdmins } from '../services/notifications.service.js'
 
 // ═══════════════════════════════════════════════════════════
 // NOTIFICATIONS
@@ -17,12 +91,27 @@ notificationsRouter.get('/unread-count', authenticate, async (req, res) => {
 notificationsRouter.get('/', authenticate, async (req, res) => {
   const page  = Math.max(1, parseInt(req.query.page)  || 1)
   const limit = Math.min(50, parseInt(req.query.limit) || 20)
-  const { data, count } = await supabase.from('notifications').select('*', { count: 'exact' }).eq('user_id', req.user.id).order('created_at', { ascending: false }).range((page - 1) * limit, page * limit - 1)
-  return res.json({ notifications: data || [], unreadCount: count || 0, pagination: { page, limit, total: count || 0, totalPages: Math.ceil((count || 0) / limit) } })
+  const [{ data, count }, { count: unreadCount }] = await Promise.all([
+    supabase.from('notifications').select('*', { count: 'exact' }).eq('user_id', req.user.id).order('created_at', { ascending: false }).range((page - 1) * limit, page * limit - 1),
+    supabase.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', req.user.id).eq('is_read', false),
+  ])
+  return res.json({ notifications: data || [], unreadCount: unreadCount || 0, pagination: { page, limit, total: count || 0, totalPages: Math.ceil((count || 0) / limit) } })
+})
+
+notificationsRouter.get('/:id', authenticate, async (req, res) => {
+  const { data, error } = await supabase.from('notifications')
+    .select('*').eq('id', req.params.id).eq('user_id', req.user.id).single()
+  if (error || !data) return res.status(404).json({ message: 'Notification introuvable' })
+  if (!data.is_read) {
+    await supabase.from('notifications').update({ is_read: true }).eq('id', req.params.id)
+    data.is_read = true
+  }
+  return res.json(data)
 })
 
 notificationsRouter.patch('/:id/read', authenticate, async (req, res) => {
-  const { data } = await supabase.from('notifications').update({ is_read: true }).eq('id', req.params.id).eq('user_id', req.user.id).select().single()
+  const { data, error } = await supabase.from('notifications').update({ is_read: true }).eq('id', req.params.id).eq('user_id', req.user.id).select().single()
+  if (error || !data) return res.status(404).json({ message: 'Notification introuvable' })
   return res.json(data)
 })
 
@@ -72,6 +161,14 @@ reviewsRouter.post('/', authenticate, async (req, res) => {
       await supabase.from('boats').update({ average_rating: Math.round(avg * 10) / 10, review_count: allReviews.length }).eq('id', booking.boat_id)
     }
   }
+
+  notifyAdmins(
+    'NEW_REVIEW',
+    'Nouvel avis',
+    `Avis ${rating}/5 posté sur la réservation #${bookingId}`,
+    { reviewId: review.id, bookingId, boatId: booking.boat_id }
+  ).catch(() => {})
+
   return res.status(201).json(review)
 })
 
@@ -80,7 +177,7 @@ reviewsRouter.get('/boat/:boatId', async (req, res) => {
   return res.json({ data: data || [], total: count || 0 })
 })
 
-function formatAdminReview(r) {
+export function formatAdminReview(r) {
   return {
     id: r.id,
     bookingId: r.booking_id,
@@ -172,11 +269,11 @@ reviewsRouter.delete('/admin/:id', authenticate, requireRole('ADMIN'), async (re
 export const messagesRouter = Router()
 
 // Conversation ID = "${minUserId}-${maxUserId}" — stable, no separate table needed
-function buildConvId(a, b) {
+export function buildConvId(a, b) {
   return `${Math.min(Number(a), Number(b))}-${Math.max(Number(a), Number(b))}`
 }
 
-function parseConvId(convId, myId) {
+export function parseConvId(convId, myId) {
   const parts = String(convId).split('-').map(Number)
   if (parts.length !== 2 || parts.some(isNaN)) return null
   const [a, b] = parts
@@ -185,7 +282,7 @@ function parseConvId(convId, myId) {
   return null
 }
 
-function formatMsg(msg) {
+export function formatMsg(msg) {
   return {
     id: msg.id,
     conversationId: buildConvId(msg.sender_id, msg.recipient_id),
@@ -388,13 +485,13 @@ favoritesRouter.delete('/:boatId', authenticate, async (req, res) => {
 // ═══════════════════════════════════════════════════════════
 export const availabilityRouter = Router()
 
-function addDaysStr(dateStr, days) {
+export function addDaysStr(dateStr, days) {
   const d = new Date(`${dateStr}T12:00:00`)
   d.setDate(d.getDate() + days)
   return d.toISOString().slice(0, 10)
 }
 
-function eachDateStr(from, to) {
+export function eachDateStr(from, to) {
   const dates = []
   let cur = from
   while (cur <= to) {
@@ -542,7 +639,7 @@ seasonalPricesRouter.delete('/:id', authenticate, async (req, res) => {
 // ═══════════════════════════════════════════════════════════
 const MONTH_LABELS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc']
 
-function formatAdminUser(u) {
+export function formatAdminUser(u) {
   return {
     id: u.id,
     email: u.email,
@@ -561,6 +658,14 @@ function formatAdminUser(u) {
     sailorCvSubmittedAt: u.sailor_cv_submitted_at,
     sailorCvReviewedAt: u.sailor_cv_reviewed_at,
     sailorCvRejectionReason: u.sailor_cv_rejection_reason,
+    kycVerified: Boolean(u.kyc_verified_at || u.kyc_status === 'APPROVED'),
+    kycStatus: u.kyc_status || 'NOT_SUBMITTED',
+    kycFrontDoc: u.kyc_front_doc || null,
+    kycBackDoc: u.kyc_back_doc || null,
+    kycSubmittedAt: u.kyc_submitted_at || null,
+    kycReviewedAt: u.kyc_reviewed_at || u.kyc_verified_at || null,
+    kycRejectionReason: u.kyc_rejection_reason || null,
+    kycDocumentExpiresAt: u.kyc_document_expires_at || null,
     isActive: !u.is_blocked,
     emailVerifiedAt: u.email_verified_at,
     createdAt: u.created_at,
@@ -568,7 +673,7 @@ function formatAdminUser(u) {
   }
 }
 
-function formatAdminBoat(b) {
+export function formatAdminBoat(b) {
   return {
     id: b.id,
     title: b.title,
@@ -590,7 +695,7 @@ function formatAdminBoat(b) {
   }
 }
 
-function formatAdminBooking(b) {
+export function formatAdminBooking(b) {
   const days = b.start_date && b.end_date
     ? Math.round((new Date(b.end_date) - new Date(b.start_date)) / (1000 * 60 * 60 * 24))
     : 0
@@ -626,7 +731,7 @@ function formatAdminBooking(b) {
   }
 }
 
-function normalizeBoatStatus(status) {
+export function normalizeBoatStatus(status) {
   const map = {
     ACTIVE: 'active', PUBLISHED: 'active',
     INACTIVE: 'inactive', SUSPENDED: 'inactive',
@@ -636,7 +741,25 @@ function normalizeBoatStatus(status) {
   return map[key] || status
 }
 
-async function buildDashboardStats() {
+/** Normalise un nom de rôle admin (CRUD rôles). */
+export function normalizeRoleName(name) {
+  return String(name || '').toUpperCase().replace(/[^A-Z0-9_]/g, '_')
+}
+
+/** Agrège CA plateforme / total depuis les réservations de l'année. */
+export function computeAdminYearRevenue(yearRows) {
+  const paidStatuses = ['CONFIRMED', 'COMPLETED']
+  const paid = (yearRows || []).filter((b) => paidStatuses.includes(b.status))
+  const totalRevenue = paid.reduce((s, b) => s + parseFloat(b.total_price || 0), 0)
+  const platformRevenue = paid.reduce((s, b) => s + parseFloat(b.service_fee || 0), 0)
+  return {
+    totalRevenue: Math.round(totalRevenue * 100) / 100,
+    platformRevenue: Math.round(platformRevenue * 100) / 100,
+    paidCount: paid.length,
+  }
+}
+
+export async function buildDashboardStats() {
   const year = new Date().getFullYear()
   const yearStart = `${year}-01-01`
 
@@ -651,12 +774,7 @@ async function buildDashboardStats() {
 
   const paidStatuses = ['CONFIRMED', 'COMPLETED']
   const yearRows = allBookingsYear.data || []
-  const totalRevenue = yearRows
-    .filter((b) => paidStatuses.includes(b.status))
-    .reduce((s, b) => s + parseFloat(b.total_price || 0), 0)
-  const platformRevenue = yearRows
-    .filter((b) => paidStatuses.includes(b.status))
-    .reduce((s, b) => s + parseFloat(b.service_fee || 0), 0)
+  const { totalRevenue, platformRevenue } = computeAdminYearRevenue(yearRows)
 
   const revenueByMonth = MONTH_LABELS.map((month, i) => {
     const monthBookings = yearRows.filter((b) => {
@@ -675,8 +793,8 @@ async function buildDashboardStats() {
     totalBoats: allBoats.count || 0,
     activeBoats: activeBoats.count || 0,
     totalBookings: bookings.count || 0,
-    totalRevenue: Math.round(totalRevenue * 100) / 100,
-    platformRevenue: Math.round(platformRevenue * 100) / 100,
+    totalRevenue,
+    platformRevenue,
     pendingReviews: reviews.count || 0,
     revenueByMonth,
     bookingsByMonth: revenueByMonth.map(({ month, bookings: count }) => ({ month, bookings: count })),
@@ -805,7 +923,7 @@ adminRouter.get('/roles', async (req, res) => {
 adminRouter.post('/roles', async (req, res) => {
   const { name, label, description, color } = req.body
   if (!name || !label) return res.status(400).json({ message: 'name et label requis' })
-  const normalized = name.toUpperCase().replace(/[^A-Z0-9_]/g, '_')
+  const normalized = normalizeRoleName(name)
   const { data, error } = await supabase.from('roles').insert({
     name: normalized, label, description: description || '', color: color || 'gray', is_system: false,
   }).select().single()

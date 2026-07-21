@@ -1,5 +1,5 @@
 /**
- * Business enum labels — resolved via i18n (boat.type.*, boat.motorization.*).
+ * Business enum labels - resolved via i18n (boat.type.*, boat.motorization.*).
  * Use boatTypeLabel() / motorizationLabel() in components so language switches update the UI.
  */
 
@@ -16,7 +16,7 @@ export function motorizationLabel(type: MotorizationType): string {
 
 const boatTypeKeys = Object.values(BoatType)
 
-/** @deprecated Prefer boatTypeLabel(type) — kept for gradual migration */
+/** @deprecated Prefer boatTypeLabel(type) - kept for gradual migration */
 export const BOAT_TYPE_LABELS = new Proxy({} as Record<BoatType, string>, {
   get: (_target, prop: string) => boatTypeLabel(prop as BoatType),
   ownKeys: () => boatTypeKeys,

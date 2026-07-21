@@ -17,11 +17,11 @@ const __dirname  = path.dirname(__filename)
  * Les tests utilisent ensuite ces fichiers via loginAs() sans
  * refaire de vraie connexion formulaire.
  *
- * Prérequis : backend Symfony + fixtures chargées (doctrine:fixtures:load).
+ * Prérequis : backend Node/Express (port 3000) + comptes demo seedés.
  */
 
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:5173'
-const API_URL  = process.env.PLAYWRIGHT_API_URL  ?? 'http://localhost:8000'
+const API_URL  = process.env.PLAYWRIGHT_API_URL  ?? 'http://127.0.0.1:3000'
 
 const ACCOUNTS = {
   renter: { email: 'renter@demo.fr',       password: 'Renter@Sail2026!' },
@@ -34,20 +34,26 @@ const AUTH_DIR = path.join(__dirname, '../.auth')
 async function globalSetup() {
   fs.mkdirSync(AUTH_DIR, { recursive: true })
 
-  // ── 1. Vérifie que le backend est joignable ──────────────────────────────
+  // ── 1. Vérifie que le backend est joignable (quelques retries) ───────────
   let backendOk = false
-  try {
-    const res = await fetch(`${API_URL}/api/health`, {
-      signal: AbortSignal.timeout(5_000),
-    })
-    backendOk = res.ok
-  } catch { /* backend non démarré */ }
+  for (let attempt = 1; attempt <= 5; attempt++) {
+    try {
+      const res = await fetch(`${API_URL}/api/health`, {
+        signal: AbortSignal.timeout(5_000),
+      })
+      if (res.ok) {
+        backendOk = true
+        break
+      }
+    } catch { /* retry */ }
+    await new Promise((r) => setTimeout(r, 1_000))
+  }
 
   if (!backendOk) {
     console.warn(
       `\n⚠️  Backend non joignable (${API_URL}). ` +
       `Les tests nécessitant l'authentification seront ignorés.\n` +
-      `Lancez le backend avec : cd backend && symfony serve\n`,
+      `Lancez le backend avec : cd backend && npm run dev\n`,
     )
     // Sauvegarde des états vides pour que les tests puissent démarrer
     for (const role of Object.keys(ACCOUNTS)) {
@@ -77,20 +83,26 @@ async function globalSetup() {
       }
 
       const json = await res.json()
-      // L'enveloppe Symfony renvoie { success, data: { user, accessToken, refreshToken } }
-      const { user, accessToken, refreshToken } = json.data ?? json
+      const { user, accessToken, refreshToken } = json
 
       // ── 3. Injecte l'état dans localStorage via un contexte navigateur ──
       const context = await browser.newContext()
       const page    = await context.newPage()
 
-      await page.goto(BASE_URL)
-
-      await page.evaluate(
+      await page.addInitScript(
         ({ user, accessToken, refreshToken }) => {
-          // Zustand charge TOUS les champs du state stocké au démarrage,
-          // même ceux absents de partialize (comme accessToken).
-          // Cela évite la boucle 401 → refresh au premier appel API.
+          const consent = JSON.stringify({
+            version: '3',
+            essential: true,
+            analytical: false,
+            marketing: false,
+            date: new Date().toISOString(),
+          })
+          localStorage.setItem('sailingloc-cookie-consent', consent)
+          document.cookie = `sailingloc_consent=${encodeURIComponent(consent)};path=/;SameSite=Lax`
+          // Requis pour initSessionGuard() : sinon logout immédiat au montage.
+          localStorage.setItem('sailingloc-remember-me', 'true')
+          sessionStorage.setItem('sailingloc-session-active', '1')
           localStorage.setItem(
             'sailingloc-auth',
             JSON.stringify({
@@ -101,6 +113,8 @@ async function globalSetup() {
         },
         { user, accessToken, refreshToken },
       )
+
+      await page.goto(BASE_URL)
 
       // ── 4. Sauvegarde le storageState ────────────────────────────────────
       await context.storageState({ path: path.join(AUTH_DIR, `${role}.json`) })

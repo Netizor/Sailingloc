@@ -115,6 +115,20 @@ const PaymentMethods: React.FC = () => {
           </h1>
         </div>
 
+        <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Modes de paiement</h2>
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            <div className="rounded-xl border border-ocean-100 bg-ocean-50 p-3">
+              <p className="text-sm font-semibold text-ocean-800">Carte bancaire</p>
+              <p className="mt-1 text-sm text-ocean-700">Ajoutez votre carte via Stripe pour sécuriser vos réservations.</p>
+            </div>
+            <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-3">
+              <p className="text-sm font-semibold text-gray-800">Autres options</p>
+              <p className="mt-1 text-sm text-gray-600">Virement bancaire et paiement manuel seront ajoutés prochainement.</p>
+            </div>
+          </div>
+        </div>
+
         {/* ── Liste des cartes ── */}
         {isLoading ? (
           <div className="flex justify-center py-20">

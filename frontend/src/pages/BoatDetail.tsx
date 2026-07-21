@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate } from 'react-router-dom'
@@ -34,6 +34,7 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn, formatDate } from '../lib/utils'
+import { TITLE_SEP } from '../lib/typography'
 import { boatsApi } from '../api/boats.api'
 import { bookingsApi } from '../api/bookings.api'
 import { availabilityApi } from '../api/availability.api'
@@ -46,10 +47,12 @@ import { BOAT_TYPE_LABELS } from '../lib/labels'
 import { getBoatEquipment, getEnrichedDescription } from '../lib/boatContent'
 import { reportBoat } from '../api/reports.api'
 import type { ReportReason } from '../api/reports.api'
-import { getDemoBoat } from '../data/demoBoats'
+import { getBoatDescription, getDemoBoat, resolveLang } from '../data/demoBoats'
 import BoatDetailGallery from '../components/boats/BoatDetailGallery'
 import BoatAvailabilityCalendar from '../components/boats/BoatAvailabilityCalendar'
 import BoatOwnerCard from '../components/boats/BoatOwnerCard'
+import SimilarBoats from '../components/boats/SimilarBoats'
+import MapView from '../components/boats/MapView'
 import BookingForm, { BookingFormData } from '../components/bookings/BookingForm'
 import StripePaymentModal from '../components/bookings/StripePaymentModal'
 import Modal from '../components/ui/Modal'
@@ -57,22 +60,35 @@ import Button from '../components/ui/Button'
 import Spinner from '../components/ui/Spinner'
 import toast from 'react-hot-toast'
 
-const DEMO_REVIEWS: Partial<Review>[] = [
+interface DemoReview extends Partial<Review> {
+  commentFr: string
+  commentEn: string
+}
+
+const DEMO_REVIEWS: DemoReview[] = [
   {
     id: 9001,
     rating: 5,
-    comment: 'Une expérience formidable ! Le propriétaire était super accueillant et le voilier en parfait état. Nous reviendrons sans hésiter.',
+    commentFr: "Une expérience incroyable ! Le propriétaire était très accueillant et le voilier en parfait état. Nous reviendrons sans hésiter.",
+    commentEn: 'An amazing experience! The owner was very welcoming and the sailboat was in perfect condition. We will definitely come back.',
+    comment: 'An amazing experience! The owner was very welcoming and the sailboat was in perfect condition. We will definitely come back.',
     createdAt: '2024-04-12',
     reviewer: { id: 1, firstName: 'Marc-Antoine', lastName: 'D.', email: '', role: UserRole.RENTER, kycVerified: true, isActive: true, createdAt: '' },
   },
   {
     id: 9002,
     rating: 5,
-    comment: 'Week-end parfait en famille. Le bateau est spacieux, bien équipé et idéalement situé. Communication fluide avec le propriétaire.',
+    commentFr: "Week-end en famille parfait. Le bateau est spacieux, bien équipé et idéalement situé. Communication fluide avec le propriétaire.",
+    commentEn: 'Perfect family weekend. The boat is spacious, well equipped and ideally located. Smooth communication with the owner.',
+    comment: 'Perfect family weekend. The boat is spacious, well equipped and ideally located. Smooth communication with the owner.',
     createdAt: '2024-03-28',
     reviewer: { id: 2, firstName: 'Sophie', lastName: 'L.', email: '', role: UserRole.RENTER, kycVerified: true, isActive: true, createdAt: '' },
   },
 ]
+
+function getDemoReviewComment(review: DemoReview, lang: string): string {
+  return resolveLang(lang) === 'en' ? review.commentEn : review.commentFr
+}
 
 // Associe chaque équipement à une icône pertinente (recherche par mot-clé)
 const EQUIPMENT_ICONS: { match: RegExp; icon: LucideIcon }[] = [
@@ -146,6 +162,13 @@ const BoatDetail: React.FC = () => {
 
   const boat = apiBoat ?? getDemoBoat(Number(id))
 
+  // Défense: en dev (Fast Refresh / PWA) ou après navigation, on s'assure que la page
+  // d'un bateau ne démarre jamais avec une modale de paiement "restée ouverte".
+  useEffect(() => {
+    setStripePayment(null)
+    setBookingPanelOpen(false)
+  }, [id])
+
   const { data: favData } = useQuery({
     queryKey: ['favorites', 'check', id],
     queryFn: () => checkFavorite(Number(id!)),
@@ -204,7 +227,11 @@ const BoatDetail: React.FC = () => {
   })
   const apiReviews = reviewsData?.data ?? []
   const reviewTotal = reviewsData?.total ?? boat?.reviewCount ?? 0
-  const displayReviews = apiReviews.length > 0 ? apiReviews : DEMO_REVIEWS
+  const localizedDemoReviews = useMemo(
+    () => DEMO_REVIEWS.map((review) => ({ ...review, comment: getDemoReviewComment(review, i18n.language) })),
+    [i18n.language],
+  )
+  const displayReviews = apiReviews.length > 0 ? apiReviews : localizedDemoReviews
 
   const reportMutation = useMutation({
     mutationFn: () => reportBoat({ boatId: boat!.id, reason: reportReason, details: reportDetails || undefined }),
@@ -254,8 +281,20 @@ const BoatDetail: React.FC = () => {
     await bookingMutation.mutateAsync({ ...data, boatId: boat.id })
   }
 
+  const handlePaymentClose = async () => {
+    if (!stripePayment) return
+    const { bookingId } = stripePayment
+    setStripePayment(null)
+    try {
+      await bookingsApi.cancel(bookingId, { cancellationReason: 'Payment abandoned' })
+    } catch {
+      // La réservation a peut-être déjà été traitée
+    }
+  }
+
   const locationLabel = boat.city ? `${boat.city}, ${boat.country}` : `${boat.port}, ${boat.country}`
-  const description = getEnrichedDescription(boat)
+  const localizedDescription = getBoatDescription(boat, i18n.language)
+  const description = getEnrichedDescription({ ...boat, description: localizedDescription })
   const shortDesc = description.length > 900 ? description.slice(0, 900) + '…' : description
   const equipment = getBoatEquipment(boat)
   const interestedCount = Math.max(48, boat.reviewCount * 14 + (boat.id % 37) * 3)
@@ -268,9 +307,9 @@ const BoatDetail: React.FC = () => {
   ].filter((spec) => spec.value)
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] pb-24 lg:pb-12">
+    <div className="min-h-screen bg-[#f8f9fa] dark:bg-gray-900 pb-24 lg:pb-12">
       <Helmet>
-        <title>{boat.title} - SailingLoc</title>
+        <title>{boat.title}{TITLE_SEP}SailingLoc</title>
         <meta name="description" content={boat.description?.slice(0, 155) ?? t('boat.detail.rentMeta', { title: boat.title, port: boat.port })} />
         {boat.images?.[0] && <meta property="og:image" content={boat.images[0]} />}
       </Helmet>
@@ -409,6 +448,20 @@ const BoatDetail: React.FC = () => {
               </section>
             )}
 
+            {/* Localisation */}
+            <section>
+              <h2 className="text-lg font-bold text-[#003366] mb-4">{t('boat.detail.location')}</h2>
+              <p className="text-sm text-[#334155] mb-4 flex items-center gap-2">
+                <MapPin size={16} className="text-[#2563FF] flex-shrink-0" />
+                {boat.port}{boat.city ? `, ${boat.city}` : ''}{boat.country ? `, ${boat.country}` : ''}
+              </p>
+              {boat.lat != null && boat.lng != null ? (
+                <MapView boats={[boat]} className="rounded-2xl overflow-hidden border border-gray-100" />
+              ) : (
+                <p className="text-sm text-[#8A94A6] italic">{t('boat.detail.noMapCoordinates')}</p>
+              )}
+            </section>
+
             {/* Disponibilités */}
             <section>
               <h2 className="text-lg font-bold text-[#003366] mb-4">{t('boat.detail.availability')}</h2>
@@ -487,10 +540,12 @@ const BoatDetail: React.FC = () => {
             </div>
           </aside>
         </div>
+
+        <SimilarBoats currentBoatId={boat.id} boatType={boat.type} city={boat.city} />
       </div>
 
       {/* Mobile CTA */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 px-[10%] py-3 flex items-center justify-between gap-3">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-[10%] py-3 flex items-center justify-between gap-3">
         <div>
           <span className="text-lg font-bold text-[#003366]">
             {formatEuro(boat.dailyRate)}
@@ -583,7 +638,7 @@ const BoatDetail: React.FC = () => {
             toast.success(t('boat.detail.paymentConfirmed'))
             navigate('/mon-espace/reservations')
           }}
-          onClose={() => setStripePayment(null)}
+          onClose={handlePaymentClose}
         />
       )}
     </div>

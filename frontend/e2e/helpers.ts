@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname  = path.dirname(__filename)
 
 /**
- * Comptes de démonstration créés par `php bin/console doctrine:fixtures:load`.
+ * Comptes de démonstration créés par `npm run db:seed` (backend).
  */
 export const DEMO_ACCOUNTS = {
   renter: { email: 'renter@demo.fr',       password: 'Renter@Sail2026!' },
@@ -49,13 +49,14 @@ export async function loginAs(page: Page, role: keyof typeof DEMO_ACCOUNTS): Pro
         state?: { isAuthenticated?: boolean; accessToken?: string }
       }
       if (parsed.state?.isAuthenticated) {
-        // Injecte l'état auth dans la page avant de naviguer.
-        // Le accessToken est inclus dans le state → Zustand l'hydrate → les appels API fonctionnent.
-        await page.goto('/')
-        await page.evaluate((authValue) => {
+        // Injecte AVANT le premier chargement React (addInitScript), sinon
+        // initSessionGuard() déconnecte : pas de remember-me + sessionStorage vide.
+        await page.addInitScript((authValue) => {
           localStorage.setItem('sailingloc-auth', authValue)
+          localStorage.setItem('sailingloc-remember-me', 'true')
+          sessionStorage.setItem('sailingloc-session-active', '1')
         }, authItem.value)
-        // Navigue vers le tableau de bord approprié selon le rôle
+
         const destination = role === 'admin' ? '/admin' : role === 'owner' ? '/proprietaire' : '/mon-espace'
         await page.goto(destination)
         return
@@ -70,6 +71,17 @@ export async function loginAs(page: Page, role: keyof typeof DEMO_ACCOUNTS): Pro
   await page.locator('input[type="password"]').fill(password)
   await page.locator('button[type="submit"]').click()
   await expect(page).toHaveURL(/\/(mon-espace|proprietaire|admin)/, { timeout: 15_000 })
+}
+
+/** Ping rapide de l'API (pour skipper les tests qui appellent le backend). */
+export async function isBackendReachable(): Promise<boolean> {
+  const apiUrl = process.env.PLAYWRIGHT_API_URL ?? 'http://127.0.0.1:3000'
+  try {
+    const res = await fetch(`${apiUrl}/api/health`, { signal: AbortSignal.timeout(3_000) })
+    return res.ok
+  } catch {
+    return false
+  }
 }
 
 /**
@@ -87,8 +99,19 @@ export function isAuthAvailable(role: keyof typeof DEMO_ACCOUNTS): boolean {
   try {
     const state = JSON.parse(fs.readFileSync(authFile, 'utf-8')) as {
       state?: { isAuthenticated?: boolean }
+      origins?: Array<{
+        localStorage?: Array<{ name: string; value: string }>
+      }>
     }
-    return !!state.state?.isAuthenticated
+    if (state.state?.isAuthenticated) return true
+    const authItem = state.origins
+      ?.flatMap((o) => o.localStorage ?? [])
+      .find((item) => item.name === 'sailingloc-auth')
+    if (!authItem) return false
+    const parsed = JSON.parse(authItem.value) as {
+      state?: { isAuthenticated?: boolean }
+    }
+    return !!parsed.state?.isAuthenticated
   } catch {
     return false
   }

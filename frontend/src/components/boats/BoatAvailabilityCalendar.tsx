@@ -10,7 +10,7 @@ import {
   isBefore,
   startOfDay,
 } from 'date-fns'
-import { fr } from 'date-fns/locale'
+import { enUS } from 'date-fns/locale'
 import { availabilityApi } from '../../api/availability.api'
 import { cn } from '../../lib/utils'
 
@@ -19,10 +19,10 @@ interface BoatAvailabilityCalendarProps {
   variant?: 'default' | 'detail'
 }
 
-// Noms courts des jours en français (lundi en premier)
-const DAY_NAMES = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
+// Short day names (Monday first)
+const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
-/** Convertit getDay (0=dim) en index lundi-premier (0=lun … 6=dim) */
+/** Converts getDay (0=Sun) to Monday-first index (0=Mon … 6=Sun) */
 const mondayFirst = (d: Date) => (getDay(d) + 6) % 7
 
 const BoatAvailabilityCalendar: React.FC<BoatAvailabilityCalendarProps> = ({ boatId, variant = 'default' }) => {
@@ -37,7 +37,7 @@ const BoatAvailabilityCalendar: React.FC<BoatAvailabilityCalendarProps> = ({ boa
   const bookedSet = new Set(data?.booked ?? [])
   const unavailableSet = new Set(data?.unavailable ?? [])
 
-  // Affiche le mois en cours et le suivant
+  // Show current month and next
   const months = [today, addMonths(today, 1)]
 
   const getDayClass = (date: Date, dateStr: string) => {
@@ -59,9 +59,9 @@ const BoatAvailabilityCalendar: React.FC<BoatAvailabilityCalendarProps> = ({ boa
   return (
     <div>
       <div className={cn('flex flex-wrap items-center gap-4 mb-5 text-xs', variant === 'detail' ? 'text-[#8A94A6]' : 'text-gray-500')}>
-        <LegendDot color={variant === 'detail' ? 'bg-white border border-gray-200' : 'bg-white border border-gray-200'} label="Disponible" />
-        <LegendDot color={variant === 'detail' ? 'bg-[#2563FF]' : 'bg-orange-100'} label="Réservé" />
-        <LegendDot color={variant === 'detail' ? 'bg-[#003366]' : 'bg-gray-100'} label="Indisponible" />
+        <LegendDot color={variant === 'detail' ? 'bg-white border border-gray-200' : 'bg-white border border-gray-200'} label="Available" />
+        <LegendDot color={variant === 'detail' ? 'bg-[#2563FF]' : 'bg-orange-100'} label="Booked" />
+        <LegendDot color={variant === 'detail' ? 'bg-[#003366]' : 'bg-gray-100'} label="Unavailable" />
       </div>
 
       {isLoading ? (
@@ -88,10 +88,10 @@ const BoatAvailabilityCalendar: React.FC<BoatAvailabilityCalendarProps> = ({ boa
             return (
               <div key={monthStart.toISOString()} className={cn(variant === 'detail' ? 'p-1' : 'bg-white rounded-xl border border-gray-100 p-4')}>
                 <p className={cn('text-sm font-semibold mb-3 capitalize', variant === 'detail' ? 'text-[#003366]' : 'text-gray-900')}>
-                  {format(monthStart, 'MMMM yyyy', { locale: fr })}
+                  {format(monthStart, 'MMMM yyyy', { locale: enUS })}
                 </p>
 
-                {/* Noms des jours */}
+                {/* Day names */}
                 <div className="grid grid-cols-7 gap-1 mb-1">
                   {DAY_NAMES.map((d) => (
                     <div key={d} className="text-center text-[10px] font-medium text-gray-400 py-1">
@@ -100,9 +100,9 @@ const BoatAvailabilityCalendar: React.FC<BoatAvailabilityCalendarProps> = ({ boa
                   ))}
                 </div>
 
-                {/* Cellules des jours */}
+                {/* Day cells */}
                 <div className="grid grid-cols-7 gap-1">
-                  {/* Cases vides avant le 1er */}
+                  {/* Empty cells before the 1st */}
                   {Array.from({ length: leadingBlanks }).map((_, i) => (
                     <div key={`blank-${i}`} />
                   ))}

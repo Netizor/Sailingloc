@@ -15,6 +15,12 @@ export default defineConfig({
       // Met à jour le SW automatiquement en arrière-plan (sans popup "nouvelle version")
       registerType: 'autoUpdate',
 
+      // Active le SW en mode dev pour que navigator.serviceWorker.ready se résolve
+      devOptions: {
+        enabled: true,
+        type: 'module',
+      },
+
       // Fichiers pré-cachés au build (shell applicatif)
       includeAssets: ['icons/icon.svg', 'favicon.ico'],
 
@@ -88,7 +94,8 @@ export default defineConfig({
     // Même origine en dev : le navigateur appelle /api sur :5173, Vite relaie vers le backend Node (:3000) → pas de CORS
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        // Windows: "localhost" peut résoudre en IPv6 (::1) et provoquer ECONNREFUSED si le backend écoute en IPv4.
+        target: 'http://127.0.0.1:3000',
         changeOrigin: true,
       },
     },

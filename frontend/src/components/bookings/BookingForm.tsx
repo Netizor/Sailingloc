@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState, useMemo, useRef, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { MessageSquare, User, AlertCircle } from 'lucide-react'
 import { differenceInDays, parseISO, format, addDays, isBefore } from 'date-fns'
@@ -11,6 +11,7 @@ import 'react-day-picker/style.css'
 import { cn } from '../../lib/utils'
 import type { Boat } from '../../types'
 import { useAuthStore } from '../../store/auth.store'
+import { SETTINGS_ROUTE } from '../../lib/profilePaths'
 import Button from '../ui/Button'
 import PriceBreakdown from '../boats/PriceBreakdown'
 
@@ -55,7 +56,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
 }) => {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuthStore()
+  const location = useLocation()
+  const { isAuthenticated, user } = useAuthStore()
 
   const dateLocale = i18n.language.startsWith('en') ? enUS : fr
   const priceLocale = i18n.language
@@ -70,7 +72,58 @@ const BookingForm: React.FC<BookingFormProps> = ({
   const [withSkipper, setWithSkipper] = useState(false)
   const [message, setMessage] = useState('')
   const [dateError, setDateError] = useState<string | undefined>()
+  const [licenseError, setLicenseError] = useState<string | undefined>()
   const [passengers, setPassengers] = useState(Math.min(2, boat.capacity))
+
+  const bookingDraftKey = `sailingloc_booking_${boat.id}`
+  const [savedAt, setSavedAt] = useState<Date | null>(null)
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const licenseRequired = Boolean(
+    boat.requiredLicense && boat.requiredLicense !== 'NONE' && !withSkipper,
+  )
+  const hasBoatingCredentials = Boolean(
+    user?.sailingQualifications?.trim()
+    || (user?.sailorCvStatus === 'APPROVED' && user?.sailorCvDoc),
+  )
+
+  // Restore draft on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(bookingDraftKey)
+      if (!raw) return
+      const saved = JSON.parse(raw)
+      if (saved.withSkipper !== undefined) setWithSkipper(saved.withSkipper)
+      if (saved.message) setMessage(saved.message)
+      if (saved.passengers) setPassengers(Math.min(saved.passengers, boat.capacity))
+      if (saved.range?.from) {
+        const from = new Date(saved.range.from)
+        const to = saved.range.to ? new Date(saved.range.to) : undefined
+        if (from > new Date()) setRange({ from, to })
+      }
+      if (saved.savedAt) setSavedAt(new Date(saved.savedAt))
+    } catch {}
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Autosave on changes (debounce 600 ms)
+  useEffect(() => {
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    saveTimerRef.current = setTimeout(() => {
+      try {
+        const now = new Date()
+        localStorage.setItem(bookingDraftKey, JSON.stringify({
+          range: range ? { from: range.from?.toISOString(), to: range.to?.toISOString() } : null,
+          withSkipper,
+          message,
+          passengers,
+          boatTitle: boat.title,
+          savedAt: now.toISOString(),
+        }))
+        setSavedAt(now)
+      } catch {}
+    }, 600)
+    return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current) }
+  }, [range, withSkipper, message, passengers, bookingDraftKey])
 
   const disabledSet = useMemo(() => new Set(disabledDates), [disabledDates])
 
@@ -144,7 +197,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
       setDateError(t('booking.form.errorDatesUnavailable'))
       return false
     }
+    if (licenseRequired && !hasBoatingCredentials) {
+      setLicenseError(t('booking.form.licenseRequired'))
+      return false
+    }
     setDateError(undefined)
+    setLicenseError(undefined)
     return true
   }
 
@@ -156,6 +214,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
     }
     if (!validate()) return
     await onSubmit({ startDate, endDate, withSkipper, message })
+    try { localStorage.removeItem(bookingDraftKey) } catch {}
   }
 
   const isDetail = variant === 'detail'
@@ -214,7 +273,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               )}>
                 <p className="text-[10px] font-bold uppercase tracking-wider mb-0.5">{t('booking.startDate')}</p>
                 <p className="font-medium">
-                  {range?.from ? format(range.from, 'd MMM yyyy', { locale: dateLocale }) : '—'}
+                  {range?.from ? format(range.from, 'd MMM yyyy', { locale: dateLocale }) : '-'}
                 </p>
               </div>
               <div className={cn(
@@ -223,7 +282,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               )}>
                 <p className="text-[10px] font-bold uppercase tracking-wider mb-0.5">{t('booking.endDate')}</p>
                 <p className="font-medium">
-                  {range?.to ? format(range.to, 'd MMM yyyy', { locale: dateLocale }) : '—'}
+                  {range?.to ? format(range.to, 'd MMM yyyy', { locale: dateLocale }) : '-'}
                 </p>
               </div>
             </div>
@@ -319,7 +378,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
             <input
               type="checkbox"
               checked={withSkipper}
-              onChange={(e) => setWithSkipper(e.target.checked)}
+                    onChange={(e) => {
+                      setWithSkipper(e.target.checked)
+                      setLicenseError(undefined)
+                    }}
               className="mt-0.5 h-4 w-4 rounded border-gray-300 text-ocean-600 focus:ring-ocean-500 cursor-pointer"
             />
             <div>
@@ -397,6 +459,26 @@ const BookingForm: React.FC<BookingFormProps> = ({
           </div>
         )}
 
+        {licenseRequired && isAuthenticated && !hasBoatingCredentials && (
+          <div className="flex items-start gap-2 bg-amber-50 text-amber-800 rounded-xl px-3 py-2.5 text-xs">
+            <AlertCircle size={14} className="flex-shrink-0 mt-0.5 text-amber-500" />
+            <span>
+              {t('booking.form.licenseRequired')}{' '}
+              <button
+                type="button"
+                onClick={() => navigate(SETTINGS_ROUTE)}
+                className="underline font-medium"
+              >
+                {t('booking.form.completeProfile')}
+              </button>
+            </span>
+          </div>
+        )}
+
+        {licenseError && (
+          <p className="text-xs text-red-600">{licenseError}</p>
+        )}
+
         {isDetail ? (
           <button
             type="submit"
@@ -418,6 +500,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
               ? t('booking.form.bookAndPayDays', { count: totalDays })
               : t('booking.form.bookAndPay')}
           </Button>
+        )}
+
+        {savedAt && (
+          <p className="text-xs text-center text-gray-400">
+            Selection saved at {savedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+          </p>
         )}
 
         <p className="text-xs text-center text-[#8A94A6]">

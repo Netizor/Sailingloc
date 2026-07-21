@@ -5,7 +5,8 @@ import en from './locales/en.json'
 
 const STORAGE_KEY = 'sailingloc_lang'
 
-const initialLang = localStorage.getItem(STORAGE_KEY) ?? 'en'
+const stored = localStorage.getItem(STORAGE_KEY)
+const initialLang = stored === 'fr' || stored === 'en' ? stored : 'en'
 
 i18n
   .use(initReactI18next)
@@ -16,12 +17,12 @@ i18n
     interpolation: { escapeValue: false },
   })
 
-document.documentElement.lang = initialLang.startsWith('en') ? 'en' : 'fr'
+document.documentElement.lang = initialLang
 
-// Persist language choice
 i18n.on('languageChanged', (lng) => {
-  localStorage.setItem(STORAGE_KEY, lng)
-  document.documentElement.lang = lng.startsWith('en') ? 'en' : 'fr'
+  const normalized = lng.startsWith('en') ? 'en' : 'fr'
+  localStorage.setItem(STORAGE_KEY, normalized)
+  document.documentElement.lang = normalized
 })
 
 export default i18n

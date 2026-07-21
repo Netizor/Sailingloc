@@ -14,11 +14,11 @@ import Spinner from '../../components/ui/Spinner'
 import { formatDate, formatPrice } from '../../lib/utils'
 
 const OWNER_CANCEL_REASONS = [
-  'Problème technique sur le bateau',
-  'Indisponibilité personnelle',
-  'Conditions météo extrêmes',
-  'Raison de sécurité',
-  'Autre',
+  'Technical issue with the boat',
+  'Personal unavailability',
+  'Extreme weather conditions',
+  'Safety reason',
+  'Other',
 ]
 
 type FilterTab = 'ALL' | BookingStatus
@@ -164,10 +164,10 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
   const { mutate: accept, isPending: isAccepting } = useMutation({
     mutationFn: () => bookingsApi.accept(booking.id),
     onSuccess: () => {
-      toast.success(t('booking.ownerBookings.confirmed'))
+      toast.success('Booking accepted')
       queryClient.invalidateQueries({ queryKey: ['owner', 'bookings'] })
     },
-    onError: () => toast.error(t('booking.ownerBookings.confirmError')),
+    onError: (err: any) => toast.error(err?.response?.data?.message ?? 'Error accepting booking'),
   })
 
   const { mutate: decline, isPending: isDeclining } = useMutation({
@@ -182,18 +182,18 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
   const { mutate: cancel, isPending: isCancelling } = useMutation({
     mutationFn: (reason: string) => bookingsApi.cancel(booking.id, { cancellationReason: reason }),
     onSuccess: () => {
-      toast.success('Réservation annulée — le locataire sera intégralement remboursé', { id: 'cancel-booking' })
+      toast.success('Booking cancelled: the renter will be fully refunded', { id: 'cancel-booking' })
       setCancelOpen(false)
       queryClient.invalidateQueries({ queryKey: ['owner', 'bookings'] })
     },
     onError: (err: any) => toast.error(
-      err?.response?.data?.message ?? "Erreur lors de l'annulation",
+      err?.response?.data?.message ?? 'Error cancelling booking',
       { id: 'cancel-booking' },
     ),
   })
 
   const handleConfirmCancel = () => {
-    const reason = cancelReason === 'Autre' ? (cancelOther.trim() || 'Autre') : cancelReason
+    const reason = cancelReason === 'Other' ? (cancelOther.trim() || 'Other') : cancelReason
     cancel(reason)
   }
 
@@ -239,25 +239,30 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
         </div>
 
         {isPending && (
-          <div className="flex items-center gap-2 flex-wrap">
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => accept()}
-              disabled={isAccepting || isDeclining}
-              loading={isAccepting}
-            >
-              {t('booking.ownerBookings.accept')}
-            </Button>
-            <Button
-              variant="danger"
-              size="sm"
-              onClick={() => decline()}
-              disabled={isAccepting || isDeclining}
-              loading={isDeclining}
-            >
-              {t('booking.ownerBookings.decline')}
-            </Button>
+          <div className="flex flex-col gap-2">
+            <p className="text-xs text-amber-600 dark:text-amber-400">
+              {t('booking.ownerBookings.pendingPayment')}
+            </p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => accept()}
+                disabled={isAccepting || isDeclining}
+                loading={isAccepting}
+              >
+                Accept
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => decline()}
+                disabled={isDeclining || isAccepting}
+                loading={isDeclining}
+              >
+                {t('booking.ownerBookings.decline')}
+              </Button>
+            </div>
           </div>
         )}
 
@@ -270,7 +275,7 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
               onClick={() => setCancelOpen(true)}
               disabled={isCancelling}
             >
-              Annuler
+              Cancel
             </Button>
           </div>
         )}
@@ -288,25 +293,25 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
         )}
       </div>
 
-      {/* Modal annulation propriétaire */}
+      {/* Owner cancellation modal */}
       <Modal
         isOpen={cancelOpen}
         onClose={() => setCancelOpen(false)}
-        title="Annuler la réservation"
+        title="Cancel booking"
         size="sm"
       >
         <div className="p-6 space-y-5">
           <div className="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-xl p-4">
             <AlertTriangle size={18} className="text-amber-500 flex-shrink-0 mt-0.5" />
             <div className="text-sm text-amber-700 space-y-1">
-              <p className="font-medium">Cette action est irréversible.</p>
-              <p>En tant que propriétaire, le locataire sera <strong>intégralement remboursé</strong>.</p>
+              <p className="font-medium">This action cannot be undone.</p>
+              <p>As the owner, the renter will be <strong>fully refunded</strong>.</p>
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Motif d'annulation
+              Cancellation reason
             </label>
             <select
               value={cancelReason}
@@ -319,16 +324,16 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
             </select>
           </div>
 
-          {cancelReason === 'Autre' && (
+          {cancelReason === 'Other' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Précisez
+                Please specify
               </label>
               <textarea
                 value={cancelOther}
                 onChange={(e) => setCancelOther(e.target.value)}
                 rows={3}
-                placeholder="Décrivez votre motif d'annulation…"
+                placeholder="Describe your cancellation reason…"
                 className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 resize-none dark:bg-gray-800"
               />
             </div>
@@ -341,7 +346,7 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
               onClick={() => setCancelOpen(false)}
               disabled={isCancelling}
             >
-              Conserver
+              Keep booking
             </Button>
             <Button
               variant="danger"
@@ -350,7 +355,7 @@ const BookingCard: React.FC<{ booking: Booking }> = ({ booking }) => {
               loading={isCancelling}
               disabled={isCancelling}
             >
-              Confirmer l'annulation
+              Confirm cancellation
             </Button>
           </div>
         </div>

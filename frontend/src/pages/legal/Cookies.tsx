@@ -1,93 +1,77 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import LegalSection from '../../components/ui/LegalSection'
 import LegalPageLayout from '../../components/ui/LegalPageLayout'
 import { usePageTitle } from '../../hooks/usePageTitle'
 
-// ─── Tableau des types de cookies ─────────────────────────────────────────────
+// ─── Cookie types table ───────────────────────────────────────────────────────
 
 const COOKIE_TYPES = [
-  {
-    type: 'Cookies essentiels',
-    purpose: 'Authentification, sécurité, session utilisateur',
-    duration: 'Session / 7 jours',
-    consent: 'Non requis',
-  },
-  {
-    type: 'Cookies analytiques',
-    purpose: "Mesure d'audience, amélioration des pages (anonymisés)",
-    duration: '13 mois',
-    consent: 'Requis',
-  },
-  {
-    type: 'Cookies marketing',
-    purpose: 'Personnalisation des publicités, retargeting',
-    duration: '30 jours',
-    consent: 'Requis',
-  },
+  { key: 'essential', consent: 'notRequired' as const },
+  { key: 'analytics', consent: 'required' as const },
+  { key: 'marketing', consent: 'required' as const },
 ]
 
-// ─── Page Politique de cookies ────────────────────────────────────────────────
+// ─── Cookie Policy page ───────────────────────────────────────────────────────
 
 const Cookies: React.FC = () => {
-  // #6 - Titre de l'onglet pour le SEO et l'accessibilité
-  usePageTitle('Politique de cookies')
+  const { t } = useTranslation()
+  // #6 - Tab title for SEO and accessibility
+  usePageTitle(t('legalPages.cookies.pageTitle'))
 
   return (
-    // #7 - badge <span> (cohérence via PageHero)  #8 - boilerplate hero + carte extrait dans LegalPageLayout
+    // #7 - badge <span> (consistency via PageHero)  #8 - hero boilerplate + card extracted in LegalPageLayout
     <LegalPageLayout
-      title="Politique de cookies"
-      lastUpdated="Dernière mise à jour : 1er janvier 2026"
+      title={t('legalPages.cookies.title')}
+      lastUpdated={t('legalPages.cookies.lastUpdated')}
     >
-      <LegalSection title="1. Qu'est-ce qu'un cookie ?">
-        <p>
-          Un cookie est un petit fichier texte déposé sur votre terminal (ordinateur, smartphone,
-          tablette) lorsque vous visitez un site internet. Il permet au site de mémoriser vos
-          préférences et d'améliorer votre expérience de navigation.
-        </p>
-        <p>
-          Les cookies ne contiennent pas de virus et ne peuvent pas lire d'autres fichiers sur votre
-          terminal. Ils sont strictement limités aux finalités décrites ci-dessous.
-        </p>
+      <LegalSection title={t('legalPages.cookies.section1Title')}>
+        <p>{t('legalPages.cookies.section1P1')}</p>
+        <p>{t('legalPages.cookies.section1P2')}</p>
       </LegalSection>
 
-      <LegalSection title="2. Types de cookies utilisés">
-        <p>SailingLoc utilise trois catégories de cookies :</p>
-        {/* Tableau responsive */}
+      <LegalSection title={t('legalPages.cookies.section2Title')}>
+        <p>{t('legalPages.cookies.section2Intro')}</p>
+        {/* Responsive table */}
         <div className="overflow-x-auto mt-3">
           <table className="w-full text-xs border-collapse">
             <thead>
               <tr className="bg-gray-50">
                 <th className="text-left px-3 py-2 border border-gray-200 font-semibold text-gray-700">
-                  Type
+                  {t('legalPages.cookies.table.typeHeader')}
                 </th>
                 <th className="text-left px-3 py-2 border border-gray-200 font-semibold text-gray-700">
-                  Finalité
+                  {t('legalPages.cookies.table.purposeHeader')}
                 </th>
                 <th className="text-left px-3 py-2 border border-gray-200 font-semibold text-gray-700">
-                  Durée
+                  {t('legalPages.cookies.table.durationHeader')}
                 </th>
                 <th className="text-left px-3 py-2 border border-gray-200 font-semibold text-gray-700">
-                  Consentement
+                  {t('legalPages.cookies.table.consentHeader')}
                 </th>
               </tr>
             </thead>
             <tbody>
               {COOKIE_TYPES.map((row) => (
-                <tr key={row.type} className="hover:bg-gray-50 transition-colors">
+                <tr key={row.key} className="hover:bg-gray-50 transition-colors">
                   <td className="px-3 py-2 border border-gray-200 font-medium text-gray-800">
-                    {row.type}
+                    {t(`legalPages.cookies.types.${row.key}.type`)}
                   </td>
-                  <td className="px-3 py-2 border border-gray-200 text-gray-600">{row.purpose}</td>
-                  <td className="px-3 py-2 border border-gray-200 text-gray-600">{row.duration}</td>
+                  <td className="px-3 py-2 border border-gray-200 text-gray-600">
+                    {t(`legalPages.cookies.types.${row.key}.purpose`)}
+                  </td>
+                  <td className="px-3 py-2 border border-gray-200 text-gray-600">
+                    {t(`legalPages.cookies.types.${row.key}.duration`)}
+                  </td>
                   <td className="px-3 py-2 border border-gray-200">
                     <span
                       className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
-                        row.consent === 'Requis'
+                        row.consent === 'required'
                           ? 'bg-amber-50 text-amber-700 border border-amber-200'
                           : 'bg-green-50 text-green-700 border border-green-200'
                       }`}
                     >
-                      {row.consent}
+                      {t(`legalPages.cookies.table.${row.consent}`)}
                     </span>
                   </td>
                 </tr>
@@ -97,44 +81,32 @@ const Cookies: React.FC = () => {
         </div>
       </LegalSection>
 
-      <LegalSection title="3. Durée de vie des cookies">
-        <p>
-          Les cookies de session expirent automatiquement à la fermeture de votre navigateur.
-          Les cookies persistants ont une durée de vie définie dans le tableau ci-dessus, à compter
-          de leur dépôt. À l'issue de cette durée, ils sont automatiquement supprimés.
-        </p>
+      <LegalSection title={t('legalPages.cookies.section3Title')}>
+        <p>{t('legalPages.cookies.section3P1')}</p>
       </LegalSection>
 
-      <LegalSection title="4. Comment paramétrer vos cookies">
-        <p>
-          Vous pouvez accepter ou refuser les cookies non essentiels à tout moment depuis le bandeau
-          de consentement affiché lors de votre première visite, ou via les paramètres de votre
-          navigateur :
-        </p>
+      <LegalSection title={t('legalPages.cookies.section4Title')}>
+        <p>{t('legalPages.cookies.section4Intro')}</p>
         <ul className="list-disc list-inside space-y-1 pl-2">
           <li>
-            <strong>Chrome :</strong> Paramètres → Confidentialité et sécurité → Cookies
+            <strong>Chrome:</strong> {t('legalPages.cookies.browsers.chrome')}
           </li>
           <li>
-            <strong>Firefox :</strong> Options → Vie privée et sécurité → Cookies
+            <strong>Firefox:</strong> {t('legalPages.cookies.browsers.firefox')}
           </li>
           <li>
-            <strong>Safari :</strong> Préférences → Confidentialité
+            <strong>Safari:</strong> {t('legalPages.cookies.browsers.safari')}
           </li>
           <li>
-            <strong>Edge :</strong> Paramètres → Cookies et autorisations de site
+            <strong>Edge:</strong> {t('legalPages.cookies.browsers.edge')}
           </li>
         </ul>
-        <p>
-          Notez que le refus de cookies essentiels peut altérer le fonctionnement de la plateforme
-          (connexion impossible, perte de préférences).
-        </p>
+        <p>{t('legalPages.cookies.section4Note')}</p>
       </LegalSection>
 
-      <LegalSection title="5. Contact">
+      <LegalSection title={t('legalPages.cookies.section5Title')}>
         <p>
-          Pour toute question relative à notre utilisation des cookies, contactez notre DPO à
-          l'adresse{' '}
+          {t('legalPages.cookies.section5TextBefore')}{' '}
           <a
             href="mailto:dpo@sailingloc.fr"
             className="text-ocean-700 hover:text-ocean-900 underline underline-offset-2"

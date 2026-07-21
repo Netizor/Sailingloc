@@ -22,7 +22,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
-function formatUser(user) {
+export function formatUser(user) {
   if (!user) return null
   return {
     id: user.id,
@@ -48,6 +48,86 @@ function formatUser(user) {
     createdAt: user.created_at,
     updatedAt: user.updated_at,
   }
+}
+
+/**
+ * Construit les champs profil à mettre à jour (validation métier pure).
+ * @returns {{ error: string } | { updates: object }}
+ */
+export function buildProfileUpdates(body) {
+  const {
+    firstName, lastName, phone, bio,
+    sailingExperienceYears, sailingQualifications, sailingAreas, sailorBio,
+  } = body
+  const updates = {}
+
+  if (firstName !== undefined) {
+    if (firstName.trim().length > 100) return { error: 'firstName trop long (100 max)' }
+    updates.first_name = firstName.trim()
+  }
+  if (lastName !== undefined) {
+    if (lastName.trim().length > 100) return { error: 'lastName trop long (100 max)' }
+    updates.last_name = lastName.trim()
+  }
+  if (phone !== undefined) {
+    if (phone && !/^\+?[\d\s\-().]{0,20}$/.test(phone)) return { error: 'Numéro de téléphone invalide' }
+    updates.phone = phone.trim()
+  }
+  if (bio !== undefined) {
+    if (bio.length > 2000) return { error: 'bio trop longue (2000 max)' }
+    updates.bio = bio.trim()
+  }
+  if (sailingExperienceYears !== undefined) {
+    if (sailingExperienceYears === null || sailingExperienceYears === '') {
+      updates.sailing_experience_years = null
+    } else {
+      const years = Number(sailingExperienceYears)
+      if (!Number.isInteger(years) || years < 0 || years > 100) {
+        return { error: "Années d'expérience invalides (0 à 100)" }
+      }
+      updates.sailing_experience_years = years
+    }
+  }
+  if (sailingQualifications !== undefined) {
+    if (sailingQualifications && sailingQualifications.length > 2000) {
+      return { error: 'Qualifications trop longues (2000 max)' }
+    }
+    updates.sailing_qualifications = sailingQualifications ? sailingQualifications.trim() : null
+  }
+  if (sailingAreas !== undefined) {
+    if (sailingAreas && sailingAreas.length > 2000) {
+      return { error: 'Zones de navigation trop longues (2000 max)' }
+    }
+    updates.sailing_areas = sailingAreas ? sailingAreas.trim() : null
+  }
+  if (sailorBio !== undefined) {
+    if (sailorBio && sailorBio.length > 4000) return { error: 'CV de marin trop long (4000 max)' }
+    updates.sailor_bio = sailorBio ? sailorBio.trim() : null
+  }
+
+  updates.updated_at = new Date().toISOString()
+  return { updates }
+}
+
+/**
+ * Valide le payload de changement de mot de passe (règles alignées sur l'inscription).
+ * Retourne null si OK, sinon le message d'erreur.
+ */
+export function validatePasswordChange({ currentPassword, newPassword }) {
+  if (!currentPassword || !newPassword) return 'currentPassword et newPassword requis'
+  if (newPassword.length < 12 || newPassword.length > 128) {
+    return 'Le mot de passe doit contenir entre 12 et 128 caractères'
+  }
+  if (!/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword) || !/[^A-Za-z0-9]/.test(newPassword)) {
+    return 'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial.'
+  }
+  return null
+}
+
+/** Seuls RENTER et OWNER sont auto-assignables via PATCH /users/role. */
+export function validateRoleChange(role) {
+  if (!['OWNER', 'RENTER'].includes(role)) return 'Rôle invalide'
+  return null
 }
 
 function formatBoatSummary(boat) {
@@ -97,54 +177,15 @@ function formatReview(review) {
 // ─── PATCH /users/profile ──────────────────────────────────
 router.patch('/profile', authenticate, async (req, res, next) => {
   try {
-    const {
-      firstName, lastName, phone, bio,
-      sailingExperienceYears, sailingQualifications, sailingAreas, sailorBio,
-    } = req.body
-    const updates = {}
+    const profile = buildProfileUpdates(req.body)
+    if (profile.error) return res.status(400).json({ message: profile.error })
 
-    if (firstName !== undefined) {
-      if (firstName.trim().length > 100) return res.status(400).json({ message: 'firstName trop long (100 max)' })
-      updates.first_name = firstName.trim()
-    }
-    if (lastName !== undefined) {
-      if (lastName.trim().length > 100) return res.status(400).json({ message: 'lastName trop long (100 max)' })
-      updates.last_name = lastName.trim()
-    }
-    if (phone !== undefined) {
-      if (phone && !/^\+?[\d\s\-().]{0,20}$/.test(phone)) return res.status(400).json({ message: 'Numéro de téléphone invalide' })
-      updates.phone = phone.trim()
-    }
-    if (bio !== undefined) {
-      if (bio.length > 2000) return res.status(400).json({ message: 'bio trop longue (2000 max)' })
-      updates.bio = bio.trim()
-    }
-    if (sailingExperienceYears !== undefined) {
-      if (sailingExperienceYears === null || sailingExperienceYears === '') {
-        updates.sailing_experience_years = null
-      } else {
-        const years = Number(sailingExperienceYears)
-        if (!Number.isInteger(years) || years < 0 || years > 100) {
-          return res.status(400).json({ message: "Années d'expérience invalides (0 à 100)" })
-        }
-        updates.sailing_experience_years = years
-      }
-    }
-    if (sailingQualifications !== undefined) {
-      if (sailingQualifications && sailingQualifications.length > 2000) return res.status(400).json({ message: 'Qualifications trop longues (2000 max)' })
-      updates.sailing_qualifications = sailingQualifications ? sailingQualifications.trim() : null
-    }
-    if (sailingAreas !== undefined) {
-      if (sailingAreas && sailingAreas.length > 2000) return res.status(400).json({ message: 'Zones de navigation trop longues (2000 max)' })
-      updates.sailing_areas = sailingAreas ? sailingAreas.trim() : null
-    }
-    if (sailorBio !== undefined) {
-      if (sailorBio && sailorBio.length > 4000) return res.status(400).json({ message: 'CV de marin trop long (4000 max)' })
-      updates.sailor_bio = sailorBio ? sailorBio.trim() : null
-    }
-
-    updates.updated_at = new Date().toISOString()
-    const { data: user, error } = await supabase.from('users').update(updates).eq('id', req.user.id).select().single()
+    const { data: user, error } = await supabase
+      .from('users')
+      .update(profile.updates)
+      .eq('id', req.user.id)
+      .select()
+      .single()
     if (error) return res.status(500).json({ message: error.message })
 
     return res.json({ user: formatUser(user) })
@@ -196,11 +237,8 @@ router.post('/sailor-cv/document', authenticate, upload.single('document'), asyn
 router.patch('/password', authenticate, async (req, res, next) => {
   try {
     const { currentPassword, newPassword } = req.body
-    if (!currentPassword || !newPassword) return res.status(400).json({ message: 'currentPassword et newPassword requis' })
-    if (newPassword.length < 12 || newPassword.length > 128) return res.status(400).json({ message: 'Le mot de passe doit contenir entre 12 et 128 caractères' })
-    if (!/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword) || !/[^A-Za-z0-9]/.test(newPassword)) {
-      return res.status(400).json({ message: 'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial.' })
-    }
+    const validationError = validatePasswordChange({ currentPassword, newPassword })
+    if (validationError) return res.status(400).json({ message: validationError })
 
     const { data: userWithPw } = await supabase.from('users').select('password').eq('id', req.user.id).single()
     const valid = await bcrypt.compare(currentPassword, userWithPw.password)
@@ -402,7 +440,8 @@ router.get('/:id/profile', async (req, res, next) => {
 router.patch('/role', authenticate, async (req, res, next) => {
   try {
     const { role } = req.body
-    if (!['OWNER', 'RENTER'].includes(role)) return res.status(400).json({ message: 'Rôle invalide' })
+    const roleError = validateRoleChange(role)
+    if (roleError) return res.status(400).json({ message: roleError })
 
     const { data: user, error } = await supabase
       .from('users').update({ role }).eq('id', req.user.id).select().single()

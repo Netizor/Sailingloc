@@ -22,7 +22,7 @@ const BoatDetailGallery: React.FC<BoatDetailGalleryProps> = ({ images, title, in
 
   const displayImages = galleryImages.length > 0 ? galleryImages : [FALLBACK]
   const gridImages = displayImages.slice(0, 5)
-  const formattedInterestedCount = (interestedCount ?? 382).toLocaleString('fr-FR')
+  const formattedInterestedCount = (interestedCount ?? 382).toLocaleString('en-US')
 
   const openLightbox = (index: number) => {
     setActiveIndex(index)
@@ -47,13 +47,13 @@ const BoatDetailGallery: React.FC<BoatDetailGalleryProps> = ({ images, title, in
         >
           <img
             src={displayImages[0]}
-            alt={`${title} - photo principale`}
+            alt={`${title} - main photo`}
             className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
           />
         </button>
       ) : (
         <div className="grid grid-cols-4 grid-rows-2 gap-2 h-[380px] sm:h-[420px] rounded-2xl overflow-hidden relative">
-          {/* Grande photo à gauche */}
+          {/* Large photo on the left */}
           <button
             type="button"
             onClick={() => openLightbox(0)}
@@ -61,25 +61,25 @@ const BoatDetailGallery: React.FC<BoatDetailGalleryProps> = ({ images, title, in
           >
             <img
               src={gridImages[0]}
-              alt={`${title} - photo principale`}
+              alt={`${title} - main photo`}
               className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
             />
-            {/* Badge "bateau populaire" */}
+            {/* Popular boat badge */}
             <div className="absolute top-3 left-3 flex items-center gap-2 bg-white/95 rounded-xl px-3 py-2 shadow-md max-w-[88%]">
               <Flame size={18} className="text-orange-500 flex-shrink-0" />
               <div className="text-left leading-tight">
-                <p className="text-[13px] font-bold text-[#003366]">Bateau populaire - disponibilités limitées !</p>
-                <p className="text-[11px] text-[#8A94A6]">{formattedInterestedCount} personnes sont intéressées par ce bateau</p>
+                <p className="text-[13px] font-bold text-[#003366]">Popular boat - limited availability!</p>
+                <p className="text-[11px] text-[#8A94A6]">{formattedInterestedCount} people are interested in this boat</p>
               </div>
             </div>
-            {/* Bouton mobile */}
+            {/* Mobile button */}
             <span className="sm:hidden absolute bottom-3 right-3 flex items-center gap-1.5 bg-white/95 text-[#003366] text-xs font-semibold px-3 py-2 rounded-lg shadow-md">
               <Grid3X3 size={14} />
-              Voir les {displayImages.length} photos
+              View the {displayImages.length} photos
             </span>
           </button>
 
-          {/* Grille 2x2 à droite */}
+          {/* 2x2 grid on the right */}
           {[1, 2, 3, 4].map((idx) => {
             const img = gridImages[idx]
             const isLast = idx === 4
@@ -104,7 +104,7 @@ const BoatDetailGallery: React.FC<BoatDetailGalleryProps> = ({ images, title, in
                 {isLast && (
                   <span className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-white/95 text-[#003366] text-xs font-semibold px-3 py-2 rounded-lg shadow-md group-hover:bg-white transition-colors">
                     <Grid3X3 size={14} />
-                    Voir les {displayImages.length} photos
+                    View the {displayImages.length} photos
                   </span>
                 )}
               </button>
@@ -120,7 +120,7 @@ const BoatDetailGallery: React.FC<BoatDetailGalleryProps> = ({ images, title, in
           className="mt-2 flex items-center gap-1.5 text-sm font-semibold text-[#2563FF] hover:underline"
         >
           <Grid3X3 size={14} />
-          Voir la photo
+          View photo
         </button>
       )}
 
@@ -180,7 +180,7 @@ const Lightbox: React.FC<LightboxProps> = ({ images, title, activeIndex, onClose
       className="fixed inset-0 z-[100] bg-black/95 flex flex-col"
       role="dialog"
       aria-modal
-      aria-label={`Photos de ${title}`}
+      aria-label={`Photos of ${title}`}
       onClick={onClose}
     >
       <div className="flex items-center justify-between px-4 py-3 text-white shrink-0" onClick={(e) => e.stopPropagation()}>
@@ -191,7 +191,7 @@ const Lightbox: React.FC<LightboxProps> = ({ images, title, activeIndex, onClose
           type="button"
           onClick={onClose}
           className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white"
-          aria-label="Fermer"
+          aria-label="Close"
         >
           <X size={22} />
         </button>
@@ -215,7 +215,7 @@ const Lightbox: React.FC<LightboxProps> = ({ images, title, activeIndex, onClose
               type="button"
               onClick={goPrev}
               className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-white/10 hover:bg-white/25 text-white transition-colors"
-              aria-label="Photo précédente"
+              aria-label="Previous photo"
             >
               <ChevronLeft size={28} />
             </button>
@@ -223,7 +223,7 @@ const Lightbox: React.FC<LightboxProps> = ({ images, title, activeIndex, onClose
               type="button"
               onClick={goNext}
               className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-white/10 hover:bg-white/25 text-white transition-colors"
-              aria-label="Photo suivante"
+              aria-label="Next photo"
             >
               <ChevronRight size={28} />
             </button>

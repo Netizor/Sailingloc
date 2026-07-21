@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import {
   Anchor,
+  CalendarCheck,
   Calendar,
   ChevronDown,
   Download,
@@ -20,13 +21,13 @@ import {
   formatDateRangeDash,
   formatDateRangeShort,
   formatPrice,
-  getBookingStatusColor,
-  getBookingStatusLabel,
 } from '../../lib/utils'
+import BookingStatusBadge from '../../components/bookings/BookingStatusBadge'
 import { BookingStatus } from '../../types'
 import type { Booking } from '../../types'
 import Spinner from '../../components/ui/Spinner'
 import Button from '../../components/ui/Button'
+import DashboardBanner from '../../components/ui/DashboardBanner'
 
 type HistoryFilter = 'ALL' | 'UPCOMING' | 'COMPLETED' | 'PENDING' | 'CANCELLED'
 
@@ -126,14 +127,11 @@ const MyBookings: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
-          {t('booking.myBookings.title')}
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-          {t('booking.myBookings.subtitle')}
-        </p>
-      </div>
+      <DashboardBanner
+        icon={<CalendarCheck size={18} className="opacity-80" />}
+        title={t('booking.myBookings.title')}
+        subtitle={t('booking.myBookings.subtitle')}
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
@@ -262,6 +260,7 @@ const MyBookings: React.FC = () => {
                     <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">{t('booking.myBookings.tableLocation')}</th>
                     <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">{t('booking.myBookings.tableStatus')}</th>
                     <th className="px-5 py-3.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase text-right">{t('booking.myBookings.tableAmount')}</th>
+                    <th className="px-5 py-3.5" />
                   </tr>
                 </thead>
                 <tbody>
@@ -298,6 +297,21 @@ const MyBookings: React.FC = () => {
                       </td>
                       <td className="px-5 py-4 text-right font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">
                         {formatPrice(booking.totalAmount ?? 0)}
+                      </td>
+                      <td className="px-5 py-4 text-right whitespace-nowrap">
+                        {booking.status === BookingStatus.COMPLETED && !reviewedBookingIds.has(booking.id) && (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            leftIcon={<Star size={13} />}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              navigate(`/mon-espace/reservations/${booking.id}/avis`)
+                            }}
+                          >
+                            {t('booking.myBookings.leaveReview')}
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -348,16 +362,9 @@ const BoatThumbnail: React.FC<{ booking: Booking }> = ({ booking }) => {
   )
 }
 
-const StatusPill: React.FC<{ status: BookingStatus }> = ({ status }) => {
-  const color = getBookingStatusColor(status)
-  const label = getBookingStatusLabel(status).toUpperCase()
-
-  return (
-    <span className={`inline-block text-[10px] font-bold tracking-wide px-2.5 py-1 rounded-md ${color}`}>
-      {label}
-    </span>
-  )
-}
+const StatusPill: React.FC<{ status: BookingStatus }> = ({ status }) => (
+  <BookingStatusBadge status={status} size="sm" dot={false} />
+)
 
 const NextTripHero: React.FC<{
   booking: Booking
@@ -391,17 +398,7 @@ const NextTripHero: React.FC<{
 
       <div className="relative h-full flex items-end justify-between p-5 sm:p-6 gap-4">
         <div className="flex flex-col items-start gap-2">
-          <span
-            className={`text-white text-[10px] font-bold tracking-wider px-2.5 py-1 rounded-md uppercase ${
-              booking.status === BookingStatus.CONFIRMED
-                ? 'bg-green-500'
-                : 'bg-yellow-500'
-            }`}
-          >
-            {booking.status === BookingStatus.CONFIRMED
-              ? t('booking.myBookings.statusConfirmed')
-              : t('booking.myBookings.statusPending')}
-          </span>
+          <BookingStatusBadge status={booking.status} size="sm" className="uppercase tracking-wider" />
           <h3 className="text-lg sm:text-xl font-bold text-white leading-tight">
             {booking.boat?.title ?? t('booking.myBookings.boatFallback')}
           </h3>

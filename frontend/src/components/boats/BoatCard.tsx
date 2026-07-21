@@ -6,6 +6,7 @@ import type { Boat } from '../../types'
 import Badge from '../ui/Badge'
 import { useCompareStore } from '../../store/compare.store'
 import { BOAT_TYPE_LABELS } from '../../lib/labels'
+import FavoriteButton from './FavoriteButton'
 
 interface BoatCardProps {
   boat: Boat
@@ -66,7 +67,7 @@ const BoatCard: React.FC<BoatCardProps> = ({
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-sky-100">
               <Anchor size={40} className="text-blue-200 mb-2" strokeWidth={1.5} />
-              <span className="text-xs text-blue-300 font-medium">Aucune photo</span>
+              <span className="text-xs text-blue-300 font-medium">No photo</span>
             </div>
           )}
 
@@ -77,31 +78,37 @@ const BoatCard: React.FC<BoatCardProps> = ({
             </Badge>
             {boat.withSkipper && (
               <Badge variant="success" size="sm">
-                Avec skipper
+                With skipper
               </Badge>
             )}
           </div>
 
           {/* Favorite button */}
-          <button
-            onClick={handleFavoriteClick}
-            aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
-            aria-pressed={isFavorite}
-            className={cn(
-              'absolute top-3 right-3 p-2 rounded-full transition-all duration-150',
-              'focus:outline-none focus:ring-2 focus:ring-orange-400',
-              isFavorite
-                ? 'bg-orange-500 text-white shadow-md'
-                : 'bg-white/80 backdrop-blur-sm text-gray-500 hover:text-orange-500 hover:bg-white shadow dark:bg-gray-800/80 dark:text-gray-300'
-            )}
-          >
-            <Heart size={16} fill={isFavorite ? 'currentColor' : 'none'} strokeWidth={2} />
-          </button>
+          {onFavoriteToggle ? (
+            <button
+              onClick={handleFavoriteClick}
+              aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+              aria-pressed={isFavorite}
+              className={cn(
+                'absolute top-3 right-3 p-2 rounded-full transition-all duration-150',
+                'focus:outline-none focus:ring-2 focus:ring-brand-blue',
+                isFavorite
+                  ? 'bg-rose-500 text-white shadow-md'
+                  : 'bg-white/80 backdrop-blur-sm text-gray-500 hover:text-rose-500 hover:bg-white shadow dark:bg-gray-800/80 dark:text-gray-300',
+              )}
+            >
+              <Heart size={16} fill={isFavorite ? 'currentColor' : 'none'} strokeWidth={2} />
+            </button>
+          ) : (
+            <div className="absolute top-3 right-3 z-10">
+              <FavoriteButton boatId={boat.id} size="sm" />
+            </div>
+          )}
 
           {/* Bouton comparateur - coin bas gauche */}
           <button
             onClick={handleCompareClick}
-            aria-label={isCompared ? 'Retirer du comparateur' : 'Ajouter au comparateur'}
+            aria-label={isCompared ? 'Remove from compare' : 'Add to compare'}
             aria-pressed={isCompared}
             disabled={!isCompared && !canAddMore}
             className={cn(
@@ -116,12 +123,12 @@ const BoatCard: React.FC<BoatCardProps> = ({
             <input
               type="checkbox"
               checked={isCompared}
-              onChange={() => {}} // Le clic est géré par le bouton parent
+              onChange={() => {}} // Click handled by parent button
               tabIndex={-1}
               aria-hidden="true"
               className="pointer-events-none accent-ocean-600 h-3 w-3"
             />
-            Comparer
+            Compare
           </button>
         </div>
 
@@ -144,7 +151,7 @@ const BoatCard: React.FC<BoatCardProps> = ({
           <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mb-3">
             <span className="flex items-center gap-1">
               <Users size={12} className="text-gray-400" />
-              {boat.capacity} pers.
+              {boat.capacity} guests
             </span>
             {boat.length && (
               <span className="flex items-center gap-1">
@@ -153,7 +160,7 @@ const BoatCard: React.FC<BoatCardProps> = ({
               </span>
             )}
             {!boat.withSkipper && (
-              <span className="text-gray-400 italic text-xs">Sans skipper</span>
+              <span className="text-gray-400 italic text-xs">Without skipper</span>
             )}
           </div>
 
@@ -177,7 +184,7 @@ const BoatCard: React.FC<BoatCardProps> = ({
                   </span>
                 </>
               ) : (
-                <span className="text-xs text-gray-400 dark:text-gray-500 italic">Pas encore noté</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500 italic">Not rated yet</span>
               )}
             </div>
 
@@ -186,7 +193,7 @@ const BoatCard: React.FC<BoatCardProps> = ({
               <span className="text-lg font-bold text-orange-500">
                 {formatPrice(boat.dailyRate)}
               </span>
-              <span className="text-xs text-gray-400 dark:text-gray-500"> /jour</span>
+              <span className="text-xs text-gray-400 dark:text-gray-500"> /day</span>
             </div>
           </div>
         </div>

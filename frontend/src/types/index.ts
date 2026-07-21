@@ -19,12 +19,12 @@ export enum MotorizationType {
 }
 
 export enum BoatStatus {
-  DRAFT = 'DRAFT',
-  PENDING_REVIEW = 'PENDING_REVIEW',
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  SUSPENDED = 'SUSPENDED',
-  REJECTED = 'REJECTED',
+  DRAFT = 'draft',
+  PENDING_REVIEW = 'pending_review',
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  SUSPENDED = 'suspended',
+  REJECTED = 'rejected',
 }
 
 export enum BookingStatus {
@@ -75,6 +75,14 @@ export interface User {
   bio?: string
   role: UserRole
   kycVerified: boolean
+  /** Champs KYC exposés côté admin */
+  kycStatus?: 'NOT_SUBMITTED' | 'PENDING' | 'APPROVED' | 'REJECTED'
+  kycFrontDoc?: string | null
+  kycBackDoc?: string | null
+  kycSubmittedAt?: string | null
+  kycReviewedAt?: string | null
+  kycRejectionReason?: string | null
+  kycDocumentExpiresAt?: string | null
   isActive: boolean
   sailingExperienceYears?: number | null
   sailingQualifications?: string | null
@@ -90,12 +98,18 @@ export interface User {
   updatedAt?: string
 }
 
+export type RequiredLicense = 'NONE' | 'COASTAL' | 'OFFSHORE' | 'INLAND'
+
 export interface Boat {
   id: number
   ownerId: number
   owner?: Partial<User>
   title: string
   description: string
+  /** Bilingual demo content only (French) - real listings only use `description` */
+  descriptionFr?: string
+  /** Bilingual demo content only (English) - real listings only use `description` */
+  descriptionEn?: string
   type: BoatType
   manufacturer?: string
   model?: string
@@ -119,6 +133,7 @@ export interface Boat {
   rules?: string
   images?: string[]
   welcomeMessage?: string
+  requiredLicense?: RequiredLicense | null
   discountRules?: { minDays: number; discountPercent: number }[]
   registrationDoc?: string
   insuranceDoc?: string
@@ -149,6 +164,8 @@ export interface Booking {
   depositAmount: number
   totalAmount: number
   status: BookingStatus
+  /** L'utilisateur connecté a déjà laissé un avis pour cette réservation */
+  hasReview?: boolean
   cancellationReason?: string
   stripePaymentIntentId?: string
   message?: string

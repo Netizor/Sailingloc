@@ -45,7 +45,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ bookingId, onSuccess, onErr
     })
 
     if (error) {
-      const msg = error.message ?? 'Une erreur de paiement est survenue.'
+      const msg = error.message ?? 'A payment error occurred.'
       setErrorMsg(msg)
       onError(msg)
       setIsSubmitting(false)
@@ -53,7 +53,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ bookingId, onSuccess, onErr
       setSucceeded(true)
       onSuccess(paymentIntent.id)
     } else {
-      const msg = 'Le paiement n\'a pas pu être traité. Veuillez réessayer.'
+      const msg = 'Payment could not be processed. Please try again.'
       setErrorMsg(msg)
       onError(msg)
       setIsSubmitting(false)
@@ -66,10 +66,10 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ bookingId, onSuccess, onErr
         <div className="h-16 w-16 bg-green-100 rounded-full flex items-center justify-center">
           <CheckCircle size={32} className="text-green-600" />
         </div>
-        <h3 className="text-lg font-semibold text-gray-900">Paiement effectué !</h3>
+        <h3 className="text-lg font-semibold text-gray-900">Payment successful!</h3>
         <p className="text-sm text-gray-500">
-          Votre demande de réservation a été envoyée au propriétaire.
-          Vous serez notifié dès qu&apos;il l&apos;aura confirmée.
+          Your booking request has been sent to the owner.
+          You will be notified once they confirm it.
         </p>
       </div>
     )
@@ -114,21 +114,21 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ bookingId, onSuccess, onErr
         disabled={isSubmitting || !stripe || !elements}
         leftIcon={<Lock size={16} />}
       >
-        Payer maintenant
+        Pay now
       </Button>
 
       {/* Security note */}
       <div className="flex items-center justify-center gap-1.5 text-xs text-gray-400">
         <Lock size={11} />
-        Paiement sécurisé par Stripe - Données chiffrées (TLS 1.3)
+        Secure payment by Stripe - Encrypted data (TLS 1.3)
       </div>
 
       <p className="text-xs text-gray-400 text-center">
-        En cliquant sur &laquo; Payer maintenant &raquo;, vous acceptez les{' '}
+        By clicking &laquo; Pay now &raquo;, you accept the{' '}
         <a href="/cgu" className="underline hover:text-gray-600">
-          conditions générales
+          terms and conditions
         </a>{' '}
-        de SailingLoc.
+        of SailingLoc.
       </p>
     </form>
   )
@@ -159,8 +159,8 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
           <Lock size={20} className="text-white" />
         </div>
         <div>
-          <h2 className="font-semibold text-gray-900 text-base">Paiement sécurisé</h2>
-          <p className="text-xs text-gray-400">Propulsé par Stripe</p>
+          <h2 className="font-semibold text-gray-900 text-base">Secure payment</h2>
+          <p className="text-xs text-gray-400">Powered by Stripe</p>
         </div>
       </div>
 
@@ -180,7 +180,7 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
               borderRadius: '8px',
             },
           },
-          locale: 'fr',
+          locale: 'en',
         }}
       >
         <CheckoutForm

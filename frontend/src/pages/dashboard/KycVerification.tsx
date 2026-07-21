@@ -14,6 +14,7 @@ import type { KycStatus } from '../../api/kyc.api'
 import { formatDate } from '../../lib/utils'
 import Button from '../../components/ui/Button'
 import Spinner from '../../components/ui/Spinner'
+import DashboardBanner from '../../components/ui/DashboardBanner'
 import toast from 'react-hot-toast'
 
 // ─── Bloc de statut ───────────────────────────────────────────────────────────
@@ -28,7 +29,7 @@ const STATUS_CONFIG: Record<KycStatus, {
   NOT_SUBMITTED: {
     icon: <ShieldAlert size={24} />,
     title: 'Identité non vérifiée',
-    description: "Soumettez votre pièce d'identité pour accéder à toutes les fonctionnalités de la plateforme.",
+    description: "Soumettez votre pièce d'identité (CNI, passeport). Notre équipe valide chaque dossier sous 24-48 h.",
     color: 'text-gray-500 dark:text-gray-400',
     bg: 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600',
   },
@@ -36,22 +37,22 @@ const STATUS_CONFIG: Record<KycStatus, {
     icon: <Clock size={24} />,
     title: 'Vérification en cours',
     description: "Vos documents ont été reçus et sont en cours d'examen par notre équipe (sous 24-48h).",
-    color: 'text-amber-600',
-    bg: 'bg-amber-50 border-amber-200',
+    color: 'text-brand-navy dark:text-yellow-200',
+    bg: 'badge-variant-warning border',
   },
   APPROVED: {
     icon: <ShieldCheck size={24} />,
     title: 'Identité vérifiée',
     description: "Votre identité a été validée. Vous bénéficiez de l'accès complet à la plateforme.",
-    color: 'text-green-600',
-    bg: 'bg-green-50 border-green-200',
+    color: 'text-brand-navy dark:text-green-200',
+    bg: 'badge-variant-success border',
   },
   REJECTED: {
     icon: <ShieldAlert size={24} />,
-    title: 'Vérification refusée',
-    description: 'Votre dossier a été rejeté. Veuillez soumettre à nouveau vos documents.',
-    color: 'text-red-600',
-    bg: 'bg-red-50 border-red-200',
+    title: 'Renouvellement requis',
+    description: 'Votre administrateur vous demande de soumettre une nouvelle pièce d\'identité valide.',
+    color: 'text-brand-navy dark:text-red-200',
+    bg: 'badge-variant-danger border',
   },
 }
 
@@ -136,10 +137,11 @@ const KycVerification: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Vérification d'identité</h1>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">
-        La vérification d'identité est requise pour effectuer des réservations et recevoir des paiements.
-      </p>
+      <DashboardBanner
+        icon={<ShieldCheck size={18} className="opacity-80" />}
+        title="Vérification d'identité"
+        subtitle="Renforcez la confiance sur SailingLoc : pièce d'identité vérifiée par notre équipe, avec renouvellement si le document expire."
+      />
 
       {isLoading ? (
         <div className="flex justify-center py-20">
@@ -169,6 +171,11 @@ const KycVerification: React.FC = () => {
                   Vérifié le {formatDate(kycData.reviewedAt)}
                 </p>
               )}
+              {kycData?.documentExpiresAt && status === 'APPROVED' && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Pièce valide jusqu&apos;au {formatDate(kycData.documentExpiresAt)}
+                </p>
+              )}
             </div>
           </div>
 
@@ -176,7 +183,7 @@ const KycVerification: React.FC = () => {
           {canSubmit && (
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 space-y-5">
               <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                Soumettre votre pièce d'identité
+                {status === 'REJECTED' ? 'Envoyer une nouvelle pièce d\'identité' : 'Soumettre votre pièce d\'identité'}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Formats acceptés : JPEG, PNG, PDF - max. 10 Mo par fichier.

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, User, Phone, AlertCircle, Check } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -63,12 +63,17 @@ interface RegisterProps {
 
 const Register: React.FC<RegisterProps> = ({
   embedded = false,
-  defaultRole = UserRole.RENTER,
-  hideRoleToggle = false,
+  defaultRole: defaultRoleProp = UserRole.RENTER,
+  hideRoleToggle: hideRoleToggleProp = false,
 }) => {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { setAuth } = useAuthStore()
   const { t } = useTranslation()
+
+  const roleFromUrl = searchParams.get('role') === 'owner' ? UserRole.OWNER : UserRole.RENTER
+  const defaultRole = embedded ? defaultRoleProp : roleFromUrl
+  const hideRoleToggle = embedded ? hideRoleToggleProp : searchParams.get('role') === 'owner'
 
   const [form, setForm] = useState<RegisterForm>({
     firstName: '',
@@ -150,43 +155,53 @@ const Register: React.FC<RegisterProps> = ({
   }
 
   const criteriaItems = [
-    { key: 'minLength', label: '12 caractères min.' },
-    { key: 'hasUpper', label: 'Une majuscule' },
-    { key: 'hasLower', label: 'Une minuscule' },
-    { key: 'hasDigit', label: 'Un chiffre' },
-    { key: 'hasSpecial', label: 'Un caractère spécial' },
+    { key: 'minLength', label: '12 characters min.' },
+    { key: 'hasUpper', label: 'One uppercase letter' },
+    { key: 'hasLower', label: 'One lowercase letter' },
+    { key: 'hasDigit', label: 'One digit' },
+    { key: 'hasSpecial', label: 'One special character' },
   ] as { key: keyof PasswordCriteria; label: string }[]
 
   const formContent = (
-    <div className="w-full max-w-[620px]">
-      <Link to="/" className="inline-block mb-12">
-        <img src={LOGO_IMAGE} alt="SailingLoc" className="h-11 w-auto" />
-      </Link>
+    <div className={embedded ? 'w-full' : 'w-full max-w-[620px]'}>
+      {!embedded && (
+        <>
+          <Link to="/" className="inline-block mb-12">
+            <img src={LOGO_IMAGE} alt="SailingLoc" className="h-11 w-auto" />
+          </Link>
+          <Link to="/" className="text-sm font-medium text-brand-slate dark:text-gray-400 hover:text-brand-navy dark:hover:text-white transition-colors">
+            ← Back to home
+          </Link>
+        </>
+      )}
 
-      <Link to="/" className="text-sm font-medium text-gray-500 hover:text-gray-700">
-        ← Retour d’accueil
-      </Link>
+      {embedded && (
+        <img src={LOGO_IMAGE} alt="SailingLoc" className="h-9 w-auto mb-6" />
+      )}
 
-      <h1 className="mt-10 text-5xl font-serif font-bold leading-tight text-[#071d49]">
-  Créer un compte
-</h1>
+      <h1 className={cn(
+        'font-serif font-bold leading-tight text-brand-navy dark:text-white',
+        embedded ? 'text-2xl sm:text-3xl' : 'mt-10 text-5xl',
+      )}>
+        Create an account
+      </h1>
 
-      <p className="mt-3 text-lg text-gray-500">
-        Rejoignez la communauté SailingLoc.
+      <p className="mt-2 text-sm text-brand-slate dark:text-gray-400">
+        {embedded ? 'Sign up as an owner.' : 'Join the SailingLoc community.'}
       </p>
 
-      <div className="mt-8 grid grid-cols-2 gap-6">
-        <button type="button" className="h-12 rounded-lg border border-gray-300 bg-white font-semibold text-[#071d49]">
-          Continuer avec Google
+      <div className="mt-6 grid grid-cols-2 gap-4">
+        <button type="button" className="h-11 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 font-semibold text-brand-navy dark:text-gray-200 text-sm">
+          Continue with Google
         </button>
-        <button type="button" className="h-12 rounded-lg border border-gray-300 bg-white font-semibold text-[#071d49]">
-          Continuer avec Facebook
+        <button type="button" className="h-11 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 font-semibold text-brand-navy dark:text-gray-200 text-sm">
+          Continue with Facebook
         </button>
       </div>
 
       <div className="my-7 flex items-center gap-5">
         <div className="h-px flex-1 bg-gray-200" />
-        <span className="text-xs font-semibold text-gray-400">OU</span>
+        <span className="text-xs font-semibold text-gray-400">OR</span>
         <div className="h-px flex-1 bg-gray-200" />
       </div>
 
@@ -200,9 +215,9 @@ const Register: React.FC<RegisterProps> = ({
 
         <div className="grid grid-cols-2 gap-5">
           <Input
-            label="Prénom"
+            label="First name"
             type="text"
-            placeholder="Votre prénom"
+            placeholder="Your first name"
             value={form.firstName}
             onChange={(e) => setField('firstName', e.target.value)}
             error={errors.firstName}
@@ -211,9 +226,9 @@ const Register: React.FC<RegisterProps> = ({
           />
 
           <Input
-            label="Nom"
+            label="Last name"
             type="text"
-            placeholder="Votre nom"
+            placeholder="Your last name"
             value={form.lastName}
             onChange={(e) => setField('lastName', e.target.value)}
             error={errors.lastName}
@@ -225,7 +240,7 @@ const Register: React.FC<RegisterProps> = ({
         <Input
           label="Email"
           type="email"
-          placeholder="Votre email"
+          placeholder="Your email"
           value={form.email}
           onChange={(e) => setField('email', e.target.value)}
           error={errors.email}
@@ -234,9 +249,9 @@ const Register: React.FC<RegisterProps> = ({
         />
 
         <Input
-          label="Téléphone (optionnel)"
+          label="Phone (optional)"
           type="tel"
-          placeholder="Votre numéro de téléphone"
+          placeholder="Your phone number"
           value={form.phone}
           onChange={(e) => setField('phone', e.target.value)}
           leftIcon={<Phone size={16} />}
@@ -244,32 +259,31 @@ const Register: React.FC<RegisterProps> = ({
 
         {!hideRoleToggle && (
           <div>
-            <p className="mb-2 text-sm font-bold text-[#071d49]">Je suis</p>
-            <div className="grid grid-cols-2 rounded-lg border border-gray-300 bg-white">
+            <p className="mb-2 text-sm font-bold text-brand-navy dark:text-white">I am a</p>
+            <div className="grid grid-cols-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800">
               <button
                 type="button"
                 onClick={() => setField('role', UserRole.RENTER)}
                 className={cn(
                   'h-12 rounded-lg font-semibold transition',
                   form.role === UserRole.RENTER
-                    ? 'border-2 border-blue-600 text-blue-600'
-                    : 'text-[#071d49]'
+                    ? 'border-2 border-brand-blue text-brand-blue'
+                    : 'text-brand-slate dark:text-gray-400',
                 )}
               >
-                Locataire
+                Renter
               </button>
-
               <button
                 type="button"
                 onClick={() => setField('role', UserRole.OWNER)}
                 className={cn(
                   'h-12 rounded-lg font-semibold transition',
                   form.role === UserRole.OWNER
-                    ? 'border-2 border-blue-600 text-blue-600'
-                    : 'text-[#071d49]'
+                    ? 'border-2 border-brand-blue text-brand-blue'
+                    : 'text-brand-slate dark:text-gray-400',
                 )}
               >
-                Propriétaire
+                Owner
               </button>
             </div>
           </div>
@@ -277,7 +291,7 @@ const Register: React.FC<RegisterProps> = ({
 
         <div className="grid grid-cols-2 gap-5">
           <Input
-            label="Mot de passe"
+            label="Password"
             type={showPassword ? 'text' : 'password'}
             placeholder="••••••••••••"
             value={form.password}
@@ -290,7 +304,7 @@ const Register: React.FC<RegisterProps> = ({
           />
 
           <Input
-            label="Confirmer le mot de passe"
+            label="Confirm password"
             type={showConfirm ? 'text' : 'password'}
             placeholder="••••••••••••"
             value={form.confirmPassword}
@@ -305,7 +319,7 @@ const Register: React.FC<RegisterProps> = ({
 
         <div>
           <p className="mb-3 text-sm font-semibold text-gray-500">
-            Le mot de passe doit contenir :
+            Password must contain:
           </p>
 
           <div className="flex flex-wrap gap-2">
@@ -315,8 +329,8 @@ const Register: React.FC<RegisterProps> = ({
                 className={cn(
                   'rounded-full px-3 py-2 text-xs font-semibold',
                   passwordCriteria[key]
-                    ? 'bg-blue-50 text-blue-700'
-                    : 'bg-gray-100 text-gray-500'
+                    ? 'bg-ocean-100 dark:bg-ocean-900/40 text-brand-navy dark:text-brand-blue'
+                    : 'bg-gray-100 dark:bg-gray-700 text-brand-slate dark:text-gray-400',
                 )}
               >
                 {passwordCriteria[key] ? '✓' : '○'} {label}
@@ -332,20 +346,20 @@ const Register: React.FC<RegisterProps> = ({
               onClick={() => setField('acceptTerms', !form.acceptTerms)}
               className={cn(
                 'mt-1 flex h-5 w-5 items-center justify-center rounded border',
-                form.acceptTerms ? 'border-blue-600 bg-blue-600' : 'border-gray-300 bg-white'
+                form.acceptTerms ? 'border-brand-blue bg-brand-blue' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800',
               )}
             >
               {form.acceptTerms && <Check size={13} className="text-white" />}
             </button>
 
-            <span className="text-sm text-gray-500">
-              J’accepte les{' '}
-              <Link to="/cgu" className="font-semibold text-blue-600">
-                Conditions Générales d’Utilisation
+            <span className="text-sm text-brand-slate dark:text-gray-400">
+              I accept the{' '}
+              <Link to="/cgu" className="font-semibold text-brand-blue hover:text-ocean-600">
+                Terms of Use
               </Link>{' '}
-              et la{' '}
-              <Link to="/rgpd" className="font-semibold text-blue-600">
-                Politique de Confidentialité.
+              and the{' '}
+              <Link to="/rgpd" className="font-semibold text-brand-blue hover:text-ocean-600">
+                Privacy Policy.
               </Link>
             </span>
           </label>
@@ -356,15 +370,15 @@ const Register: React.FC<RegisterProps> = ({
         </div>
 
         <Button type="submit" variant="primary" size="lg" fullWidth loading={registerMutation.isPending}>
-          Créer mon compte
+          Create my account
         </Button>
       </form>
 
       {!embedded && (
-        <p className="mt-7 text-center text-sm text-gray-500">
-          Vous avez déjà un compte ?{' '}
-          <Link to="/connexion" className="font-bold text-blue-600">
-            Se connecter
+        <p className="mt-7 text-center text-sm text-brand-slate dark:text-gray-400">
+          Already have an account?{' '}
+          <Link to="/connexion" className="font-bold text-brand-blue hover:text-ocean-600">
+            Sign in
           </Link>
         </p>
       )}
@@ -372,20 +386,20 @@ const Register: React.FC<RegisterProps> = ({
   )
 
   if (embedded) {
-    return <div className="w-full">{formContent}</div>
+    return formContent
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
-        <section className="flex items-center justify-center bg-[#f8f7ff] px-8 py-12 lg:px-16">
+    <div className="-mt-[72px] pt-[72px] min-h-screen bg-white dark:bg-gray-900">
+      <div className="grid min-h-[calc(100vh-72px)] grid-cols-1 lg:grid-cols-2">
+        <section className="flex items-center justify-center bg-white dark:bg-gray-900 px-8 py-12 lg:px-16">
           {formContent}
         </section>
 
         <section
-          className="hidden lg:flex items-end bg-cover bg-center px-16 py-20 text-white"
+          className="hidden lg:flex items-end bg-cover bg-center px-16 py-20 text-white relative"
           style={{
-            backgroundImage: `linear-gradient(rgba(3,18,50,0.15), rgba(3,18,50,0.85)), url(${LOGIN_HERO_IMAGE})`,
+            backgroundImage: `linear-gradient(rgba(0,51,102,0.35), rgba(0,51,102,0.85)), url(${LOGIN_HERO_IMAGE})`,
           }}
         >
           <Ship
@@ -394,21 +408,21 @@ const Register: React.FC<RegisterProps> = ({
 />
           <div className="max-w-xl">
             <h2 className="text-2xl font-serif font-bold leading-tight">
-              La mer est un espace de liberté infinie,
+              The sea is a space of infinite freedom,
               <br />
-              nous en sommes les gardiens pour vos plus beaux souvenirs.
+              we are its guardians for your finest memories.
             </h2>
 
             <p className="mt-6 text-xs font-bold tracking-widest">
-              CAPITAINE MARC L, SAILINGLOC EXPERT
+              CAPTAIN MARC L, SAILINGLOC EXPERT
             </p>
 
             <div className="my-10 h-px w-16 bg-white/60" />
 
             <p className="mt-6 text-sm">
-              <span className="font-bold">+1,200 Propriétaires</span>
+              <span className="font-bold">+1,200 Owners</span>
               <br />
-              Nous font confiance chaque jour
+              Trust us every day
             </p>
           </div>
         </section>

@@ -1,4 +1,5 @@
 import type { Booking } from '../types'
+import html2pdf from 'html2pdf.js'
 
 // Formate un prix en EUR avec séparateurs français
 function fmt(amount: number): string {
@@ -16,12 +17,28 @@ function invoiceNumber(booking: Booking): string {
   return `SAIL-${year}-${String(booking.id).padStart(5, '0')}`
 }
 
+function safeNumber(n: unknown, fallback = 0): number {
+  const v = typeof n === 'number' ? n : Number(n)
+  return Number.isFinite(v) ? v : fallback
+}
+
+function computeTotalDays(booking: Booking): number {
+  const existing = safeNumber((booking as any).totalDays, 0)
+  if (existing > 0) return Math.round(existing)
+  const start = new Date(booking.startDate).getTime()
+  const end = new Date(booking.endDate).getTime()
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return 1
+  const msPerDay = 24 * 60 * 60 * 1000
+  return Math.max(1, Math.ceil((end - start) / msPerDay))
+}
+
 /**
- * Génère une facture HTML dans un nouvel onglet et déclenche l'impression navigateur.
- * L'utilisateur peut enregistrer en PDF via "Imprimer → Enregistrer en PDF".
- * Aucune dépendance externe nécessaire.
+ * Télécharge une facture en PDF (sans ouvrir l'imprimante).
  */
-export function generateInvoice(booking: Booking, renterName: string): void {
+export async function downloadInvoicePdf(
+  booking: Booking,
+  renter: { name: string; email?: string },
+): Promise<void> {
   const invoiceNo   = invoiceNumber(booking)
   const invoiceDate = fmtDate(booking.createdAt)
   const boat        = booking.boat
@@ -31,22 +48,29 @@ export function generateInvoice(booking: Booking, renterName: string): void {
     ? 'Payée'
     : 'En attente'
 
-  const html = `<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <title>Facture ${invoiceNo} - SailingLoc</title>
+  const totalDays = computeTotalDays(booking)
+  const dailyRate = safeNumber((booking as any).dailyRate, safeNumber((boat as any)?.dailyRate, 0))
+  const subtotal = safeNumber((booking as any).subtotal, dailyRate * totalDays)
+  const platformFee = safeNumber((booking as any).platformFee, 0)
+  const depositAmount = safeNumber((booking as any).depositAmount, safeNumber((boat as any)?.depositAmount, 0))
+  const totalAmount = safeNumber((booking as any).totalAmount, subtotal + platformFee)
+
+  const logoUrl = `${window.location.origin}/logo.jpeg`
+
+  const html = `
+  <div id="invoice-root">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
+    #invoice-root {
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      font-size: 13px;
+      font-size: 12px;
       color: #1a1a2e;
       background: #fff;
-      padding: 48px 56px;
-      max-width: 800px;
-      margin: 0 auto;
+      padding: 28px 24px;
+      width: 680px;
+      max-width: 680px;
+      overflow: hidden;
     }
 
     /* ─── Header ─── */
@@ -63,16 +87,10 @@ export function generateInvoice(booking: Booking, renterName: string): void {
       align-items: center;
       gap: 10px;
     }
-    .brand-icon {
-      width: 38px;
-      height: 38px;
-      background: #0e4d7b;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 20px;
+    .brand-logo {
+      width: 130px;
+      height: auto;
+      display: block;
     }
     .brand-name {
       font-size: 22px;
@@ -82,7 +100,7 @@ export function generateInvoice(booking: Booking, renterName: string): void {
     }
     .invoice-meta { text-align: right; }
     .invoice-title {
-      font-size: 26px;
+      font-size: 22px;
       font-weight: 800;
       color: #0e4d7b;
       letter-spacing: -0.5px;
@@ -170,49 +188,62 @@ export function generateInvoice(booking: Booking, renterName: string): void {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 20px;
+      table-layout: fixed;
     }
     thead tr {
       background: #0e4d7b;
       color: #fff;
     }
     thead th {
-      padding: 10px 14px;
+      padding: 8px 10px;
       text-align: left;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    thead th:last-child { text-align: right; }
+    thead th:nth-child(1) { width: 42%; }
+    thead th:nth-child(2) { width: 12%; }
+    thead th:nth-child(3) { width: 24%; }
+    thead th:nth-child(4) { width: 22%; text-align: right; }
     tbody tr {
       border-bottom: 1px solid #f1f5f9;
     }
     tbody tr:last-child { border-bottom: none; }
     tbody td {
-      padding: 11px 14px;
-      font-size: 13px;
+      padding: 9px 10px;
+      font-size: 12px;
       color: #334155;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
     tbody td:last-child {
       text-align: right;
       font-weight: 500;
       color: #1a1a2e;
+      white-space: nowrap;
     }
     tbody tr:nth-child(even) { background: #f8fafc; }
 
     /* ─── Totals ─── */
     .totals {
       margin-left: auto;
-      width: 260px;
+      width: 240px;
+      max-width: 100%;
       margin-bottom: 32px;
     }
     .total-row {
       display: flex;
       justify-content: space-between;
+      gap: 12px;
       padding: 6px 0;
-      font-size: 13px;
+      font-size: 12px;
       color: #64748b;
       border-bottom: 1px solid #f1f5f9;
+    }
+    .total-row span:last-child {
+      white-space: nowrap;
+      text-align: right;
     }
     .total-row.grand {
       border-top: 2px solid #0e4d7b;
@@ -241,18 +272,15 @@ export function generateInvoice(booking: Booking, renterName: string): void {
 
     /* ─── Print ─── */
     @media print {
-      body { padding: 24px 32px; }
+      #invoice-root { padding: 24px 32px; }
       @page { margin: 0; size: A4; }
     }
   </style>
-</head>
-<body>
 
   <!-- Header -->
   <header>
     <div class="brand">
-      <div class="brand-icon">⚓</div>
-      <span class="brand-name">SailingLoc</span>
+      <img class="brand-logo" src="${logoUrl}" alt="SailingLoc" />
     </div>
     <div class="invoice-meta">
       <div class="invoice-title">FACTURE</div>
@@ -272,7 +300,8 @@ export function generateInvoice(booking: Booking, renterName: string): void {
     </div>
     <div>
       <div class="party-label">Client</div>
-      <div class="party-name">${renterName}</div>
+      <div class="party-name">${renter.name || 'Client'}</div>
+      ${renter.email ? `<div class="party-detail">${renter.email}</div>` : ''}
       <div class="party-detail">Réservation n° ${invoiceNo}</div>
     </div>
   </div>
@@ -289,7 +318,7 @@ export function generateInvoice(booking: Booking, renterName: string): void {
     </div>
     <div class="info-block">
       <div class="info-label">Durée</div>
-      <div class="info-value">${booking.totalDays} jour${booking.totalDays > 1 ? 's' : ''}</div>
+      <div class="info-value">${totalDays} jour${totalDays > 1 ? 's' : ''}</div>
     </div>
     <div class="info-block">
       <div class="info-label">Arrivée</div>
@@ -318,9 +347,9 @@ export function generateInvoice(booking: Booking, renterName: string): void {
     <tbody>
       <tr>
         <td>Location du bateau - ${boatLabel}</td>
-        <td>${booking.totalDays} j.</td>
-        <td>${fmt(booking.dailyRate)} / j.</td>
-        <td>${fmt(booking.subtotal ?? 0)}</td>
+        <td>${totalDays} j.</td>
+        <td>${fmt(dailyRate)} / j.</td>
+        <td>${fmt(subtotal)}</td>
       </tr>
       ${booking.withSkipper ? `
       <tr>
@@ -333,7 +362,7 @@ export function generateInvoice(booking: Booking, renterName: string): void {
         <td>Frais de service SailingLoc</td>
         <td>-</td>
         <td>-</td>
-        <td>${fmt(booking.platformFee ?? 0)}</td>
+        <td>${fmt(platformFee)}</td>
       </tr>
     </tbody>
   </table>
@@ -342,19 +371,19 @@ export function generateInvoice(booking: Booking, renterName: string): void {
   <div class="totals">
     <div class="total-row">
       <span>Sous-total</span>
-      <span>${fmt(booking.subtotal ?? 0)}</span>
+      <span>${fmt(subtotal)}</span>
     </div>
     <div class="total-row">
       <span>Frais de service</span>
-      <span>${fmt(booking.platformFee ?? 0)}</span>
+      <span>${fmt(platformFee)}</span>
     </div>
     <div class="total-row deposit">
       <span>Caution (remboursée à la fin)</span>
-      <span>${fmt(booking.depositAmount ?? 0)}</span>
+      <span>${fmt(depositAmount)}</span>
     </div>
     <div class="total-row grand">
       <span>Total TTC</span>
-      <span>${fmt(booking.totalAmount ?? 0)}</span>
+      <span>${fmt(totalAmount)}</span>
     </div>
   </div>
 
@@ -365,17 +394,41 @@ export function generateInvoice(booking: Booking, renterName: string): void {
       Cette facture est générée automatiquement et ne constitue pas un document comptable officiel.
     </p>
   </footer>
+</div>`
 
-  <script>window.onload = function() { window.print() }</script>
-</body>
-</html>`
+  const host = document.createElement('div')
+  host.style.position = 'fixed'
+  host.style.left = '-10000px'
+  host.style.top = '0'
+  host.style.width = '680px'
+  host.innerHTML = html
+  document.body.appendChild(host)
 
-  // Ouvre la facture dans un nouvel onglet et déclenche l'impression
-  const win = window.open('', '_blank', 'width=900,height=700')
-  if (!win) {
-    alert("Veuillez autoriser les pop-ups pour télécharger la facture.")
-    return
+  const element = host.querySelector('#invoice-root') as HTMLElement | null
+  if (!element) {
+    host.remove()
+    throw new Error('Invoice rendering failed')
   }
-  win.document.write(html)
-  win.document.close()
+
+  try {
+    await html2pdf()
+      .from(element)
+      .set({
+        margin: [12, 12, 12, 12],
+        filename: `${invoiceNo}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          width: 680,
+          windowWidth: 680,
+          scrollX: 0,
+          scrollY: 0,
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      })
+      .save()
+  } finally {
+    host.remove()
+  }
 }

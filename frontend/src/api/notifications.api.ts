@@ -18,21 +18,42 @@ interface NotificationListParams {
   unreadOnly?: boolean
 }
 
+// Backend returns snake_case Supabase columns - map to the frontend camelCase type
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapNotification(raw: any): Notification {
+  return {
+    id: raw.id,
+    userId: raw.user_id,
+    type: raw.type,
+    title: raw.title,
+    body: raw.body,
+    isRead: raw.is_read,
+    data: raw.data,
+    createdAt: raw.created_at,
+  }
+}
+
 export const getNotifications = async (
   params: NotificationListParams = {},
 ): Promise<NotificationListResponse> => {
-  const { data } = await api.get<NotificationListResponse>('/notifications', { params })
-  return data
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data } = await api.get<any>('/notifications', { params })
+  return {
+    ...data,
+    notifications: (data.notifications ?? []).map(mapNotification),
+  }
 }
 
 export const getNotificationById = async (id: number): Promise<Notification> => {
-  const { data } = await api.get<Notification>(`/notifications/${id}`)
-  return data
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data } = await api.get<any>(`/notifications/${id}`)
+  return mapNotification(data)
 }
 
 export const markAsRead = async (id: number): Promise<Notification> => {
-  const { data } = await api.patch<Notification>(`/notifications/${id}/read`)
-  return data
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data } = await api.patch<any>(`/notifications/${id}/read`)
+  return mapNotification(data)
 }
 
 export const markAllAsRead = async (): Promise<{ message: string }> => {

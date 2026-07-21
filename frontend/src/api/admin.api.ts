@@ -129,6 +129,10 @@ export const reviewSailorCv = async (
   await api.patch(`/admin/users/${userId}/sailor-cv`, payload)
 }
 
+export const requestKycRenewal = async (userId: number, reason: string): Promise<void> => {
+  await api.post(`/kyc/admin/${userId}/request-renewal`, { reason })
+}
+
 export const listBoats = async (
   params: AdminBoatListParams = {},
 ): Promise<PaginatedResponse<Boat>> => {
@@ -223,6 +227,7 @@ export const adminApi = {
   setUserRole: (userId: number, role: string) =>
     updateUserStatus(userId, { role }),
   reviewSailorCv,
+  requestKycRenewal,
   getBoats: async (params: AdminBoatListParams = {}) => {
     const result = await listBoats(params)
     return { ...result, boats: result.data }

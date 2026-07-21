@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
@@ -6,7 +6,6 @@ import {
   Search,
   Heart,
   Anchor,
-  Star,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
@@ -14,17 +13,40 @@ import { useTranslation } from 'react-i18next'
 import SearchBar from '../components/boats/SearchBar'
 import FeaturedBoatCard from '../components/boats/FeaturedBoatCard'
 import EngagementSection from '../components/home/EngagementSection'
+import MobileAppSection from '../components/home/MobileAppSection'
+import TestimonialCard from '../components/testimonials/TestimonialCard'
 import Spinner from '../components/ui/Spinner'
 import type { SearchParams } from '../components/boats/SearchBar'
 import type { Boat } from '../types'
 import { BoatStatus, BoatType, MotorizationType } from '../types'
 import { boatsApi } from '../api/boats.api'
 import { getDestinationImage, HOME_DESTINATIONS } from '../data/destinations'
+import { TESTIMONIALS } from '../data/testimonials'
+import { TITLE_SEP } from '../lib/typography'
 
 type PopularBoatItem = {
   boat: Boat
   image: string
-  badge?: 'PREMIUM' | 'NOUVEAU'
+  badge?: 'PREMIUM' | 'NOUVEAU' | 'EXEMPLE'
+  isDemo?: boolean
+}
+
+function useInView(threshold = 0.15) {
+  const ref = useRef<HTMLElement>(null)
+  const [inView, setInView] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setInView(true) },
+      { threshold },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [threshold])
+
+  return { ref, inView }
 }
 
 const POPULAR_BOATS: PopularBoatItem[] = [
@@ -184,37 +206,11 @@ const IMAGES = {
   boatFallback: '/ai-generated-boat-picture.jpg',
 } as const
 
-const testimonials = [
-  {
-    id: 1,
-    name: 'Sophie Martin',
-    role: 'Locataire vérifiée',
-    text: 'Une expérience formidable ! Le propriétaire était super accueillant et le voilier en parfait état.',
-    rating: 5,
-    avatar: 'SM',
-  },
-  {
-    id: 2,
-    name: 'Thomas Leroy',
-    role: 'Propriétaire',
-    text: 'Première location via SailingLoc. La réservation était simple, le prix transparent. Parfait en famille.',
-    rating: 5,
-    avatar: 'TL',
-  },
-  {
-    id: 3,
-    name: 'Claire Bernard',
-    role: 'Locataire vérifiée',
-    text: 'Le skipper était exceptionnel, très pédagogue. Un weekend inoubliable sur la Méditerranée.',
-    rating: 5,
-    avatar: 'CB',
-  },
-]
-
 const Home: React.FC = () => {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const [carouselIndex, setCarouselIndex] = useState(0)
+  const { ref: testimonialsRef, inView: testimonialsInView } = useInView(0.18)
 
   const steps = [
     { icon: <Search size={36} strokeWidth={1.25} />, title: t('home.step1Title'), desc: t('home.step1Desc') },
@@ -238,7 +234,11 @@ const Home: React.FC = () => {
           boat,
           image: boat.images?.[0] ?? IMAGES.boatFallback,
         }))
-      : POPULAR_BOATS
+      : POPULAR_BOATS.map((item) => ({
+          ...item,
+          badge: 'EXEMPLE' as const,
+          isDemo: true,
+        }))
 
   const visibleBoats = popularBoats.slice(carouselIndex, carouselIndex + 3)
   const canPrev = carouselIndex > 0
@@ -248,6 +248,7 @@ const Home: React.FC = () => {
     const qs = new URLSearchParams()
     if (params.location) qs.set('location', params.location)
     if (params.startDate) qs.set('startDate', params.startDate)
+    if (params.endDate) qs.set('endDate', params.endDate)
     if (params.boatType) qs.append('type', params.boatType)
     navigate(`/bateaux?${qs.toString()}`)
   }
@@ -255,14 +256,14 @@ const Home: React.FC = () => {
   return (
     <div className="flex flex-col bg-white">
       <Helmet>
-        <title>SailingLoc  Location de bateaux entre particuliers</title>
-        <meta name="description" content="Louez un voilier, catamaran ou yacht d'exception dans les plus beaux ports de France et d'Europe." />
+        <title>SailingLoc{TITLE_SEP}{t('home.metaTitle')}</title>
+        <meta name="description" content={t('home.metaDescription')} />
       </Helmet>
 
-      {/* Hero - coucher de soleil */}
-      <section className="relative min-h-[calc(100vh-72px)] flex flex-col" aria-label="Bannière principale">
+      {/* Hero */}
+      <section className="relative min-h-[calc(100vh-72px)] flex flex-col" aria-label={t('home.heroAria')}>
         <div className="absolute inset-0 overflow-hidden">
-          <img src={IMAGES.hero} alt="Marina au coucher du soleil" className="w-full h-full object-cover" loading="eager" />
+          <img src={IMAGES.hero} alt={t('home.heroImageAlt')} className="w-full h-full object-cover" loading="eager" />
           <div className="absolute inset-0 bg-black/60" />
         </div>
 
@@ -287,6 +288,9 @@ const Home: React.FC = () => {
             <h2 id="how-it-works-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy">
               {t('home.howTitle')}
             </h2>
+            <p className="mt-4 text-brand-slate text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+              {t('home.howSubtitle')}
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
@@ -300,6 +304,8 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+
+      <MobileAppSection />
 
       {/* Popular boats */}
       <section className="py-14 bg-white" aria-labelledby="featured-boats-title">
@@ -316,7 +322,7 @@ const Home: React.FC = () => {
                 type="button"
                 onClick={() => setCarouselIndex((i) => Math.max(0, i - 1))}
                 disabled={!canPrev}
-                aria-label="Précédent"
+                aria-label="Previous"
                 className="h-9 w-9 rounded-full border border-gray-200 bg-white text-brand-navy flex items-center justify-center disabled:opacity-30"
               >
                 <ChevronLeft size={18} />
@@ -325,7 +331,7 @@ const Home: React.FC = () => {
                 type="button"
                 onClick={() => setCarouselIndex((i) => i + 1)}
                 disabled={!canNext}
-                aria-label="Suivant"
+                aria-label="Next"
                 className="h-9 w-9 rounded-full border border-gray-200 bg-white text-brand-navy flex items-center justify-center disabled:opacity-30"
               >
                 <ChevronRight size={18} />
@@ -337,8 +343,8 @@ const Home: React.FC = () => {
             <div className="flex justify-center py-20"><Spinner size="lg" /></div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {visibleBoats.map(({ boat, image, badge }) => (
-                <FeaturedBoatCard key={boat.id} boat={boat} image={image} badge={badge} />
+              {visibleBoats.map(({ boat, image, badge, isDemo }) => (
+                <FeaturedBoatCard key={boat.id} boat={boat} image={image} badge={badge} isDemo={isDemo} />
               ))}
             </div>
           )}
@@ -385,32 +391,34 @@ const Home: React.FC = () => {
       <EngagementSection />
 
       {/* Testimonials */}
-      <section className="py-14 bg-[#f8f9fa]" aria-labelledby="testimonials-title">
+      <section ref={testimonialsRef} className="py-14 bg-[#f8f9fa]" aria-labelledby="testimonials-title">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 id="testimonials-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy text-center mb-10">
-            {t('home.testimonialsTitle')}
-          </h2>
+          <div className="text-center mb-10">
+            <h2 id="testimonials-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy text-center mb-3">
+              {t('home.testimonialsTitle')}
+            </h2>
+            <p className="text-brand-slate text-sm">{t('home.testimonialsRating')}</p>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((item) => (
-              <div key={item.id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col gap-4">
-                <div className="flex items-center gap-0.5">
-                  {Array.from({ length: item.rating }).map((_, j) => (
-                    <Star key={j} size={14} fill="currentColor" strokeWidth={0} className="text-amber-400" />
-                  ))}
-                </div>
-                <p className="text-brand-slate text-sm leading-relaxed flex-1">&ldquo;{item.text}&rdquo;</p>
-                <div className="flex items-center gap-3 pt-3">
-                  <div className="h-10 w-10 rounded-full bg-brand-navy text-white flex items-center justify-center text-xs font-bold">
-                    {item.avatar}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-brand-navy text-sm">{item.name}</p>
-                    <p className="text-xs text-brand-slate">{item.role}</p>
-                  </div>
-                </div>
-              </div>
+            {TESTIMONIALS.slice(0, 3).map((item, i) => (
+              <TestimonialCard
+                key={item.id}
+                item={item}
+                animated
+                inView={testimonialsInView}
+                style={{ transitionDelay: `${i * 120}ms` }}
+              />
             ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <Link
+              to="/temoignages"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-brand-navy hover:text-brand-blue transition-colors"
+            >
+              {t('home.testimonialsSeeAll')}
+            </Link>
           </div>
         </div>
       </section>

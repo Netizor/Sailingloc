@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures'
 import { loginAs, isAuthAvailable } from './helpers'
 
 /**
@@ -8,76 +8,87 @@ import { loginAs, isAuthAvailable } from './helpers'
  * et déclenchement du formulaire de réservation.
  * Note : le paiement Stripe réel n'est pas testé ici (nécessite des webhooks).
  */
+
+async function waitForBoatCard(page: import('@playwright/test').Page) {
+  // Cartes listing (lien /bateaux/:id avec contenu) — attendre la fin du chargement API
+  const card = page.locator('a[href^="/bateaux/"]').filter({
+    has: page.locator('img'),
+  }).first()
+  await expect(
+    page.getByRole('heading', {
+      name: /maritime adventures?|boats? (found|in)|bateau|aventures maritimes|no boats|aucun bateau/i,
+    }).or(card).first(),
+  ).toBeVisible({ timeout: 20_000 })
+  return card
+}
+
 test.describe('Recherche de bateaux', () => {
   test('la page /bateaux se charge correctement', async ({ page }) => {
     await page.goto('/bateaux')
-    // La barre de recherche est visible
-    await expect(page.getByPlaceholder(/port|destination|location/i).first()).toBeVisible()
+    await expect(
+      page.getByPlaceholder(
+        /where are you sailing|où naviguez|port or city|port ou ville|marseille|la rochelle/i,
+      ).first(),
+    ).toBeVisible()
   })
 
   test('affiche les bateaux disponibles ou le message vide', async ({ page }) => {
     await page.goto('/bateaux')
-    // Attend la fin du chargement (squelette → résultats ou message vide)
-    await expect(
-      page.getByText(/bateau(x)? trouvé|aucun résultat|aucun bateau/i).first()
-    ).toBeVisible({ timeout: 10_000 })
+    const heading = page.getByRole('heading', {
+      name: /maritime adventures? available|boats? (found|in)|bateau(x)? trouvé|aventures maritimes|no boats found|aucun bateau/i,
+    })
+    const boatCard = page.locator('a[href^="/bateaux/"]').first()
+    const empty = page.getByText(/no boats found|aucun bateau|discover the best rentals|découvrez les meilleures/i)
+    await expect(heading.or(boatCard).or(empty).first()).toBeVisible({ timeout: 20_000 })
   })
 
   test('recherche par localisation met à jour l\'URL', async ({ page }) => {
     await page.goto('/bateaux')
-    const locationInput = page.getByPlaceholder(/port|destination|location/i).first()
+    const locationInput = page.getByPlaceholder(
+      /where are you sailing|où naviguez|port or city|port ou ville|marseille/i,
+    ).first()
     await locationInput.fill('Marseille')
-    // Soumet la recherche (Entrée ou bouton rechercher)
     await locationInput.press('Enter')
     await expect(page).toHaveURL(/location=Marseille/)
   })
 
-  test('toggle vue carte est fonctionnel', async ({ page }) => {
+  test('la carte est affichée sur la page recherche', async ({ page }) => {
     await page.goto('/bateaux')
-    const carteBtn = page.getByRole('button', { name: /carte/i })
-    await expect(carteBtn).toBeVisible()
-    await carteBtn.click()
-    // La vue carte doit être active (aria-pressed="true")
-    await expect(carteBtn).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.locator('.leaflet-container').first()).toBeVisible({ timeout: 10_000 })
   })
 })
 
 test.describe('Fiche bateau et réservation', () => {
   test('cliquer sur un bateau navigue vers sa fiche', async ({ page }) => {
     await page.goto('/bateaux')
-    // Attend au moins un bateau (skip si pas de données seed)
-    const firstBoat = page.locator('a[href^="/bateaux/"]').first()
-    const hasBoat = await firstBoat.isVisible({ timeout: 8_000 }).catch(() => false)
-
+    const firstBoat = await waitForBoatCard(page)
+    const hasBoat = await firstBoat.isVisible().catch(() => false)
     if (!hasBoat) {
-      test.skip()
+      test.skip(true, 'Aucun bateau en base pour ce parcours')
       return
     }
 
     await firstBoat.click()
     await expect(page).toHaveURL(/\/bateaux\/\d+/)
-    // La fiche contient des infos essentielles
-    await expect(page.getByText(/€|par jour|\/jour/i).first()).toBeVisible()
+    await expect(page.getByText(/€|par jour|\/ ?day|per day|\/jour/i).first()).toBeVisible({ timeout: 10_000 })
   })
 
   test('formulaire de réservation inaccessible sans connexion → redirige', async ({ page }) => {
     await page.goto('/bateaux')
-    const firstBoat = page.locator('a[href^="/bateaux/"]').first()
-    const hasBoat = await firstBoat.isVisible({ timeout: 8_000 }).catch(() => false)
-
+    const firstBoat = await waitForBoatCard(page)
+    const hasBoat = await firstBoat.isVisible().catch(() => false)
     if (!hasBoat) {
-      test.skip()
+      test.skip(true, 'Aucun bateau en base pour ce parcours')
       return
     }
 
     await firstBoat.click()
-    // Cherche un bouton de réservation
-    const reserveBtn = page.getByRole('button', { name: /réserver|louer/i })
-    if (await reserveBtn.isVisible()) {
-      await reserveBtn.click()
-      // Doit rediriger vers la connexion si non authentifié
-      await expect(page).toHaveURL(/connexion/)
-    }
+    await expect(page).toHaveURL(/\/bateaux\/\d+/)
+
+    const reserveBtn = page.getByRole('button', { name: /book now|book & pay|réserver|louer/i }).first()
+    await expect(reserveBtn).toBeVisible({ timeout: 10_000 })
+    await reserveBtn.click()
+    await expect(page).toHaveURL(/connexion/)
   })
 
   test('utilisateur connecté peut voir le formulaire de réservation', async ({ page }, testInfo) => {
@@ -85,19 +96,18 @@ test.describe('Fiche bateau et réservation', () => {
     await loginAs(page, 'renter')
     await page.goto('/bateaux')
 
-    const firstBoat = page.locator('a[href^="/bateaux/"]').first()
-    const hasBoat = await firstBoat.isVisible({ timeout: 8_000 }).catch(() => false)
-
+    const firstBoat = await waitForBoatCard(page)
+    const hasBoat = await firstBoat.isVisible().catch(() => false)
     if (!hasBoat) {
-      test.skip()
+      test.skip(true, 'Aucun bateau en base pour ce parcours')
       return
     }
 
     await firstBoat.click()
     await expect(page).toHaveURL(/\/bateaux\/\d+/)
-    // Le formulaire de réservation (date picker ou bouton Réserver) est visible
-    const reserveEl = page.getByRole('button', { name: /réserver|louer/i })
-    await expect(reserveEl).toBeVisible({ timeout: 5_000 })
+    await expect(
+      page.getByRole('button', { name: /book now|book & pay|réserver|louer/i }).first(),
+    ).toBeVisible({ timeout: 10_000 })
   })
 })
 
@@ -106,10 +116,9 @@ test.describe('Mes réservations', () => {
     if (!isAuthAvailable('renter')) { testInfo.skip(); return }
     await loginAs(page, 'renter')
     await page.goto('/mon-espace/reservations')
-    // La page charge sans erreur
     await expect(page).toHaveURL('/mon-espace/reservations')
     await expect(
-      page.getByText(/réservation|aucune réservation/i).first()
+      page.getByText(/my bookings|réservation|booking|aucune réservation|no booking|getaway/i).first(),
     ).toBeVisible({ timeout: 8_000 })
   })
 })

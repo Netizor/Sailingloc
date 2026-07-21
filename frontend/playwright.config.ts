@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test'
 /**
  * G5 — Configuration Playwright pour les tests End-to-End SailingLoc.
  *
- * Prérequis : le backend Symfony (port 8000) doit être démarré manuellement.
+ * Prérequis : le backend Node/Express (port 3000) doit être démarré manuellement.
  * Le serveur Vite (port 5173) est démarré automatiquement par webServer ci-dessous.
  *
  * Commandes :

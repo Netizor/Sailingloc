@@ -17,6 +17,7 @@ import { cn } from '../../lib/utils'
 const navItems = [
   { to: '/admin', labelKey: 'layout.dashboard', icon: <LayoutDashboard size={18} />, end: true },
   { to: '/admin/utilisateurs', labelKey: 'layout.users', icon: <Users size={18} /> },
+  { to: '/admin/kyc', labelKey: 'layout.kycNav', icon: <ShieldCheck size={18} /> },
   { to: '/admin/bateaux', labelKey: 'layout.boatsNav', icon: <Ship size={18} /> },
   { to: '/admin/reservations', labelKey: 'layout.bookingsNav', icon: <CalendarCheck size={18} /> },
   { to: '/admin/signalements', labelKey: 'layout.reports', icon: <Flag size={18} /> },

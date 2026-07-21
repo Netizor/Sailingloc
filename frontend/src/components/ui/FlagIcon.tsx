@@ -8,7 +8,7 @@ interface FlagIconProps {
   className?: string
 }
 
-/** Small SVG flags — render correctly on Windows (unlike emoji flags). */
+/** Small SVG flags - render correctly on Windows (unlike emoji flags). */
 const FlagIcon: React.FC<FlagIconProps> = ({ code, className }) => {
   const base = cn('inline-block h-3.5 w-5 rounded-[2px] overflow-hidden shadow-sm ring-1 ring-black/10', className)
 

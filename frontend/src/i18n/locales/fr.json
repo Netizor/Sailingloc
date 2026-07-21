@@ -40,6 +40,8 @@
     "aboutUs": "Qui sommes-nous ?",
     "aboutShort": "À propos",
     "services": "Nos services",
+    "contact": "Contact",
+    "faq": "FAQ",
     "howItWorks": "Comment ça marche",
     "login": "Connexion",
     "becomeOwner": "Devenir Propriétaire",
@@ -66,9 +68,12 @@
     "english": "Anglais"
   },
   "footer": {
-    "tagline": "La plateforme de location de bateaux entre particuliers. Naviguez en toute confiance, louez ou proposez votre bateau en quelques clics.",
-    "taglineShort": "La plateforme premium de location de bateaux entre particuliers. Naviguez en toute confiance.",
-    "taglineListing": "Découvrez la liberté de naviguer avec notre sélection de bateaux d'exception.",
+    "tagline": "La plateforme de location de bateaux entre particuliers inscrits. Contrats de location simples, en France, en Europe et à l'international.",
+    "taglineShort": "Location de bateaux entre particuliers inscrits. Naviguez en toute confiance.",
+    "taglineListing": "Louez ou proposez un bateau entre particuliers, en France, en Europe et dans le monde entier.",
+    "mobileApp": "Application mobile iOS et Android, prochainement.",
+    "mobileAppHeading": "Application mobile",
+    "pwaHint": "Installez SailingLoc sur votre téléphone dès aujourd'hui (site installable).",
     "navigation": "Navigation",
     "support": "Support",
     "legalCol": "Légal",
@@ -90,6 +95,7 @@
     "availablePorts": "Ports disponibles",
     "insurance": "Assurance & sécurité",
     "faq": "FAQ",
+    "testimonials": "Témoignages",
     "becomeOwner": "Devenir propriétaire",
     "ownerSpace": "Espace propriétaire",
     "manageBoats": "Gérer mes bateaux",
@@ -120,10 +126,10 @@
     }
   },
   "studentNotice": {
-    "title": "Projet étudiant — aucun paiement accepté",
+    "title": "Projet étudiant : aucun paiement accepté",
     "message": "SailingLoc est un projet pédagogique (DSP4 O24). Aucun paiement réel n'est accepté sur ce site : les fonctionnalités de réservation et de paiement sont simulées.",
     "dismiss": "Fermer ce message",
-    "footerTitle": "Projet étudiant DSP4 O24 — démonstration uniquement",
+    "footerTitle": "Projet étudiant DSP4 O24 : démonstration uniquement",
     "footerMessage": "Aucun paiement réel est accepté sur ce site. Les réservations et transactions sont fictives, à des fins pédagogiques."
   },
   "cookies": {
@@ -131,7 +137,12 @@
     "banner": {
       "ariaLabel": "Bandeau de consentement aux cookies",
       "title": "Nous utilisons des cookies",
+      "hookTitle": "Envie de cookies pour vos voyages en mer ?",
+      "hookDescription": "Chez SailingLoc, nous utilisons des cookies pour fluidifier votre navigation, mémoriser vos préférences et améliorer l'expérience. Les cookies analytiques et marketing ne sont activés qu'avec votre accord. Consultez notre",
       "description": "Les cookies essentiels assurent le fonctionnement du site (session, préférences). Les cookies analytiques et marketing ne sont activés qu'avec votre accord. Consultez notre",
+      "continueWithout": "Continuer sans accepter",
+      "choose": "Je choisis",
+      "okForMe": "OK pour moi",
       "customize": "Personnaliser",
       "essentialOnly": "Essentiels uniquement",
       "acceptAll": "Tout accepter",
@@ -147,48 +158,74 @@
     }
   },
   "home": {
-    "badge": "Location de bateaux entre particuliers",
+    "badge": "Location de bateaux entre particuliers inscrits",
+    "metaTitle": "Location de bateaux entre particuliers inscrits",
+    "metaDescription": "Louez un voilier, catamaran ou bateau à moteur entre particuliers en France, en Europe et à l'international.",
+    "heroAria": "Bannière principale",
+    "heroImageAlt": "Marina au coucher du soleil",
     "heroTitle": "L'élégance de la mer à votre portée",
-    "heroSubtitle": "Vivez des moments d'exception à bord de nos yachts et voiliers d'exception. Une navigation sans compromis.",
+    "heroSubtitle": "Louez un voilier ou un bateau à moteur entre particuliers, en France, en Europe et à l'international. Réservez en ligne et établissez un contrat de location en quelques clics.",
     "statsBoats": "bateaux disponibles",
     "statsPorts": "ports couverts",
     "statsRenters": "locataires satisfaits",
-    "howTitle": "Réservez en trois étapes",
-    "howSubtitle": "Une expérience fluide, de la recherche à la navigation.",
+    "howTitle": "De la recherche au contrat",
+    "howSubtitle": "Trois étapes pour établir un contrat de location entre particuliers inscrits.",
     "conceptLabel": "Simplicité",
     "step1Title": "Cherchez votre bateau",
-    "step1Desc": "Explorez notre sélection de bateaux d'exception dans les plus beaux ports.",
-    "step2Title": "Réservez en ligne",
-    "step2Desc": "Réservez en toute sécurité avec paiement protégé et confirmation instantanée.",
+    "step1Desc": "Explorez voiliers et bateaux à moteur dans les ports de France, d'Europe et du monde.",
+    "step2Title": "Réservez et contractez",
+    "step2Desc": "Confirmez en ligne : la réservation forme un contrat de location entre vous et le propriétaire, avec paiement sécurisé.",
     "step3Title": "Partez à l'aventure",
     "step3Desc": "Embarquez et vivez une expérience nautique inoubliable.",
+    "mobileAppLabel": "Application mobile",
+    "mobileAppTitle": "SailingLoc dans votre poche",
+    "mobileAppSubtitle": "Réservez, gérez vos locations et recevez vos notifications où que vous soyez. L'application native iOS et Android arrive bientôt. Installez déjà le site sur votre écran d'accueil.",
+    "mobileAppFeature1Title": "Recherche instantanée",
+    "mobileAppFeature1Desc": "Trouvez un voilier, catamaran ou yacht près de chez vous en quelques secondes.",
+    "mobileAppFeature2Title": "Réservations & calendrier",
+    "mobileAppFeature2Desc": "Suivez vos locations, consultez vos dates et gérez vos disponibilités (propriétaires).",
+    "mobileAppFeature3Title": "Notifications en direct",
+    "mobileAppFeature3Desc": "Demandes de réservation, messages et confirmations : ne manquez rien.",
+    "mobileAppStoreApple": "Bientôt sur l'App Store",
+    "mobileAppStoreGoogle": "Bientôt sur Google Play",
+    "mobileAppComingSoon": "Prochainement",
+    "mobileAppPwaTitle": "Disponible dès maintenant sur mobile",
+    "mobileAppPwaDesc": "Ajoutez SailingLoc à votre écran d'accueil (Safari, Chrome) pour une expérience proche d'une application.",
+    "mobileAppPwaAction": "Explorer les bateaux",
+    "mobileAppPreviewLabel": "Près de vous",
+    "mobileAppPreviewCta": "Réserver",
+    "mobileAppPreviewGreeting": "Où naviguez-vous ?",
+    "mobileAppPreviewSearch": "Marseille, Nice, Cannes...",
+    "mobileAppPreviewNotifTitle": "Réservation confirmée",
+    "mobileAppPreviewNotifBody": "Votre Lagoon 46 vous attend à Nice.",
     "popularBoats": "Bateaux Populaires",
     "popularSubtitle": "Les coups de cœur de nos voyageurs cette saison.",
     "seeAllBoats": "Voir tous les bateaux",
     "exploreBoats": "Trouver un bateau",
     "noBoats": "Aucun bateau disponible pour le moment.",
     "destinationsTitle": "Destinations les plus populaires",
-    "destinationsSubtitle": "Explorez les plus beaux coins de navigation",
+    "destinationsSubtitle": "De la Méditerranée aux Caraïbes, de l'Europe à l'Asie et l'Océanie",
     "seeAllDestinations": "Voir toutes les destinations",
     "featuresTitle": "Naviguez l'esprit libre",
     "featuresLabel": "Engagement",
-    "feature1Title": "Assurance Premium Incluse",
-    "feature1Desc": "Chaque location est couverte par notre partenaire AXA Marine, vous protégeant contre tous les imprévus.",
+    "feature1Title": "Assurance partenaire",
+    "feature1Desc": "Chaque location bénéficie d'un partenaire assurance maritime pour vous accompagner face aux imprévus.",
     "feature2Title": "Assistance 24/7",
-    "feature2Desc": "Une équipe d'experts maritimes à votre écoute, que vous soyez au port ou au milieu de l'océan.",
-    "feature3Title": "Bateaux Vérifiés",
-    "feature3Desc": "Plus de 50 points de contrôle effectués sur chaque navire pour garantir votre sécurité et votre confort.",
+    "feature2Desc": "Une équipe à votre écoute avant, pendant et après la location, que vous soyez au port ou en mer.",
+    "feature3Title": "Bateaux et profils vérifiés",
+    "feature3Desc": "Annonces contrôlées et utilisateurs inscrits : des contrats de location entre particuliers en toute confiance.",
     "milesStat": "15k+",
     "milesStatLabel": "Milles marins parcourus",
     "testimonialsTitle": "Ils ont navigué avec nous",
     "testimonialsRating": "4.9 / 5 en moyenne",
-    "ctaTitle": "Prête à explorer la mer ?",
-    "ctaSubtitle": "Rejoignez des milliers de navigateurs qui ont choisi SailingLoc pour leurs aventures nautiques.",
+    "testimonialsSeeAll": "Voir tous les témoignages →",
+    "ctaTitle": "Prêt à explorer la mer ?",
+    "ctaSubtitle": "Inscrivez-vous et établissez vos contrats de location entre particuliers sur SailingLoc.",
     "ctaRentBoat": "Louer un bateau",
     "ctaFindBoat": "Trouver un bateau",
     "ownerBadge": "Pour les propriétaires",
     "ownerTitle": "Rentabilisez votre bateau",
-    "ownerDesc": "Mettez votre bateau en location et générez des revenus quand vous ne l'utilisez pas. Inscription gratuite, vous décidez de vos disponibilités.",
+    "ownerDesc": "Proposez votre bateau à la location entre particuliers inscrits et générez des revenus quand vous ne l'utilisez pas. Inscription gratuite, vous décidez de vos disponibilités.",
     "ownerPerk1": "Publiez votre annonce en moins de 10 minutes",
     "ownerPerk2": "Gardez le contrôle total de vos disponibilités",
     "ownerPerk3": "Paiement sécurisé sous 48h après chaque location",
@@ -198,6 +235,213 @@
     "skipperOptional": "Skipper (optionnel)",
     "platformFee": "Commission plateforme",
     "estimationNote": "*Estimation indicative basée sur la moyenne des propriétaires actifs."
+  },
+  "testimonials": {
+    "pageTitle": "Témoignages",
+    "heroBadge": "Avis vérifiés",
+    "heroTitle": "Ils ont navigué avec SailingLoc",
+    "heroSubtitle": "Découvrez les expériences de locataires et propriétaires qui font confiance à notre plateforme pour vivre des moments inoubliables en mer.",
+    "readReviews": "Lire les avis",
+    "stats": {
+      "rating": "Note moyenne",
+      "reviews": "Avis publiés",
+      "reviewsCount": "{{count}} avis",
+      "satisfaction": "Clients satisfaits",
+      "ports": "Ports partenaires"
+    },
+    "featuredLabel": "Témoignage vedette",
+    "gridTitle": "Ce que disent nos membres",
+    "gridSubtitle": "Des avis authentiques, laissés après des locations confirmées sur SailingLoc.",
+    "filters": {
+      "all": "Tous",
+      "renters": "Locataires",
+      "owners": "Propriétaires"
+    },
+    "trustTitle": "Pourquoi ils nous font confiance",
+    "trust": {
+      "security": {
+        "title": "Sécurité & assurance",
+        "desc": "Chaque location est couverte par une assurance partenaire et un contrat clair entre les parties."
+      },
+      "verified": {
+        "title": "Profils vérifiés",
+        "desc": "Identités contrôlées, annonces validées et avis modérés pour une communauté de confiance."
+      },
+      "community": {
+        "title": "Communauté passionnée",
+        "desc": "Des milliers de navigateurs et propriétaires partagent la même passion de la mer."
+      }
+    },
+    "ctaTitle": "Votre prochaine aventure vous attend",
+    "ctaSubtitle": "Rejoignez la communauté SailingLoc et vivez une expérience nautique exceptionnelle.",
+    "ctaBrowse": "Explorer les bateaux",
+    "ctaOwner": "Devenir propriétaire"
+  },
+  "aboutPage": {
+    "pageTitle": "À propos de SailingLoc",
+    "heroBadge": "Notre histoire",
+    "heroTitle": "La mer,",
+    "heroTitleAccent": "accessible à tous",
+    "heroSubtitle": "SailingLoc connecte locataires et propriétaires de bateaux en France, en Europe et à l'international. Une plateforme simple, sécurisée et transparente pour établir des contrats de location entre particuliers inscrits.",
+    "heroCta": "Découvrir la plateforme",
+    "missionTitle": "Notre mission",
+    "missionP1": "Passionné de voyages et de mer, M. Voisin a créé SailingLoc pour transmettre sa passion : permettre à chacun de naviguer, et aux propriétaires de partager leur bateau. La plateforme met en relation uniquement des particuliers inscrits, qui établissent entre eux leurs contrats de location.",
+    "missionP2": "Depuis Marseille, SailingLoc déploie ses ports partenaires en France, en Europe et dans le monde de la Méditerranée aux Caraïbes, jusqu'à l'Asie et l'Océanie. Voiliers, catamarans, bateaux à moteur ou semi-rigides : chaque annonce est vérifiée, chaque réservation forme un contrat clair entre les parties, et chaque location bénéficie d'un partenaire assurance.",
+    "stats": {
+      "ports": "Ports couverts",
+      "rating": "Satisfaction utilisateurs",
+      "support": "Support disponible",
+      "payments": "Paiements sécurisés"
+    },
+    "promiseLabel": "Nos engagements",
+    "promiseTitle": "Ce que garantit SailingLoc",
+    "promiseSubtitle": "Des garanties concrètes pour louer ou mettre en location en toute confiance.",
+    "promise": {
+      "insurance": {
+        "title": "Assurance incluse",
+        "desc": "Chaque location est couverte par notre partenaire assurance maritime."
+      },
+      "verified": {
+        "title": "Annonces vérifiées",
+        "desc": "Les bateaux et profils sont contrôlés avant publication sur la plateforme."
+      },
+      "payment": {
+        "title": "Paiement sécurisé",
+        "desc": "Transactions protégées via Stripe. La caution éventuelle est convenue directement avec le propriétaire."
+      },
+      "support": {
+        "title": "Support client",
+        "desc": "Notre équipe vous aide en cas de question avant, pendant ou après la location."
+      }
+    },
+    "journeyLabel": "Comment ça marche",
+    "journeyTitle": "De la recherche à la navigation",
+    "journeySubtitle": "Quatre étapes simples pour conclure un contrat de location sur SailingLoc.",
+    "steps": {
+      "1": {
+        "title": "Rechercher un bateau",
+        "desc": "Parcourez les annonces par port, type de bateau, dates et budget. Filtrez avec ou sans skipper."
+      },
+      "2": {
+        "title": "Réserver et contracter",
+        "desc": "Choisissez vos dates, consultez le prix détaillé et confirmez : la réservation constitue un contrat de location entre vous et le propriétaire."
+      },
+      "3": {
+        "title": "Échanger avec le propriétaire",
+        "desc": "Via la messagerie intégrée, obtenez toutes les infos pratiques : rendez-vous au port, équipement, consignes."
+      },
+      "4": {
+        "title": "Naviguer & laisser un avis",
+        "desc": "Profitez de votre sortie en mer, puis partagez votre expérience pour aider la communauté."
+      }
+    },
+    "featuresLabel": "La plateforme",
+    "featuresTitle": "Ce que vous pouvez faire sur SailingLoc",
+    "featuresSubtitle": "Des fonctionnalités réelles, disponibles dès maintenant sur le site.",
+    "features": {
+      "booking": {
+        "title": "Réservation en ligne",
+        "desc": "Consultez les disponibilités, le prix par jour, les frais de service et réservez directement depuis le site."
+      },
+      "contract": {
+        "title": "Contrats de location",
+        "desc": "Chaque réservation établit un contrat entre particuliers inscrits. SailingLoc agit comme intermédiaire : le contrat lie le locataire et le propriétaire."
+      },
+      "messaging": {
+        "title": "Messagerie intégrée",
+        "desc": "Contactez le propriétaire avant la location pour poser vos questions et organiser le rendez-vous au port."
+      },
+      "kyc": {
+        "title": "Vérification d'identité",
+        "desc": "Les utilisateurs peuvent vérifier leur identité (KYC) pour renforcer la confiance entre locataires et propriétaires."
+      }
+    },
+    "audienceLabel": "Pour qui ?",
+    "audienceTitle": "Locataires et propriétaires",
+    "audienceSubtitle": "Que vous cherchiez à naviguer ou à rentabiliser votre bateau, SailingLoc vous accompagne.",
+    "audiencePopular": "Le plus demandé",
+    "audience": {
+      "renter": {
+        "name": "Locataires",
+        "tagline": "Trouvez et réservez un bateau",
+        "cta": "Louer un bateau",
+        "features": [
+          "Recherche par port, dates et type",
+          "Contrat de location entre particuliers",
+          "Paiement sécurisé en ligne",
+          "Assurance location incluse",
+          "Messagerie avec le propriétaire"
+        ]
+      },
+      "owner": {
+        "name": "Propriétaires",
+        "tagline": "Louez votre bateau entre particuliers",
+        "cta": "Devenir propriétaire",
+        "features": [
+          "Publication d'annonce gratuite",
+          "Contrats de location avec les locataires",
+          "Gestion du calendrier de disponibilités",
+          "Paiements reçus de façon sécurisée",
+          "Tableau de bord revenus & réservations"
+        ]
+      }
+    },
+    "quote": "La mer ne devrait pas être un luxe inaccessible.",
+    "quoteBody": "Comme M. Voisin, nous croyons à la transmission de la passion de la mer : rendre la navigation accessible, sécurisée et simple entre particuliers, que vous soyez locataire ou propriétaire.",
+    "badges": {
+      "verified": "Profils et annonces vérifiés",
+      "secure": "Paiements sécurisés Stripe",
+      "support": "Équipe support réactive",
+      "rating": "4.9/5 de satisfaction"
+    },
+    "faqLabel": "Questions fréquentes",
+    "faqTitle": "Ce qu'il faut savoir",
+    "faqSeeAll": "Voir toutes les questions →",
+    "faq": {
+      "1": {
+        "q": "Comment réserver un bateau sur SailingLoc ?",
+        "a": "Recherchez un bateau par port, dates et nombre de personnes. Choisissez une annonce, cliquez sur « Réserver » et suivez les étapes jusqu'au paiement sécurisé."
+      },
+      "2": {
+        "q": "Puis-je annuler ma réservation ?",
+        "a": "Oui, depuis « Mes réservations ». Le remboursement dépend de la politique d'annulation du propriétaire et du délai avant le départ."
+      },
+      "3": {
+        "q": "Les bateaux sont-ils assurés ?",
+        "a": "Chaque propriétaire doit fournir une assurance navigation valide. SailingLoc vérifie ces documents avant la publication de l'annonce."
+      },
+      "4": {
+        "q": "Puis-je louer un bateau avec skipper ?",
+        "a": "Oui, si le propriétaire le propose. Utilisez le filtre « avec skipper » dans la recherche pour trouver les offres adaptées."
+      },
+      "5": {
+        "q": "Quels sont les frais de service ?",
+        "a": "SailingLoc encaisse 10 % de chaque transaction confirmée. Le montant exact est toujours affiché avant la confirmation."
+      },
+      "6": {
+        "q": "Comment fonctionne la caution ?",
+        "a": "Le propriétaire peut définir un montant de caution dans son annonce. Ce montant est indiqué à titre informatif : la gestion concrète (empreinte bancaire ou dépôt) se fait directement entre locataire et propriétaire avant le départ."
+      },
+      "7": {
+        "q": "Comment mettre mon bateau en location ?",
+        "a": "Créez un compte propriétaire, cliquez sur « Ajouter un bateau », renseignez les informations et ajoutez vos photos. L'annonce est publiée après vérification."
+      },
+      "8": {
+        "q": "Quand le propriétaire reçoit-il son paiement ?",
+        "a": "Le locataire paie en ligne via Stripe lors de la réservation. Le versement au propriétaire est géré par la plateforme ; l'historique est visible dans l'espace « Revenus ». Le virement automatique via Stripe Connect est prévu en phase 2."
+      },
+      "9": {
+        "q": "Comment fonctionnent les contrats de location ?",
+        "a": "Seuls les utilisateurs inscrits peuvent louer ou mettre en location. Toute réservation confirmée constitue un contrat de location entre le locataire et le propriétaire. SailingLoc agit comme intermédiaire et ne remplace pas les obligations de chaque partie."
+      }
+    },
+    "testimonialLabel": "Ils nous font confiance",
+    "testimonialCta": "Voir les témoignages",
+    "ctaTitle": "Prêt à naviguer ?",
+    "ctaSubtitle": "Explorez les bateaux disponibles ou proposez le vôtre sur SailingLoc.",
+    "ctaBoats": "Voir les bateaux",
+    "ctaContact": "Nous contacter",
+    "ctaTestimonials": "Témoignages"
   },
   "search": {
     "adventures_one": "{{count}} aventure maritime disponible",
@@ -221,9 +465,22 @@
     "mobileFilters": "Filtres",
     "sortBy": "Tri",
     "results": "Résultats",
-    "demoApiError": "Connexion API indisponible — recherche appliquée sur les bateaux de démonstration.",
-    "demoNoResults": "Aucun résultat API pour ces critères — affichage des bateaux de démonstration correspondants.",
-    "demoFallback": "Affichage de bateaux de démonstration."
+    "demoApiError": "Connexion API indisponible : recherche appliquée sur les bateaux de démonstration.",
+    "demoNoResults": "Aucun résultat API pour ces critères : affichage des bateaux de démonstration correspondants.",
+    "demoFallback": "Affichage de bateaux de démonstration.",
+    "sortByLabel": "Trier par :",
+    "pageTitle": "Nos bateaux  SailingLoc",
+    "titleWithLocation": "Bateaux à {{location}}, SailingLoc",
+    "boatsAtLocation_one": "{{count}} bateau à {{location}}",
+    "boatsAtLocation_other": "{{count}} bateaux à {{location}}",
+    "resultsByCriteria": "Résultats selon vos critères de recherche.",
+    "clearFilters": "Effacer les filtres",
+    "topRated": "Coup de cœur",
+    "perDay": "/jour",
+    "persons": "pers.",
+    "withSkipperIncluded": "Skipper professionnel inclus",
+    "withoutSkipper": "Sans skipper",
+    "premiumService": "Service de bord premium"
   },
   "filters": {
     "title": "Filtres",
@@ -294,6 +551,20 @@
       "errorPasswordMatch": "Les mots de passe ne correspondent pas",
       "errorTokenInvalid": "Ce lien est invalide ou a expiré.",
       "requestNewLink": "Demander un nouveau lien"
+    },
+    "verifyEmail": {
+      "pageTitle": "Vérification de l'email",
+      "heading": "Vérification de l'email",
+      "loading": "Vérification en cours…",
+      "successTitle": "Email vérifié !",
+      "successMessage": "Votre adresse email a bien été confirmée.",
+      "errorTitle": "Lien invalide",
+      "errorMissingToken": "Lien de vérification manquant ou invalide.",
+      "errorDefault": "Lien invalide ou expiré.",
+      "goToSpace": "Accéder à mon espace",
+      "signIn": "Se connecter",
+      "backToSpace": "Retour à mon espace",
+      "resendHint": "Une fois connecté, vous pourrez renvoyer un email de vérification depuis votre profil."
     },
     "register": {
       "title": "Créer un compte",
@@ -391,6 +662,8 @@
       "ownerBoats": "{{count}} bateau",
       "ownerBoats_other": "{{count}} bateaux",
       "similarBoats": "Bateaux similaires",
+      "similarBoatsSubtitle": "D'autres bateaux qui pourraient vous plaire dans la même région.",
+      "similarBoatsSeeAll": "Voir plus",
       "report": "Signaler cette annonce",
       "share": "Partager",
       "addFavorite": "Ajouter aux favoris",
@@ -437,7 +710,8 @@
       "reportError": "Erreur lors du signalement",
       "paymentConfirmed": "Paiement confirmé !",
       "bookingError": "Erreur lors de la réservation",
-      "rentMeta": "Louez {{title}} à {{port}}."
+      "rentMeta": "Louez {{title}} à {{port}}.",
+      "noMapCoordinates": "Carte indisponible : coordonnées GPS non renseignées pour ce bateau."
     }
   },
   "booking": {
@@ -479,6 +753,8 @@
       "serviceFee": "Frais de service",
       "cleaningFee": "Frais de ménage",
       "loginRequired": "Vous devez être connecté pour réserver. Cliquez sur \"Réserver\" pour vous connecter.",
+      "licenseRequired": "Ce bateau nécessite un permis bateau. Renseignez vos qualifications nautiques ou uploadez votre permis.",
+      "completeProfile": "Compléter mon profil",
       "bookNow": "Réserver maintenant",
       "loading": "Chargement…",
       "bookAndPay": "Réserver & Payer",
@@ -529,7 +805,8 @@
       "statusConfirmed": "Confirmée",
       "statusPending": "En attente",
       "boatFallback": "Bateau",
-      "reviewLeft": "Avis laissé"
+      "reviewLeft": "Avis laissé",
+      "leaveReview": "Laisser un avis"
     },
     "ownerBookings": {
       "title": "Mes réservations",
@@ -542,6 +819,7 @@
       "noPhoto": "Pas de photo",
       "renterLabel": "Locataire : {{name}}",
       "accept": "Accepter",
+      "pendingPayment": "En attente du paiement du locataire. La réservation sera confirmée automatiquement après paiement.",
       "decline": "Refuser",
       "rateRenter": "Évaluer le locataire",
       "confirmed": "Réservation confirmée",
@@ -583,12 +861,26 @@
   },
   "messages": {
     "title": "Messages",
-    "noMessages": "Aucune conversation",
-    "noMessagesHint": "Vos échanges avec les propriétaires apparaîtront ici.",
+    "noMessages": "Aucun message",
+    "noMessagesHint": "Contactez un propriétaire depuis la fiche d'un bateau pour démarrer une conversation.",
     "typeMessage": "Votre message...",
     "send": "Envoyer",
     "today": "Aujourd'hui",
-    "yesterday": "Hier"
+    "yesterday": "Hier",
+    "active": "Actifs",
+    "archived": "Archivés",
+    "startConversation": "Démarrer une conversation avec ce propriétaire",
+    "startPlaceholder": "Bonjour, je suis intéressé par votre bateau…",
+    "exploreBoats": "Explorer les bateaux",
+    "youPrefix": "Vous : ",
+    "noMessageYet": "Aucun message",
+    "unknown": "Inconnu",
+    "archive": "Archiver",
+    "unarchive": "Désarchiver",
+    "justNow": "À l'instant",
+    "minutesAgo": "{{count}} min",
+    "hoursAgo": "{{count}} h",
+    "daysAgo": "{{count}} j"
   },
   "notifications": {
     "title": "Notifications",
@@ -598,8 +890,14 @@
   },
   "favorites": {
     "title": "Mes favoris",
-    "noFavorites": "Aucun favori",
-    "noFavoritesHint": "Sauvegardez les bateaux qui vous intéressent pour les retrouver facilement."
+    "noFavorites": "Aucun bateau en favoris",
+    "noFavoritesHint": "Cliquez sur le cœur d'une annonce pour la sauvegarder ici.",
+    "add": "Ajouter aux favoris",
+    "remove": "Retirer des favoris",
+    "added": "Ajouté aux favoris",
+    "removed": "Retiré des favoris",
+    "loadError": "Erreur lors du chargement de vos favoris.",
+    "explore": "Explorer les bateaux"
   },
   "kyc": {
     "title": "Vérification d'identité",
@@ -637,7 +935,7 @@
     "emptyRegion": "Aucune destination dans cette région pour le moment.",
     "seasonPick": "La sélection de la saison",
     "seeSelection": "Voir la sélection",
-    "explore": "Explorer",
+    "explore": "Rechercher",
     "backToDestinations": "Retour aux destinations"
   },
   "review": {
@@ -671,6 +969,7 @@
     "addBoat": "Ajouter un bateau",
     "administration": "Administration",
     "users": "Utilisateurs",
+    "kycNav": "Vérifications KYC",
     "boatsNav": "Bateaux",
     "bookingsNav": "Réservations",
     "reports": "Signalements",
@@ -693,7 +992,7 @@
     "availabilityTitle": "Gérez vos disponibilités",
     "availabilityDesc": "Bloquez vos dates indisponibles et définissez vos créneaux de location. Vous restez libre de refuser ou d'accepter chaque demande de réservation.",
     "revenueTitle": "Percevez vos revenus",
-    "revenueDesc": "Dès qu'une réservation est confirmée, le paiement est sécurisé. Vous recevez votre virement sous 2 à 5 jours ouvrés après la fin de chaque location via Stripe Connect."
+    "revenueDesc": "Dès qu'une réservation est confirmée, le paiement locataire est sécurisé via Stripe. Consultez vos revenus dans l'espace dédié. Les virements automatiques aux propriétaires via Stripe Connect arriveront en phase 2."
   },
   "profileCompletion": {
     "emailNotVerified": "Email non vérifié",
@@ -763,7 +1062,7 @@
     "dates": "Dates",
     "whenLeaving": "Quand partir ?",
     "allBoats": "Tous les bateaux",
-    "explore": "explorer",
+    "explore": "Rechercher",
     "portCity": "Port / Ville",
     "portCityPlaceholder": "Ex: Marseille, La Rochelle…",
     "people": "Personnes",
@@ -786,5 +1085,547 @@
     "completeProfile": "Compléter mon profil",
     "emailSent": "Email de vérification envoyé !",
     "emailSendFailed": "Erreur lors de l'envoi. Réessayez dans quelques instants."
+  },
+  "compare": {
+    "pageTitle": "Comparateur de bateaux",
+    "title": "Comparateur de bateaux",
+    "minBoats": "Sélectionnez au moins 2 bateaux pour les comparer.",
+    "backToSearch": "Retour à la recherche",
+    "back": "Retour",
+    "partialError": "Certains bateaux n'ont pas pu être chargés.",
+    "compare": "Comparer",
+    "compareCount": "Comparer ({{count}})",
+    "add": "Ajouter au comparateur",
+    "remove": "Retirer du comparateur",
+    "addSlot": "Ajouter un bateau",
+    "clearAll": "Tout effacer",
+    "boatId": "Bateau #{{id}}",
+    "type": "Type",
+    "port": "Port",
+    "length": "Longueur",
+    "capacity": "Capacité",
+    "cabins": "Cabines",
+    "cabins_one": "{{count}} cabine",
+    "cabins_other": "{{count}} cabines",
+    "motorization": "Motorisation",
+    "skipperIncluded": "Skipper inclus",
+    "yes": "✓ Oui",
+    "no": "✗ Non",
+    "rating": "Note",
+    "notRated": "Pas encore noté",
+    "ratingValue": "{{rating}} / 5 ({{count}} avis)",
+    "pricePerDay": "Prix / jour",
+    "deposit": "Caution",
+    "equipment": "Équipements",
+    "notProvided": "Non renseigné",
+    "viewListing": "Voir l'annonce"
+  },
+  "contactPage": {
+    "pageTitle": "Contact - SailingLoc",
+    "heroTitleLine1": "Parlons de votre",
+    "heroTitleLine2": "prochaine escale.",
+    "heroSubtitle": "Une demande précise, une escapade sur mesure ou une question technique ? Notre conciergerie maritime est entièrement à votre disposition.",
+    "formTitle": "Envoyez-nous un message",
+    "sentTitle": "Message envoyé !",
+    "sentHint": "Merci de nous avoir contactés. Nous vous répondrons sous 48 h.",
+    "sendAnother": "Envoyer un autre message",
+    "firstNameLabel": "Prénom",
+    "firstNamePlaceholder": "Jean",
+    "lastNameLabel": "Nom",
+    "lastNamePlaceholder": "Dupont",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "jean.dupont@email.com",
+    "subjectLabel": "Objet de votre demande",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Décrivez votre projet d'escapade…",
+    "submit": "Envoyer la demande",
+    "submitting": "Envoi…",
+    "error": "Une erreur s'est produite. Veuillez réessayer.",
+    "subjects": {
+      "booking": "Réservation premium",
+      "technical": "Question technique",
+      "owner": "Devenir propriétaire",
+      "other": "Autre demande"
+    },
+    "info": {
+      "contact": {
+        "title": "Nous contacter",
+        "text": "Du lundi au vendredi, de 9 h à 17 h."
+      },
+      "office": {
+        "title": "Siège principal",
+        "text": "12 rue de la Paix, 75002 Paris",
+        "action": "ITINÉRAIRE"
+      },
+      "support": {
+        "title": "Support 24h/24",
+        "text": "Réservé à nos membres en mer.",
+        "action": "Ligne exclusive VIP"
+      }
+    },
+    "faqSectionTitle": "Questions fréquentes",
+    "faqs": {
+      "license": {
+        "question": "Comment réserver sans permis bateau ?",
+        "answer": "Une partie de notre flotte est constituée de bateaux « permis plaisance » accessibles sans permis (jusqu'à 6 chevaux et une longueur limitée selon la réglementation en vigueur). Filtrez les annonces avec le critère « Sans permis » pour les trouver facilement."
+      },
+      "cancellation": {
+        "question": "Quelles sont les conditions d'annulation ?",
+        "answer": "L'annulation gratuite est possible jusqu'à 7 jours avant le départ. Entre 7 et 3 jours, 50 % du montant est remboursé. Dans les 3 jours, aucun remboursement n'est accordé, sauf cas de force majeure."
+      },
+      "delivery": {
+        "question": "Livrez-vous jusqu'à la marina ?",
+        "answer": "Selon l'annonce, le bateau peut être livré directement à votre ponton ou point de départ préféré. Cette option apparaît sur la page du bateau et peut entraîner un supplément selon la distance."
+      }
+    },
+    "mapAlt": "Port de Cannes",
+    "promo": {
+      "boats": {
+        "title": "Nos bateaux",
+        "text": "Découvrez l'excellence."
+      },
+      "destinations": {
+        "title": "Destinations",
+        "text": "Les pépites de la Méditerranée."
+      },
+      "services": {
+        "title": "Nos services",
+        "text": "Un service sans limites."
+      }
+    }
+  },
+  "faqPage": {
+    "pageTitle": "FAQ - SailingLoc",
+    "heroBadge": "Centre d'aide",
+    "heroTitle": "Questions fréquentes",
+    "heroSubtitle": "Réservations, contrats entre particuliers, paiements et sécurité : les réponses essentielles pour louer ou mettre en location un bateau sur SailingLoc. Vous ne trouvez pas ce que vous cherchez ?",
+    "categoriesLabel": "Catégories de questions",
+    "categories": {
+      "all": "Toutes",
+      "reservations": "Réservations",
+      "paiements": "Paiements",
+      "proprietaires": "Propriétaires",
+      "securite": "Sécurité"
+    },
+    "empty": "Aucune question dans cette catégorie.",
+    "ctaTitle": "Vous cherchez encore une réponse ?",
+    "ctaSubtitle": "Notre équipe est disponible pour vous aider du lundi au vendredi, de 9 h à 18 h.",
+    "ctaButton": "Nous contacter",
+    "items": {
+      "res-comment-reserver": {
+        "q": "Comment réserver un bateau sur SailingLoc ?",
+        "a": "Inscrivez-vous, puis recherchez un bateau (port, dates, nombre de personnes) en France, en Europe ou à l'international. Choisissez une annonce et cliquez sur « Réserver » : vous êtes guidé jusqu'au paiement sécurisé. Une réservation confirmée constitue un contrat de location entre vous et le propriétaire."
+      },
+      "res-contrat": {
+        "q": "Comment fonctionnent les contrats de location ?",
+        "a": "SailingLoc est une plateforme de location entre particuliers, réservée aux utilisateurs inscrits. Chaque réservation confirmée établit un contrat de location entre le locataire et le propriétaire. SailingLoc agit comme intermédiaire et ne se substitue pas aux obligations de l'une ou l'autre partie."
+      },
+      "res-annuler": {
+        "q": "Puis-je annuler ma réservation ?",
+        "a": "Oui, vous pouvez annuler depuis votre espace « Mes réservations ». Les conditions de remboursement dépendent de la politique d'annulation choisie par le propriétaire (flexible, modérée ou stricte) et du délai avant le départ."
+      },
+      "res-refus": {
+        "q": "Que se passe-t-il si le propriétaire refuse ma demande ?",
+        "a": "Si votre demande est refusée, aucun montant n'est débité et la demande est clôturée. Vous recevez une notification et pouvez immédiatement rechercher un autre bateau. SailingLoc ne facture rien en cas de refus."
+      },
+      "res-delai": {
+        "q": "Combien de temps à l'avance dois-je réserver ?",
+        "a": "SailingLoc n'impose pas de délai minimum, mais chaque propriétaire peut fixer un préavis (par exemple 24 ou 48 heures). Ce délai est indiqué sur l'annonce. En haute saison, nous recommandons de réserver au moins une semaine à l'avance."
+      },
+      "res-modifier-dates": {
+        "q": "Puis-je modifier les dates après confirmation ?",
+        "a": "Modifier les dates après confirmation nécessite l'accord du propriétaire. Contactez-le via la messagerie intégrée. En cas d'accord, la réservation sera annulée puis recréée avec les nouvelles dates, sous réserve de la politique d'annulation applicable."
+      },
+      "pai-modes": {
+        "q": "Quels moyens de paiement sont acceptés ?",
+        "a": "SailingLoc accepte les principales cartes bancaires (Visa, Mastercard, American Express) via Stripe, notre partenaire de paiement sécurisé. Les virements bancaires et les espèces ne sont pas acceptés sur la plateforme."
+      },
+      "pai-debit": {
+        "q": "Quand suis-je débité ?",
+        "a": "Le montant total est débité en ligne via Stripe dès que vous confirmez votre réservation. La réservation passe automatiquement au statut « Confirmée » après un paiement réussi."
+      },
+      "pai-caution": {
+        "q": "Comment fonctionne la caution ?",
+        "a": "Le propriétaire peut indiquer un montant de caution dans son annonce. Ce montant est affiché à titre informatif : la gestion réelle (empreinte bancaire ou dépôt) s'organise directement entre le locataire et le propriétaire avant le départ."
+      },
+      "pai-remboursement": {
+        "q": "Puis-je être remboursé si j'annule ?",
+        "a": "Oui, sous réserve de la politique d'annulation du propriétaire. Avec une politique flexible, vous êtes intégralement remboursé jusqu'à 24 heures avant le départ. Avec une politique stricte, seul 50 % peut être remboursé. Les frais de service SailingLoc ne sont pas remboursables."
+      },
+      "pai-frais": {
+        "q": "Quels sont les frais de service ?",
+        "a": "SailingLoc prélève 10 % de chaque transaction confirmée. Le montant exact des frais de service est toujours clairement affiché avant la confirmation de la réservation."
+      },
+      "pro-mettre-en-location": {
+        "q": "Comment mettre mon bateau en location ?",
+        "a": "Créez un compte particulier, sélectionnez le rôle « Propriétaire », puis ajoutez votre bateau (type, capacité, équipements, tarif, photos). Après vérification, votre annonce est en ligne : vous louez uniquement à d'autres particuliers inscrits, dans le cadre d'un contrat de location créé à chaque réservation."
+      },
+      "pro-documents": {
+        "q": "Quels documents sont requis pour publier une annonce ?",
+        "a": "Vous devez fournir les documents d'immatriculation du bateau, une pièce d'identité et une attestation d'assurance navigation en cours de validité. Ces documents sont examinés par notre équipe avant la mise en ligne de votre annonce."
+      },
+      "pro-commissions": {
+        "q": "Comment sont calculées les commissions SailingLoc ?",
+        "a": "SailingLoc prélève 10 % de chaque transaction confirmée. Le détail est affiché avant la confirmation de réservation et dans votre tableau de bord propriétaire (revenus)."
+      },
+      "pro-paiements": {
+        "q": "Comment et quand reçois-je mes paiements ?",
+        "a": "Le locataire paie en ligne via Stripe lors de la réservation. Les versements au propriétaire sont suivis dans l'espace « Revenus ». Les virements automatiques via Stripe Connect sont prévus en phase 2."
+      },
+      "pro-bloquer-dates": {
+        "q": "Puis-je bloquer des dates sur mon calendrier ?",
+        "a": "Oui. Depuis votre tableau de bord propriétaire, ouvrez « Disponibilités » pour chaque bateau. Vous pouvez bloquer des périodes pour usage personnel, entretien ou toute autre raison. Ces dates n'apparaîtront pas comme disponibles pour les locataires."
+      },
+      "sec-assurance": {
+        "q": "Les bateaux sont-ils couverts par une assurance ?",
+        "a": "Chaque propriétaire doit fournir une assurance navigation valide couvrant la location à des tiers. SailingLoc vérifie ces documents avant la mise en ligne des annonces et travaille avec des partenaires assureurs. Consultez également les conditions de couverture avec le propriétaire avant le départ."
+      },
+      "sec-dommages": {
+        "q": "Que se passe-t-il en cas de dommages pendant la location ?",
+        "a": "En cas de dommages, signalez-les immédiatement via la messagerie et remplissez le formulaire d'incident disponible dans votre réservation. SailingLoc assure la médiation entre locataire et propriétaire. Toute caution est gérée directement entre les parties en fonction des constatations."
+      },
+      "sec-verification-locataires": {
+        "q": "Comment SailingLoc vérifie-t-il les locataires ?",
+        "a": "Seuls les utilisateurs inscrits peuvent réserver. Lors de l'inscription, les locataires doivent fournir une pièce d'identité valide. Un système d'avis permet aux propriétaires de consulter les retours laissés par les autres membres. Les profils non vérifiés sont signalés aux propriétaires."
+      },
+      "sec-permis": {
+        "q": "Un permis bateau est-il obligatoire ?",
+        "a": "Cela dépend du type de bateau et de la zone de navigation. Pour les bateaux de plus de 6 CV en mer ou sur les plans d'eau réglementés, un permis plaisance est requis. Le propriétaire indique dans son annonce si un permis est nécessaire."
+      },
+      "sec-verification-proprietaires": {
+        "q": "SailingLoc vérifie-t-il l'identité des propriétaires ?",
+        "a": "Oui. Avant toute publication d'annonce, les propriétaires passent par une vérification d'identité et de documents (pièce d'identité, preuve de propriété ou contrat de gestion du bateau, assurance). Ce processus contribue à la fiabilité des annonces publiées."
+      }
+    }
+  },
+  "createEditBoat": {
+    "editTitle": "Modifier le bateau",
+    "addTitle": "Ajouter un bateau",
+    "stepLabel": "Étape {{step}} : {{title}}",
+    "steps": {
+      "basic": "Informations de base",
+      "location": "Localisation",
+      "pricing": "Tarifs & skipper",
+      "equipment": "Équipements & règles",
+      "media": "Photos & documents"
+    },
+    "prev": "Précédent",
+    "next": "Suivant",
+    "saveDraft": "Enregistrer le brouillon",
+    "publish": "Publier l'annonce",
+    "published": "Annonce publiée !",
+    "draftSaved": "Brouillon enregistré",
+    "saveError": "Erreur lors de la sauvegarde",
+    "docUploaded": "Document uploadé avec succès",
+    "docUploadError": "Erreur lors de l'upload du document",
+    "validation": {
+      "titleRequired": "Le titre est requis",
+      "typeRequired": "Le type est requis",
+      "capacityRequired": "La capacité est requise",
+      "portRequired": "Le port est requis",
+      "cityRequired": "La ville est requise",
+      "dailyRateRequired": "Le tarif journalier est requis"
+    },
+    "fields": {
+      "title": "Titre de l'annonce",
+      "titlePlaceholder": "Ex: Voilier Jeanneau Sun Odyssey 440",
+      "boatType": "Type de bateau",
+      "manufacturer": "Fabricant",
+      "manufacturerPlaceholder": "Jeanneau, Bénéteau…",
+      "model": "Modèle",
+      "modelPlaceholder": "Sun Odyssey 440",
+      "year": "Année",
+      "length": "Longueur (m)",
+      "capacity": "Capacité (pers.)",
+      "cabins": "Cabines",
+      "port": "Port d'attache",
+      "city": "Ville",
+      "country": "Pays",
+      "motorization": "Motorisation",
+      "dailyRate": "Tarif journalier (€)",
+      "weeklyRate": "Tarif hebdomadaire (€)",
+      "deposit": "Caution (€)",
+      "withSkipper": "Proposer un skipper",
+      "skipperPrice": "Tarif skipper / jour (€)",
+      "requiredLicense": "Permis requis",
+      "description": "Description",
+      "equipment": "Équipements",
+      "rules": "Règles à bord",
+      "welcomeMessage": "Message de bienvenue",
+      "photos": "Photos du bateau",
+      "documents": "Documents officiels"
+    }
+  },
+  "ownerGuidePage": {
+    "pageTitle": "Guide propriétaire",
+    "heroBadge": "Guide propriétaire",
+    "heroTitle": "Louez votre bateau entre particuliers",
+    "heroSubtitle": "Publiez votre voilier ou bateau à moteur, signez des contrats de location avec des locataires inscrits, et estimez vos revenus après la commission de 10 % de SailingLoc.",
+    "heroCta": "Devenir propriétaire — c'est gratuit",
+    "stepsTitle": "5 étapes pour commencer à louer",
+    "steps": {
+      "1": {
+        "title": "Créez votre compte propriétaire",
+        "desc": "Inscrivez-vous gratuitement en tant que particulier et sélectionnez le rôle « Propriétaire ». Sur SailingLoc, vous louez uniquement à d'autres particuliers inscrits."
+      },
+      "2": {
+        "title": "Publiez votre annonce",
+        "desc": "Renseignez les caractéristiques de votre voilier ou bateau à moteur (type, longueur, capacité, équipements) et ajoutez de belles photos. Une annonce complète attire davantage de locataires en France, en Europe et à l'international."
+      },
+      "3": {
+        "title": "Gérez vos disponibilités",
+        "desc": "Définissez votre calendrier de disponibilités, vos tarifs (jour, semaine) et votre politique d'annulation. Vous gardez à tout moment le contrôle de votre planning."
+      },
+      "4": {
+        "title": "Signez des contrats de location",
+        "desc": "Chaque réservation confirmée crée un contrat de location entre vous et le locataire. SailingLoc agit comme intermédiaire ; le paiement est sécurisé via Stripe (commission de service de 10 % sur chaque transaction)."
+      },
+      "5": {
+        "title": "Construisez votre réputation",
+        "desc": "Les avis des locataires renforcent la visibilité de votre annonce. Un profil bien noté peut doubler ses revenus en quelques mois."
+      }
+    },
+    "boatTypes": {
+      "INFLATABLE": "Semi-rigide",
+      "MOTORBOAT": "Bateau à moteur",
+      "SAILBOAT": "Voilier",
+      "CATAMARAN": "Catamaran"
+    },
+    "estimatorTitle": "Estimez vos revenus",
+    "boatTypeLabel": "Type de bateau",
+    "daysPerMonthLabel": "Jours loués par mois :",
+    "daysMin": "1 j",
+    "daysMax": "25 j",
+    "avgDailyRate": "Tarif journalier moyen",
+    "netMonthly": "Revenu net / mois",
+    "netYearly": "Revenu net / an ({{months}} mois)",
+    "estimatorNote": "* Estimation indicative après déduction des 10 % perçus par SailingLoc sur chaque transaction (~{{percent}}%). Hors frais liés au bateau (entretien, port, assurance).",
+    "documentsTitle": "Documents requis",
+    "documents": [
+      "Carte de circulation / acte de francisation du bateau",
+      "Pièce d'identité en cours de validité du propriétaire",
+      "Attestation d'assurance navigation valide (responsabilité civile + dommages)",
+      "Photos récentes du bateau (extérieur, intérieur, cockpit)",
+      "Certificat de conformité ou rapport d'expertise (le cas échéant)",
+      "Contrat de location (modèle ou document propriétaire, si vous en avez un)",
+      "IBAN pour vos futurs versements (Stripe Connect, phase 2)"
+    ],
+    "ctaTitle": "Prêt à mettre votre bateau en location ?",
+    "ctaSubtitle": "Inscription gratuite pour les particuliers. Publiez votre annonce et signez vos contrats de location en quelques minutes.",
+    "ctaButton": "Créer mon compte propriétaire"
+  },
+  "becomeOwnerPage": {
+    "pageTitle": "Devenir propriétaire",
+    "heroBadge": "Exclusivité & Sérénité",
+    "heroTitle": "Optimisez la gestion de votre bateau d'exception.",
+    "heroSubtitle": "Rejoignez SailingLoc et transformez votre passion pour la voile en un investissement serein et performant.",
+    "heroCtaStart": "Commencer",
+    "heroCtaGuide": "Consulter le guide propriétaire",
+    "stats": {
+      "boats": "Bateaux gérés",
+      "rating": "Note propriétaires",
+      "revenue": "Revenus générés",
+      "support": "Support propriétaire"
+    },
+    "whyLabel": "Nos engagements",
+    "whyTitle": "Pourquoi confier votre bateau à SailingLoc ?",
+    "whySubtitle": "Une gestion clé en main, des revenus optimisés et une sérénité totale pour les propriétaires exigeants.",
+    "why": {
+      "income": {
+        "title": "Revenus locatifs optimisés",
+        "desc": "Des algorithmes de tarification dynamique pour maximiser vos revenus selon la saison et la demande."
+      },
+      "secure": {
+        "title": "Locations sécurisées",
+        "desc": "Sélection rigoureuse des locataires, assurance navigation et paiements sécurisés via Stripe."
+      },
+      "concierge": {
+        "title": "Conciergerie dédiée",
+        "desc": "Entretien, accueil des locataires et gestion quotidienne pris en charge par nos équipes."
+      }
+    },
+    "journeyTitle": "Votre chemin vers la sérénité",
+    "steps": {
+      "1": {
+        "title": "Évaluation gratuite",
+        "desc": "Nos experts analysent le potentiel locatif de votre bateau en 48 heures."
+      },
+      "2": {
+        "title": "Mise en ligne",
+        "desc": "Séance photo professionnelle et annonce optimisée pour la visibilité dans les recherches."
+      },
+      "3": {
+        "title": "Gagnez & naviguez",
+        "desc": "Générez des revenus tout en gardant les dates qui vous conviennent pour naviguer."
+      }
+    },
+    "ctaTitle": "Prêt à mettre le cap sur la réussite ?",
+    "ctaSubtitle": "Rejoignez la flotte la plus prestigieuse de Méditerranée et démarrez dès aujourd'hui.",
+    "ctaButton": "Commencer maintenant"
+  },
+  "legalPages": {
+    "cgu": {
+      "pageTitle": "Conditions Générales d'Utilisation",
+      "title": "Conditions Générales d'Utilisation",
+      "lastUpdated": "Dernière mise à jour : 16 juillet 2026",
+      "articles": {
+        "1": {
+          "title": "Article 1 - Objet",
+          "body": "Les présentes Conditions Générales d'Utilisation régissent l'accès et l'utilisation de la plateforme SailingLoc, accessible à l'adresse sailingloc.fr et éditée par SailingLoc SAS. SailingLoc est une plateforme intermédiaire qui permet à des particuliers inscrits de conclure entre eux des contrats de location de voiliers et de bateaux à moteur, en France, en Europe et à l'international. En accédant à la plateforme, l'utilisateur accepte sans réserve les présentes Conditions Générales d'Utilisation."
+        },
+        "2": {
+          "title": "Article 2 - Nature du service",
+          "body": "SailingLoc agit exclusivement en qualité d'intermédiaire technique. Les locations sont conclues uniquement entre particuliers inscrits. SailingLoc n'est propriétaire d'aucun des bateaux publiés et n'est pas partie au contrat de location, à l'exception des services de mise en relation, de paiement et d'assistance liés à la plateforme."
+        },
+        "3": {
+          "title": "Article 3 - Accès à la plateforme",
+          "body": "La consultation du site est gratuite. L'inscription est requise pour louer un bateau, publier une annonce ou conclure un contrat de location. L'accès est réservé aux personnes majeures. La Société se réserve le droit de suspendre tout utilisateur en cas de manquement aux présentes Conditions Générales d'Utilisation."
+        },
+        "4": {
+          "title": "Article 4 - Inscription et compte utilisateur",
+          "body": "L'utilisateur s'engage à fournir des informations exactes et à jour. Toute usurpation d'identité est interdite. L'utilisateur est seul responsable de la confidentialité de ses identifiants. Seuls les comptes inscrits et actifs peuvent conclure des contrats de location via la plateforme."
+        },
+        "5": {
+          "title": "Article 5 - Obligations de l'utilisateur",
+          "body": "L'utilisateur s'engage à utiliser la plateforme conformément à la réglementation en vigueur et à ne proposer que des locations entre particuliers. Il est interdit de contourner les systèmes de paiement de SailingLoc ou d'utiliser la plateforme pour une activité de location professionnelle non déclarée comme telle."
+        },
+        "6": {
+          "title": "Article 6 - Réservations et contrats de location",
+          "body": "Toute réservation confirmée constitue un contrat de location entre le locataire et le propriétaire, tous deux particuliers inscrits. SailingLoc agit comme intermédiaire. Le propriétaire dispose de 24 heures pour accepter ou refuser une demande. En l'absence de réponse, la réservation est automatiquement annulée."
+        },
+        "7": {
+          "title": "Article 7 - Paiements et commissions",
+          "body": "Les paiements sont traités par Stripe. SailingLoc perçoit 10 % de chaque transaction confirmée au titre des frais de service de la plateforme. Le montant exact est affiché avant la confirmation de la réservation. Les remboursements sont soumis à la politique d'annulation du propriétaire."
+        },
+        "8": {
+          "title": "Article 8 - Assurance",
+          "body": "Chaque propriétaire s'engage à disposer d'une assurance navigation valide couvrant la location à des tiers. SailingLoc peut collaborer avec des partenaires assureurs ; cela ne dispense pas le propriétaire de ses obligations, ni le locataire du devoir de vérifier les conditions de couverture avant le départ."
+        },
+        "9": {
+          "title": "Article 9 - Résiliation",
+          "body": "L'utilisateur peut supprimer son compte depuis ses paramètres. Les obligations financières nées avant la résiliation restent dues."
+        },
+        "10": {
+          "title": "Article 10 - Droit applicable",
+          "body": "Les présentes Conditions Générales d'Utilisation sont soumises au droit français. En cas de litige, les tribunaux compétents de Marseille seront seuls compétents."
+        }
+      }
+    },
+    "mentions": {
+      "pageTitle": "Mentions légales",
+      "title": "Mentions légales",
+      "lastUpdated": "Dernière mise à jour : 1er janvier 2026",
+      "publisherTitle": "Éditeur du site",
+      "publisherP1Before": "Le site sailingloc.fr est édité par ",
+      "publisherP1After": ", société par actions simplifiée au capital de 10 000 €, immatriculée au Registre du Commerce et des Sociétés de Marseille sous le numéro RCS 123 456 789.",
+      "publisherOffice": "Siège social : 12 Quai de la Joliette, 13002 Marseille, France.",
+      "publisherDirector": "Directeur de la publication : Lucas Martin, Président de SailingLoc SAS.",
+      "publisherContact": "Contact : contact@sailingloc.fr",
+      "hostingTitle": "Hébergement",
+      "hostingP1Before": "Le site est hébergé par ",
+      "hostingP1After": ", 340 Pine Street, Suite 900, San Francisco, CA 94104, États-Unis — pour le frontend.",
+      "hostingP2Before": "Le backend est hébergé par ",
+      "hostingP2After": ", 340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis.",
+      "hostingP3Before": "Les médias (photos de bateaux) sont hébergés par ",
+      "hostingP3After": ", 3400 Central Expy Suite 110, Santa Clara, CA 95051, États-Unis.",
+      "ipTitle": "Propriété intellectuelle",
+      "ipP1": "Tous les éléments du site (textes, images, logos, graphismes, code source) sont la propriété exclusive de SailingLoc SAS, sauf mention contraire.",
+      "ipP2": "Toute reproduction, représentation, modification ou exploitation, totale ou partielle, du contenu du site, par quelque moyen que ce soit, sans l'autorisation expresse et préalable de SailingLoc SAS, est strictement interdite et constituerait une contrefaçon au sens des articles L.335-2 et suivants du Code de la propriété intellectuelle.",
+      "cookiesTitle": "Cookies",
+      "cookiesTextBefore": "Le site utilise des cookies à des fins techniques, statistiques et publicitaires. Pour en savoir plus, consultez notre",
+      "cookiesLink": "Politique de cookies",
+      "dataProtectionTitle": "Protection des données - CNIL",
+      "dataProtectionP1": "Conformément à la loi n° 78-17 du 6 janvier 1978 relative à l'informatique, aux fichiers et aux libertés et au Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit d'accès, de rectification, d'effacement et de portabilité de vos données personnelles.",
+      "dataProtectionP2Before": "Pour exercer ces droits, adressez votre demande à :",
+      "dataProtectionP3Before": "Pour en savoir plus, consultez notre",
+      "dataProtectionLink": "Politique RGPD"
+    },
+    "rgpd": {
+      "pageTitle": "Politique de protection des données (RGPD)",
+      "title": "Politique de protection des données (RGPD)",
+      "lastUpdated": "Dernière mise à jour : 1er janvier 2026",
+      "sections": {
+        "1": {
+          "title": "1. Responsable du traitement",
+          "body": "SailingLoc SAS, 12 Quai de la Joliette, 13002 Marseille — contact@sailingloc.fr. DPO : dpo@sailingloc.fr"
+        },
+        "2": {
+          "title": "2. Données collectées",
+          "body": "Identité (nom, prénom, date de naissance, pièce d'identité), Contact (email, téléphone), Compte (identifiant, rôle), Financières (IBAN des propriétaires, carte bancaire via Stripe), Navigation (IP, cookies techniques), Contenus générés par l'utilisateur (annonces, avis, messages, photos)."
+        },
+        "3": {
+          "title": "3. Finalités",
+          "body": "Gestion des comptes et authentification, mise en relation et réservations, traitement des paiements via Stripe, notifications transactionnelles, prévention de la fraude, amélioration du service et obligations légales."
+        },
+        "4": {
+          "title": "4. Durée de conservation",
+          "body": "Compte actif pendant toute la durée de la relation contractuelle ; compte supprimé conservé 3 ans après suppression ; données de paiement conservées 5 ans (Code de commerce) ; journaux de navigation conservés 12 mois maximum."
+        },
+        "5": {
+          "title": "5. Vos droits",
+          "bodyBefore": "Droit d'accès, de rectification, d'effacement (droit à l'oubli), de portabilité, d'opposition et de limitation. Vous pouvez introduire une réclamation auprès de la CNIL à l'adresse",
+          "bodyAfter": "."
+        },
+        "6": {
+          "title": "6. Transferts hors UE",
+          "body": "Vercel Inc. (États-Unis) hébergement frontend, Railway Corp. (États-Unis) hébergement backend, Cloudinary Ltd. (États-Unis) stockage des photos, Stripe Inc. (États-Unis) paiements certifiés PCI-DSS, Resend Inc. (États-Unis) emails transactionnels. Tous sont encadrés par des clauses contractuelles types (CCT)."
+        },
+        "7": {
+          "title": "7. Contact DPO",
+          "body": "dpo@sailingloc.fr : réponse dans un délai d'un mois."
+        }
+      }
+    },
+    "cookies": {
+      "pageTitle": "Politique de cookies",
+      "title": "Politique de cookies",
+      "lastUpdated": "Dernière mise à jour : 1er janvier 2026",
+      "section1Title": "1. Qu'est-ce qu'un cookie ?",
+      "section1P1": "Un cookie est un petit fichier texte déposé sur votre appareil (ordinateur, smartphone ou tablette) lors de votre visite sur un site web. Il permet au site de mémoriser vos préférences et d'améliorer votre expérience de navigation.",
+      "section1P2": "Les cookies ne contiennent pas de virus et ne peuvent pas lire d'autres fichiers présents sur votre appareil. Ils sont strictement limités aux finalités décrites ci-dessous.",
+      "section2Title": "2. Types de cookies utilisés",
+      "section2Intro": "SailingLoc utilise trois catégories de cookies :",
+      "table": {
+        "typeHeader": "Type",
+        "purposeHeader": "Finalité",
+        "durationHeader": "Durée",
+        "consentHeader": "Consentement",
+        "required": "Requis",
+        "notRequired": "Non requis"
+      },
+      "types": {
+        "essential": {
+          "type": "Cookies essentiels",
+          "purpose": "Authentification, sécurité, session utilisateur",
+          "duration": "Session / 7 jours",
+          "consent": "notRequired"
+        },
+        "analytics": {
+          "type": "Cookies analytiques",
+          "purpose": "Mesure d'audience, amélioration des pages (anonymisée)",
+          "duration": "13 mois",
+          "consent": "required"
+        },
+        "marketing": {
+          "type": "Cookies marketing",
+          "purpose": "Personnalisation publicitaire, retargeting",
+          "duration": "30 jours",
+          "consent": "required"
+        }
+      },
+      "section3Title": "3. Durée de conservation des cookies",
+      "section3P1": "Les cookies de session expirent automatiquement à la fermeture de votre navigateur. Les cookies persistants ont une durée de vie indiquée dans le tableau ci-dessus, à compter de leur dépôt. À l'issue de cette période, ils sont automatiquement supprimés.",
+      "section4Title": "4. Comment gérer vos cookies",
+      "section4Intro": "Vous pouvez accepter ou refuser les cookies non essentiels à tout moment depuis le bandeau de consentement affiché lors de votre première visite, ou via les paramètres de votre navigateur :",
+      "browsers": {
+        "chrome": "Paramètres → Confidentialité et sécurité → Cookies",
+        "firefox": "Options → Vie privée et sécurité → Cookies",
+        "safari": "Préférences → Confidentialité",
+        "edge": "Paramètres → Cookies et autorisations de site"
+      },
+      "section4Note": "Attention, le refus des cookies essentiels peut altérer le fonctionnement de la plateforme (impossibilité de se connecter, perte des préférences).",
+      "section5Title": "5. Contact",
+      "section5TextBefore": "Pour toute question sur l'utilisation des cookies, contactez notre DPO à l'adresse"
+    }
   }
 }

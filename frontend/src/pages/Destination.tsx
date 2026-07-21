@@ -71,7 +71,7 @@ const Destination: React.FC = () => {
         </title>
         <meta
           name="description"
-          content={`Louez un bateau en ${displayName}. ${total > 0 ? `${total} bateaux disponibles` : 'Explorez les offres'} sur SailingLoc.`}
+          content={`Rent a boat in ${displayName}. ${total > 0 ? `${total} boats available` : 'Browse listings'} on SailingLoc.`}
         />
       </Helmet>
 

@@ -19,7 +19,7 @@ const Register = React.lazy(() => import('./pages/auth/Register'))
 const ForgotPassword = React.lazy(() => import('./pages/auth/ForgotPassword'))
 const ResetPassword = React.lazy(() => import('./pages/auth/ResetPassword'))
 const VerifyEmail   = React.lazy(() => import('./pages/auth/VerifyEmail'))
-const RenterDashboard = React.lazy(() => import('./pages/dashboard/RenterDashboard'))
+const DashboardHome = React.lazy(() => import('./pages/dashboard/DashboardHome'))
 const MyBookings = React.lazy(() => import('./pages/dashboard/MyBookings'))
 const OwnerDashboard = React.lazy(() => import('./pages/owner/OwnerDashboard'))
 const MyBoats = React.lazy(() => import('./pages/owner/MyBoats'))
@@ -35,6 +35,7 @@ const AdminBookings = React.lazy(() => import('./pages/admin/AdminBookings'))
 const AdminReports  = React.lazy(() => import('./pages/admin/AdminReports'))
 const AdminReviews  = React.lazy(() => import('./pages/admin/AdminReviews'))
 const AdminRoles    = React.lazy(() => import('./pages/admin/AdminRoles'))
+const AdminKyc      = React.lazy(() => import('./pages/admin/AdminKyc'))
 const Notifications = React.lazy(() => import('./pages/dashboard/Notifications'))
 const UserProfile = React.lazy(() => import('./pages/dashboard/UserProfile'))
 const MyPublicProfileRedirect = React.lazy(() => import('./pages/dashboard/MyPublicProfileRedirect'))
@@ -50,7 +51,6 @@ const NotFound = React.lazy(() => import('./pages/NotFound'))
 const MyPayments = React.lazy(() => import('./pages/dashboard/MyPayments'))
 const PaymentMethods = React.lazy(() => import('./pages/dashboard/PaymentMethods'))
 const KycVerification = React.lazy(() => import('./pages/dashboard/KycVerification'))
-const MyDocuments = React.lazy(() => import('./pages/dashboard/MyDocuments'))
 const SavedSearches = React.lazy(() => import('./pages/dashboard/SavedSearches'))
 const OwnerProfile = React.lazy(() => import('./pages/OwnerProfile'))
 const Destination = React.lazy(() => import('./pages/Destination'))
@@ -62,6 +62,7 @@ const Contact = React.lazy(() => import('./pages/Contact'))
 const APropos = React.lazy(() => import('./pages/APropos'))
 const GuideProprietaire = React.lazy(() => import('./pages/GuideProprietaire'))
 const DevenirProprietaire = React.lazy(() => import('./pages/DevenirProprietaire'))
+const Temoignages = React.lazy(() => import('./pages/Temoignages'))
 const OwnerAuthPage = React.lazy(() => import('./pages/OwnerAuthPage'))
 
 // ── Comparateur ────────────────────────────────────────────────────────────────
@@ -146,6 +147,7 @@ export default function App() {
               <Route path="faq" element={<Faq />} />
               <Route path="contact" element={<Contact />} />
               <Route path="a-propos" element={<APropos />} />
+              <Route path="temoignages" element={<Temoignages />} />
               <Route path="guide-proprietaire" element={<GuideProprietaire />} />
               <Route path="devenir-proprietaire" element={<DevenirProprietaire />} />
               <Route path="devenir-proprietaire/commencer" element={<OwnerAuthPage />} />
@@ -163,7 +165,7 @@ export default function App() {
               {/* ── Renter (any authenticated user) ───────────────────────── */}
               <Route path="mon-espace" element={<ProtectedRoute />}>
                 <Route element={<UserDashboardLayout />}>
-                <Route index element={<RenterDashboard />} />
+                <Route index element={<DashboardHome />} />
                 <Route path="reservations" element={<MyBookings />} />
                 <Route path="reservations/:id" element={<BookingDetail />} />
                 <Route path="reservations/:id/avis" element={<LeaveReview />} />
@@ -172,8 +174,8 @@ export default function App() {
                 <Route path="messages/:conversationId" element={<Messages />} />
                 <Route path="notifications" element={<Notifications />} />
                 <Route path="notifications/:id" element={<NotificationDetail />} />
-                <Route path="profil" element={<LegacyProfileRedirect />} />
-                <Route path="parametres" element={<UserProfile />} />
+                <Route path="profil" element={<UserProfile />} />
+                <Route path="parametres" element={<LegacyProfileRedirect />} />
                 <Route path="mon-profil" element={<MyPublicProfileRedirect />} />
                 {/* D3 - Historique des paiements */}
                 <Route path="paiements" element={<MyPayments />} />
@@ -181,8 +183,6 @@ export default function App() {
                 <Route path="cartes" element={<PaymentMethods />} />
                 {/* C1 - KYC */}
                 <Route path="verification" element={<KycVerification />} />
-                {/* Upload de documents contractuels */}
-                <Route path="documents" element={<MyDocuments />} />
                 {/* C9 - Recherches sauvegardées */}
                 <Route path="alertes" element={<SavedSearches />} />
                 </Route>
@@ -214,6 +214,7 @@ export default function App() {
                 <Route path="signalements" element={<AdminReports />} />
                 <Route path="avis" element={<AdminReviews />} />
                 <Route path="roles" element={<AdminRoles />} />
+                <Route path="kyc" element={<AdminKyc />} />
                 </Route>
               </Route>
 

@@ -24,8 +24,8 @@ const BoatOwnerCard: React.FC<BoatOwnerCardProps> = ({ boat, onContact }) => {
   )
 
   const experienceLabel = owner.sailingExperienceYears != null
-    ? `${owner.sailingExperienceYears} an${owner.sailingExperienceYears > 1 ? 's' : ''} d'expérience en navigation`
-    : 'Propriétaire sur SailingLoc'
+    ? `${owner.sailingExperienceYears} year${owner.sailingExperienceYears > 1 ? 's' : ''} of sailing experience`
+    : 'Owner on SailingLoc'
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
@@ -58,15 +58,15 @@ const BoatOwnerCard: React.FC<BoatOwnerCardProps> = ({ boat, onContact }) => {
           <div className="flex items-center justify-between gap-2">
             <p className="text-xs font-bold uppercase tracking-wide text-[#003366] flex items-center gap-1.5">
               <Anchor size={13} />
-              CV de marin
+              Sailor CV
             </p>
             {owner.sailorCvStatus === 'APPROVED' ? (
               <span className="inline-flex items-center gap-1 text-[10px] font-medium text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5">
                 <ShieldCheck size={11} />
-                Vérifié
+                Verified
               </span>
             ) : (
-              <span className="text-[10px] text-[#8A94A6]">Déclaré par le propriétaire</span>
+              <span className="text-[10px] text-[#8A94A6]">Declared by the owner</span>
             )}
           </div>
 
@@ -80,7 +80,7 @@ const BoatOwnerCard: React.FC<BoatOwnerCardProps> = ({ boat, onContact }) => {
             {owner.sailingQualifications && (
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-[#8A94A6] mb-0.5">
-                  Permis & qualifications
+                  Licenses & qualifications
                 </p>
                 <p className="text-xs text-[#5A6478] whitespace-pre-line line-clamp-2">
                   {owner.sailingQualifications}
@@ -90,7 +90,7 @@ const BoatOwnerCard: React.FC<BoatOwnerCardProps> = ({ boat, onContact }) => {
             {owner.sailingAreas && (
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-[#8A94A6] mb-0.5">
-                  Zones de navigation
+                  Sailing areas
                 </p>
                 <p className="text-xs text-[#5A6478] whitespace-pre-line line-clamp-2">
                   {owner.sailingAreas}
@@ -103,18 +103,18 @@ const BoatOwnerCard: React.FC<BoatOwnerCardProps> = ({ boat, onContact }) => {
             to={`/proprietaires/${boat.ownerId}`}
             className="inline-block text-xs font-medium text-[#2563FF] hover:underline"
           >
-            Voir le profil complet
+            View full profile
           </Link>
         </div>
       )}
 
       <div className="grid grid-cols-2 gap-3 mb-5">
         <div className="bg-[#f8f9fa] rounded-xl px-4 py-3 text-center">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A94A6] mb-1">Avis</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A94A6] mb-1">Reviews</p>
           <p className="text-lg font-bold text-[#003366]">{boat.reviewCount > 0 ? boat.reviewCount + 100 : 152}</p>
         </div>
         <div className="bg-[#f8f9fa] rounded-xl px-4 py-3 text-center">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A94A6] mb-1">Réponse</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A94A6] mb-1">Response</p>
           <p className="text-lg font-bold text-[#003366]">1h</p>
         </div>
       </div>
