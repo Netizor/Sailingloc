@@ -19,7 +19,6 @@ import {
 import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/utils'
 import { useAuthStore } from '../../store/auth.store'
-import { getDefaultDashboardPath } from '../../lib/profilePaths'
 import { getUnreadCount } from '../../api/notifications.api'
 import { getUnreadMessagesCount } from '../../api/messages.api'
 import { MY_PUBLIC_PROFILE_ROUTE, SETTINGS_ROUTE } from '../../lib/profilePaths'

@@ -35,7 +35,7 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
 
   const [form, setForm] = useState<LoginForm>({ email: '', password: '' })
   const [showPassword, setShowPassword] = useState(false)
-  const [rememberMe, setRememberMe] = useState(false)
+  const [rememberMe] = useState(false)
   const [errors, setErrors] = useState<Partial<LoginForm>>({})
   const [globalError, setGlobalError] = useState('')
 

@@ -16,7 +16,7 @@ import {
   deleteNotification,
 } from '../../api/notifications.api'
 import { usePushNotifications } from '../../hooks/usePushNotifications'
-import { useNotificationPrefs, NOTIFICATION_TYPES } from '../../hooks/useNotificationPrefs'
+import { useNotificationPrefs } from '../../hooks/useNotificationPrefs'
 import Button from '../../components/ui/Button'
 import Spinner from '../../components/ui/Spinner'
 
