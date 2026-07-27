@@ -10,7 +10,7 @@ import {
 } from '@stripe/react-stripe-js'
 import {
   Anchor, Camera, Download, Eye, EyeOff, FileCheck, Lock, ShieldAlert,
-  Trash2, Upload, UserCircle, Settings, Shield, ExternalLink, ChevronRight,
+  Trash2, Upload, UserCircle, Shield, ExternalLink, ChevronRight,
   CreditCard, PencilLine,
 } from 'lucide-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'

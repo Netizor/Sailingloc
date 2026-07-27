@@ -7,7 +7,7 @@ import toast from 'react-hot-toast'
 import { useAuthStore } from '../../store/auth.store'
 import { authApi } from '../../api/auth.api'
 import { UserRole } from '../../types'
-import { SETTINGS_ROUTE, MY_PUBLIC_PROFILE_ROUTE, getPublicProfilePath } from '../../lib/profilePaths'
+import { SETTINGS_ROUTE } from '../../lib/profilePaths'
 
 /**
  * Bandeau persistant affiché quand :
@@ -20,7 +20,7 @@ const VerificationBanner: React.FC = () => {
   const { t } = useTranslation()
   const { user } = useAuthStore()
 
-  const [emailDismissed, setEmailDismissed] = useState(false)
+  const [, setEmailDismissed] = useState(false)
   const [phoneDismissed, setPhoneDismissed] = useState(false)
 
   const showEmailBanner = false
