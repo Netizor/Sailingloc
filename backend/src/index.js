@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
+import sitemapRoutes from './routes/sitemap.routes.js'
 
 import authRouter from './routes/auth.routes.js'
 import pushRouter from './routes/push.routes.js'
@@ -31,6 +32,7 @@ const PORT = process.env.PORT || 3000
 
 // ─── Sécurité ──────────────────────────────────────────────
 app.use(helmet())
+app.use('/', sitemapRoutes)
 
 // CORS — n'autoriser que le frontend déclaré en .env
 app.use(cors({
