@@ -21,7 +21,7 @@ const SiteSettingsMenu: React.FC<SiteSettingsMenuProps> = ({ variant = 'header' 
   const currentLang = i18n.language?.startsWith('en') ? 'en' : 'fr'
 
   const switchLanguage = (lang: 'fr' | 'en') => {
-    i18n.changeLanguage(lang)
+    void i18n.changeLanguage(lang)
   }
 
   if (variant === 'mobile') {

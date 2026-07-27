@@ -27,7 +27,7 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
   const navigate = useNavigate()
   const location = useLocation()
   const { setAuth } = useAuthStore()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const from = redirectAfterLogin
     ?? (location.state as { from?: Location })?.from?.pathname
@@ -57,7 +57,7 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
       authApi.checkPasswordHibp(form.password).then(({ compromised, count }) => {
         if (compromised) {
           toast.error(
-            `⚠️ Your password has been compromised (${(count ?? 0).toLocaleString('en-US')} breach${(count ?? 0) > 1 ? 'es' : ''}). Change it now in your profile.`,
+            t('auth.login.hibpWarning', { count: count ?? 0 }),
             { duration: 10000, id: 'hibp-warning' },
           )
         }
@@ -91,28 +91,28 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
   }
 
   const formContent = (
-    <div className={embedded ? 'w-full' : 'w-full max-w-[430px]'}>
+    <div key={i18n.language} className={embedded ? 'w-full' : 'w-full max-w-[430px]'}>
       {!embedded && (
         <Link to="/" className="text-xs text-brand-slate dark:text-gray-400 hover:text-brand-navy dark:hover:text-white transition-colors">
-          ← Back to home
+          ← {t('auth.login.backToHome')}
         </Link>
       )}
 
       <h1 className={embedded ? 'text-2xl sm:text-3xl font-serif font-bold text-brand-navy dark:text-white' : 'mt-8 text-5xl font-serif font-bold text-brand-navy dark:text-white'}>
-        Welcome
+        {t('auth.login.title')}
       </h1>
 
       <p className="mt-2 text-sm text-brand-slate dark:text-gray-400">
-        {embedded ? 'Sign in to your owner space.' : 'Maritime excellence within your reach.'}
+        {embedded ? t('auth.login.subtitleOwner') : t('auth.login.subtitle')}
       </p>
 
       {!embedded && (
         <div className="mt-10 flex gap-8 border-b border-gray-200 dark:border-gray-700">
           <button type="button" className="pb-3 text-sm font-bold border-b-2 border-brand-navy dark:border-brand-blue text-brand-navy dark:text-white">
-            Sign in
+            {t('auth.login.signInTab')}
           </button>
           <Link to="/inscription" className="pb-3 text-sm text-brand-slate dark:text-gray-400 hover:text-brand-blue transition-colors">
-            Create an account
+            {t('auth.login.createAccountTab')}
           </Link>
         </div>
       )}
@@ -126,10 +126,10 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
         )}
 
         <Input
-          label="EMAIL ADDRESS"
+          label={t('auth.login.email')}
           type="email"
           autoComplete="email"
-          placeholder="name@example.com"
+          placeholder={t('auth.login.emailPlaceholder')}
           value={form.email}
           onChange={handleChange('email')}
           error={errors.email}
@@ -137,10 +137,10 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
         />
 
         <Input
-          label="PASSWORD"
+          label={t('auth.login.password')}
           type={showPassword ? 'text' : 'password'}
           autoComplete="current-password"
-          placeholder="••••••••"
+          placeholder={t('auth.login.passwordPlaceholder')}
           value={form.password}
           onChange={handleChange('password')}
           error={errors.password}
@@ -151,29 +151,14 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
 
         <div className="flex justify-end">
           <Link to="/mot-de-passe-oublie" className="text-xs text-brand-blue hover:text-ocean-600 transition-colors">
-            Forgot password?
+            {t('auth.login.forgotPassword')}
           </Link>
         </div>
 
         <Button type="submit" variant="primary" size="lg" fullWidth loading={loginMutation.isPending}>
-          Sign in
+          {t('auth.login.submit')}
         </Button>
       </form>
-
-      {!embedded && (
-        <>
-          <div className="my-8 flex items-center gap-4">
-            <div className="h-px bg-gray-200 dark:bg-gray-700 flex-1" />
-            <span className="text-[10px] text-brand-slate dark:text-gray-500 uppercase">Or continue with</span>
-            <div className="h-px bg-gray-200 dark:bg-gray-700 flex-1" />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <button type="button" className="border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 py-3 text-sm text-brand-navy dark:text-gray-200">Google</button>
-            <button type="button" className="border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 py-3 text-sm text-brand-navy dark:text-gray-200">Facebook</button>
-          </div>
-        </>
-      )}
     </div>
   )
 
@@ -197,15 +182,15 @@ const Login: React.FC<LoginProps> = ({ embedded = false, redirectAfterLogin }) =
           <Ship size={130} className="absolute right-20 top-16 text-white/25" />
           <div className="text-white max-w-md mb-8">
             <p className="text-2xl font-serif font-bold leading-relaxed">
-              "The sea is a space of infinite freedom — we are its guardians for your finest memories."
+              {t('auth.login.quote')}
             </p>
             <p className="mt-6 text-xs font-bold tracking-widest text-white/80">
-              CAPTAIN MARC L, SAILINGLOC EXPERT
+              {t('auth.login.quoteAuthor')}
             </p>
             <p className="mt-6 text-sm">
-              <span className="font-bold">+1,200 Owners</span>
+              <span className="font-bold">{t('auth.login.ownersTrust')}</span>
               <br />
-              trust us every day
+              {t('auth.login.ownersTrustHint')}
             </p>
           </div>
         </section>

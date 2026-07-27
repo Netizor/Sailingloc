@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { Eye, EyeOff, Mail, Lock, User, Phone, AlertCircle, Check } from 'lucide-react'
+import { Eye, EyeOff, Mail, Lock, User, Phone, AlertCircle, Check, Ship } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { authApi } from '../../api/auth.api'
@@ -10,7 +10,6 @@ import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import { cn } from '../../lib/utils'
 import toast from 'react-hot-toast'
-import { Ship } from 'lucide-react'
 
 const LOGIN_HERO_IMAGE = '/login-boat.jpg'
 const LOGO_IMAGE = '/logo.jpeg'
@@ -69,7 +68,7 @@ const Register: React.FC<RegisterProps> = ({
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { setAuth } = useAuthStore()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const roleFromUrl = searchParams.get('role') === 'owner' ? UserRole.OWNER : UserRole.RENTER
   const defaultRole = embedded ? defaultRoleProp : roleFromUrl
@@ -155,22 +154,22 @@ const Register: React.FC<RegisterProps> = ({
   }
 
   const criteriaItems = [
-    { key: 'minLength', label: '12 characters min.' },
-    { key: 'hasUpper', label: 'One uppercase letter' },
-    { key: 'hasLower', label: 'One lowercase letter' },
-    { key: 'hasDigit', label: 'One digit' },
-    { key: 'hasSpecial', label: 'One special character' },
-  ] as { key: keyof PasswordCriteria; label: string }[]
+    { key: 'minLength', labelKey: 'auth.register.criteriaMinLength' },
+    { key: 'hasUpper', labelKey: 'auth.register.criteriaUpper' },
+    { key: 'hasLower', labelKey: 'auth.register.criteriaLower' },
+    { key: 'hasDigit', labelKey: 'auth.register.criteriaDigit' },
+    { key: 'hasSpecial', labelKey: 'auth.register.criteriaSpecial' },
+  ] as { key: keyof PasswordCriteria; labelKey: string }[]
 
   const formContent = (
-    <div className={embedded ? 'w-full' : 'w-full max-w-[620px]'}>
+    <div key={i18n.language} className={embedded ? 'w-full' : 'w-full max-w-[620px]'}>
       {!embedded && (
         <>
           <Link to="/" className="inline-block mb-12">
             <img src={LOGO_IMAGE} alt="SailingLoc" className="h-11 w-auto" />
           </Link>
           <Link to="/" className="text-sm font-medium text-brand-slate dark:text-gray-400 hover:text-brand-navy dark:hover:text-white transition-colors">
-            ← Back to home
+            ← {t('auth.register.backToHome')}
           </Link>
         </>
       )}
@@ -183,29 +182,14 @@ const Register: React.FC<RegisterProps> = ({
         'font-serif font-bold leading-tight text-brand-navy dark:text-white',
         embedded ? 'text-2xl sm:text-3xl' : 'mt-10 text-5xl',
       )}>
-        Create an account
+        {t('auth.register.title')}
       </h1>
 
       <p className="mt-2 text-sm text-brand-slate dark:text-gray-400">
-        {embedded ? 'Sign up as an owner.' : 'Join the SailingLoc community.'}
+        {embedded ? t('auth.register.subtitleOwner') : t('auth.register.subtitle')}
       </p>
 
-      <div className="mt-6 grid grid-cols-2 gap-4">
-        <button type="button" className="h-11 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 font-semibold text-brand-navy dark:text-gray-200 text-sm">
-          Continue with Google
-        </button>
-        <button type="button" className="h-11 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 font-semibold text-brand-navy dark:text-gray-200 text-sm">
-          Continue with Facebook
-        </button>
-      </div>
-
-      <div className="my-7 flex items-center gap-5">
-        <div className="h-px flex-1 bg-gray-200" />
-        <span className="text-xs font-semibold text-gray-400">OR</span>
-        <div className="h-px flex-1 bg-gray-200" />
-      </div>
-
-      <form onSubmit={handleSubmit} noValidate className="space-y-5">
+      <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-5">
         {globalError && (
           <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
             <AlertCircle size={16} className="text-red-500" />
@@ -215,9 +199,9 @@ const Register: React.FC<RegisterProps> = ({
 
         <div className="grid grid-cols-2 gap-5">
           <Input
-            label="First name"
+            label={t('auth.register.firstName')}
             type="text"
-            placeholder="Your first name"
+            placeholder={t('auth.register.firstNamePlaceholder')}
             value={form.firstName}
             onChange={(e) => setField('firstName', e.target.value)}
             error={errors.firstName}
@@ -226,9 +210,9 @@ const Register: React.FC<RegisterProps> = ({
           />
 
           <Input
-            label="Last name"
+            label={t('auth.register.lastName')}
             type="text"
-            placeholder="Your last name"
+            placeholder={t('auth.register.lastNamePlaceholder')}
             value={form.lastName}
             onChange={(e) => setField('lastName', e.target.value)}
             error={errors.lastName}
@@ -238,9 +222,9 @@ const Register: React.FC<RegisterProps> = ({
         </div>
 
         <Input
-          label="Email"
+          label={t('auth.register.email')}
           type="email"
-          placeholder="Your email"
+          placeholder={t('auth.register.emailPlaceholder')}
           value={form.email}
           onChange={(e) => setField('email', e.target.value)}
           error={errors.email}
@@ -249,9 +233,9 @@ const Register: React.FC<RegisterProps> = ({
         />
 
         <Input
-          label="Phone (optional)"
+          label={t('auth.register.phone')}
           type="tel"
-          placeholder="Your phone number"
+          placeholder={t('auth.register.phonePlaceholder')}
           value={form.phone}
           onChange={(e) => setField('phone', e.target.value)}
           leftIcon={<Phone size={16} />}
@@ -259,7 +243,7 @@ const Register: React.FC<RegisterProps> = ({
 
         {!hideRoleToggle && (
           <div>
-            <p className="mb-2 text-sm font-bold text-brand-navy dark:text-white">I am a</p>
+            <p className="mb-2 text-sm font-bold text-brand-navy dark:text-white">{t('auth.register.iWantTo')}</p>
             <div className="grid grid-cols-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800">
               <button
                 type="button"
@@ -271,7 +255,7 @@ const Register: React.FC<RegisterProps> = ({
                     : 'text-brand-slate dark:text-gray-400',
                 )}
               >
-                Renter
+                {t('auth.register.rentBoat')}
               </button>
               <button
                 type="button"
@@ -283,7 +267,7 @@ const Register: React.FC<RegisterProps> = ({
                     : 'text-brand-slate dark:text-gray-400',
                 )}
               >
-                Owner
+                {t('auth.register.listBoat')}
               </button>
             </div>
           </div>
@@ -291,7 +275,7 @@ const Register: React.FC<RegisterProps> = ({
 
         <div className="grid grid-cols-2 gap-5">
           <Input
-            label="Password"
+            label={t('auth.register.password')}
             type={showPassword ? 'text' : 'password'}
             placeholder="••••••••••••"
             value={form.password}
@@ -304,7 +288,7 @@ const Register: React.FC<RegisterProps> = ({
           />
 
           <Input
-            label="Confirm password"
+            label={t('auth.register.confirmPassword')}
             type={showConfirm ? 'text' : 'password'}
             placeholder="••••••••••••"
             value={form.confirmPassword}
@@ -319,11 +303,11 @@ const Register: React.FC<RegisterProps> = ({
 
         <div>
           <p className="mb-3 text-sm font-semibold text-gray-500">
-            Password must contain:
+            {t('auth.register.passwordMustContain')}
           </p>
 
           <div className="flex flex-wrap gap-2">
-            {criteriaItems.map(({ key, label }) => (
+            {criteriaItems.map(({ key, labelKey }) => (
               <span
                 key={key}
                 className={cn(
@@ -333,7 +317,7 @@ const Register: React.FC<RegisterProps> = ({
                     : 'bg-gray-100 dark:bg-gray-700 text-brand-slate dark:text-gray-400',
                 )}
               >
-                {passwordCriteria[key] ? '✓' : '○'} {label}
+                {passwordCriteria[key] ? '✓' : '○'} {t(labelKey)}
               </span>
             ))}
           </div>
@@ -353,13 +337,13 @@ const Register: React.FC<RegisterProps> = ({
             </button>
 
             <span className="text-sm text-brand-slate dark:text-gray-400">
-              I accept the{' '}
+              {t('auth.register.termsText')}{' '}
               <Link to="/cgu" className="font-semibold text-brand-blue hover:text-ocean-600">
-                Terms of Use
+                {t('auth.register.termsLink')}
               </Link>{' '}
-              and the{' '}
+              {t('auth.register.termsAnd')}{' '}
               <Link to="/rgpd" className="font-semibold text-brand-blue hover:text-ocean-600">
-                Privacy Policy.
+                {t('auth.register.privacyLink')}
               </Link>
             </span>
           </label>
@@ -370,15 +354,15 @@ const Register: React.FC<RegisterProps> = ({
         </div>
 
         <Button type="submit" variant="primary" size="lg" fullWidth loading={registerMutation.isPending}>
-          Create my account
+          {t('auth.register.submit')}
         </Button>
       </form>
 
       {!embedded && (
         <p className="mt-7 text-center text-sm text-brand-slate dark:text-gray-400">
-          Already have an account?{' '}
+          {t('auth.register.alreadyMember')}{' '}
           <Link to="/connexion" className="font-bold text-brand-blue hover:text-ocean-600">
-            Sign in
+            {t('auth.register.loginLink')}
           </Link>
         </p>
       )}
@@ -403,26 +387,26 @@ const Register: React.FC<RegisterProps> = ({
           }}
         >
           <Ship
-  size={130}
-  className="absolute right-20 top-16 text-white/25"
-/>
+            size={130}
+            className="absolute right-20 top-16 text-white/25"
+          />
           <div className="max-w-xl">
             <h2 className="text-2xl font-serif font-bold leading-tight">
-              The sea is a space of infinite freedom,
+              {t('auth.register.quote')}
               <br />
-              we are its guardians for your finest memories.
+              {t('auth.register.quoteLine2')}
             </h2>
 
             <p className="mt-6 text-xs font-bold tracking-widest">
-              CAPTAIN MARC L, SAILINGLOC EXPERT
+              {t('auth.register.quoteAuthor')}
             </p>
 
             <div className="my-10 h-px w-16 bg-white/60" />
 
             <p className="mt-6 text-sm">
-              <span className="font-bold">+1,200 Owners</span>
+              <span className="font-bold">{t('auth.register.ownersTrust')}</span>
               <br />
-              Trust us every day
+              {t('auth.register.ownersTrustHint')}
             </p>
           </div>
         </section>

@@ -31,6 +31,9 @@ i18n
     lng: initialLang,
     fallbackLng: 'fr',
     interpolation: { escapeValue: false },
+    // Traductions déjà bundlées : pas de Suspense i18n (évite un contenu figé
+    // sur les pages lazy comme Contact au changement de langue).
+    react: { useSuspense: false },
   })
 
 document.documentElement.lang = initialLang

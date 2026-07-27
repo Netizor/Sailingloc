@@ -28,7 +28,7 @@ const inputClass =
   'w-full rounded-xl bg-ocean-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 px-4 py-4 text-sm text-brand-navy dark:text-gray-100 outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent placeholder:text-brand-muted dark:placeholder:text-gray-500'
 
 const Contact: React.FC = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   usePageTitle(t('contactPage.pageTitle'))
 
   const [form, setForm] = useState({
@@ -73,7 +73,10 @@ const Contact: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 text-brand-navy dark:text-gray-100">
+    <div
+      key={i18n.language}
+      className="min-h-screen bg-white dark:bg-gray-900 text-brand-navy dark:text-gray-100"
+    >
       <section
         className="relative min-h-[430px] bg-cover bg-center flex items-center px-4 sm:px-6 lg:px-8 pt-24 pb-20"
         style={{
