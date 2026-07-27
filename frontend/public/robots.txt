@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dsp-dev-o24a-g4.cloud/sitemap.xml
