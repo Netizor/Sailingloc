@@ -57,9 +57,9 @@ const VerifyEmail: React.FC = () => {
           <div className="bg-[#003366] px-8 py-8 text-center">
             <Link to="/" className="inline-flex flex-col items-center gap-2 mb-3">
               <img
-                src="/logo.jpeg"
+                src="/logo-dark.png"
                 alt="SailingLoc"
-                className="h-12 w-auto max-w-[160px] object-contain rounded-lg bg-white/10 p-1"
+                className="h-12 w-auto max-w-[160px] object-contain"
               />
               <span className="text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
                 {t('auth.verifyEmail.heading')}

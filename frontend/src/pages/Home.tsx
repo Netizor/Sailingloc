@@ -264,14 +264,14 @@ const Home: React.FC = () => {
       <section className="relative min-h-[calc(100vh-72px)] flex flex-col" aria-label={t('home.heroAria')}>
         <div className="absolute inset-0 overflow-hidden">
           <img src={IMAGES.hero} alt={t('home.heroImageAlt')} className="w-full h-full object-cover" loading="eager" />
-          <div className="absolute inset-0 bg-black/60" />
+          <div className="absolute inset-0 media-scrim" aria-hidden />
         </div>
 
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8 pb-20">
-          <h1 className="font-serif text-4xl sm:text-5xl lg:text-[3.25rem] font-bold italic text-white leading-[1.2] mb-5 max-w-3xl">
+          <h1 className="font-serif text-4xl sm:text-5xl lg:text-[3.25rem] font-bold italic text-on-media leading-[1.2] mb-5 max-w-3xl">
             {t('home.heroTitle')}
           </h1>
-          <p className="text-white/90 text-base sm:text-lg max-w-2xl mb-8 sm:mb-10 leading-relaxed">
+          <p className="text-on-media-muted text-base sm:text-lg max-w-2xl mb-8 sm:mb-10 leading-relaxed font-medium">
             {t('home.heroSubtitle')}
           </p>
           <div className="w-full max-w-5xl -mb-14 sm:-mb-16">
@@ -288,7 +288,7 @@ const Home: React.FC = () => {
             <h2 id="how-it-works-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy">
               {t('home.howTitle')}
             </h2>
-            <p className="mt-4 text-brand-slate text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+            <p className="mt-4 text-brand-slate dark:text-gray-100 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
               {t('home.howSubtitle')}
             </p>
           </div>
@@ -298,7 +298,7 @@ const Home: React.FC = () => {
               <div key={step.title} className="flex flex-col items-center text-center px-4">
                 <div className="text-brand-blue mb-6">{step.icon}</div>
                 <h3 className="text-base font-bold text-brand-navy mb-3">{step.title}</h3>
-                <p className="text-brand-slate text-sm leading-relaxed max-w-[260px]">{step.desc}</p>
+                <p className="text-brand-slate dark:text-gray-100 text-sm leading-relaxed max-w-[260px]">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -315,7 +315,7 @@ const Home: React.FC = () => {
               <h2 id="featured-boats-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy mb-2">
                 {t('home.popularBoats')}
               </h2>
-              <p className="text-brand-slate text-sm">{t('home.popularSubtitle')}</p>
+              <p className="text-brand-slate dark:text-gray-100 text-sm">{t('home.popularSubtitle')}</p>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
@@ -358,7 +358,7 @@ const Home: React.FC = () => {
             <h2 id="destinations-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy mb-2">
               {t('home.destinationsTitle')}
             </h2>
-            <p className="text-brand-slate text-sm">{t('home.destinationsSubtitle')}</p>
+            <p className="text-brand-slate dark:text-gray-100 text-sm">{t('home.destinationsSubtitle')}</p>
           </div>
 
           <div className="grid grid-cols-12 auto-rows-[200px] sm:auto-rows-[220px] gap-4">
@@ -428,12 +428,12 @@ const Home: React.FC = () => {
         <div className="max-w-6xl mx-auto">
           <div className="relative rounded-3xl overflow-hidden min-h-[320px] flex items-center justify-center">
             <img src={IMAGES.cta} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
-            <div className="absolute inset-0 bg-black/65" />
+            <div className="absolute inset-0 media-scrim" aria-hidden />
             <div className="relative z-10 text-center px-6 py-16 max-w-2xl">
-              <h2 id="cta-title" className="font-serif text-3xl sm:text-4xl font-bold text-white mb-4">
+              <h2 id="cta-title" className="font-serif text-3xl sm:text-4xl font-bold text-on-media mb-4">
                 {t('home.ctaTitle')}
               </h2>
-              <p className="text-white/85 text-sm sm:text-base mb-10 leading-relaxed">
+              <p className="text-on-media-muted text-sm sm:text-base mb-10 leading-relaxed font-medium">
                 {t('home.ctaSubtitle')}
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

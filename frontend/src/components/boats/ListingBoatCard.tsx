@@ -82,11 +82,11 @@ const ListingBoatCard: React.FC<ListingBoatCardProps> = ({ boat, className }) =>
             aria-pressed={isCompared}
             disabled={!isCompared && !canAddMore}
             className={cn(
-              'absolute bottom-3 left-3 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded transition-all duration-150 z-10',
-              'focus:outline-none focus:ring-2 focus:ring-brand-blue',
+              'absolute bottom-3 left-3 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide px-2.5 py-1.5 rounded-md transition-all duration-150 z-10',
+              'focus:outline-none focus:ring-2 focus:ring-brand-blue border',
               isCompared
-                ? 'bg-brand-blue text-white shadow-md'
-                : 'bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-brand-navy dark:text-white hover:bg-white shadow-sm',
+                ? 'bg-brand-blue text-white border-brand-blue shadow-md'
+                : 'bg-white dark:bg-gray-900 border-gray-300 dark:border-white text-brand-navy dark:text-white shadow-md',
               !isCompared && !canAddMore && 'opacity-40 cursor-not-allowed',
             )}
           >
@@ -108,11 +108,11 @@ const ListingBoatCard: React.FC<ListingBoatCardProps> = ({ boat, className }) =>
             </h3>
             <div className="text-right flex-shrink-0">
               <span className="text-base font-bold text-brand-navy dark:text-white">{formatDailyPrice(boat.dailyRate)}</span>
-              <span className="text-xs text-brand-slate dark:text-gray-400"> {t('search.perDay')}</span>
+              <span className="text-xs text-brand-slate dark:text-gray-200"> {t('search.perDay')}</span>
             </div>
           </div>
 
-          <p className="text-xs text-brand-muted dark:text-gray-400 mb-3">
+          <p className="text-xs text-brand-muted dark:text-gray-200 mb-3 font-medium">
             {typeLabel}{INLINE_SEP}{boat.capacity} {t('search.persons')}{INLINE_SEP}{location}
           </p>
 

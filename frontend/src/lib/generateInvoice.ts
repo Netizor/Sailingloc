@@ -55,7 +55,7 @@ export async function downloadInvoicePdf(
   const depositAmount = safeNumber((booking as any).depositAmount, safeNumber((boat as any)?.depositAmount, 0))
   const totalAmount = safeNumber((booking as any).totalAmount, subtotal + platformFee)
 
-  const logoUrl = `${window.location.origin}/logo.jpeg`
+  const logoUrl = `${window.location.origin}/logo.png`
 
   const html = `
   <div id="invoice-root">

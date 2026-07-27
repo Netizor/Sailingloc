@@ -10,10 +10,12 @@ export default {
       colors: {
         'brand-navy': '#003366',
         'brand-blue': '#2563FF',
-        'brand-slate': '#334155',
+        /* slate plus sombre : meilleur contraste WCAG sur fond clair (~7:1) */
+        'brand-slate': '#1e293b',
         'brand-teal': '#006875',
         'brand-dark': '#0A1120',
-        'brand-muted': '#8A94A6',
+        /* muted relevé : ~4.6:1 sur blanc (AA textes secondaires) */
+        'brand-muted': '#64748b',
         ocean: {
           50: '#eef3fb',
           100: '#d6e4f5',

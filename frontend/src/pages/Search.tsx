@@ -308,53 +308,30 @@ const Search: React.FC = () => {
 
 
 
-            <div className="pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-
-              <div className="flex items-center gap-2 overflow-x-auto pb-1">
-
+            <div className="pb-5 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+              <div className="flex flex-wrap items-center gap-2 min-w-0">
                 {TYPE_FILTERS.map((filter) => {
-
                   const isActive = typeFilter === filter.id
-
                   return (
-
                     <button
-
                       key={filter.id}
-
                       type="button"
-
                       onClick={() => handleTypeFilter(filter.id)}
-
                       className={
-
                         isActive
-
                           ? 'sl-btn-filled flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap shadow-sm'
-
                           : 'sl-btn-outline flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap'
-
                       }
-
                     >
-
                       <filter.Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-[#2563FF]'}`} />
-
                       {filter.label}
-
                     </button>
-
                   )
-
                 })}
-
               </div>
 
-
-
               <div className="flex items-center gap-2 flex-shrink-0">
-
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#8A94A6]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-brand-muted dark:text-gray-200">
                   {t('search.sortByLabel')}
                 </span>
 

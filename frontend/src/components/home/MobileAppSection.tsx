@@ -33,7 +33,7 @@ function PhoneMockup({ t }: { t: (key: string) => string }) {
 
               <div className="px-4 pt-8 pb-3 bg-white border-b border-gray-100">
                 <img
-                  src="/logo.jpeg"
+                  src="/logo.png"
                   alt="SailingLoc"
                   className="h-8 w-auto max-w-[148px] object-contain object-left mb-2.5"
                 />
@@ -136,16 +136,16 @@ const MobileAppSection: React.FC = () => {
         <div className="rounded-[2rem] border border-ocean-200/60 bg-white p-8 sm:p-10 lg:p-12 shadow-[0_12px_48px_rgba(0,51,102,0.08)] ring-1 ring-brand-navy/5">
           <div className="flex flex-col lg:flex-row lg:items-center gap-12 lg:gap-14">
             <div className="lg:w-[50%] order-2 lg:order-1">
-              <p className="text-brand-blue text-sm font-medium mb-3">
+              <p className="text-brand-blue dark:text-blue-200 text-sm font-semibold mb-3">
                 {t('home.mobileAppLabel')}
               </p>
               <h2
                 id="mobile-app-title"
-                className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy leading-tight mb-4"
+                className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy dark:text-white leading-tight mb-4"
               >
                 {t('home.mobileAppTitle')}
               </h2>
-              <p className="text-brand-slate text-sm sm:text-base leading-relaxed mb-8 max-w-md">
+              <p className="text-brand-slate dark:text-gray-100 text-sm sm:text-base leading-relaxed mb-8 max-w-md">
                 {t('home.mobileAppSubtitle')}
               </p>
 
@@ -153,9 +153,9 @@ const MobileAppSection: React.FC = () => {
                 {features.map(({ icon: Icon, title }) => (
                   <span
                     key={title}
-                    className="inline-flex items-center gap-2 rounded-full bg-white border border-ocean-100 px-4 py-2 text-xs font-medium text-brand-navy shadow-sm"
+                    className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-gray-800 border border-ocean-100 dark:border-gray-500 px-4 py-2 text-xs font-semibold text-brand-navy dark:text-white shadow-sm"
                   >
-                    <Icon size={14} className="text-brand-blue flex-shrink-0" />
+                    <Icon size={14} className="text-brand-blue dark:text-blue-300 flex-shrink-0" />
                     {title}
                   </span>
                 ))}
@@ -163,16 +163,16 @@ const MobileAppSection: React.FC = () => {
 
               <StoreBadges className="mb-8" />
 
-              <div className="flex items-start gap-3 rounded-xl border border-ocean-100 bg-ocean-50/50 px-5 py-4 max-w-md">
-                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-brand-blue/10 text-brand-blue">
+              <div className="flex items-start gap-3 rounded-xl border border-ocean-100 dark:border-gray-500 bg-ocean-50/50 dark:bg-gray-800 px-5 py-4 max-w-md">
+                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-brand-blue/10 dark:bg-blue-500/20 text-brand-blue dark:text-blue-300">
                   <Ship size={18} />
                 </span>
                 <div>
-                  <p className="text-sm font-semibold text-brand-navy mb-1">{t('home.mobileAppPwaTitle')}</p>
-                  <p className="text-xs text-brand-slate leading-relaxed mb-2">{t('home.mobileAppPwaDesc')}</p>
+                  <p className="text-sm font-semibold text-brand-navy dark:text-white mb-1">{t('home.mobileAppPwaTitle')}</p>
+                  <p className="text-xs text-brand-slate dark:text-gray-200 leading-relaxed mb-2">{t('home.mobileAppPwaDesc')}</p>
                   <Link
                     to="/bateaux"
-                    className="inline-flex text-xs font-semibold text-brand-blue hover:text-brand-navy transition-colors"
+                    className="inline-flex text-xs font-semibold text-brand-blue dark:text-blue-300 hover:underline transition-colors"
                   >
                     {t('home.mobileAppPwaAction')} →
                   </Link>

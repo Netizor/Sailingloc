@@ -61,7 +61,7 @@ function SectionHeading({ label, title, subtitle }: { label: string; title: stri
     <div className="text-center max-w-2xl mx-auto mb-12 lg:mb-14">
       <p className="text-brand-blue text-sm font-medium mb-3">{label}</p>
       <h2 className="text-3xl lg:text-4xl font-serif font-bold text-brand-navy dark:text-white">{title}</h2>
-      {subtitle && <p className="mt-4 text-brand-slate dark:text-gray-400 leading-relaxed">{subtitle}</p>}
+      {subtitle && <p className="mt-4 text-brand-slate dark:text-gray-200 leading-relaxed">{subtitle}</p>}
     </div>
   )
 }
@@ -114,8 +114,8 @@ const APropos: React.FC = () => {
           <h2 className="text-2xl sm:text-3xl font-serif font-bold text-brand-navy dark:text-white mb-6">
             {t('aboutPage.missionTitle')}
           </h2>
-          <p className="text-brand-slate dark:text-gray-400 leading-relaxed mb-4">{t('aboutPage.missionP1')}</p>
-          <p className="text-brand-slate dark:text-gray-400 leading-relaxed">{t('aboutPage.missionP2')}</p>
+          <p className="text-brand-slate dark:text-gray-200 leading-relaxed mb-4">{t('aboutPage.missionP1')}</p>
+          <p className="text-brand-slate dark:text-gray-200 leading-relaxed">{t('aboutPage.missionP2')}</p>
         </div>
       </section>
 
@@ -126,7 +126,7 @@ const APropos: React.FC = () => {
             {STATS.map((stat) => (
               <div key={stat.labelKey} className="text-center">
                 <p className="text-2xl sm:text-3xl font-bold text-brand-navy dark:text-white">{stat.value}</p>
-                <p className="text-sm text-brand-slate dark:text-gray-400 mt-1">{t(stat.labelKey)}</p>
+                <p className="text-sm text-brand-slate dark:text-gray-200 mt-1">{t(stat.labelKey)}</p>
               </div>
             ))}
           </div>
@@ -151,7 +151,7 @@ const APropos: React.FC = () => {
                   <Icon size={22} />
                 </div>
                 <h3 className="font-semibold mb-2">{t(titleKey)}</h3>
-                <p className="text-sm text-brand-slate dark:text-gray-400 leading-relaxed">{t(descKey)}</p>
+                <p className="text-sm text-brand-slate dark:text-gray-200 leading-relaxed">{t(descKey)}</p>
               </div>
             ))}
           </div>
@@ -176,7 +176,7 @@ const APropos: React.FC = () => {
                   {String(index + 1).padStart(2, '0')}
                 </span>
                 <h3 className="font-semibold mt-2 mb-2">{t(`aboutPage.steps.${key}.title`)}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                <p className="text-sm text-gray-500 dark:text-gray-200 leading-relaxed">
                   {t(`aboutPage.steps.${key}.desc`)}
                 </p>
               </div>
@@ -204,7 +204,7 @@ const APropos: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1.5">{t(titleKey)}</h3>
-                  <p className="text-sm text-brand-slate dark:text-gray-400 leading-relaxed">{t(descKey)}</p>
+                  <p className="text-sm text-brand-slate dark:text-gray-200 leading-relaxed">{t(descKey)}</p>
                 </div>
               </div>
             ))}
@@ -240,7 +240,7 @@ const APropos: React.FC = () => {
                     </span>
                   )}
                   <h3 className="text-xl font-serif font-bold">{t(`aboutPage.audience.${key}.name`)}</h3>
-                  <p className={cn('text-sm mt-1 mb-6', isRenter ? 'text-white/70' : 'text-brand-slate dark:text-gray-400')}>
+                  <p className={cn('text-sm mt-1 mb-6', isRenter ? 'text-white/90' : 'text-brand-slate dark:text-gray-200')}>
                     {t(`aboutPage.audience.${key}.tagline`)}
                   </p>
                   <ul className="space-y-3 flex-1">
@@ -277,7 +277,7 @@ const APropos: React.FC = () => {
             <p className="italic font-serif text-2xl sm:text-3xl leading-snug">
               &ldquo;{t('aboutPage.quote')}&rdquo;
             </p>
-            <p className="mt-6 text-brand-slate dark:text-gray-400 leading-relaxed">{t('aboutPage.quoteBody')}</p>
+            <p className="mt-6 text-brand-slate dark:text-gray-200 leading-relaxed">{t('aboutPage.quoteBody')}</p>
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
               {BADGE_ITEMS.map(({ icon: Icon, key }) => (
                 <div
@@ -349,7 +349,7 @@ const APropos: React.FC = () => {
                     <ChevronDown size={18} className={cn('shrink-0 text-gray-400 transition-transform', isOpen && 'rotate-180')} />
                   </button>
                   {isOpen && (
-                    <div className="px-6 pb-5 text-sm text-brand-slate dark:text-gray-400 leading-relaxed border-t border-gray-100 dark:border-gray-700 pt-4">
+                    <div className="px-6 pb-5 text-sm text-brand-slate dark:text-gray-200 leading-relaxed border-t border-gray-100 dark:border-gray-700 pt-4">
                       {t(`aboutPage.faq.${key}.a`)}
                     </div>
                   )}

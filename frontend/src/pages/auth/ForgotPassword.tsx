@@ -6,8 +6,8 @@ import { useTranslation } from 'react-i18next'
 import { authApi } from '../../api/auth.api'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
+import BrandLogo from '../../components/ui/BrandLogo'
 const loginBoat = '/login-boat.jpg'
-const logo = '/logo.jpeg'
 
 const ForgotPassword: React.FC = () => {
   const { t } = useTranslation()
@@ -52,7 +52,7 @@ const ForgotPassword: React.FC = () => {
         <section className="flex items-center justify-center bg-[#f8f7ff] px-8 py-12 lg:px-20">
           <div className="w-full max-w-[520px]">
             <Link to="/" className="inline-block mb-20">
-              <img src={logo} alt="SailingLoc" className="h-10 w-auto" />
+              <BrandLogo className="h-10 w-auto" />
             </Link>
 
             <Link

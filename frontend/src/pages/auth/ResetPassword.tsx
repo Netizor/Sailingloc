@@ -7,8 +7,8 @@ import toast from 'react-hot-toast'
 import { authApi } from '../../api/auth.api'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
+import BrandLogo from '../../components/ui/BrandLogo'
 const loginBoat = '/login-boat.jpg'
-const logo = '/logo.jpeg'
 
 interface ResetForm {
   password: string
@@ -94,7 +94,7 @@ const ResetPassword: React.FC = () => {
         <section className="flex items-center justify-center px-8 py-12 lg:px-20">
           <div className="w-full max-w-[460px]">
             <Link to="/" className="inline-block mb-20">
-              <img src={logo} alt="SailingLoc" className="h-10 w-auto" />
+              <BrandLogo className="h-10 w-auto" />
             </Link>
 
             <h1 className="text-5xl font-serif font-bold leading-tight text-[#071d49]">

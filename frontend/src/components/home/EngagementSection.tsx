@@ -23,7 +23,7 @@ const EngagementSection: React.FC = () => {
           <div className="flex flex-col lg:flex-row lg:items-center gap-12 lg:gap-16">
             {/* Colonne gauche - texte */}
             <div className="lg:w-[44%] flex flex-col justify-center">
-              <p className="text-brand-blue text-[11px] font-bold uppercase tracking-[0.25em] mb-6">
+              <p className="text-blue-300 text-[11px] font-bold uppercase tracking-[0.25em] mb-6">
                 {t('home.featuresLabel')}
               </p>
 
@@ -38,8 +38,8 @@ const EngagementSection: React.FC = () => {
                 {features.map(({ icon: Icon, title, desc }) => (
                   <li key={title} className="flex items-start gap-4">
                     <span
-                      className="h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: '#101D30', color: '#2563FF' }}
+                      className="h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 border border-blue-400/40"
+                      style={{ backgroundColor: '#101D30', color: '#93C5FD' }}
                     >
                       <Icon size={20} strokeWidth={1.75} />
                     </span>
@@ -47,7 +47,7 @@ const EngagementSection: React.FC = () => {
                       <p className="text-white font-semibold text-[15px] mb-1.5 leading-snug">
                         {title}
                       </p>
-                      <p className="text-[#94A3B8] text-sm leading-relaxed">
+                      <p className="text-slate-300 text-sm leading-relaxed">
                         {desc}
                       </p>
                     </div>
@@ -72,7 +72,7 @@ const EngagementSection: React.FC = () => {
                 <span className="font-serif text-3xl font-bold text-white leading-none">
                   {t('home.milesStat')}
                 </span>
-                <span className="text-[9px] font-semibold text-white/80 uppercase tracking-[0.12em] leading-[1.4] max-w-[72px]">
+                <span className="text-[9px] font-semibold text-white uppercase tracking-[0.12em] leading-[1.4] max-w-[72px]">
                   {t('home.milesStatLabel')}
                 </span>
               </div>

@@ -8,11 +8,11 @@ import { useAuthStore } from '../../store/auth.store'
 import { UserRole } from '../../types'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
+import BrandLogo from '../../components/ui/BrandLogo'
 import { cn } from '../../lib/utils'
 import toast from 'react-hot-toast'
 
 const LOGIN_HERO_IMAGE = '/login-boat.jpg'
-const LOGO_IMAGE = '/logo.jpeg'
 type RegistrationRole = UserRole.RENTER | UserRole.OWNER
 
 interface RegisterForm {
@@ -166,7 +166,7 @@ const Register: React.FC<RegisterProps> = ({
       {!embedded && (
         <>
           <Link to="/" className="inline-block mb-12">
-            <img src={LOGO_IMAGE} alt="SailingLoc" className="h-11 w-auto" />
+            <BrandLogo className="h-11 w-auto" />
           </Link>
           <Link to="/" className="text-sm font-medium text-brand-slate dark:text-gray-400 hover:text-brand-navy dark:hover:text-white transition-colors">
             ← {t('auth.register.backToHome')}
@@ -175,7 +175,7 @@ const Register: React.FC<RegisterProps> = ({
       )}
 
       {embedded && (
-        <img src={LOGO_IMAGE} alt="SailingLoc" className="h-9 w-auto mb-6" />
+        <BrandLogo className="h-9 w-auto mb-6" />
       )}
 
       <h1 className={cn(

@@ -52,26 +52,26 @@ const FeaturedBoatCard: React.FC<FeaturedBoatCardProps> = ({ boat, image, badge,
               {boat.title}
             </h3>
             <div className="text-right flex-shrink-0">
-              <p className="text-[10px] uppercase tracking-wide text-brand-muted dark:text-gray-400 mb-0.5">À partir de</p>
+              <p className="text-[10px] uppercase tracking-wide text-brand-muted dark:text-gray-200 mb-0.5 font-semibold">À partir de</p>
               <p className="text-brand-navy dark:text-white leading-none">
                 <span className="text-lg font-bold">{formatPrice(boat.dailyRate)}</span>
-                <span className="text-xs text-brand-slate dark:text-gray-400"> /jour</span>
+                <span className="text-xs text-brand-slate dark:text-gray-200"> /jour</span>
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-1 text-brand-slate dark:text-gray-400 text-sm mb-5">
-            <MapPin size={14} className="flex-shrink-0 text-brand-muted" />
+          <div className="flex items-center gap-1 text-brand-slate dark:text-gray-100 text-sm mb-5">
+            <MapPin size={14} className="flex-shrink-0 text-brand-blue dark:text-blue-300" />
             <span className="truncate">{location}</span>
           </div>
 
-          <div className="flex items-center gap-4 text-xs text-brand-slate dark:text-gray-400">
+          <div className="flex items-center gap-4 text-xs text-brand-slate dark:text-gray-100 font-medium">
             <span className="flex items-center gap-1.5">
-              <Users size={14} className="text-brand-muted" />
+              <Users size={14} className="text-brand-blue dark:text-blue-300" />
               {boat.capacity} pers.
             </span>
             <span className="flex items-center gap-1.5">
-              <BedDouble size={14} className="text-brand-muted" />
+              <BedDouble size={14} className="text-brand-blue dark:text-blue-300" />
               {boat.cabins} cabines
             </span>
           </div>

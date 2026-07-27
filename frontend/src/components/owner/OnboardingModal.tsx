@@ -94,7 +94,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ onClose }) => {
         <div className="mb-6">
           {showLogo ? (
             <img
-              src="/logo.jpeg"
+              src="/logo.png"
               alt="SailingLoc"
               className="h-12 w-auto max-w-[220px] object-contain"
             />

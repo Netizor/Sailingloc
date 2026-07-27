@@ -24,6 +24,7 @@ import { getUnreadMessagesCount } from '../../api/messages.api'
 import { MY_PUBLIC_PROFILE_ROUTE, SETTINGS_ROUTE } from '../../lib/profilePaths'
 import NotificationPanel from '../notifications/NotificationPanel'
 import SiteSettingsMenu from './SiteSettingsMenu'
+import BrandLogo from '../ui/BrandLogo'
 
 const Header: React.FC = () => {
   const navigate = useNavigate()
@@ -99,8 +100,8 @@ const Header: React.FC = () => {
     cn(
       'inline-flex items-center h-full px-2 xl:px-3 text-xs font-semibold uppercase tracking-[0.08em] whitespace-nowrap border-b-[3px] transition-colors',
       isActive(to)
-        ? 'text-[#2563FF] border-[#2563FF] font-bold dark:text-blue-400 dark:border-blue-400'
-        : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-[#2563FF] dark:hover:text-blue-400'
+        ? 'text-brand-blue border-brand-blue font-bold dark:text-blue-300 dark:border-blue-300'
+        : 'text-gray-700 dark:text-gray-200 border-transparent hover:text-brand-blue dark:hover:text-blue-300'
     )
 
   return (
@@ -109,11 +110,7 @@ const Header: React.FC = () => {
         <div className="flex items-stretch justify-between h-[72px] gap-3 lg:gap-4 min-w-0">
           {/* Logo */}
           <Link to="/" className="flex-shrink-0 self-center focus:outline-none focus:ring-2 focus:ring-brand-blue rounded-lg">
-            <img
-              src="/logo.jpeg"
-              alt="SailingLoc"
-              className="h-9 sm:h-10 lg:h-11 w-auto max-w-[140px] lg:max-w-[180px] object-contain"
-            />
+            <BrandLogo className="h-9 sm:h-10 lg:h-11 w-auto max-w-[140px] lg:max-w-[180px] object-contain" />
           </Link>
 
           {/* Nav desktop - reculée vers le logo pour libérer la droite */}
@@ -135,7 +132,7 @@ const Header: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/connexion')}
-                  className="px-3 xl:px-4 py-2 text-xs xl:text-sm font-semibold text-[#2563FF] dark:text-blue-400 bg-white dark:bg-gray-800 border-2 border-[#2563FF] dark:border-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap"
+                  className="px-3 xl:px-4 py-2 text-xs xl:text-sm font-semibold text-brand-blue dark:text-blue-300 bg-white dark:bg-gray-800 border-2 border-brand-blue dark:border-blue-300 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap"
                 >
                   {t('nav.login')}
                 </button>

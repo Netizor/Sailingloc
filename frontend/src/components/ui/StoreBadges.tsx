@@ -35,22 +35,22 @@ const StoreBadges: React.FC<StoreBadgesProps> = ({ size = 'md', className = '' }
   return (
     <div className={`flex flex-col sm:flex-row flex-wrap gap-2.5 ${className}`}>
       <div
-        className={`inline-flex items-center gap-2.5 rounded-xl bg-black text-white ${pad} ${minW} shadow-sm cursor-default`}
+        className={`inline-flex items-center gap-2.5 rounded-xl bg-black text-white border-2 border-white/40 dark:border-gray-400 ${pad} ${minW} shadow-sm cursor-default`}
         aria-label={t('home.mobileAppStoreApple')}
       >
         <AppleIcon className={compact ? 'h-6 w-6' : 'h-7 w-7 flex-shrink-0'} />
         <div className="text-left leading-tight">
-          <p className={`${compact ? 'text-[9px]' : 'text-[10px]'} text-white/70`}>{t('home.mobileAppComingSoon')}</p>
+          <p className={`${compact ? 'text-[9px]' : 'text-[10px]'} text-white/90`}>{t('home.mobileAppComingSoon')}</p>
           <p className={`${compact ? 'text-xs' : 'text-sm'} font-semibold`}>App Store</p>
         </div>
       </div>
       <div
-        className={`inline-flex items-center gap-2.5 rounded-xl bg-[#f8f9fa] dark:bg-gray-800 text-brand-navy dark:text-gray-100 border border-gray-200 dark:border-gray-600 ${pad} ${minW} shadow-sm cursor-default`}
+        className={`inline-flex items-center gap-2.5 rounded-xl bg-[#f8f9fa] dark:bg-gray-700 text-brand-navy dark:text-white border-2 border-gray-300 dark:border-gray-400 ${pad} ${minW} shadow-sm cursor-default`}
         aria-label={t('home.mobileAppStoreGoogle')}
       >
         <GooglePlayIcon size={iconSize} />
         <div className="text-left leading-tight">
-          <p className={`${compact ? 'text-[9px]' : 'text-[10px]'} text-brand-muted dark:text-gray-400`}>{t('home.mobileAppComingSoon')}</p>
+          <p className={`${compact ? 'text-[9px]' : 'text-[10px]'} text-brand-muted dark:text-gray-200`}>{t('home.mobileAppComingSoon')}</p>
           <p className={`${compact ? 'text-xs' : 'text-sm'} font-semibold`}>Google Play</p>
         </div>
       </div>

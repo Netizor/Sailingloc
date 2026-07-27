@@ -44,21 +44,21 @@ const PageHero: React.FC<PageHeroProps> = ({
             aria-hidden
             className="absolute inset-0 w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/80 via-brand-navy/65 to-brand-navy/85" />
+          <div className="absolute inset-0 media-scrim" aria-hidden />
         </>
       )}
 
       <div className="relative z-10 w-full max-w-3xl mx-auto">
         <span
-          className={`inline-flex items-center gap-2 bg-white/10 border border-white/20 text-sm font-medium px-4 py-1.5 rounded-full backdrop-blur-sm ${
+          className={`inline-flex items-center gap-2 bg-white/15 border border-white/30 text-sm font-semibold px-4 py-1.5 rounded-full backdrop-blur-sm text-on-media ${
             isOcean ? 'mb-6' : 'mb-4'
           }`}
         >
-          <Icon size={15} />
+          <Icon size={15} aria-hidden />
           {badge}
         </span>
         <h1
-          className={`font-bold ${
+          className={`font-bold text-on-media ${
             isOcean
               ? 'text-4xl sm:text-5xl tracking-tight mb-4'
               : 'text-3xl sm:text-4xl mb-2'
@@ -66,7 +66,7 @@ const PageHero: React.FC<PageHeroProps> = ({
         >
           {title}
         </h1>
-        <p className={isOcean ? 'text-lg text-white/85 max-w-xl mx-auto' : 'text-gray-400 dark:text-gray-300 text-sm'}>
+        <p className={isOcean ? 'text-lg text-on-media-muted max-w-xl mx-auto font-medium' : 'text-gray-200 text-sm font-medium'}>
           {subtitle}
         </p>
         {children}
