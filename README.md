@@ -138,27 +138,22 @@ sailingloc/
 
 | Technologie | Rôle |
 |---|---|
-| Symfony 7.2 | Framework PHP |
-| PHP 8.3 | Langage |
-| Doctrine ORM | ORM + Migrations |
-| MySQL 8.0 | Base de données |
-| LexikJWTAuthenticationBundle | Auth JWT RSA 4096 bits |
-| NelmioCorsBundle | CORS |
-| NelmioApiDocBundle | Documentation OpenAPI 3.0 |
-| Stripe PHP SDK | Paiements + Connect + Webhooks |
-| Cloudinary (cURL) | Stockage médias |
-| Resend (cURL) | Emails transactionnels |
-| Symfony Rate Limiter | Protection anti-abus |
+| Node.js 20 (ESM) | Runtime |
+| Express 4 | Framework HTTP |
+| Supabase (PostgreSQL) | Base de données + stockage |
+| JWT (custom) | Auth — access 15 min / refresh 7 jours |
+| Stripe Node SDK | Paiements + webhooks |
+| Nodemailer / Resend | Emails transactionnels |
+| express-rate-limit | Protection anti-abus |
+| Swagger UI | Documentation API interactive |
 
 ---
 
 ## Prérequis
 
-- **Node.js 18+** et **npm 9+**
-- **PHP 8.3** avec extensions : `pdo_mysql`, `openssl`, `ctype`, `iconv`, `curl`
-- **Composer 2+**
-- **Symfony CLI** (recommandé pour le serveur de développement)
-- **MySQL 8.0+**
+- **Node.js 20+** et **npm 9+**
+- Un projet **Supabase** (base de données PostgreSQL gérée)
+- Comptes **Stripe** et **Resend** (ou SMTP) pour les paiements et emails
 
 ---
 
@@ -181,48 +176,29 @@ npm install
 cd frontend && npm install && cd ..
 
 # Backend
-cd backend && composer install && cd ..
+cd backend && npm install && cd ..
 ```
 
 ### 3. Configurer les variables d'environnement
 
 ```bash
 # Backend
-cp backend/.env backend/.env.local
-# → Renseigner DATABASE_URL, STRIPE_*, CLOUDINARY_*, RESEND_*, etc.
+cp backend/.env.example backend/.env
+# → Renseigner SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, JWT_SECRET, STRIPE_*, etc.
 
 # Frontend
 cp frontend/.env.example frontend/.env.local
 # → Renseigner VITE_API_URL, VITE_STRIPE_PUBLIC_KEY
 ```
 
-### 4. Générer les clés JWT
+### 4. Alimenter la base de données (optionnel)
 
 ```bash
 cd backend
-mkdir -p config/jwt
-openssl genpkey -algorithm RSA -out config/jwt/private.pem -pkeyopt rsa_keygen_bits:4096
-openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
-cd ..
+npm run db:seed          # crée les comptes de démo s'ils sont absents
 ```
 
-Ou via la commande Symfony :
-
-```bash
-cd backend && php bin/console lexik:jwt:generate-keypair && cd ..
-```
-
-### 5. Créer la base de données
-
-```bash
-cd backend
-php bin/console doctrine:database:create
-php bin/console doctrine:migrations:migrate
-php bin/console doctrine:fixtures:load   # optionnel — données de démonstration
-cd ..
-```
-
-### 6. Lancer les deux serveurs
+### 5. Lancer les deux serveurs
 
 ```bash
 npm run dev
@@ -231,77 +207,65 @@ npm run dev
 | Service | URL |
 |---|---|
 | Frontend (Vite) | `http://localhost:5173` |
-| Backend (API) | `http://localhost:8000/api` |
-| Documentation API | `http://localhost:8000/api/doc` |
+| Backend (API) | `http://localhost:3000/api` |
+| Documentation API | `http://localhost:3000/api/doc` |
 
 ---
 
 ## Variables d'environnement
 
-### Backend (`backend/.env.local`)
+### Backend (`backend/.env`)
 
 | Variable | Description | Exemple |
 |---|---|---|
-| `DATABASE_URL` | DSN MySQL | `mysql://user:pass@127.0.0.1:3306/sailingloc` |
-| `JWT_SECRET_KEY` | Chemin clé privée RSA | `%kernel.project_dir%/config/jwt/private.pem` |
-| `JWT_PUBLIC_KEY` | Chemin clé publique RSA | `%kernel.project_dir%/config/jwt/public.pem` |
-| `JWT_PASSPHRASE` | Passphrase de la clé | `your-passphrase` |
-| `JWT_TTL` | Durée access token (secondes) | `900` |
-| `JWT_REFRESH_TTL` | Durée refresh token (secondes) | `604800` |
-| `CORS_ALLOW_ORIGIN` | Regex origines CORS | `^https://sailingloc\.vercel\.app$` |
+| `SUPABASE_URL` | URL du projet Supabase | `https://xxx.supabase.co` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Clé service Supabase (privée) | `eyJ...` |
+| `JWT_SECRET` | Secret de signature des tokens JWT | *(chaîne aléatoire longue)* |
 | `STRIPE_SECRET_KEY` | Clé secrète Stripe | `sk_test_...` |
 | `STRIPE_WEBHOOK_SECRET` | Secret webhook Stripe | `whsec_...` |
 | `STRIPE_PLATFORM_FEE_PERCENT` | Commission plateforme (%) | `15` |
-| `CLOUDINARY_CLOUD_NAME` | Cloud Cloudinary | `my-cloud` |
-| `CLOUDINARY_API_KEY` | Clé API Cloudinary | `123456789` |
-| `CLOUDINARY_API_SECRET` | Secret Cloudinary | `abc...` |
-| `RESEND_API_KEY` | Clé API Resend | `re_...` |
-| `MAIL_FROM` | Adresse expéditeur | `noreply@sailingloc.fr` |
-| `FRONTEND_URL` | URL frontend (liens emails) | `https://sailingloc.vercel.app` |
+| `RESEND_API_KEY` | Clé API Resend (emails) | `re_...` |
+| `MAIL_FROM` | Adresse expéditeur | `SailingLoc <noreply@sailingloc.fr>` |
+| `CONTACT_EMAIL` | Destination des messages de contact | `contact@sailingloc.fr` |
+| `FRONTEND_URL` | URL frontend (liens dans les emails) | `https://sailingloc.vercel.app` |
+| `PORT` | Port du serveur Express | `3000` |
+
+> **Important :** `SUPABASE_SERVICE_ROLE_KEY` et `JWT_SECRET` sont des secrets à ne jamais committer.
 
 ### Frontend (`frontend/.env.local`)
 
 | Variable | Description | Exemple |
 |---|---|---|
-| `VITE_API_URL` | URL de l'API backend | `http://localhost:8000` |
+| `VITE_API_URL` | URL de l'API backend | `http://localhost:3000` |
 | `VITE_STRIPE_PUBLIC_KEY` | Clé publique Stripe | `pk_test_...` |
 
 ---
 
 ## Comptes de démonstration
 
-Après `php bin/console doctrine:fixtures:load` :
+Après `npm run db:seed` dans le dossier `backend` :
 
-| Rôle | Email | Mot de passe |
-|---|---|---|
-| Admin | `admin@sailingloc.fr` | `Admin@Sail2026!` |
-| Propriétaire | `owner@demo.fr` | `Owner@Sail2026!` |
-| Locataire | `renter@demo.fr` | `Renter@Sail2026!` |
+| Rôle | Email |
+|---|---|
+| Admin | `admin@sailingloc.fr` |
+| Propriétaire | `owner@demo.fr` |
+| Locataire | `renter@demo.fr` |
 
-Créer / réinitialiser ces comptes dans Supabase :
-
-```bash
-cd backend
-npm run db:seed          # crée seulement si absents
-npm run db:seed:force    # réinitialise aussi les mots de passe
-```
-
-> Les mots de passe respectent la politique CNIL 2022 : 12 caractères minimum, majuscule, minuscule, chiffre, caractère spécial.
+Les mots de passe sont définis dans le script de seed (`backend/scripts/seed.js`). Ils respectent la politique CNIL 2022 : 12 caractères minimum, majuscule, minuscule, chiffre, caractère spécial.
 
 ---
 
 ## Documentation API
 
-La documentation interactive (Swagger UI) est disponible en local à l'adresse :
+La documentation interactive (Swagger UI) est disponible en local à :
 
 ```
-http://localhost:8000/api/doc
+http://localhost:3000/api/doc
 ```
 
 Elle permet de :
 - Explorer tous les endpoints avec leurs paramètres et réponses documentés
-- Tester les requêtes directement depuis le navigateur (playground)
-- Visualiser les réponses en JSON ou YAML
+- Tester les requêtes directement depuis le navigateur
 - S'authentifier avec un JWT Bearer token
 
 > En production, la documentation est désactivée pour des raisons de sécurité.
@@ -312,15 +276,10 @@ Elle permet de :
 
 ### Backend (Railway)
 
-```bash
-# Build
-composer install --no-dev --optimize-autoloader
-php bin/console cache:warmup --env=prod
-php bin/console doctrine:migrations:migrate --no-interaction --env=prod
+Railway détecte automatiquement Node.js. Variables à configurer dans le dashboard Railway :
+`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `JWT_SECRET`, `STRIPE_*`, `RESEND_API_KEY`, `MAIL_FROM`, `CONTACT_EMAIL`, `FRONTEND_URL`.
 
-# Start
-php -S 0.0.0.0:$PORT public/index.php
-```
+Commande de démarrage : définie dans `backend/package.json` (`start`).
 
 Healthcheck : `GET /api/health`
 
@@ -334,7 +293,7 @@ cd frontend && npm run build
 frontend/dist
 ```
 
-Variables d'environnement à configurer dans les dashboards respectifs (Railway / Vercel).
+Variables à configurer dans le dashboard Vercel : `VITE_API_URL`, `VITE_STRIPE_PUBLIC_KEY`.
 
 ---
 
