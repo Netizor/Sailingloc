@@ -62,15 +62,18 @@ const DraftSection: React.FC<DraftSectionProps> = ({ type }) => {
           const raw = localStorage.getItem(key)!
           const saved = JSON.parse(raw)
           if (!saved.savedAt) continue
+          // Ignorer les brouillons sans dates (visite seule de la fiche)
+          if (!saved.range?.from) {
+            try { localStorage.removeItem(key) } catch {}
+            continue
+          }
           const boatId = key.replace('sailingloc_booking_', '')
           const parts: string[] = []
-          if (saved.range?.from) {
-            const from = new Date(saved.range.from).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
-            const to = saved.range.to
-              ? new Date(saved.range.to).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
-              : '...'
-            parts.push(`${from} → ${to}`)
-          }
+          const from = new Date(saved.range.from).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+          const to = saved.range.to
+            ? new Date(saved.range.to).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+            : '...'
+          parts.push(`${from} → ${to}`)
           if (saved.withSkipper) parts.push('Avec skipper')
           found.push({
             key,

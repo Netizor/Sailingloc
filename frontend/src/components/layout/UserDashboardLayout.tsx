@@ -127,11 +127,14 @@ const UserDashboardLayout: React.FC = () => {
     ? `${user.firstName} ${user.lastName}`
     : t('layout.myAccount')
 
+  // Sidebar visible sur mon-espace ET proprietaire (messages, KYC, etc.)
+  const showSidebar = pathname.startsWith('/mon-espace') || pathname.startsWith('/proprietaire')
+
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          {isOwnerSpace && (
+          {showSidebar && (
             <aside className="w-full lg:w-64 flex-shrink-0">
               <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 sticky top-24 flex flex-col">
                 <div className="flex flex-col items-center text-center pb-5 border-b border-gray-100 dark:border-gray-700">

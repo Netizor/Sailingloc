@@ -14,3 +14,7 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+
+*.png
+!frontend/public/logo.png
+!frontend/public/logo-dark.png

@@ -51,7 +51,7 @@ const VerifyEmail: React.FC = () => {
   const redirectPath = getDefaultDashboardPath(user?.role)
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-[#003366] via-ocean-800 to-[#2563FF] flex items-center justify-center px-4 py-16">
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-[#003366] via-ocean-800 to-[#1A6FA8] flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-md">
         <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden border border-white/10">
           <div className="bg-[#003366] px-8 py-8 text-center">
@@ -70,7 +70,7 @@ const VerifyEmail: React.FC = () => {
           <div className="px-8 py-10 flex flex-col items-center gap-6 text-center">
             {state === 'loading' && (
               <>
-                <Loader2 size={48} className="text-[#2563FF] animate-spin" />
+                <Loader2 size={48} className="text-[#1A6FA8] animate-spin" />
                 <p className="text-brand-slate dark:text-gray-400">
                   {t('auth.verifyEmail.loading')}
                 </p>

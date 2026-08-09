@@ -93,6 +93,8 @@ const Header: React.FC = () => {
 
   const isActive = (to: string) => {
     if (to === '/') return location.pathname === '/'
+    // Liste bateaux uniquement — la fiche détail a son propre fil d'Ariane
+    if (to === '/bateaux') return location.pathname === '/bateaux'
     return location.pathname === to || location.pathname.startsWith(`${to}/`)
   }
 
@@ -132,14 +134,14 @@ const Header: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/connexion')}
-                  className="px-3 xl:px-4 py-2 text-xs xl:text-sm font-semibold text-brand-blue dark:text-blue-300 bg-white dark:bg-gray-800 border-2 border-brand-blue dark:border-blue-300 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap"
+                  className="px-3 xl:px-4 py-2 text-xs xl:text-sm font-semibold text-[#1A6FA8] dark:text-[#7EB8D9] bg-white dark:bg-gray-800 border-2 border-[#1A6FA8] dark:border-[#1A6FA8] rounded-lg hover:bg-[#eef3fb] dark:hover:bg-gray-700 transition-colors whitespace-nowrap"
                 >
                   {t('nav.login')}
                 </button>
                 <button
                   type="button"
                   onClick={() => navigate('/devenir-proprietaire')}
-                  className="px-3 xl:px-4 py-2 text-xs xl:text-sm font-semibold text-white bg-[#2563FF] hover:bg-[#1a4fcc] rounded-lg whitespace-nowrap transition-colors"
+                  className="px-3 xl:px-4 py-2 text-xs xl:text-sm font-semibold text-white bg-[#1A6FA8] hover:bg-[#155A8A] rounded-lg whitespace-nowrap transition-colors"
                 >
                   {t('nav.becomeOwner')}
                 </button>
@@ -207,9 +209,9 @@ const Header: React.FC = () => {
                       ) : (
                         <DropdownItem icon={<User size={15} />} label={t('nav.myProfile')} to={MY_PUBLIC_PROFILE_ROUTE} onClick={() => setDropdownOpen(false)} />
                       )}
-                      <DropdownItem icon={<LayoutDashboard size={15} />} label={t('nav.mySpace')} to="/mon-espace" onClick={() => setDropdownOpen(false)} />
                       {user.role === 'RENTER' && (
                         <>
+                          <DropdownItem icon={<LayoutDashboard size={15} />} label={t('nav.mySpace')} to="/mon-espace" onClick={() => setDropdownOpen(false)} />
                           <DropdownItem icon={<CalendarCheck size={15} />} label={t('layout.myBookings')} to="/mon-espace/reservations" onClick={() => setDropdownOpen(false)} />
                           <DropdownItem icon={<Heart size={15} />} label={t('favorites.title')} to="/mon-espace/favoris" onClick={() => setDropdownOpen(false)} />
                           <DropdownItem icon={<ShieldCheck size={15} />} label={t('layout.identityVerification')} to="/mon-espace/verification" onClick={() => setDropdownOpen(false)} />
@@ -256,7 +258,7 @@ const Header: React.FC = () => {
                 to={link.to}
                 className={cn(
                   'px-3 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide',
-                  isActive(link.to) ? 'text-[#2563FF] dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30' : 'text-gray-600 dark:text-gray-300'
+                  isActive(link.to) ? 'text-[#1A6FA8] dark:text-[#7EB8D9] bg-[#eef3fb] dark:bg-[#1A6FA8]/20' : 'text-gray-600 dark:text-gray-300'
                 )}
               >
                 {link.label}
@@ -267,14 +269,14 @@ const Header: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/connexion')}
-                  className="px-5 py-2.5 text-sm font-semibold text-[#2563FF] dark:text-blue-400 bg-white dark:bg-gray-800 border-2 border-[#2563FF] dark:border-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors"
+                  className="px-5 py-2.5 text-sm font-semibold text-[#1A6FA8] dark:text-[#7EB8D9] bg-white dark:bg-gray-800 border-2 border-[#1A6FA8] rounded-lg hover:bg-[#eef3fb] dark:hover:bg-gray-700 transition-colors"
                 >
                   {t('nav.login')}
                 </button>
                 <button
                   type="button"
                   onClick={() => navigate('/devenir-proprietaire')}
-                  className="px-5 py-2.5 text-sm font-medium text-white bg-[#2563FF] rounded-lg"
+                  className="px-5 py-2.5 text-sm font-medium text-white bg-[#1A6FA8] rounded-lg"
                 >
                   {t('nav.becomeOwner')}
                 </button>

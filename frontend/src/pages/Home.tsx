@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Helmet } from 'react-helmet-async'
 import { Link, useNavigate } from 'react-router-dom'
+import { SEO } from '../components/SEO'
 import { useQuery } from '@tanstack/react-query'
 import {
   Search,
@@ -255,10 +255,10 @@ const Home: React.FC = () => {
 
   return (
     <div className="flex flex-col bg-white">
-      <Helmet>
-        <title>SailingLoc{TITLE_SEP}{t('home.metaTitle')}</title>
-        <meta name="description" content={t('home.metaDescription')} />
-      </Helmet>
+      <SEO
+        title={`SailingLoc${TITLE_SEP}${t('home.metaTitle')}`}
+        description={t('home.metaDescription')}
+      />
 
       {/* Hero */}
       <section className="relative min-h-[calc(100vh-72px)] flex flex-col" aria-label={t('home.heroAria')}>
@@ -267,14 +267,14 @@ const Home: React.FC = () => {
           <div className="absolute inset-0 media-scrim" aria-hidden />
         </div>
 
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8 pb-20">
-          <h1 className="font-serif text-4xl sm:text-5xl lg:text-[3.25rem] font-bold italic text-on-media leading-[1.2] mb-5 max-w-3xl">
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8 pb-10 sm:pb-16 lg:pb-20 min-w-0 w-full">
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-bold italic text-on-media leading-[1.2] mb-4 sm:mb-5 max-w-3xl px-1">
             {t('home.heroTitle')}
           </h1>
-          <p className="text-on-media-muted text-base sm:text-lg max-w-2xl mb-8 sm:mb-10 leading-relaxed font-medium">
+          <p className="text-on-media-muted text-sm sm:text-base md:text-lg max-w-2xl mb-6 sm:mb-8 md:mb-10 leading-relaxed font-medium px-1">
             {t('home.heroSubtitle')}
           </p>
-          <div className="w-full max-w-5xl -mb-14 sm:-mb-16">
+          <div className="w-full max-w-3xl min-w-0">
             <SearchBar hero onSearch={handleSearch} />
           </div>
         </div>
@@ -284,7 +284,7 @@ const Home: React.FC = () => {
       <section id="comment-ca-marche" className="pt-20 pb-14 bg-white" aria-labelledby="how-it-works-title">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-[#2563FF] text-sm font-medium mb-4">{t('home.conceptLabel')}</p>
+            <p className="text-[#1A6FA8] text-sm font-medium mb-4">{t('home.conceptLabel')}</p>
             <h2 id="how-it-works-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy">
               {t('home.howTitle')}
             </h2>
@@ -440,7 +440,7 @@ const Home: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/bateaux')}
-                  className="px-8 py-3 text-sm font-medium text-white bg-[#2563FF] rounded-full whitespace-nowrap"
+                  className="px-8 py-3 text-sm font-medium text-white bg-[#1A6FA8] rounded-full whitespace-nowrap"
                 >
                   {t('home.ctaRentBoat')}
                 </button>

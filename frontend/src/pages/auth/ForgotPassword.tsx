@@ -89,6 +89,13 @@ const ForgotPassword: React.FC = () => {
                     {t('auth.forgotPassword.successMessage')}
                   </p>
 
+                  <p className="mt-4 text-sm text-gray-500">
+                    {t('auth.forgotPassword.noAccountHint')}{' '}
+                    <Link to="/inscription" className="font-semibold text-blue-600 hover:text-blue-700">
+                      {t('auth.forgotPassword.createAccount')}
+                    </Link>
+                  </p>
+
                   <Link
                     to="/connexion"
                     className="mt-8 inline-flex w-full justify-center rounded-lg bg-blue-600 px-6 py-3 text-sm font-bold text-white hover:bg-blue-700"

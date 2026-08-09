@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
-import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
+import { SEO } from '../components/SEO'
 import { useQuery } from '@tanstack/react-query'
 import { Anchor, ChevronDown, LayoutGrid, Ship, Sailboat, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -258,19 +258,10 @@ const Search: React.FC = () => {
   return (
     <div className={`min-h-screen bg-white ${compareIds.length > 0 ? 'pb-20' : ''}`}>
 
-      <Helmet>
-
-        <title>{searchTitle}</title>
-
-        <meta
-
-          name="description"
-
-          content={`${total} aventures maritimes disponibles sur SailingLoc.`}
-
-        />
-
-      </Helmet>
+      <SEO
+        title={searchTitle}
+        description={`${total} aventures maritimes disponibles sur SailingLoc.`}
+      />
 
 
 
@@ -323,7 +314,7 @@ const Search: React.FC = () => {
                           : 'sl-btn-outline flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap'
                       }
                     >
-                      <filter.Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-[#2563FF]'}`} />
+                      <filter.Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-[#1A6FA8]'}`} />
                       {filter.label}
                     </button>
                   )
@@ -446,7 +437,7 @@ const Search: React.FC = () => {
 
                           onClick={clearFilters}
 
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-[#2563FF] hover:underline"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-[#1A6FA8] hover:underline"
 
                         >
 

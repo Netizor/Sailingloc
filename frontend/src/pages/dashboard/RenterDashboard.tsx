@@ -14,6 +14,7 @@ import {
 import { useAuthStore } from '../../store/auth.store'
 import { bookingsApi } from '../../api/bookings.api'
 import { getFavorites } from '../../api/favorites.api'
+import { boatsApi } from '../../api/boats.api'
 import {
   daysBetween,
   formatDateRangeShort,
@@ -26,7 +27,8 @@ import Spinner from '../../components/ui/Spinner'
 import Button from '../../components/ui/Button'
 import DraftSection from '../../components/ui/DraftSection'
 import DashboardBanner from '../../components/ui/DashboardBanner'
-import type { Booking } from '../../types'
+import ListingBoatCard from '../../components/boats/ListingBoatCard'
+import type { Boat, Booking } from '../../types'
 import { BookingStatus } from '../../types'
 
 interface BookingWithReview extends Booking {
@@ -47,6 +49,12 @@ const RenterDashboard: React.FC = () => {
     queryKey: ['favorites'],
     queryFn: getFavorites,
     staleTime: 60 * 1000,
+  })
+
+  const { data: suggestedBoats } = useQuery({
+    queryKey: ['boats', 'dashboard-preview'],
+    queryFn: () => boatsApi.list({ page: 1, limit: 3 }),
+    staleTime: 5 * 60 * 1000,
   })
 
   const bookings: BookingWithReview[] = bookingsData?.data ?? []
@@ -75,24 +83,30 @@ const RenterDashboard: React.FC = () => {
     }
   }, [bookings])
 
+  const previewBoats: Boat[] = suggestedBoats?.data?.slice(0, 3) ?? []
+
   const stats = [
     {
-      label: 'Total Réservations',
+      label: 'Total réservations',
       value: totalBookings,
       icon: <Calendar size={22} />,
       iconBg: 'bg-violet-100 text-violet-600',
+      to: '/mon-espace/reservations',
     },
     {
-      label: 'Avis Donnés',
+      label: 'Avis laissés',
       value: reviewsGiven,
       icon: <Star size={22} />,
       iconBg: 'bg-teal-100 text-teal-600',
+      to: '/mon-espace/reservations',
+      hint: 'Avis que vous avez laissés après une location',
     },
     {
       label: 'Favoris',
       value: favorites?.length ?? 0,
       icon: <Heart size={22} />,
       iconBg: 'bg-blue-100 text-blue-600',
+      to: '/mon-espace/favoris',
     },
   ]
 
@@ -112,12 +126,15 @@ const RenterDashboard: React.FC = () => {
         subtitle="Bienvenue dans votre espace personnel."
       />
 
-      {/* Statistiques */}
+      {/* Statistiques cliquables */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {stats.map((stat) => (
-          <div
+          <button
             key={stat.label}
-            className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 flex items-center gap-4"
+            type="button"
+            onClick={() => navigate(stat.to)}
+            title={stat.hint}
+            className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 flex items-center gap-4 text-left hover:border-ocean-200 dark:hover:border-ocean-700 hover:shadow-md transition-all cursor-pointer"
           >
             <div className={`h-12 w-12 rounded-xl flex items-center justify-center flex-shrink-0 ${stat.iconBg}`}>
               {stat.icon}
@@ -126,7 +143,7 @@ const RenterDashboard: React.FC = () => {
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stat.value}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{stat.label}</p>
             </div>
-          </div>
+          </button>
         ))}
       </div>
 
@@ -152,9 +169,31 @@ const RenterDashboard: React.FC = () => {
             Trouvez le bateau de vos rêves et réservez dès maintenant.
           </p>
           <Button variant="primary" onClick={() => navigate('/bateaux')}>
-            Explorer les bateaux
+            Explorer plus de bateaux
           </Button>
         </div>
+      )}
+
+      {/* Mini-liste de bateaux */}
+      {previewBoats.length > 0 && (
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              Bateaux à découvrir
+            </h2>
+            <Link
+              to="/bateaux"
+              className="text-sm text-ocean-700 dark:text-ocean-400 hover:text-ocean-900 font-medium flex items-center gap-1"
+            >
+              Explorer plus de bateaux <ArrowRight size={13} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {previewBoats.map((boat) => (
+              <ListingBoatCard key={boat.id} boat={boat} />
+            ))}
+          </div>
+        </section>
       )}
 
       {/* Historique récent */}

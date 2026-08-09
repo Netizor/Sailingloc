@@ -117,7 +117,7 @@ const BoatDetailGallery: React.FC<BoatDetailGalleryProps> = ({ images, title, in
         <button
           type="button"
           onClick={() => openLightbox(0)}
-          className="mt-2 flex items-center gap-1.5 text-sm font-semibold text-[#2563FF] hover:underline"
+          className="mt-2 flex items-center gap-1.5 text-sm font-semibold text-[#1A6FA8] hover:underline"
         >
           <Grid3X3 size={14} />
           View photo

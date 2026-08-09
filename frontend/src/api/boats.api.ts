@@ -83,6 +83,16 @@ export const uploadBoatImages = async (id: number, imageUrls: string[]): Promise
   return data
 }
 
+/** Upload a local image file to Cloudinary via the backend; returns the secure URL. */
+export const uploadBoatImageFile = async (file: File): Promise<string> => {
+  const formData = new FormData()
+  formData.append('file', file)
+  const { data } = await api.post<{ url: string }>('/boats/upload-image', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data.url
+}
+
 /**
  * Attach a document URL to a boat (registrationDoc | insuranceDoc | licenseScanDoc | contractDoc).
  * documentType must match one of the accepted field names on the Boat model.
@@ -136,5 +146,6 @@ export const boatsApi = {
   updateStatus: updateBoatStatus,
   delete: deleteBoat,
   uploadImages: uploadBoatImages,
+  uploadImageFile: uploadBoatImageFile,
   uploadDocument: uploadBoatDocument,
 }

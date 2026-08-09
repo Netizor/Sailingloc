@@ -1,8 +1,8 @@
 import React from 'react'
-import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { SEO } from '../components/SEO'
 
 const HERO_IMAGE = '/marcin-ciszewski-Zexjl0v3MRU-unsplash.jpg'
 
@@ -12,9 +12,10 @@ const NotFound: React.FC = () => {
 
   return (
     <>
-      <Helmet>
-        <meta name="robots" content="noindex" />
-      </Helmet>
+      <SEO
+        title={`${t('notFound.pageTitle')} | SailingLoc`}
+        description={t('notFound.subtitle')}
+      />
 
       <div className="bg-white dark:bg-gray-900 flex flex-col items-center justify-center px-4 sm:px-6 py-16 sm:py-24 min-h-[calc(100vh-72px-1px)]">
         <div className="w-full max-w-2xl text-center">

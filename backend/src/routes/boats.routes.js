@@ -379,7 +379,7 @@ router.post('/', authenticate, requireRole('OWNER', 'ADMIN'), async (req, res) =
 
   const { data: boat, error } = await supabase.from('boats').insert({
     owner_id: req.user.id,
-    title: title.trim(),
+    title: (title ?? '').trim(),
     description: description ? description.trim() : '',
     type,
     manufacturer,
@@ -394,8 +394,8 @@ router.post('/', authenticate, requireRole('OWNER', 'ADMIN'), async (req, res) =
     skipper_price: skipperPrice,
     price_per_day: parsedDailyRate,
     deposit: depositAmount ? parseFloat(depositAmount) : (deposit ? parseFloat(deposit) : null),
-    city: city.trim(),
-    port: port?.trim(),
+    city: (city ?? '').trim(),
+    port: port?.trim() || null,
     country: country?.trim() || 'France',
     latitude: lat || latitude,
     longitude: lng || longitude,
@@ -504,6 +504,28 @@ router.delete('/:id', authenticate, async (req, res) => {
   ).catch(() => {})
 
   return res.json({ message: 'Bateau désactivé' })
+})
+
+// ─── POST /boats/upload-image ─── upload fichier → Cloudinary URL
+router.post('/upload-image', authenticate, requireRole('OWNER', 'ADMIN'), upload.single('file'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ message: 'Fichier requis' })
+  const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+  if (!allowed.includes(req.file.mimetype)) {
+    return res.status(400).json({ message: 'Formats acceptés : JPG, PNG, WebP' })
+  }
+  try {
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'sailingloc/boats', resource_type: 'image' },
+        (err, r) => (err ? reject(err) : resolve(r)),
+      )
+      stream.end(req.file.buffer)
+    })
+    return res.status(201).json({ url: result.secure_url })
+  } catch (err) {
+    console.error('[Boats] upload-image error:', err?.message || err)
+    return res.status(500).json({ message: 'Échec de l\'upload de l\'image' })
+  }
 })
 
 // ─── POST /boats/:id/images ────────────────────────────────

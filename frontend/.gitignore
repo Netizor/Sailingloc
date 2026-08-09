@@ -64,3 +64,7 @@ desktop.ini
 .eslintcache
 .stylelintcache
 .auth/
+
+*.png
+!public/logo.png
+!public/logo-dark.png

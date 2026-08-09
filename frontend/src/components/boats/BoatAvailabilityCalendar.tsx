@@ -44,7 +44,7 @@ const BoatAvailabilityCalendar: React.FC<BoatAvailabilityCalendarProps> = ({ boa
     const past = isBefore(date, today)
     if (variant === 'detail') {
       if (past) return 'text-[#8A94A6] cursor-default'
-      if (bookedSet.has(dateStr)) return 'bg-[#2563FF] text-white font-semibold rounded-lg'
+      if (bookedSet.has(dateStr)) return 'bg-[#1A6FA8] text-white font-semibold rounded-lg'
       if (unavailableSet.has(dateStr)) return 'bg-[#003366] text-white font-semibold rounded-lg'
       return 'text-[#334155] hover:bg-[#eef3fb] rounded-lg'
     }
@@ -60,7 +60,7 @@ const BoatAvailabilityCalendar: React.FC<BoatAvailabilityCalendarProps> = ({ boa
     <div>
       <div className={cn('flex flex-wrap items-center gap-4 mb-5 text-xs', variant === 'detail' ? 'text-[#8A94A6]' : 'text-gray-500')}>
         <LegendDot color={variant === 'detail' ? 'bg-white border border-gray-200' : 'bg-white border border-gray-200'} label="Available" />
-        <LegendDot color={variant === 'detail' ? 'bg-[#2563FF]' : 'bg-orange-100'} label="Booked" />
+        <LegendDot color={variant === 'detail' ? 'bg-[#1A6FA8]' : 'bg-orange-100'} label="Booked" />
         <LegendDot color={variant === 'detail' ? 'bg-[#003366]' : 'bg-gray-100'} label="Unavailable" />
       </div>
 

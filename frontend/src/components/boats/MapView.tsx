@@ -50,18 +50,38 @@ const getPriceIcon = (dailyRate: number, dark = false): L.DivIcon => {
   return icon
 }
 
-// ─── MapUpdater - recentre la carte quand les résultats changent ──────────────
-// MapContainer ne relit pas center/zoom après le premier rendu (react-leaflet v4).
-// Ce composant enfant force la mise à jour via l'API Leaflet directement.
-const MapUpdater: React.FC<{ center: [number, number]; zoom: number }> = ({
-  center,
-  zoom,
+// Centre de la France métropolitaine - fallback si aucun bateau géolocalisé
+const DEFAULT_CENTER: [number, number] = [46.5, 2.5]
+const DEFAULT_ZOOM = 5
+
+// Cadrage automatique : toutes les bulles de prix visibles sans dézoomer manuellement
+const MapBoundsFitter: React.FC<{ positions: [number, number][]; fitKey: string }> = ({
+  positions,
+  fitKey,
 }) => {
   const map = useMap()
   useEffect(() => {
-    map.setView(center, zoom)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, center[0], center[1], zoom])
+    // Laisser le conteneur prendre sa vraie taille (colonne sticky) avant le fit
+    const apply = () => {
+      map.invalidateSize()
+      if (positions.length === 0) {
+        map.setView(DEFAULT_CENTER, DEFAULT_ZOOM)
+        return
+      }
+      if (positions.length === 1) {
+        map.setView(positions[0], 12)
+        return
+      }
+      map.fitBounds(L.latLngBounds(positions), {
+        padding: [56, 56],
+        maxZoom: 10,
+        animate: false,
+      })
+    }
+    apply()
+    const t = window.setTimeout(apply, 120)
+    return () => window.clearTimeout(t)
+  }, [map, fitKey, positions])
   return null
 }
 
@@ -74,10 +94,6 @@ interface MapViewProps {
   fullHeight?: boolean
 }
 
-// Centre de la France métropolitaine - fallback si aucun bateau géolocalisé
-const DEFAULT_CENTER: [number, number] = [46.5, 2.5]
-const DEFAULT_ZOOM = 6
-
 // ─── Composant principal ──────────────────────────────────────────────────────
 
 const MapView: React.FC<MapViewProps> = ({ boats, className, dark = false, fullHeight = false }) => {
@@ -87,20 +103,19 @@ const MapView: React.FC<MapViewProps> = ({ boats, className, dark = false, fullH
     [boats],
   )
 
-  // Barycentre des bateaux pour centrer la carte automatiquement
-  const center = useMemo<[number, number]>(
-    () =>
-      located.length > 0
-        ? [
-            located.reduce((s, b) => s + b.lat!, 0) / located.length,
-            located.reduce((s, b) => s + b.lng!, 0) / located.length,
-          ]
-        : DEFAULT_CENTER,
+  const positions = useMemo<[number, number][]>(
+    () => located.map((b) => [b.lat!, b.lng!]),
     [located],
   )
 
-  const zoom =
-    located.length === 1 ? 13 : located.length > 0 ? 8 : DEFAULT_ZOOM
+  // Clé stable pour relancer le fitBounds quand le jeu de coords change
+  const positionsKey = useMemo(
+    () => positions.map(([la, ln]) => `${la.toFixed(4)},${ln.toFixed(4)}`).join('|'),
+    [positions],
+  )
+
+  const initialCenter = positions[0] ?? DEFAULT_CENTER
+  const initialZoom = positions.length <= 1 ? 12 : DEFAULT_ZOOM
 
   return (
     <div className={[dark ? `map-teal-blueprint ${className ?? ''}` : className, 'relative isolate z-0'].filter(Boolean).join(' ')}>
@@ -111,8 +126,8 @@ const MapView: React.FC<MapViewProps> = ({ boats, className, dark = false, fullH
       )}
 
       <MapContainer
-        center={center}
-        zoom={zoom}
+        center={initialCenter}
+        zoom={initialZoom}
         scrollWheelZoom
         style={{
           height: fullHeight ? '100%' : '600px',
@@ -120,8 +135,7 @@ const MapView: React.FC<MapViewProps> = ({ boats, className, dark = false, fullH
           borderRadius: fullHeight ? '0' : '16px',
         }}
       >
-        {/* Recentrage dynamique quand les résultats changent */}
-        <MapUpdater center={center} zoom={zoom} />
+        <MapBoundsFitter positions={positions} fitKey={positionsKey} />
 
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { Helmet } from 'react-helmet-async'
 import { useParams, Link } from 'react-router-dom'
+import { SEO } from '../components/SEO'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { MapPin, LayoutGrid, Map as MapIcon, Anchor } from 'lucide-react'
@@ -65,15 +65,10 @@ const Destination: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
-      <Helmet>
-        <title>
-          {t('destinations.boats', { count: total })} {displayName} | SailingLoc
-        </title>
-        <meta
-          name="description"
-          content={`Rent a boat in ${displayName}. ${total > 0 ? `${total} boats available` : 'Browse listings'} on SailingLoc.`}
-        />
-      </Helmet>
+      <SEO
+        title={`${t('destinations.boats', { count: total })} ${displayName} | SailingLoc`}
+        description={`Rent a boat in ${displayName}. ${total > 0 ? `${total} boats available` : 'Browse listings'} on SailingLoc.`}
+      />
 
       <div className="relative bg-ocean-700 text-white overflow-hidden">
         <img

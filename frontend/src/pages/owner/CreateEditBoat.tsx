@@ -99,6 +99,9 @@ const CreateEditBoat: React.FC = () => {
   const [errors, setErrors] = useState<Partial<Record<keyof BoatFormData, string>>>({})
   const [equipmentInput, setEquipmentInput] = useState('')
   const [imageInput, setImageInput] = useState('')
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [isDraggingImage, setIsDraggingImage] = useState(false)
+  const imageFileRef = useRef<HTMLInputElement>(null)
   // Règles de réduction dégressive (E2) - gérées séparément car structure complexe
   const [discountRules, setDiscountRules] = useState<{ minDays: string; discountPercent: string }[]>([])
   // Upload documents (E5)
@@ -345,6 +348,35 @@ const CreateEditBoat: React.FC = () => {
     if (url && !form.images.includes(url)) {
       setField('images', [...form.images, url])
       setImageInput('')
+    }
+  }
+
+  const uploadImageFiles = async (files: FileList | File[]) => {
+    const list = Array.from(files).filter((f) =>
+      ['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(f.type),
+    )
+    if (list.length === 0) {
+      toast.error('Formats acceptés : JPG, PNG, WebP')
+      return
+    }
+    setUploadingImage(true)
+    try {
+      const urls: string[] = []
+      for (const file of list) {
+        const url = await boatsApi.uploadImageFile(file)
+        urls.push(url)
+      }
+      if (urls.length > 0) {
+        setForm((f) => ({
+          ...f,
+          images: [...f.images, ...urls.filter((u) => !f.images.includes(u))],
+        }))
+        toast.success(urls.length > 1 ? `${urls.length} photos ajoutées` : 'Photo ajoutée')
+      }
+    } catch {
+      toast.error('Échec de l\'upload de l\'image')
+    } finally {
+      setUploadingImage(false)
     }
   }
 
@@ -780,8 +812,7 @@ const CreateEditBoat: React.FC = () => {
                   Photos du bateau
                 </label>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">
-                  Ajoutez des URLs d'images (Cloudinary, Unsplash, etc.) ou utilisez le widget
-                  Cloudinary ci-dessous.
+                  Glissez-déposez des images, choisissez un fichier, ou collez une URL.
                 </p>
 
                 <div className="flex gap-2 mb-3">
@@ -798,12 +829,54 @@ const CreateEditBoat: React.FC = () => {
                   </Button>
                 </div>
 
+                <input
+                  ref={imageFileRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => {
+                    if (e.target.files?.length) uploadImageFiles(e.target.files)
+                    e.target.value = ''
+                  }}
+                />
+
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setIsDraggingImage(true) }}
+                  onDragLeave={() => setIsDraggingImage(false)}
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    setIsDraggingImage(false)
+                    if (e.dataTransfer.files?.length) uploadImageFiles(e.dataTransfer.files)
+                  }}
+                  onClick={() => !uploadingImage && imageFileRef.current?.click()}
+                  className={cn(
+                    'border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors mb-3',
+                    isDraggingImage
+                      ? 'border-ocean-500 bg-ocean-50 dark:bg-ocean-900/20'
+                      : 'border-gray-200 dark:border-gray-600 hover:border-ocean-300 dark:hover:border-ocean-600',
+                  )}
+                >
+                  {uploadingImage ? (
+                    <Spinner size="md" className="mx-auto" />
+                  ) : (
+                    <Upload size={28} className="text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                  )}
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {uploadingImage
+                      ? 'Upload en cours…'
+                      : 'Glissez vos photos ici ou cliquez pour parcourir'}
+                  </p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">JPG, PNG, WebP · Max 10 Mo</p>
+                </div>
+
                 {form.images.length > 0 ? (
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {form.images.map((img, i) => (
-                      <div key={i} className="relative aspect-video rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 group">
+                      <div key={img} className="relative aspect-video rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 group">
                         <img src={img} alt="" className="w-full h-full object-cover" />
                         <button
+                          type="button"
                           onClick={() => setField('images', form.images.filter((_, idx) => idx !== i))}
                           className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
                         >
@@ -818,10 +891,9 @@ const CreateEditBoat: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-xl p-8 text-center">
-                    <Upload size={28} className="text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                    <p className="text-sm text-gray-400 dark:text-gray-500">Aucune photo ajoutée</p>
-                  </div>
+                  <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-2">
+                    Aucune photo ajoutée
+                  </p>
                 )}
               </div>
 

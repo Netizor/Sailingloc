@@ -1,6 +1,6 @@
 import React from 'react'
-import { Helmet } from 'react-helmet-async'
 import { useParams, Link } from 'react-router-dom'
+import { SEO } from '../components/SEO'
 import { useQuery } from '@tanstack/react-query'
 import { Ship, Star, Calendar, MessageCircle, Anchor, Compass, ShieldCheck, Settings, BadgeCheck } from 'lucide-react'
 import { getPublicProfile } from '../api/users.api'
@@ -49,13 +49,10 @@ const OwnerProfile: React.FC = () => {
 
   return (
     <>
-    <Helmet>
-      <title>{ownerName} - SailingLoc Owner</title>
-      <meta name="description" content={`Discover ${ownerName}'s boats on SailingLoc. ${boats.length} listing(s) available.`} />
-      <meta property="og:title" content={`${ownerName} - SailingLoc Owner`} />
-      <meta property="og:description" content={`Rent a boat from ${ownerName} on SailingLoc.`} />
-      <meta property="og:type" content="profile" />
-    </Helmet>
+    <SEO
+      title={`${ownerName} - SailingLoc Owner`}
+      description={`Discover ${ownerName}'s boats on SailingLoc. ${boats.length} listing(s) available.`}
+    />
     <div className="min-h-screen bg-gray-50 dark:bg-gray-800">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6">
 

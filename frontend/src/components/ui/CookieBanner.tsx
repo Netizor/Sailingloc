@@ -203,7 +203,7 @@ const CookieBanner: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => accept(true)}
-                  className="flex-1 px-4 py-3 text-sm font-semibold text-white bg-[#2563FF] hover:bg-[#3b76ff] rounded-xl transition-colors"
+                  className="flex-1 px-4 py-3 text-sm font-semibold text-white bg-[#1A6FA8] hover:bg-[#2B8BC4] rounded-xl transition-colors"
                 >
                   {t('cookies.banner.okForMe')}
                 </button>
@@ -258,7 +258,7 @@ const CookieBanner: React.FC = () => {
                 <button
                   type="button"
                   onClick={saveCustom}
-                  className="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-[#2563FF] hover:bg-[#3b76ff] rounded-xl transition-colors"
+                  className="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-[#1A6FA8] hover:bg-[#2B8BC4] rounded-xl transition-colors"
                 >
                   {t('cookies.banner.save')}
                 </button>
@@ -295,7 +295,7 @@ const CookieToggle: React.FC<CookieToggleProps> = ({ label, description, checked
       onClick={() => onChange(!checked)}
       className={[
         'relative flex-shrink-0 w-10 h-5 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-1 focus:ring-offset-[#003366]',
-        checked ? 'bg-[#2563FF]' : 'bg-white/25',
+        checked ? 'bg-[#1A6FA8]' : 'bg-white/25',
         disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer',
       ].join(' ')}
     >

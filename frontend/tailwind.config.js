@@ -9,7 +9,8 @@ export default {
     extend: {
       colors: {
         'brand-navy': '#003366',
-        'brand-blue': '#2563FF',
+        /* Bleu mer (moins électrique que #2563FF) */
+        'brand-blue': '#1A6FA8',
         /* slate plus sombre : meilleur contraste WCAG sur fond clair (~7:1) */
         'brand-slate': '#1e293b',
         'brand-teal': '#006875',
@@ -21,9 +22,9 @@ export default {
           100: '#d6e4f5',
           200: '#adc9eb',
           300: '#7aa3db',
-          400: '#4d7fc9',
-          500: '#2563FF',
-          600: '#1a4fcc',
+          400: '#4d8fb8',
+          500: '#1A6FA8',
+          600: '#155A8A',
           700: '#003366',
           800: '#002952',
           900: '#001a33',

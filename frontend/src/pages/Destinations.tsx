@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { Helmet } from 'react-helmet-async'
+import { SEO } from '../components/SEO'
 import { Link } from 'react-router-dom'
 import { useQueries, useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -58,7 +58,7 @@ const DestinationCard: React.FC<{
     <div className="absolute inset-0 bg-gradient-to-t from-[#003366]/90 via-[#003366]/20 to-transparent" />
 
     {dest.badge && (
-      <span className="absolute top-4 left-4 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white bg-[#2563FF] rounded-full">
+      <span className="absolute top-4 left-4 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white bg-[#1A6FA8] rounded-full">
         {dest.badge}
       </span>
     )}
@@ -143,13 +143,10 @@ const Destinations: React.FC = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{t('destinations.title')} | SailingLoc</title>
-        <meta
-          name="description"
-          content={t('destinations.subtitle')}
-        />
-      </Helmet>
+      <SEO
+        title={`${t('destinations.title')} | SailingLoc`}
+        description={t('destinations.subtitle')}
+      />
 
       <div className="min-h-screen bg-white dark:bg-gray-900">
         <section className="relative h-[420px] sm:h-[480px] overflow-hidden">
@@ -160,17 +157,17 @@ const Destinations: React.FC = () => {
             loading="eager"
           />
           <div className="absolute inset-0 bg-black/45" />
-          <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-[10%]">
-            <h1 className="font-serif text-4xl sm:text-5xl lg:text-[3.25rem] font-bold italic text-white leading-tight mb-4">
+          <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 sm:px-6 lg:px-[10%]">
+            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-bold italic text-white leading-tight mb-4">
               {t('destinations.heroTitle')}
             </h1>
-            <p className="text-white/85 text-base sm:text-lg max-w-2xl italic">
+            <p className="text-white/85 text-sm sm:text-base md:text-lg max-w-2xl italic">
               {t('destinations.subtitle')}
             </p>
           </div>
         </section>
 
-        <section className="px-[10%] py-10 sm:py-14">
+        <section className="px-4 sm:px-6 lg:px-[10%] py-10 sm:py-14">
           <div className="flex flex-wrap items-center gap-2 mb-8">
             {regionLabels.map(({ id, label }) => (
               <button
@@ -181,7 +178,7 @@ const Destinations: React.FC = () => {
                   'px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-[0.08em] transition-colors border-2',
                   region === id
                     ? 'bg-[#003366] text-white border-[#003366]'
-                    : 'bg-white dark:bg-gray-800 text-[#003366] dark:text-gray-200 border-[#003366]/20 hover:border-[#2563FF] hover:text-[#2563FF]',
+                    : 'bg-white dark:bg-gray-800 text-[#003366] dark:text-gray-200 border-[#003366]/20 hover:border-[#1A6FA8] hover:text-[#1A6FA8]',
                 )}
               >
                 {label}
@@ -209,7 +206,7 @@ const Destinations: React.FC = () => {
         </section>
 
         {popularList.length > 0 && (
-          <section className="px-[10%] pb-16 sm:pb-24">
+          <section className="px-4 sm:px-6 lg:px-[10%] pb-16 sm:pb-24">
             <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#003366] dark:text-white mb-8">
               {t('home.destinationsTitle')}
             </h2>
@@ -229,7 +226,7 @@ const Destinations: React.FC = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#003366]/90 via-[#003366]/20 to-transparent" />
                   {item.badge && (
-                    <span className="absolute top-4 left-4 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white bg-[#2563FF] rounded-full">
+                    <span className="absolute top-4 left-4 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white bg-[#1A6FA8] rounded-full">
                       {item.badge}
                     </span>
                   )}

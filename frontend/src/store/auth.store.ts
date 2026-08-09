@@ -66,6 +66,15 @@ export const useAuthStore = create<AuthState>()(
         // RGPD - suppression des données comportementales stockées localement à la déconnexion
         localStorage.removeItem('sailingloc_saved_searches')
         localStorage.removeItem('sailingloc_owner_onboarded')
+        // Brouillons de réservation (évite qu'un autre compte voie d'anciens drafts)
+        try {
+          const keysToRemove: string[] = []
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i)
+            if (key?.startsWith('sailingloc_booking_')) keysToRemove.push(key)
+          }
+          keysToRemove.forEach((k) => localStorage.removeItem(k))
+        } catch { /* ignore */ }
         set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false })
       },
     }),

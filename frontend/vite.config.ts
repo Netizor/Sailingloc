@@ -22,7 +22,7 @@ export default defineConfig({
       },
 
       // Fichiers pré-cachés au build (shell applicatif)
-      includeAssets: ['icons/icon.svg', 'favicon.ico'],
+      includeAssets: ['icons/icon.svg', 'favicon.svg', 'logo.png', 'anchor.svg'],
 
       manifest: {
         name: 'SailingLoc',

@@ -158,7 +158,7 @@ const AdminDashboard: React.FC = () => {
                   <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} width={30} allowDecimals={false} />
                   <Tooltip formatter={(value) => [value ?? 0, 'Bookings']} />
-                  <Bar dataKey="bookings" fill="#2563FF" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="bookings" fill="#1A6FA8" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

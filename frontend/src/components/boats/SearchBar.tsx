@@ -303,18 +303,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
       <form
         onSubmit={handleSubmit}
         className={cn(
-          'w-full bg-white dark:bg-gray-900 rounded-2xl sm:rounded-full',
+          'w-full min-w-0 bg-white dark:bg-gray-900 rounded-2xl md:rounded-full',
           'border border-gray-200 dark:border-gray-600',
-          'shadow-[0_8px_40px_rgba(0,0,0,0.22)] p-2 sm:p-1.5 max-w-5xl mx-auto',
+          'shadow-[0_8px_32px_rgba(0,0,0,0.18)] p-1.5 max-w-3xl mx-auto',
           className
         )}
         aria-label={t('searchBar.searchBoat')}
       >
-        <div className="flex flex-col lg:flex-row lg:items-center">
-          <div className="relative flex-1 flex items-center gap-3 px-4 sm:px-5 py-3 lg:py-2.5 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-600">
-            <MapPin size={18} className="text-brand-blue flex-shrink-0" strokeWidth={1.5} aria-hidden />
+        <div className="flex flex-col md:flex-row md:items-center min-w-0">
+          <div className="relative flex-1 min-w-0 flex items-center gap-2.5 px-3.5 py-2 md:py-1.5 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-600">
+            <MapPin size={16} className="text-brand-blue flex-shrink-0" strokeWidth={1.5} aria-hidden />
             <div className="flex-1 min-w-0 text-left">
-              <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-brand-slate dark:text-gray-200 mb-0.5">
+              <span className="block text-[9px] font-bold uppercase tracking-[0.12em] text-brand-slate dark:text-gray-200 mb-0.5">
                 {t('searchBar.destinations')}
               </span>
               <input
@@ -326,16 +326,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
                 autoComplete="off"
-                className="w-full text-sm font-medium text-brand-navy dark:text-white placeholder:text-brand-muted dark:placeholder:text-gray-400 bg-transparent border-none outline-none"
+                className="w-full min-w-0 text-[13px] font-medium text-brand-navy dark:text-white placeholder:text-brand-muted dark:placeholder:text-gray-400 bg-transparent border-none outline-none"
               />
             </div>
             <SuggestionDropdown />
           </div>
 
-          <div className="flex-1 flex items-center gap-3 px-4 sm:px-5 py-3 lg:py-2.5 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-600">
-            <Calendar size={18} className="text-brand-blue flex-shrink-0" strokeWidth={1.5} aria-hidden />
+          <div className="flex-1 min-w-0 flex items-center gap-2.5 px-3.5 py-2 md:py-1.5 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-600">
+            <Calendar size={16} className="text-brand-blue flex-shrink-0" strokeWidth={1.5} aria-hidden />
             <div className="flex-1 min-w-0 text-left relative">
-              <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-brand-slate dark:text-gray-200 mb-0.5">
+              <span className="block text-[9px] font-bold uppercase tracking-[0.12em] text-brand-slate dark:text-gray-200 mb-0.5">
                 {t('searchBar.dates')}
               </span>
               <input
@@ -344,29 +344,29 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 min={today}
                 onChange={(e) => setStartDate(e.target.value)}
                 className={cn(
-                  'w-full text-sm font-medium bg-transparent border-none outline-none cursor-pointer relative z-10',
+                  'w-full max-w-full min-w-0 text-[13px] font-medium bg-transparent border-none outline-none cursor-pointer relative z-10',
                   startDate ? 'text-brand-navy dark:text-white' : 'text-transparent'
                 )}
               />
               {!startDate && (
-                <span className="absolute left-0 bottom-0 text-sm font-medium text-brand-muted dark:text-gray-300 pointer-events-none">
+                <span className="absolute left-0 bottom-0 text-[13px] font-medium text-brand-muted dark:text-gray-300 pointer-events-none truncate max-w-full">
                   {t('searchBar.whenLeaving')}
                 </span>
               )}
             </div>
           </div>
 
-          <div className="flex-1 flex items-center gap-3 px-4 sm:px-5 py-3 lg:py-2.5 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-600">
-            <Ship size={18} className="text-brand-blue flex-shrink-0" strokeWidth={1.5} aria-hidden />
+          <div className="flex-1 min-w-0 flex items-center gap-2.5 px-3.5 py-2 md:py-1.5 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-600">
+            <Ship size={16} className="text-brand-blue flex-shrink-0" strokeWidth={1.5} aria-hidden />
             <div className="flex-1 min-w-0 text-left">
-              <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-brand-slate dark:text-gray-200 mb-0.5">
+              <span className="block text-[9px] font-bold uppercase tracking-[0.12em] text-brand-slate dark:text-gray-200 mb-0.5">
                 {t('searchBar.type')}
               </span>
               <select
                 value={boatType}
                 onChange={(e) => setBoatType(e.target.value)}
                 className={cn(
-                  'w-full text-sm font-medium bg-transparent border-none outline-none cursor-pointer appearance-none',
+                  'w-full min-w-0 text-[13px] font-medium bg-transparent border-none outline-none cursor-pointer appearance-none',
                   boatType ? 'text-brand-navy dark:text-white' : 'text-brand-muted dark:text-gray-300'
                 )}
               >
@@ -380,12 +380,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center p-1 lg:pl-0 lg:pr-1">
+          <div className="flex items-stretch md:items-center p-1 md:pl-0 md:pr-0.5 shrink-0">
             <button
               type="submit"
-              className="w-full lg:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 bg-brand-blue hover:bg-ocean-600 text-white font-semibold rounded-full whitespace-nowrap text-sm shadow-md"
+              className="w-full md:w-auto inline-flex items-center justify-center gap-1.5 px-5 py-2.5 bg-brand-blue hover:bg-ocean-600 text-white font-semibold rounded-xl md:rounded-full whitespace-nowrap text-[13px] shadow-md"
             >
-              <Search size={16} strokeWidth={2.5} aria-hidden />
+              <Search size={15} strokeWidth={2.5} aria-hidden />
               {t('searchBar.explore')}
             </button>
           </div>

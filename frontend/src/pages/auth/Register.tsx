@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, User, Phone, AlertCircle, Check, Ship } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
@@ -13,6 +13,7 @@ import { cn } from '../../lib/utils'
 import toast from 'react-hot-toast'
 
 const LOGIN_HERO_IMAGE = '/login-boat.jpg'
+const REGISTER_DRAFT_KEY = 'sailingloc_register_draft'
 type RegistrationRole = UserRole.RENTER | UserRole.OWNER
 
 interface RegisterForm {
@@ -74,15 +75,34 @@ const Register: React.FC<RegisterProps> = ({
   const defaultRole = embedded ? defaultRoleProp : roleFromUrl
   const hideRoleToggle = embedded ? hideRoleToggleProp : searchParams.get('role') === 'owner'
 
-  const [form, setForm] = useState<RegisterForm>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: '',
-    role: defaultRole,
-    acceptTerms: false,
+  const [form, setForm] = useState<RegisterForm>(() => {
+    const base: RegisterForm = {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      password: '',
+      confirmPassword: '',
+      role: defaultRole,
+      acceptTerms: false,
+    }
+    try {
+      const raw = sessionStorage.getItem(REGISTER_DRAFT_KEY)
+      if (!raw) return base
+      const saved = JSON.parse(raw) as Partial<RegisterForm>
+      return {
+        ...base,
+        firstName: saved.firstName ?? '',
+        lastName: saved.lastName ?? '',
+        email: saved.email ?? '',
+        phone: saved.phone ?? '',
+        // Ne jamais restaurer les mots de passe
+        role: saved.role === UserRole.OWNER || saved.role === UserRole.RENTER ? saved.role : defaultRole,
+        acceptTerms: Boolean(saved.acceptTerms),
+      }
+    } catch {
+      return base
+    }
   })
 
   const [showPassword, setShowPassword] = useState(false)
@@ -91,6 +111,20 @@ const Register: React.FC<RegisterProps> = ({
   const [globalError, setGlobalError] = useState('')
 
   const passwordCriteria = getPasswordCriteria(form.password)
+
+  // Persiste le brouillon d'inscription (CGU / RGPD n'effacent plus les saisies)
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(REGISTER_DRAFT_KEY, JSON.stringify({
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        phone: form.phone,
+        role: form.role,
+        acceptTerms: form.acceptTerms,
+      }))
+    } catch { /* ignore */ }
+  }, [form.firstName, form.lastName, form.email, form.phone, form.role, form.acceptTerms])
 
   const registerMutation = useMutation({
     mutationFn: () =>
@@ -103,6 +137,7 @@ const Register: React.FC<RegisterProps> = ({
         role: form.role,
       }),
     onSuccess: (data) => {
+      try { sessionStorage.removeItem(REGISTER_DRAFT_KEY) } catch { /* ignore */ }
       setAuth(data.user, data.accessToken, data.refreshToken)
       toast.success(t('auth.register.welcome', { name: data.user.firstName }))
       navigate(form.role === UserRole.OWNER ? '/proprietaire' : '/mon-espace', { replace: true })
@@ -338,11 +373,21 @@ const Register: React.FC<RegisterProps> = ({
 
             <span className="text-sm text-brand-slate dark:text-gray-400">
               {t('auth.register.termsText')}{' '}
-              <Link to="/cgu" className="font-semibold text-brand-blue hover:text-ocean-600">
+              <Link
+                to="/cgu"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-brand-blue hover:text-ocean-600"
+              >
                 {t('auth.register.termsLink')}
               </Link>{' '}
               {t('auth.register.termsAnd')}{' '}
-              <Link to="/rgpd" className="font-semibold text-brand-blue hover:text-ocean-600">
+              <Link
+                to="/rgpd"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-brand-blue hover:text-ocean-600"
+              >
                 {t('auth.register.privacyLink')}
               </Link>
             </span>

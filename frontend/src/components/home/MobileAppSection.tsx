@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Bell, CalendarDays, Compass, Home, Search, Ship, User } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import StoreBadges from '../ui/StoreBadges'
+import BrandLogo from '../ui/BrandLogo'
 
 function PhoneMockup({ t }: { t: (key: string) => string }) {
   const boats = [
@@ -32,11 +33,8 @@ function PhoneMockup({ t }: { t: (key: string) => string }) {
               </div>
 
               <div className="px-4 pt-8 pb-3 bg-white border-b border-gray-100">
-                <img
-                  src="/logo.png"
-                  alt="SailingLoc"
-                  className="h-8 w-auto max-w-[148px] object-contain object-left mb-2.5"
-                />
+                {/* BrandLogo bascule logo clair/sombre — nécessaire car .dark .bg-white force un fond sombre */}
+                <BrandLogo className="h-8 w-auto max-w-[148px] object-contain object-left mb-2.5" />
                 <p className="font-serif text-[15px] font-bold text-brand-navy leading-tight">
                   {t('home.mobileAppPreviewGreeting')}
                 </p>

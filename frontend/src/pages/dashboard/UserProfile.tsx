@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
 
 import { useAuthStore } from '../../store/auth.store'
@@ -53,6 +54,7 @@ const SectionIcon: React.FC<{ icon: React.ReactNode }> = ({ icon }) => (
 // ─── Avatar ───────────────────────────────────────────────────────────────────
 
 const AvatarSection: React.FC = () => {
+  const { t } = useTranslation()
   const { user, updateUser } = useAuthStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -60,13 +62,13 @@ const AvatarSection: React.FC = () => {
     mutationFn: uploadAvatar,
     onSuccess: (updated) => {
       updateUser({ avatar: updated.avatar })
-      toast.success('Profile photo updated')
+      toast.success(t('profile.avatarUpdated'))
     },
     onError: (err: unknown) => {
       const msg = axios.isAxiosError(err)
         ? (err.response?.data as { message?: string })?.message
         : undefined
-      toast.error(msg || 'Error uploading photo')
+      toast.error(msg || t('profile.avatarError'))
     },
   })
 
@@ -76,12 +78,12 @@ const AvatarSection: React.FC = () => {
 
     // Validation côté client pour un retour immédiat, miroir des règles backend
     if (!ALLOWED_TYPES.includes(file.type)) {
-      toast.error('Accepted formats: JPG, PNG, or WebP')
+      toast.error(t('profile.avatarFormats'))
       e.target.value = ''
       return
     }
     if (file.size > MAX_AVATAR_SIZE) {
-      toast.error('Photo must not exceed 5 MB')
+      toast.error(t('profile.avatarMaxSize'))
       e.target.value = ''
       return
     }
@@ -95,7 +97,7 @@ const AvatarSection: React.FC = () => {
 
   return (
     <div className={CARD}>
-      <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-6">Profile photo</h2>
+      <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-6">{t('profile.avatar')}</h2>
       <div className="flex items-center gap-6">
         <div className="flex-shrink-0">
           <div className="h-24 w-24 rounded-full overflow-hidden bg-ocean-100 dark:bg-ocean-800/40 flex items-center justify-center ring-4 ring-ocean-50 dark:ring-ocean-900/40">
@@ -123,7 +125,7 @@ const AvatarSection: React.FC = () => {
             disabled={mutation.isPending}
             onClick={() => fileInputRef.current?.click()}
           >
-            Change photo
+            {t('profile.changeAvatar')}
           </Button>
           <p className="text-xs text-gray-400 dark:text-gray-500">JPG, PNG ou WebP · Max 5 Mo</p>
         </div>
@@ -151,6 +153,7 @@ interface ProfileForm {
 }
 
 const PersonalInfoSection: React.FC = () => {
+  const { t } = useTranslation()
   const { user, updateUser } = useAuthStore()
   const [isEditing, setIsEditing] = useState(false)
   const [form, setForm] = useState<ProfileForm>({
@@ -160,8 +163,7 @@ const PersonalInfoSection: React.FC = () => {
     bio:       user?.bio       ?? '',
   })
 
-  // Resynchronise le formulaire si l'identité de l'utilisateur change dans le store
-  // (keyed sur user.id pour ne pas écraser les saisies en cours lors d'une simple mise à jour)
+  // Resynchronise le formulaire quand le user du store change (ex. téléphone après inscription)
   useEffect(() => {
     if (user) {
       setForm({
@@ -171,7 +173,7 @@ const PersonalInfoSection: React.FC = () => {
         bio:       user.bio    ?? '',
       })
     }
-  }, [user?.id])
+  }, [user?.id, user?.phone, user?.firstName, user?.lastName, user?.bio])
 
   const mutation = useMutation({
     mutationFn: updateProfile,
@@ -182,10 +184,10 @@ const PersonalInfoSection: React.FC = () => {
         phone:     updated.phone,
         bio:       updated.bio,
       })
-      toast.success('Profile updated')
+      toast.success(t('profile.saved'))
     },
     onError: () => {
-      toast.error('Error updating profile')
+      toast.error(t('profile.saveError'))
     },
   })
 
@@ -214,12 +216,12 @@ const PersonalInfoSection: React.FC = () => {
     <div className={CARD}>
       <div className="mb-6 flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Personal information</h2>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Your visible and editable details in one place.</p>
+          <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{t('profile.personalInfo')}</h2>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t('profile.personalInfoHint')}</p>
         </div>
         {!isEditing && (
           <Button type="button" variant="secondary" size="sm" leftIcon={<PencilLine size={14} />} onClick={() => setIsEditing(true)}>
-            Edit
+            {t('profile.edit')}
           </Button>
         )}
       </div>
@@ -227,41 +229,49 @@ const PersonalInfoSection: React.FC = () => {
       {!isEditing ? (
         <div className="space-y-4">
           <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
-            <p className="text-sm font-semibold text-gray-900">Full name</p>
+            <p className="text-sm font-semibold text-gray-900">{t('profile.fullName')}</p>
             <p className="mt-1 text-sm text-gray-600">{user?.firstName} {user?.lastName}</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
-              <p className="text-sm font-semibold text-gray-900">Phone</p>
-              <p className="mt-1 text-sm text-gray-600">{user?.phone || 'Not provided'}</p>
+              <p className="text-sm font-semibold text-gray-900">{t('profile.phone')}</p>
+              <p className="mt-1 text-sm text-gray-600">{user?.phone || t('profile.phoneNotProvided')}</p>
             </div>
             <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
-              <p className="text-sm font-semibold text-gray-900">Email</p>
+              <p className="text-sm font-semibold text-gray-900">{t('profile.email')}</p>
               <p className="mt-1 text-sm text-gray-600">{user?.email}</p>
             </div>
           </div>
           <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
-            <p className="text-sm font-semibold text-gray-900">Bio</p>
-            <p className="mt-1 text-sm text-gray-600">{user?.bio || 'No bio added.'}</p>
+            <p className="text-sm font-semibold text-gray-900">{t('profile.bio')}</p>
+            <p className="mt-0.5 text-xs text-gray-400">{t('profile.bioHint')}</p>
+            <p className="mt-1 text-sm text-gray-600">{user?.bio || t('profile.bioEmpty')}</p>
           </div>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Input label="First name" name="firstName" value={form.firstName} onChange={handleChange} required />
-            <Input label="Last name" name="lastName" value={form.lastName} onChange={handleChange} required />
+            <Input label={t('profile.firstName')} name="firstName" value={form.firstName} onChange={handleChange} required />
+            <Input label={t('profile.lastName')} name="lastName" value={form.lastName} onChange={handleChange} required />
           </div>
 
-          <Input label="Phone" name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder="+33 6 12 34 56 78" />
+          <Input label={t('profile.phone')} name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder="+33 6 12 34 56 78" />
 
-          <Textarea label="Bio" name="bio" rows={3} value={form.bio} onChange={handleChange} placeholder="Tell us a bit about yourself…" />
+          <Textarea
+            label={t('profile.bioOptional')}
+            name="bio"
+            rows={3}
+            value={form.bio}
+            onChange={handleChange}
+            placeholder={t('profile.bioPlaceholder')}
+          />
 
           <div className="flex flex-wrap justify-end gap-2 pt-1">
             <Button type="button" variant="secondary" onClick={() => { setIsEditing(false); setForm({ firstName: user?.firstName ?? '', lastName: user?.lastName ?? '', phone: user?.phone ?? '', bio: user?.bio ?? '' }) }}>
-              Cancel
+              {t('profile.cancel')}
             </Button>
             <Button type="submit" loading={mutation.isPending}>
-              Save
+              {t('profile.save')}
             </Button>
           </div>
         </form>
@@ -500,6 +510,7 @@ interface PasswordForm {
 type VisibleField = 'current' | 'new' | 'confirm'
 
 const SecuritySection: React.FC = () => {
+  const { t } = useTranslation()
   const [form, setForm] = useState<PasswordForm>({
     currentPassword: '',
     newPassword:     '',
@@ -520,7 +531,7 @@ const SecuritySection: React.FC = () => {
   const mutation = useMutation({
     mutationFn: changePassword,
     onSuccess: () => {
-      toast.success('Password changed successfully')
+      toast.success(t('profile.passwordChanged'))
       setForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
       setFieldError('')
     },
@@ -529,7 +540,7 @@ const SecuritySection: React.FC = () => {
       const msg = axios.isAxiosError(err)
         ? (err.response?.data as { message?: string })?.message
         : undefined
-      setFieldError(msg ?? 'Error changing password')
+      setFieldError(msg ?? t('profile.passwordChangeError'))
     },
   })
 
@@ -544,13 +555,11 @@ const SecuritySection: React.FC = () => {
 
     // Validation côté client - miroir des règles backend pour un retour immédiat
     if (form.newPassword.length < MIN_PASSWORD_LEN) {
-      setFieldError(
-        `New password must be at least ${MIN_PASSWORD_LEN} characters`,
-      )
+      setFieldError(t('profile.passwordMin', { count: MIN_PASSWORD_LEN }))
       return
     }
     if (form.newPassword.length > MAX_PASSWORD_LEN) {
-      setFieldError(`Password must not exceed ${MAX_PASSWORD_LEN} characters`)
+      setFieldError(t('profile.passwordMax', { count: MAX_PASSWORD_LEN }))
       return
     }
     if (
@@ -559,13 +568,11 @@ const SecuritySection: React.FC = () => {
       !/[0-9]/.test(form.newPassword) ||
       !/[^A-Za-z0-9]/.test(form.newPassword)
     ) {
-      setFieldError(
-        'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character',
-      )
+      setFieldError(t('profile.passwordWeak'))
       return
     }
     if (form.newPassword !== form.confirmPassword) {
-      setFieldError('Passwords do not match')
+      setFieldError(t('profile.passwordMismatch'))
       return
     }
 
@@ -579,11 +586,11 @@ const SecuritySection: React.FC = () => {
     <div className={CARD}>
       <div className="flex items-center gap-2.5 mb-6">
         <SectionIcon icon={<Lock size={16} />} />
-        <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Security</h2>
+        <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{t('profile.security')}</h2>
       </div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Input
-          label="Current password"
+          label={t('profile.currentPassword')}
           name="currentPassword"
           type={visible.current ? 'text' : 'password'}
           value={form.currentPassword}
@@ -594,18 +601,18 @@ const SecuritySection: React.FC = () => {
           onRightIconClick={() => toggle('current')}
         />
         <Input
-          label="New password"
+          label={t('profile.newPassword')}
           name="newPassword"
           type={visible.new ? 'text' : 'password'}
           value={form.newPassword}
           onChange={handleChange}
-          helperText={`${MIN_PASSWORD_LEN}+ chars · uppercase · number`}
+          helperText={t('profile.passwordHint', { count: MIN_PASSWORD_LEN })}
           required
           rightIcon={visible.new ? <EyeOff size={16} /> : <Eye size={16} />}
           onRightIconClick={() => toggle('new')}
         />
         <Input
-          label="Confirm new password"
+          label={t('profile.confirmPassword')}
           name="confirmPassword"
           type={visible.confirm ? 'text' : 'password'}
           value={form.confirmPassword}
@@ -616,7 +623,7 @@ const SecuritySection: React.FC = () => {
         />
         <div className="flex justify-end pt-1">
           <Button type="submit" loading={mutation.isPending}>
-            Change password
+            {t('profile.changePassword')}
           </Button>
         </div>
       </form>
@@ -940,6 +947,7 @@ const DataPrivacySection: React.FC = () => {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 const UserProfile: React.FC = () => {
+  const { t } = useTranslation()
   const { user } = useAuthStore()
   const [activeTab, setActiveTab] = useState<SettingsTab>('compte')
 
@@ -956,7 +964,7 @@ const UserProfile: React.FC = () => {
     { id: 'confidentialite', label: 'Confidentialité', icon: <ShieldAlert size={18} /> },
   ]
 
-  const visibleTabs = tabs.filter((t) => !t.ownerOnly || isOwner)
+  const visibleTabs = tabs.filter((tab) => !tab.ownerOnly || isOwner)
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -972,7 +980,7 @@ const UserProfile: React.FC = () => {
               )}
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-gray-900">My profile</h1>
+              <h1 className="text-lg font-semibold text-gray-900">{t('profile.title')}</h1>
               <p className="text-sm text-gray-500">{user.firstName} {user.lastName} · {user.email}</p>
             </div>
           </div>
@@ -982,7 +990,7 @@ const UserProfile: React.FC = () => {
               className="inline-flex items-center justify-center gap-2 text-sm font-medium text-ocean-700 hover:text-ocean-800"
             >
               <ExternalLink size={15} />
-              View my public profile
+              {t('profile.viewPublic')}
             </Link>
           )}
         </div>

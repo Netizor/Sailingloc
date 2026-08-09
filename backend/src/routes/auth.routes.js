@@ -140,10 +140,15 @@ export function formatUser(u) {
 
 // ─── POST /auth/register ───────────────────────────────────
 router.post('/register', registerLimiter, async (req, res) => {
-  const { email, password, firstName, lastName, role } = req.body
+  const { email, password, firstName, lastName, role, phone } = req.body
 
   const registerError = validateRegisterInput({ email, password, firstName, lastName })
   if (registerError) return res.status(400).json({ message: registerError })
+
+  const phoneValue = typeof phone === 'string' ? phone.trim() : ''
+  if (phoneValue && !/^\+?[\d\s\-().]{0,20}$/.test(phoneValue)) {
+    return res.status(400).json({ message: 'Numéro de téléphone invalide' })
+  }
 
   const userRole = resolveRole(role)
 
@@ -153,14 +158,17 @@ router.post('/register', registerLimiter, async (req, res) => {
 
   const hashedPassword = await bcrypt.hash(password, 12)
 
-  const { data: user, error } = await supabase.from('users').insert({
+  const insertPayload = {
     email: email.toLowerCase().trim(),
     password: hashedPassword,
     first_name: firstName.trim(),
     last_name: lastName.trim(),
     role: userRole,
     terms_accepted_at: new Date().toISOString(),
-  }).select().single()
+  }
+  if (phoneValue) insertPayload.phone = phoneValue
+
+  const { data: user, error } = await supabase.from('users').insert(insertPayload).select().single()
 
   if (error) return res.status(500).json({ message: 'Erreur lors de la création du compte' })
 
@@ -172,7 +180,11 @@ router.post('/register', registerLimiter, async (req, res) => {
     expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
   })
 
-  try { await sendEmailVerification(user.email, user.first_name, verifToken) } catch {}
+  try {
+    await sendEmailVerification(user.email, user.first_name, verifToken)
+  } catch (err) {
+    console.error('[Register] Échec envoi email de vérification:', err?.message || err)
+  }
 
   const accessToken  = signAccessToken({ sub: user.id, role: user.role })
   const refreshToken = generateRefreshToken()

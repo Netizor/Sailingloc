@@ -105,14 +105,20 @@ const BookingForm: React.FC<BookingFormProps> = ({
     } catch {}
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Autosave on changes (debounce 600 ms)
+  // Autosave only when the user has started a real booking (dates chosen)
   useEffect(() => {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
     saveTimerRef.current = setTimeout(() => {
       try {
+        // Ne pas créer de brouillon juste en ouvrant la fiche bateau
+        if (!range?.from) {
+          localStorage.removeItem(bookingDraftKey)
+          setSavedAt(null)
+          return
+        }
         const now = new Date()
         localStorage.setItem(bookingDraftKey, JSON.stringify({
-          range: range ? { from: range.from?.toISOString(), to: range.to?.toISOString() } : null,
+          range: { from: range.from?.toISOString(), to: range.to?.toISOString() },
           withSkipper,
           message,
           passengers,
@@ -123,7 +129,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
       } catch {}
     }, 600)
     return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current) }
-  }, [range, withSkipper, message, passengers, bookingDraftKey])
+  }, [range, withSkipper, message, passengers, bookingDraftKey, boat.title])
 
   const disabledSet = useMemo(() => new Set(disabledDates), [disabledDates])
 
@@ -140,7 +146,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
   )
   const calendarModifiersStyles = useMemo(
     () => ({
-      booked: { backgroundColor: '#2563FF', color: '#fff', borderRadius: '8px' },
+      booked: { backgroundColor: '#1A6FA8', color: '#fff', borderRadius: '8px' },
       indispo: {
         backgroundColor: '#003366',
         color: '#fff',
@@ -245,7 +251,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
             <div
               className="flex justify-center rounded-xl border border-gray-100 p-2"
               style={{
-                '--rdp-accent-color': '#2563FF',
+                '--rdp-accent-color': '#1A6FA8',
                 '--rdp-background-color': '#eef3fb',
                 '--rdp-selected-color': '#fff',
               } as React.CSSProperties}
@@ -269,7 +275,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
             <div className="grid grid-cols-2 gap-2">
               <div className={cn(
                 'rounded-lg border px-3 py-2 text-sm',
-                startDate ? 'border-[#2563FF]/40 bg-[#eef3fb] text-[#003366]' : 'border-gray-200 text-gray-400'
+                startDate ? 'border-[#1A6FA8]/40 bg-[#eef3fb] text-[#003366]' : 'border-gray-200 text-gray-400'
               )}>
                 <p className="text-[10px] font-bold uppercase tracking-wider mb-0.5">{t('booking.startDate')}</p>
                 <p className="font-medium">
@@ -278,7 +284,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               </div>
               <div className={cn(
                 'rounded-lg border px-3 py-2 text-sm',
-                endDate ? 'border-[#2563FF]/40 bg-[#eef3fb] text-[#003366]' : 'border-gray-200 text-gray-400'
+                endDate ? 'border-[#1A6FA8]/40 bg-[#eef3fb] text-[#003366]' : 'border-gray-200 text-gray-400'
               )}>
                 <p className="text-[10px] font-bold uppercase tracking-wider mb-0.5">{t('booking.endDate')}</p>
                 <p className="font-medium">
@@ -291,7 +297,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
               <select
                 value={passengers}
                 onChange={(e) => setPassengers(Number(e.target.value))}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-[#003366] focus:outline-none focus:ring-2 focus:ring-[#2563FF]/30"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-[#003366] focus:outline-none focus:ring-2 focus:ring-[#1A6FA8]/30"
               >
                 {Array.from({ length: boat.capacity }, (_, i) => i + 1).map((n) => (
                   <option key={n} value={n}>
@@ -303,7 +309,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
             {dateError && <p className="text-xs text-red-600">{dateError}</p>}
             <div className="flex items-center gap-4 text-[10px] text-[#8A94A6]">
               <span className="flex items-center gap-1">
-                <span className="h-2.5 w-2.5 rounded-sm bg-[#2563FF] inline-block" />
+                <span className="h-2.5 w-2.5 rounded-sm bg-[#1A6FA8] inline-block" />
                 {t('booking.form.booked')}
               </span>
               <span className="flex items-center gap-1">
