@@ -48,8 +48,13 @@ export const getMe = async (): Promise<User> => {
  * Demande un lien de réinitialisation de mot de passe par email.
  * Retourne toujours 200 même si l'email n'existe pas (anti-énumération).
  */
-export const forgotPassword = async (email: string): Promise<{ message: string }> => {
-  const { data } = await api.post<{ message: string }>('/auth/forgot-password', { email })
+export const forgotPassword = async (
+  email: string,
+): Promise<{ message: string; exists?: boolean }> => {
+  const { data } = await api.post<{ message: string; exists?: boolean }>(
+    '/auth/forgot-password',
+    { email },
+  )
   return data
 }
 

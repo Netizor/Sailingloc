@@ -609,7 +609,7 @@ router.post('/:id/cancel', authenticate, async (req, res, next) => {
 // ─── POST /bookings/:id/payment-intent ────────────────────
 router.post('/:id/payment-intent', authenticate, async (req, res, next) => {
   try {
-    if (!stripe) return res.status(503).json({ message: 'Paiement en ligne non disponible — Stripe non configuré (ajoutez STRIPE_SECRET_KEY dans .env)' })
+    if (!stripe) return res.status(503).json({ message: 'Paiement en ligne non disponible : Stripe non configuré (ajoutez STRIPE_SECRET_KEY dans .env)' })
 
     const { data: booking } = await supabase.from('bookings').select('*, boats(title)').eq('id', req.params.id).single()
     if (!booking) return res.status(404).json({ message: 'Réservation introuvable' })
@@ -622,7 +622,7 @@ router.post('/:id/payment-intent', authenticate, async (req, res, next) => {
         amount: Math.round(booking.total_price * 100),
         currency: 'eur',
         metadata: { bookingId: String(booking.id) },
-        description: `SailingLoc – ${booking.boats?.title || 'Réservation'}`,
+        description: `SailingLoc : ${booking.boats?.title || 'Réservation'}`,
       })
     } catch (err) {
       const statusCode = err?.statusCode || err?.raw?.statusCode
@@ -641,7 +641,7 @@ router.post('/:id/payment-intent', authenticate, async (req, res, next) => {
     return res.json({ clientSecret: intent.client_secret, bookingId: booking.id, amount: booking.total_price })
   } catch (err) {
     if (err?.type === 'StripeAuthenticationError') {
-      return res.status(503).json({ message: 'Clé Stripe invalide — vérifiez STRIPE_SECRET_KEY dans .env' })
+      return res.status(503).json({ message: 'Clé Stripe invalide : vérifiez STRIPE_SECRET_KEY dans .env' })
     }
     next(err)
   }

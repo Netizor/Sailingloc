@@ -518,7 +518,7 @@
       "rememberMe": "Remember me",
       "forgotPassword": "Forgot password?",
       "submit": "Sign in",
-      "quote": "\"The sea is a space of infinite freedom — we are its guardians for your finest memories.\"",
+      "quote": "\"The sea is a space of infinite freedom: we are its guardians for your finest memories.\"",
       "quoteAuthor": "CAPTAIN MARC L, SAILINGLOC EXPERT",
       "ownersTrust": "+1,200 Owners",
       "ownersTrustHint": "trust us every day",
@@ -534,15 +534,20 @@
     },
     "forgotPassword": {
       "title": "Forgot password",
-      "subtitle": "Enter your email to receive a reset link",
+      "titleLine1": "Reset your",
+      "titleLine2": "password",
+      "subtitle": "Enter your email to receive a secure reset link.",
       "email": "Email address",
       "emailPlaceholder": "you@example.com",
       "submit": "Send reset link",
       "backToLogin": "Back to login",
       "successTitle": "Email sent!",
-      "successMessage": "If this email is associated with an account, you will receive a reset link shortly. Check your spam folder too.",
+      "successMessage": "A reset link has been sent to your email address. Also check your spam folder.",
+      "noAccountMessage": "No account is associated with this email.",
       "noAccountHint": "Don't have an account yet?",
       "createAccount": "Create an account",
+      "rememberPassword": "Remember your password?",
+      "signIn": "Sign in",
       "errorEmail": "Email is required",
       "errorEmailInvalid": "Invalid email",
       "errorGeneral": "An error occurred. Please try again."
@@ -906,7 +911,23 @@
     "passwordMin": "New password must be at least {{count}} characters",
     "passwordMax": "Password must not exceed {{count}} characters",
     "passwordWeak": "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character",
-    "passwordMismatch": "Passwords do not match"
+    "passwordMismatch": "Passwords do not match",
+    "payment": {
+      "title": "Payment",
+      "subtitle": "Manage your payment method and enjoy a secure checkout for your bookings.",
+      "account": "Payment account",
+      "status": "Status",
+      "statusValue": "Secure payments via Stripe",
+      "addCard": "Add a card",
+      "addCardHint": "Save a card to speed up bookings and pay securely.",
+      "stripeTitle": "Stripe payments",
+      "stripeHint": "Your bookings use Stripe as the primary payment method, with a secure experience.",
+      "secure": "Secure",
+      "saveCard": "Save card",
+      "cardAdded": "Card added successfully",
+      "setupError": "Unable to start card setup right now.",
+      "genericError": "Something went wrong."
+    }
   },
   "messages": {
     "title": "Messages",
@@ -1410,7 +1431,7 @@
     "heroBadge": "Owner guide",
     "heroTitle": "Rent your boat peer to peer",
     "heroSubtitle": "List your sailboat or motorboat, sign rental contracts with registered renters, and estimate your earnings after SailingLoc's 10% fee.",
-    "heroCta": "Become an owner — it's free",
+    "heroCta": "Become an owner: it's free",
     "stepsTitle": "5 steps to start renting",
     "steps": {
       "1": {
@@ -1572,7 +1593,7 @@
       "publisherContact": "Contact: contact@sailingloc.fr",
       "hostingTitle": "Hosting",
       "hostingP1Before": "The website is hosted by ",
-      "hostingP1After": ", 340 Pine Street, Suite 900, San Francisco, CA 94104, USA — for the frontend.",
+      "hostingP1After": ", 340 Pine Street, Suite 900, San Francisco, CA 94104, USA; for the frontend.",
       "hostingP2Before": "The backend is hosted by ",
       "hostingP2After": ", 340 S Lemon Ave #4133, Walnut, CA 91789, USA.",
       "hostingP3Before": "Media (boat photos) are hosted by ",
@@ -1596,7 +1617,7 @@
       "sections": {
         "1": {
           "title": "1. Data controller",
-          "body": "SailingLoc SAS, 12 Quai de la Joliette, 13002 Marseille — contact@sailingloc.fr. DPO: dpo@sailingloc.fr"
+          "body": "SailingLoc SAS, 12 Quai de la Joliette, 13002 Marseille; contact@sailingloc.fr. DPO: dpo@sailingloc.fr"
         },
         "2": {
           "title": "2. Data collected",

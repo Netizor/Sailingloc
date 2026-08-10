@@ -22,23 +22,29 @@ export default defineConfig({
       },
 
       // Fichiers pré-cachés au build (shell applicatif)
-      includeAssets: ['icons/icon.svg', 'favicon.svg', 'logo.png', 'anchor.svg'],
+      includeAssets: ['logo.png', 'logo-dark.png', 'logo_mobile.png'],
 
       manifest: {
         name: 'SailingLoc',
         short_name: 'SailingLoc',
         description: 'Location de bateaux entre particuliers',
-        theme_color: '#0369a1',
+        theme_color: '#2563FF',
         background_color: '#ffffff',
         display: 'standalone',
         start_url: '/',
         lang: 'fr',
         icons: [
           {
-            src: '/icons/icon.svg',
+            src: '/logo_mobile.png',
             sizes: '192x192 512x512',
-            type: 'image/svg+xml',
-            purpose: 'any maskable',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: '/logo_mobile.png',
+            sizes: '192x192 512x512',
+            type: 'image/png',
+            purpose: 'maskable',
           },
         ],
       },

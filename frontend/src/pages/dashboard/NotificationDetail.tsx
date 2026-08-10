@@ -178,7 +178,7 @@ const NotificationDetail: React.FC = () => {
             <div className="mt-6">
               <Link
                 to={actionLink.to}
-                className="inline-flex items-center gap-2 bg-ocean-700 hover:bg-ocean-800 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors"
+                className="inline-flex items-center gap-2 bg-brand-blue hover:bg-ocean-600 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors"
               >
                 {actionLink.label}
                 <ExternalLink size={14} />

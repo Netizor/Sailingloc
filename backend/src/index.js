@@ -34,7 +34,7 @@ const PORT = process.env.PORT || 3000
 app.use(helmet())
 app.use('/', sitemapRoutes)
 
-// CORS — n'autoriser que le frontend déclaré en .env
+// CORS : n'autoriser que le frontend déclaré en .env
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true,
@@ -42,7 +42,7 @@ app.use(cors({
 
 // Rate limit global : 200 req / 15 min par IP
 // Désactivé en development (et si DISABLE_RATE_LIMIT=1) pour permettre k6 / E2E
-// sans saturer le plafond après quelques scénarios (~130–140 req chacun).
+// sans saturer le plafond après quelques scénarios (~130-140 req chacun).
 if (process.env.NODE_ENV !== 'development' && process.env.DISABLE_RATE_LIMIT !== '1') {
   app.use(rateLimit({
     windowMs: 15 * 60 * 1000,

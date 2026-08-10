@@ -35,7 +35,7 @@ export function validatePassword(password) {
   return null
 }
 
-/** Un utilisateur ne peut choisir que RENTER ou OWNER à l'inscription — jamais ADMIN. */
+/** Un utilisateur ne peut choisir que RENTER ou OWNER à l'inscription : jamais ADMIN. */
 export function resolveRole(role) {
   const allowedRoles = ['RENTER', 'OWNER']
   return allowedRoles.includes(role) ? role : 'RENTER'
@@ -270,41 +270,56 @@ router.get('/me', authenticate, (req, res) => {
 router.post('/forgot-password', resetLimiter, async (req, res) => {
   try {
     const { email } = req.body
-    if (!email) return res.json({ message: 'Si cet email existe, un lien a été envoyé.' })
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({ message: 'L\'email est requis', exists: false })
+    }
 
     const { data: user, error: userErr } = await supabase
       .from('users')
       .select('id, first_name')
-      .eq('email', email.toLowerCase())
+      .eq('email', email.toLowerCase().trim())
       .single()
 
     if (userErr && userErr.code !== 'PGRST116') {
       console.error('[ForgotPassword] DB error:', userErr.message)
+      return res.status(500).json({ message: 'Une erreur est survenue. Veuillez réessayer.' })
     }
 
-    if (user) {
-      await supabase.from('password_reset_tokens').delete().eq('user_id', user.id)
-      const token = uuidv4()
-      const { error: insertErr } = await supabase.from('password_reset_tokens').insert({
-        token,
-        user_id: user.id,
-        expires_at: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+    if (!user) {
+      return res.status(404).json({
+        exists: false,
+        message: 'Aucun compte n\'est associé à cet email.',
       })
-      if (insertErr) {
-        console.error('[ForgotPassword] Token insert error:', insertErr.message)
-      } else {
-        try {
-          await sendPasswordReset(email, user.first_name, token)
-          console.log('[ForgotPassword] Email envoyé à', email)
-        } catch (emailErr) {
-          console.error('[ForgotPassword] Échec envoi email:', emailErr?.message ?? emailErr)
-        }
-      }
     }
+
+    await supabase.from('password_reset_tokens').delete().eq('user_id', user.id)
+    const token = uuidv4()
+    const { error: insertErr } = await supabase.from('password_reset_tokens').insert({
+      token,
+      user_id: user.id,
+      expires_at: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+    })
+    if (insertErr) {
+      console.error('[ForgotPassword] Token insert error:', insertErr.message)
+      return res.status(500).json({ message: 'Une erreur est survenue. Veuillez réessayer.' })
+    }
+
+    try {
+      await sendPasswordReset(email, user.first_name, token)
+      console.log('[ForgotPassword] Email envoyé à', email)
+    } catch (emailErr) {
+      console.error('[ForgotPassword] Échec envoi email:', emailErr?.message ?? emailErr)
+      return res.status(500).json({ message: 'Impossible d\'envoyer l\'email. Veuillez réessayer.' })
+    }
+
+    return res.json({
+      exists: true,
+      message: 'Un lien de réinitialisation a été envoyé à votre adresse email.',
+    })
   } catch (err) {
     console.error('[ForgotPassword] Erreur inattendue:', err?.message ?? err)
+    return res.status(500).json({ message: 'Une erreur est survenue. Veuillez réessayer.' })
   }
-  return res.json({ message: 'Si cet email existe, un lien a été envoyé.' })
 })
 
 // ─── POST /auth/reset-password ────────────────────────────

@@ -73,7 +73,7 @@ const OwnerBookings: React.FC = () => {
               onClick={() => handleTabChange(tab.key)}
               className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                 activeTab === tab.key
-                  ? 'bg-ocean-700 text-white'
+                  ? 'bg-brand-blue text-white'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
             >

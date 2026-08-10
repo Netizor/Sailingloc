@@ -258,7 +258,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           <div className="flex items-center p-2 md:pl-0">
             <button
               type="submit"
-              className="sl-btn-navy w-12 h-12 flex items-center justify-center rounded-full shadow-md transition-colors flex-shrink-0"
+              className="w-12 h-12 flex items-center justify-center rounded-full shadow-md transition-colors flex-shrink-0 bg-brand-blue hover:bg-ocean-600"
               aria-label={t('common.search')}
             >
               <Search size={20} strokeWidth={2.5} color="#ffffff" />
@@ -495,7 +495,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             type="submit"
             variant="primary"
             size="lg"
-            className="whitespace-nowrap rounded-xl px-6 bg-brand-navy hover:bg-ocean-800"
+            className="whitespace-nowrap rounded-xl px-6"
             leftIcon={<Search size={18} />}
           >
             {t('common.search')}

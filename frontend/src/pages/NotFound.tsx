@@ -39,7 +39,7 @@ const NotFound: React.FC = () => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
             <Link
               to="/"
-              className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-xs font-bold uppercase tracking-[0.12em] text-white bg-[#003366] hover:bg-[#002a52] rounded-lg transition-colors"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-xs font-bold uppercase tracking-[0.12em] text-white bg-[#2563FF] hover:bg-[#1D4ED8] rounded-lg transition-colors"
             >
               {t('notFound.backHome')}
             </Link>

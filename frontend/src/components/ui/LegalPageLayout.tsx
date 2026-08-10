@@ -38,7 +38,7 @@ const LegalPageLayout: React.FC<LegalPageLayoutProps> = ({ title, lastUpdated, c
                     [
                       'block py-2.5 pl-4 pr-3 text-sm border-l-[3px] transition-colors',
                       isActive
-                        ? 'border-[#1A6FA8] text-[#003366] dark:text-white font-semibold bg-white/60 dark:bg-gray-800/60'
+                        ? 'border-[#2563FF] text-[#003366] dark:text-white font-semibold bg-white/60 dark:bg-gray-800/60'
                         : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-[#003366] dark:hover:text-gray-200',
                     ].join(' ')
                   }

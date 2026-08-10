@@ -120,7 +120,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ onClose }) => {
           </button>
           <button
             onClick={handleNext}
-            className="inline-flex items-center gap-2 bg-ocean-700 hover:bg-ocean-800 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"
+            className="inline-flex items-center gap-2 bg-brand-blue hover:bg-ocean-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"
           >
             {isLast ? t('onboarding.createListing') : t('onboarding.next')}
             <ArrowRight size={15} />

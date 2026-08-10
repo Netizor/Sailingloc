@@ -237,7 +237,7 @@ const Conversation: React.FC = () => {
             type="submit"
             disabled={!draft.trim() || mutation.isPending}
             aria-label="Envoyer"
-            className="h-11 w-11 flex items-center justify-center rounded-xl bg-ocean-600 text-white hover:bg-ocean-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+            className="h-11 w-11 flex items-center justify-center rounded-xl bg-brand-blue text-white hover:bg-ocean-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
           >
             {mutation.isPending ? (
               <span className="h-4 w-4 border-2 border-white/50 border-t-white rounded-full animate-spin" />

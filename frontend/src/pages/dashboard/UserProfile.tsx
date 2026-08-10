@@ -9,7 +9,7 @@ import {
   useStripe,
 } from '@stripe/react-stripe-js'
 import {
-  Anchor, Camera, Download, Eye, EyeOff, FileCheck, Lock, ShieldAlert,
+  Anchor, Camera, Eye, EyeOff, FileCheck, Lock, ShieldAlert,
   Trash2, Upload, UserCircle, Shield, ExternalLink, ChevronRight,
   CreditCard, PencilLine,
 } from 'lucide-react'
@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
 
 import { useAuthStore } from '../../store/auth.store'
-import { updateProfile, changePassword, uploadAvatar, uploadSailorCvDocument, exportMyData, deleteAccount } from '../../api/users.api'
+import { updateProfile, changePassword, uploadAvatar, uploadSailorCvDocument, deleteAccount } from '../../api/users.api'
 import { stripeApi } from '../../api/stripe.api'
 import Input from '../../components/ui/Input'
 import Textarea from '../../components/ui/Textarea'
@@ -640,6 +640,7 @@ interface AddCardModalProps {
 }
 
 const AddCardModal: React.FC<AddCardModalProps> = ({ isOpen, onClose, onSuccess }) => {
+  const { t } = useTranslation()
   const [setupClientSecret, setSetupClientSecret] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -662,7 +663,7 @@ const AddCardModal: React.FC<AddCardModalProps> = ({ isOpen, onClose, onSuccess 
       } catch {
         if (!isCancelled) {
           setSetupClientSecret(null)
-          setError('Unable to start card setup right now.')
+          setError(t('profile.payment.setupError'))
         }
       }
     }
@@ -671,15 +672,18 @@ const AddCardModal: React.FC<AddCardModalProps> = ({ isOpen, onClose, onSuccess 
     return () => {
       isCancelled = true
     }
-  }, [isOpen])
+  }, [isOpen, t])
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Add a card" size="md">
+    <Modal isOpen={isOpen} onClose={onClose} title={t('profile.payment.addCard')} size="md">
       <div className="p-6">
         {error ? (
           <p className="text-sm text-red-600">{error}</p>
         ) : setupClientSecret && stripePromise ? (
-          <Elements stripe={stripePromise} options={{ clientSecret: setupClientSecret }}>
+          <Elements
+            stripe={stripePromise}
+            options={{ clientSecret: setupClientSecret, locale: 'fr' }}
+          >
             <AddCardForm onSuccess={onSuccess} onCancel={onClose} />
           </Elements>
         ) : (
@@ -698,6 +702,7 @@ interface AddCardFormProps {
 }
 
 const AddCardForm: React.FC<AddCardFormProps> = ({ onSuccess, onCancel }) => {
+  const { t } = useTranslation()
   const stripe = useStripe()
   const elements = useElements()
   const [loading, setLoading] = useState(false)
@@ -721,7 +726,7 @@ const AddCardForm: React.FC<AddCardFormProps> = ({ onSuccess, onCancel }) => {
     setLoading(false)
 
     if (stripeError) {
-      setError(stripeError.message ?? 'Something went wrong.')
+      setError(stripeError.message ?? t('profile.payment.genericError'))
     } else {
       onSuccess()
     }
@@ -733,10 +738,10 @@ const AddCardForm: React.FC<AddCardFormProps> = ({ onSuccess, onCancel }) => {
       {error && <p className="text-sm text-red-600">{error}</p>}
       <div className="flex flex-wrap gap-3">
         <Button type="submit" loading={loading} disabled={!stripe}>
-          Save card
+          {t('profile.payment.saveCard')}
         </Button>
         <Button type="button" variant="secondary" onClick={onCancel} disabled={loading}>
-          Cancel
+          {t('profile.cancel')}
         </Button>
       </div>
     </form>
@@ -744,12 +749,13 @@ const AddCardForm: React.FC<AddCardFormProps> = ({ onSuccess, onCancel }) => {
 }
 
 const PaymentSection: React.FC = () => {
+  const { t } = useTranslation()
   const { user } = useAuthStore()
   const [isAddCardOpen, setIsAddCardOpen] = useState(false)
 
   const handleCardSaved = () => {
     setIsAddCardOpen(false)
-    toast.success('Card added successfully')
+    toast.success(t('profile.payment.cardAdded'))
   }
 
   return (
@@ -757,8 +763,12 @@ const PaymentSection: React.FC = () => {
       <div className={CARD}>
         <div className="flex items-start justify-between gap-3 mb-6">
           <div>
-            <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Payment</h2>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Manage your payment method and enjoy a secure checkout for your bookings.</p>
+            <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+              {t('profile.payment.title')}
+            </h2>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              {t('profile.payment.subtitle')}
+            </p>
           </div>
           <div className="rounded-2xl bg-ocean-50 p-2 text-ocean-700">
             <CreditCard size={18} />
@@ -768,7 +778,7 @@ const PaymentSection: React.FC = () => {
         <div className="rounded-3xl border border-gray-100 bg-gradient-to-br from-[#071d49] via-[#0A737A] to-[#0f8e9d] p-5 text-white shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-white/70">Payment account</p>
+              <p className="text-sm text-white/70">{t('profile.payment.account')}</p>
               <p className="mt-1 text-lg font-semibold">{user?.email}</p>
             </div>
             <div className="rounded-2xl bg-white/15 p-3">
@@ -776,24 +786,24 @@ const PaymentSection: React.FC = () => {
             </div>
           </div>
           <div className="mt-6 rounded-2xl bg-white/10 p-4 backdrop-blur-sm">
-            <p className="text-sm text-white/70">Status</p>
-            <p className="mt-1 text-base font-semibold">Secure payments via Stripe</p>
+            <p className="text-sm text-white/70">{t('profile.payment.status')}</p>
+            <p className="mt-1 text-base font-semibold">{t('profile.payment.statusValue')}</p>
           </div>
         </div>
 
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
-            <p className="text-sm font-semibold text-gray-900">Add a card</p>
-            <p className="mt-1 text-sm text-gray-600">Save a card to speed up bookings and pay securely.</p>
+            <p className="text-sm font-semibold text-gray-900">{t('profile.payment.addCard')}</p>
+            <p className="mt-1 text-sm text-gray-600">{t('profile.payment.addCardHint')}</p>
             <Button onClick={() => setIsAddCardOpen(true)} size="sm" className="mt-4">
-              Add a card
+              {t('profile.payment.addCard')}
             </Button>
           </div>
           <div className="rounded-2xl border border-gray-100 bg-white p-4">
-            <p className="text-sm font-semibold text-gray-900">Stripe payments</p>
-            <p className="mt-1 text-sm text-gray-600">Your bookings use Stripe as the primary payment method, with a secure experience.</p>
+            <p className="text-sm font-semibold text-gray-900">{t('profile.payment.stripeTitle')}</p>
+            <p className="mt-1 text-sm text-gray-600">{t('profile.payment.stripeHint')}</p>
             <div className="mt-3 inline-flex rounded-full bg-ocean-50 px-3 py-1 text-xs font-semibold text-ocean-700">
-              Secure
+              {t('profile.payment.secure')}
             </div>
           </div>
         </div>
@@ -813,22 +823,6 @@ const DataPrivacySection: React.FC = () => {
   // État de la modale de confirmation de suppression
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [confirmEmail, setConfirmEmail]       = useState('')
-
-  const exportMutation = useMutation({
-    mutationFn: exportMyData,
-    onSuccess: (data) => {
-      // Déclenche le téléchargement du fichier JSON côté client
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-      const url  = URL.createObjectURL(blob)
-      const a    = document.createElement('a')
-      a.href     = url
-      a.download = `sailingloc-mes-donnees-${new Date().toISOString().slice(0, 10)}.json`
-      a.click()
-      URL.revokeObjectURL(url)
-      toast.success('Export téléchargé')
-    },
-    onError: () => toast.error("Erreur lors de l'export"),
-  })
 
   const deleteMutation = useMutation({
     mutationFn: deleteAccount,
@@ -860,30 +854,11 @@ const DataPrivacySection: React.FC = () => {
         <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Données &amp; confidentialité</h2>
       </div>
       <p className="text-xs text-gray-500 dark:text-gray-400 mb-6 ml-[46px]">
-        Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de portabilité et d&apos;effacement de vos données.
+        Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès et d&apos;effacement de vos données.
       </p>
 
-      {/* Export */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-gray-100 dark:border-gray-700">
-        <div>
-          <p className="text-sm font-medium text-gray-800 dark:text-gray-200">Exporter mes données</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            Téléchargez une copie de vos données personnelles au format JSON.
-          </p>
-        </div>
-        <Button
-          variant="secondary"
-          size="sm"
-          leftIcon={<Download size={14} />}
-          loading={exportMutation.isPending}
-          onClick={() => exportMutation.mutate()}
-        >
-          Exporter
-        </Button>
-      </div>
-
       {/* Account deletion */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <p className="text-sm font-medium text-red-600 dark:text-red-400">Supprimer mon compte</p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">

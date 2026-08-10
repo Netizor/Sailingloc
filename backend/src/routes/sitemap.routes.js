@@ -5,7 +5,7 @@ const router = express.Router()
 
 const BASE_URL = process.env.FRONTEND_URL || 'https://dsp-dev-o24a-g4.cloud'
 
-// Pages statiques du site — priorité et fréquence de mise à jour indicatives pour Google
+// Pages statiques du site : priorité et fréquence de mise à jour indicatives pour Google
 const staticPages = [
   { path: '/', priority: '1.0', changefreq: 'daily' },
   { path: '/bateaux', priority: '0.9', changefreq: 'daily' },

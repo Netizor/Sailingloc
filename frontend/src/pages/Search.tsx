@@ -314,7 +314,7 @@ const Search: React.FC = () => {
                           : 'sl-btn-outline flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap'
                       }
                     >
-                      <filter.Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-[#1A6FA8]'}`} />
+                      <filter.Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-[#2563FF]'}`} />
                       {filter.label}
                     </button>
                   )
@@ -437,7 +437,7 @@ const Search: React.FC = () => {
 
                           onClick={clearFilters}
 
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-[#1A6FA8] hover:underline"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-[#2563FF] hover:underline"
 
                         >
 

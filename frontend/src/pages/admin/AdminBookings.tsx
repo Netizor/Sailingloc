@@ -235,7 +235,7 @@ function ResolveDisputeModal({ booking, onClose, onResolved }: {
             type="button"
             onClick={() => resolution && mutation.mutate(resolution === 'complete' ? BookingStatus.COMPLETED : BookingStatus.CANCELLED)}
             disabled={!resolution || mutation.isPending}
-            className="flex-1 py-2.5 rounded-xl bg-ocean-700 hover:bg-ocean-800 text-white text-sm font-medium disabled:opacity-50">
+            className="flex-1 py-2.5 rounded-xl bg-brand-blue hover:bg-ocean-600 text-white text-sm font-medium disabled:opacity-50">
             {mutation.isPending ? 'Processing…' : 'Confirm'}
           </button>
         </div>

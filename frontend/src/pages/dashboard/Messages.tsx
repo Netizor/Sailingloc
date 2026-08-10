@@ -317,7 +317,7 @@ const Messages: React.FC = () => {
                 <button
                   type="submit"
                   disabled={!draft.trim() || sendMutation.isPending}
-                  className="h-10 w-10 flex items-center justify-center rounded-xl bg-ocean-600 text-white hover:bg-ocean-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+                  className="h-10 w-10 flex items-center justify-center rounded-xl bg-brand-blue text-white hover:bg-ocean-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
                 >
                   {sendMutation.isPending
                     ? <span className="h-4 w-4 border-2 border-white/50 border-t-white rounded-full animate-spin" />
@@ -473,7 +473,7 @@ const BoatPanel: React.FC<{ boatId: number }> = ({ boatId }) => {
         <div className="space-y-2">
           <Link
             to={`/bateaux/${boat.id}`}
-            className="flex items-center justify-center gap-1.5 w-full py-2 px-3 rounded-lg bg-ocean-600 hover:bg-ocean-700 text-white text-xs font-semibold transition-colors"
+            className="flex items-center justify-center gap-1.5 w-full py-2 px-3 rounded-lg bg-brand-blue hover:bg-ocean-600 text-white text-xs font-semibold transition-colors"
           >
             <ExternalLink size={12} />
             Voir l'annonce

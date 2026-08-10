@@ -174,8 +174,8 @@ const Temoignages: React.FC = () => {
                 className={[
                   'px-4 py-2 rounded-full text-sm font-medium transition-colors',
                   filter === item.key
-                    ? 'bg-brand-navy text-white shadow-sm'
-                    : 'bg-white dark:bg-gray-800 text-brand-slate dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-brand-navy/30',
+                    ? 'bg-brand-blue text-white shadow-sm'
+                    : 'bg-white dark:bg-gray-800 text-brand-slate dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-brand-blue/30',
                 ].join(' ')}
               >
                 {item.label}

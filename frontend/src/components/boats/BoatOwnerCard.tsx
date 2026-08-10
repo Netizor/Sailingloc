@@ -45,7 +45,7 @@ const BoatOwnerCard: React.FC<BoatOwnerCardProps> = ({ boat, onContact }) => {
         <div>
           <Link
             to={`/proprietaires/${boat.ownerId}`}
-            className="font-semibold text-[#003366] hover:text-[#1A6FA8] transition-colors"
+            className="font-semibold text-[#003366] hover:text-[#2563FF] transition-colors"
           >
             {fullName}
           </Link>
@@ -101,7 +101,7 @@ const BoatOwnerCard: React.FC<BoatOwnerCardProps> = ({ boat, onContact }) => {
 
           <Link
             to={`/proprietaires/${boat.ownerId}`}
-            className="inline-block text-xs font-medium text-[#1A6FA8] hover:underline"
+            className="inline-block text-xs font-medium text-[#2563FF] hover:underline"
           >
             View full profile
           </Link>
@@ -122,7 +122,7 @@ const BoatOwnerCard: React.FC<BoatOwnerCardProps> = ({ boat, onContact }) => {
       <button
         type="button"
         onClick={onContact}
-        className="w-full py-3 text-sm font-semibold text-[#003366] bg-white border border-gray-200 rounded-xl hover:border-[#1A6FA8] hover:text-[#1A6FA8] transition-colors"
+        className="w-full py-3 text-sm font-semibold text-[#003366] bg-white border border-gray-200 rounded-xl hover:border-[#2563FF] hover:text-[#2563FF] transition-colors"
       >
         {t('boatOwnerCard.contact', { name: owner.firstName })}
       </button>

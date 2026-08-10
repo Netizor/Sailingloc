@@ -355,12 +355,12 @@ const BoatDetail: React.FC = () => {
                 </h1>
                 <div className="flex items-center gap-2">
                   {boat.rating > 0 && (
-                    <span className="flex items-center gap-1.5 bg-[#006875] text-white text-sm font-semibold px-3 py-1.5 rounded-full">
+                    <span className="flex items-center gap-1.5 bg-[#2563FF] text-white text-sm font-semibold px-3 py-1.5 rounded-full">
                       <Star size={14} fill="white" strokeWidth={0} />
                       {boat.rating.toFixed(1)} ({boat.reviewCount} {t('boat.detail.reviews')})
                     </span>
                   )}
-                  <button type="button" onClick={handleShare} aria-label={t('boat.detail.share')} className="p-2 rounded-full border border-gray-200 text-[#8A94A6] hover:text-[#1A6FA8]">
+                  <button type="button" onClick={handleShare} aria-label={t('boat.detail.share')} className="p-2 rounded-full border border-gray-200 text-[#8A94A6] hover:text-[#2563FF]">
                     <Share2 size={18} />
                   </button>
                   <button
@@ -369,7 +369,7 @@ const BoatDetail: React.FC = () => {
                     aria-label={isFavorite ? t('boat.detail.removeFavorite') : t('boat.detail.addFavorite')}
                     className={cn(
                       'p-2 rounded-full border transition-colors',
-                      isFavorite ? 'bg-[#1A6FA8] border-[#1A6FA8] text-white' : 'border-gray-200 text-[#8A94A6]'
+                      isFavorite ? 'bg-[#2563FF] border-[#2563FF] text-white' : 'border-gray-200 text-[#8A94A6]'
                     )}
                   >
                     <Heart size={18} fill={isFavorite ? 'currentColor' : 'none'} />
@@ -379,19 +379,19 @@ const BoatDetail: React.FC = () => {
 
               <div className="flex flex-wrap items-center gap-5 text-sm text-[#8A94A6]">
                 <span className="flex items-center gap-1.5">
-                  <MapPin size={15} className="text-[#1A6FA8]" />
+                  <MapPin size={15} className="text-[#2563FF]" />
                   {locationLabel}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Ship size={15} className="text-[#1A6FA8]" />
+                  <Ship size={15} className="text-[#2563FF]" />
                   {getLuxuryTypeLabel(boat.type)}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Users size={15} className="text-[#1A6FA8]" />
+                  <Users size={15} className="text-[#2563FF]" />
                   {t('boat.detail.capacityPers', { count: boat.capacity })}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <UserCheck size={15} className="text-[#1A6FA8]" />
+                  <UserCheck size={15} className="text-[#2563FF]" />
                   {boat.withSkipper ? t('boat.detail.withSkipperOptional') : t('boat.detail.withoutSkipper')}
                 </span>
               </div>
@@ -418,7 +418,7 @@ const BoatDetail: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setDescExpanded((v) => !v)}
-                    className="mt-3 flex items-center gap-1 text-sm font-semibold text-[#1A6FA8] hover:underline"
+                    className="mt-3 flex items-center gap-1 text-sm font-semibold text-[#2563FF] hover:underline"
                   >
                     {descExpanded ? t('boat.detail.readLess') : t('boat.detail.readMore')}
                     <ArrowRight size={14} />
@@ -433,10 +433,10 @@ const BoatDetail: React.FC = () => {
               <div
                 className={cn(
                   'flex items-start gap-3 rounded-2xl border p-5',
-                  boat.withSkipper ? 'bg-[#eef3fb] border-[#1A6FA8]/20' : 'bg-amber-50 border-amber-100',
+                  boat.withSkipper ? 'bg-[#eef3fb] border-[#2563FF]/20' : 'bg-amber-50 border-amber-100',
                 )}
               >
-                <UserCheck size={22} className={cn('flex-shrink-0 mt-0.5', boat.withSkipper ? 'text-[#1A6FA8]' : 'text-amber-500')} />
+                <UserCheck size={22} className={cn('flex-shrink-0 mt-0.5', boat.withSkipper ? 'text-[#2563FF]' : 'text-amber-500')} />
                 <div>
                   <p className="text-sm font-semibold text-[#003366]">
                     {boat.withSkipper ? t('boat.detail.withSkipperPro') : t('boat.detail.withoutSkipperSelf')}
@@ -463,7 +463,7 @@ const BoatDetail: React.FC = () => {
                     const Icon = getEquipmentIcon(item)
                     return (
                       <div key={item} className="flex items-center gap-3 text-sm text-[#334155]">
-                        <span className="flex-shrink-0 h-9 w-9 rounded-lg bg-[#eef3fb] flex items-center justify-center text-[#1A6FA8]">
+                        <span className="flex-shrink-0 h-9 w-9 rounded-lg bg-[#eef3fb] flex items-center justify-center text-[#2563FF]">
                           <Icon size={18} />
                         </span>
                         {item}
@@ -478,7 +478,7 @@ const BoatDetail: React.FC = () => {
             <section>
               <h2 className="text-lg font-bold text-[#003366] mb-4">{t('boat.detail.location')}</h2>
               <p className="text-sm text-[#334155] mb-4 flex items-center gap-2">
-                <MapPin size={16} className="text-[#1A6FA8] flex-shrink-0" />
+                <MapPin size={16} className="text-[#2563FF] flex-shrink-0" />
                 {boat.port}{boat.city ? `, ${boat.city}` : ''}{boat.country ? `, ${boat.country}` : ''}
               </p>
               {boat.lat != null && boat.lng != null ? (

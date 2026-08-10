@@ -171,7 +171,7 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
           appearance: {
             theme: 'stripe',
             variables: {
-              colorPrimary: '#0369a1',
+              colorPrimary: '#2563FF',
               colorBackground: '#ffffff',
               colorText: '#111827',
               colorDanger: '#dc2626',

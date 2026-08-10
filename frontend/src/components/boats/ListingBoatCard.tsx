@@ -95,7 +95,7 @@ const ListingBoatCard: React.FC<ListingBoatCardProps> = ({ boat, className }) =>
           </button>
 
           {isTopRated && (
-            <span className="absolute bottom-3 right-3 bg-brand-teal dark:bg-teal-800 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded">
+            <span className="absolute bottom-3 right-3 bg-brand-blue dark:bg-ocean-700 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded">
               {t('search.topRated')}
             </span>
           )}
@@ -118,7 +118,7 @@ const ListingBoatCard: React.FC<ListingBoatCardProps> = ({ boat, className }) =>
 
           <div className="flex flex-wrap items-center gap-1.5 pt-1">
             {boat.withSkipper ? (
-              <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-brand-teal dark:text-teal-300">
+              <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-brand-blue dark:text-ocean-300">
                 <UserCheck size={12} strokeWidth={2.5} />
                 {t('search.withSkipperIncluded')}
               </span>

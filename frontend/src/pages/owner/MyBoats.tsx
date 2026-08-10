@@ -68,7 +68,7 @@ const MyBoats: React.FC = () => {
               type="button"
               disabled={!canManageBoat}
               onClick={() => navigate('/proprietaire/bateaux/nouveau')}
-              className="flex items-center gap-2 bg-brand-teal hover:bg-brand-teal/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-sm px-5 py-3 rounded-xl shadow-lg shadow-brand-teal/25 transition-all"
+              className="flex items-center gap-2 bg-brand-blue hover:bg-ocean-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-sm px-5 py-3 rounded-xl shadow-lg shadow-brand-blue/25 transition-all"
             >
               <Plus size={16} strokeWidth={2.5} />
               {t('layout.addBoat')}

@@ -33,7 +33,7 @@ function PhoneMockup({ t }: { t: (key: string) => string }) {
               </div>
 
               <div className="px-4 pt-8 pb-3 bg-white border-b border-gray-100">
-                {/* BrandLogo bascule logo clair/sombre — nécessaire car .dark .bg-white force un fond sombre */}
+                {/* BrandLogo bascule logo clair/sombre : nécessaire car .dark .bg-white force un fond sombre */}
                 <BrandLogo className="h-8 w-auto max-w-[148px] object-contain object-left mb-2.5" />
                 <p className="font-serif text-[15px] font-bold text-brand-navy leading-tight">
                   {t('home.mobileAppPreviewGreeting')}

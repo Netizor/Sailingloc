@@ -95,7 +95,7 @@ const MonthlyBarChart: React.FC<{ rows: RevenueByMonth[] }> = ({ rows }) => {
                 fontSize: '13px',
               }}
             />
-            <Bar dataKey="revenus" fill="#0369a1" radius={[4, 4, 0, 0]} maxBarSize={40} />
+            <Bar dataKey="revenus" fill="#2563FF" radius={[4, 4, 0, 0]} maxBarSize={40} />
           </BarChart>
         </ResponsiveContainer>
       </div>

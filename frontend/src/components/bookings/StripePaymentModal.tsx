@@ -132,7 +132,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           <div>
             <p className="font-semibold mb-0.5">Carte de test Stripe</p>
             <p>Numéro : <span className="font-mono">4242 4242 4242 4242</span></p>
-            <p>Expiration : <span className="font-mono">12/34</span> — CVC : <span className="font-mono">123</span></p>
+            <p>Expiration : <span className="font-mono">12/34</span> ; CVC : <span className="font-mono">123</span></p>
           </div>
         </div>
       )}
@@ -222,7 +222,7 @@ const StripePaymentModal: React.FC<StripePaymentModalProps> = ({
   const appearance = {
     theme: 'stripe' as const,
     variables: {
-      colorPrimary: '#0369a1',
+      colorPrimary: '#2563FF',
       borderRadius: '10px',
       fontFamily: 'inherit',
     },

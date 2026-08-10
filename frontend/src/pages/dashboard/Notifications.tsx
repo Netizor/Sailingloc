@@ -284,7 +284,7 @@ const Notifications: React.FC = () => {
               'text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors flex-shrink-0',
               push.isSubscribed
                 ? 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
-                : 'bg-ocean-600 text-white hover:bg-ocean-700',
+                : 'bg-brand-blue text-white hover:bg-ocean-600',
             )}
           >
             {push.isLoading ? '…' : push.isSubscribed ? (
@@ -321,7 +321,7 @@ const Notifications: React.FC = () => {
           <p className="text-gray-500 dark:text-gray-400 font-medium">No notifications yet</p>
           <p className="text-sm text-gray-400 dark:text-gray-500">
             {disabledCount > 0
-              ? 'Some types are hidden — check your preferences.'
+              ? 'Some types are hidden; check your preferences.'
               : 'You will be notified here about important activity.'}
           </p>
         </div>

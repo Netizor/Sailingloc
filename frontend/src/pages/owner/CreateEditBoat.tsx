@@ -410,7 +410,7 @@ const CreateEditBoat: React.FC = () => {
                     step > s.number
                       ? 'bg-green-500 text-white cursor-pointer hover:bg-green-600'
                       : step === s.number
-                      ? 'bg-ocean-700 text-white ring-4 ring-ocean-100'
+                      ? 'bg-brand-blue text-white ring-4 ring-ocean-100'
                       : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
                   )}
                 >

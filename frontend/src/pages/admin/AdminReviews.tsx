@@ -281,7 +281,7 @@ const AdminReviews: React.FC = () => {
               onClick={() => handleTabChange(tab.key)}
               className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                 statusFilter === tab.key
-                  ? 'bg-ocean-700 text-white'
+                  ? 'bg-brand-blue text-white'
                   : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
             >

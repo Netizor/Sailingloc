@@ -83,7 +83,7 @@ const enrichDescription = (boat: EnrichableBoat, lang: LangCode): string => {
 
 This ${typeLabel} is designed for a simple, reassuring booking. Before boarding, the owner confirms your preferred itinerary, the group's experience level, and the weather conditions to ensure a coherent, safe departure. You know exactly what is included, what to bring onboard, and how the handover works.
 
-For comfort, the boat has ${cabinsCount} cabin${cabinsCount > 1 ? 's' : ''}, outdoor spaces to relax, a welcoming dining area, and practical equipment for a day trip or several nights aboard. Storage, galley, fresh water, power outlets, and navigation gear let you cruise with peace of mind—even on a first charter.
+For comfort, the boat has ${cabinsCount} cabin${cabinsCount > 1 ? 's' : ''}, outdoor spaces to relax, a welcoming dining area, and practical equipment for a day trip or several nights aboard. Storage, galley, fresh water, power outlets, and navigation gear let you cruise with peace of mind, even on a first charter.
 
 ${skipperText}
 
@@ -122,7 +122,7 @@ const DEMO_BOATS_BASE: Boat[] = [
 À bord, 5 cabines doubles et 12 couchages accueillent un grand groupe dans un vrai confort : un salon lumineux, une cuisine entièrement équipée et de généreux espaces bain de soleil sur les trampolines avant. Le cockpit extérieur, ombragé par un bimini, devient le cœur de vos journées en mer.
 
 Idéal pour explorer les Calanques de Marseille à Cassis, les îles du Frioul et la Côte Bleue, en journée ou lors de croisières de plusieurs jours. Ce catamaran est proposé avec un skipper professionnel : vous profitez de la navigation pendant qu'il s'occupe de tout (itinéraire, mouillages, sécurité).`,
-    descriptionEn: `Step aboard L'Émeraude des Mers, a spacious, stable catamaran ideal for cruising with family or friends from Marseille. Its twin hulls create a wide, reassuring platform—perfect for children and less experienced sailors alike.
+    descriptionEn: `Step aboard L'Émeraude des Mers, a spacious, stable catamaran ideal for cruising with family or friends from Marseille. Its twin hulls create a wide, reassuring platform: perfect for children and less experienced sailors alike.
 
 Onboard, 5 double cabins and 12 berths welcome a large group in real comfort: a bright saloon, fully equipped galley, and generous sunbathing areas on the forward trampolines. The outdoor cockpit, shaded by a bimini, becomes the heart of your days at sea.
 
@@ -236,7 +236,7 @@ Our local professional skipper can join you to reveal secret coves unreachable b
 Avec 4 cabines doubles, 10 couchages et de généreux espaces extérieurs, il offre tout ce qu'il faut pour une escapade en famille sur la Riviera. Cuisine équipée, eau chaude, coussins de bain de soleil et coin repas ombragé : tout est pensé pour profiter du soleil méditerranéen.
 
 Naviguez jusqu'à Villefranche-sur-Mer, au Cap-Ferrat, à la baie de Beaulieu, ou poussez jusqu'aux îles de Lérins. Ce bateau est proposé sans skipper (location en autonomie uniquement) : un permis côtier et une expérience de navigation sont requis. Un briefing complet est assuré au départ.`,
-    descriptionEn: `Ocean Breeze is a modern, easy-to-handle catamaran—perfect for bareboat charter from Nice. Its balanced design and low heel make it a reassuring choice for licensed skippers who want to sail independently.
+    descriptionEn: `Ocean Breeze is a modern, easy-to-handle catamaran: perfect for bareboat charter from Nice. Its balanced design and low heel make it a reassuring choice for licensed skippers who want to sail independently.
 
 With 4 double cabins, 10 berths, and generous outdoor spaces, it offers everything you need for a family escape on the Riviera. Equipped galley, hot water, sun pads, and a shaded dining area: everything is set up to enjoy the Mediterranean sun.
 
@@ -273,7 +273,7 @@ Cruise to Villefranche-sur-Mer, Cap-Ferrat, Beaulieu Bay, or push on to the Lér
 Ses 2 cabines et 6 couchages, sa cuisine fonctionnelle et son cockpit accueillant conviennent à un couple, une petite famille ou un groupe d'amis. Un excellent rapport qualité-prix pour se lancer dans la croisière côtière.
 
 Explorez les îles de Ré, d'Aix et d'Oléron, ou dérivez jusqu'au majestueux Fort Boyard. Voilier proposé avec skipper : parfait pour les débutants qui souhaitent apprendre, ou pour ceux qui préfèrent être guidés vers les plus beaux mouillages du Pertuis charentais.`,
-    descriptionEn: `Vent du Large is a friendly, easy-handling sailboat—ideal for discovering sailing or sharing a lovely outing in a small group from La Rochelle. At a sensible 11.2 m, it is pleasant to sail while still offering real comfort onboard.
+    descriptionEn: `Vent du Large is a friendly, easy-handling sailboat: ideal for discovering sailing or sharing a lovely outing in a small group from La Rochelle. At a sensible 11.2 m, it is pleasant to sail while still offering real comfort onboard.
 
 Its 2 cabins and 6 berths, functional galley, and welcoming cockpit suit a couple, a small family, or a group of friends. Excellent value for getting into coastal cruising.
 
@@ -313,7 +313,7 @@ Explore the islands of Ré, Aix, and Oléron, or drift toward majestic Fort Boya
 Rejoignez rapidement les criques de Pampelonne, la baie de Cavalaire ou les îles d'Or grâce à ses moteurs puissants. Yacht proposé avec skipper professionnel (et équipage sur demande) pour un service impeccable, de l'accueil à bord jusqu'au dernier coucher de soleil.`,
     descriptionEn: `Majestic Star is an exceptional motor yacht that embodies luxury and refinement on the Mediterranean. At 18.5 m, it offers impressive volumes and high-end finishes for an experience worthy of the finest private cruises.
 
-Onboard: 4 elegant cabins, an air-conditioned panoramic lounge, a flybridge with sunbathing area, and a large aft cockpit for entertaining. Professional galley, immersive sound system, and tailor-made service—everything for an unforgettable stay from Saint-Tropez.
+Onboard: 4 elegant cabins, an air-conditioned panoramic lounge, a flybridge with sunbathing area, and a large aft cockpit for entertaining. Professional galley, immersive sound system, and tailor-made service: everything for an unforgettable stay from Saint-Tropez.
 
 Reach the coves of Pampelonne, Cavalaire Bay, or the Golden Islands quickly thanks to its powerful engines. Yacht offered with a professional skipper (and crew on request) for impeccable service from welcome aboard to the last sunset.`,
     type: BoatType.YACHT,

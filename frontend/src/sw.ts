@@ -68,8 +68,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(payload.title, {
       body: payload.body,
-      icon: '/icons/icon.svg',
-      badge: '/icons/icon.svg',
+      icon: '/logo_mobile.png',
+      badge: '/logo_mobile.png',
       tag: 'sailingloc-push',
       data: { url: payload.url ?? '/' },
     } as NotificationOptions),

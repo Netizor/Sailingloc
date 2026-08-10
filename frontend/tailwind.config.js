@@ -9,8 +9,8 @@ export default {
     extend: {
       colors: {
         'brand-navy': '#003366',
-        /* Bleu mer (moins électrique que #2563FF) */
-        'brand-blue': '#1A6FA8',
+        /* Bleu principal SailingLoc */
+        'brand-blue': '#2563FF',
         /* slate plus sombre : meilleur contraste WCAG sur fond clair (~7:1) */
         'brand-slate': '#1e293b',
         'brand-teal': '#006875',
@@ -18,17 +18,17 @@ export default {
         /* muted relevé : ~4.6:1 sur blanc (AA textes secondaires) */
         'brand-muted': '#64748b',
         ocean: {
-          50: '#eef3fb',
-          100: '#d6e4f5',
-          200: '#adc9eb',
-          300: '#7aa3db',
-          400: '#4d8fb8',
-          500: '#1A6FA8',
-          600: '#155A8A',
-          700: '#003366',
-          800: '#002952',
-          900: '#001a33',
-          950: '#000d1a',
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#2563FF',
+          600: '#1D4ED8',
+          700: '#1e40af',
+          800: '#1e3a8a',
+          900: '#172554',
+          950: '#0b1228',
         },
       },
       fontFamily: {

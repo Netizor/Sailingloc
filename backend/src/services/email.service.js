@@ -1,5 +1,5 @@
 /**
- * Service email — Resend si RESEND_API_KEY, sinon log console (dev).
+ * Service email : Resend si RESEND_API_KEY, sinon log console (dev).
  *
  * .env :
  * - MAIL_FROM ou EMAIL_FROM  (ex: "SailingLoc <noreply@domaine>")
@@ -112,7 +112,7 @@ export async function sendContactConfirmation({ firstName, email, subject }) {
 
   await sendMail({
     to: email,
-    subject: 'Nous avons bien reçu votre message – SailingLoc',
+    subject: 'Nous avons bien reçu votre message : SailingLoc',
     html: `
       <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">
         <div style="background:${NAVY};color:#fff;padding:16px 20px">
@@ -137,7 +137,7 @@ export async function sendAccountDeletedEmail({ to, firstName }) {
 
   await sendMail({
     to,
-    subject: 'Confirmation de suppression de compte – SailingLoc',
+    subject: 'Confirmation de suppression de compte : SailingLoc',
     html: `
       <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">
         <div style="background:${NAVY};color:#fff;padding:16px 20px">
@@ -164,7 +164,7 @@ export async function sendEmailVerification(to, firstName, token) {
   const link = `${FRONTEND_URL}/verifier-email?token=${token}`
   await sendMail({
     to,
-    subject: 'Vérifiez votre adresse email – SailingLoc',
+    subject: 'Vérifiez votre adresse email : SailingLoc',
     html: `
       <h2>Bonjour ${firstName},</h2>
       <p>Merci de vous être inscrit sur SailingLoc. Cliquez sur le lien ci-dessous pour vérifier votre email :</p>
@@ -179,7 +179,7 @@ export async function sendPasswordReset(to, firstName, token) {
   const link = `${FRONTEND_URL}/reinitialiser-mot-de-passe?token=${token}`
   await sendMail({
     to,
-    subject: 'Réinitialisation de votre mot de passe – SailingLoc',
+    subject: 'Réinitialisation de votre mot de passe : SailingLoc',
     html: `
       <h2>Bonjour ${firstName},</h2>
       <p>Vous avez demandé la réinitialisation de votre mot de passe.</p>
@@ -212,7 +212,7 @@ export async function sendCancellationEmail({
 
   await sendMail({
     to,
-    subject: 'Réservation annulée – SailingLoc',
+    subject: 'Réservation annulée : SailingLoc',
     html: `
       <h2>Bonjour ${firstName},</h2>
       <p>${intro}</p>
@@ -230,9 +230,9 @@ export async function sendCancellationEmail({
 
 export async function sendBookingNotification(to, firstName, { type, boatTitle, startDate, endDate }) {
   const messages = {
-    confirmed: { subject: 'Réservation confirmée – SailingLoc', intro: 'Votre réservation a été confirmée !' },
-    cancelled: { subject: 'Réservation annulée – SailingLoc', intro: 'Une réservation a été annulée.' },
-    new_request: { subject: 'Nouvelle demande de réservation – SailingLoc', intro: 'Vous avez reçu une nouvelle demande de réservation.' },
+    confirmed: { subject: 'Réservation confirmée : SailingLoc', intro: 'Votre réservation a été confirmée !' },
+    cancelled: { subject: 'Réservation annulée : SailingLoc', intro: 'Une réservation a été annulée.' },
+    new_request: { subject: 'Nouvelle demande de réservation : SailingLoc', intro: 'Vous avez reçu une nouvelle demande de réservation.' },
   }
   const msg = messages[type] || { subject: 'Mise à jour de réservation', intro: 'Votre réservation a été mise à jour.' }
 

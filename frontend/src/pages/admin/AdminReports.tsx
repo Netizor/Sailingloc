@@ -87,7 +87,7 @@ const AdminReports: React.FC = () => {
               onClick={() => { setStatusFilter(opt.value); setPage(1) }}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 statusFilter === opt.value
-                  ? 'bg-ocean-700 text-white'
+                  ? 'bg-brand-blue text-white'
                   : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-600 hover:border-ocean-300'
               }`}
             >

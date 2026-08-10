@@ -107,7 +107,7 @@ const Destination: React.FC = () => {
               onClick={() => setViewMode('list')}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
                 viewMode === 'list'
-                  ? 'bg-ocean-700 text-white'
+                  ? 'bg-brand-blue text-white'
                   : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
             >
@@ -117,7 +117,7 @@ const Destination: React.FC = () => {
               onClick={() => setViewMode('map')}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
                 viewMode === 'map'
-                  ? 'bg-ocean-700 text-white'
+                  ? 'bg-brand-blue text-white'
                   : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
             >

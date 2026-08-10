@@ -18,9 +18,19 @@ const ForgotPassword: React.FC = () => {
 
   const mutation = useMutation({
     mutationFn: () => authApi.forgotPassword(email),
-    onSuccess: () => setSent(true),
+    onSuccess: () => {
+      setApiError('')
+      setSent(true)
+    },
     onError: (err: any) => {
-      setApiError(err?.response?.data?.message ?? t('auth.forgotPassword.errorGeneral'))
+      const status = err?.response?.status
+      const message = err?.response?.data?.message
+      if (status === 404) {
+        setApiError(message ?? t('auth.forgotPassword.noAccountMessage'))
+        setSent(false)
+        return
+      }
+      setApiError(message ?? t('auth.forgotPassword.errorGeneral'))
     },
   })
 
@@ -59,19 +69,17 @@ const ForgotPassword: React.FC = () => {
               to="/connexion"
               className="text-sm font-semibold text-blue-600 hover:text-blue-700"
             >
-              ← Retour à la connexion
+              ← {t('auth.forgotPassword.backToLogin')}
             </Link>
 
             <h1 className="mt-10 text-5xl font-serif font-bold leading-tight text-[#071d49]">
-              Réinitialiser votre
+              {t('auth.forgotPassword.titleLine1')}
               <br />
-              mot de passe
+              {t('auth.forgotPassword.titleLine2')}
             </h1>
 
             <p className="mt-5 text-lg leading-relaxed text-gray-500">
-              Entrez votre adresse e-mail pour recevoir un lien de
-              <br />
-              <span className="font-semibold text-gray-600">réinitialisation sécurisé.</span>
+              {t('auth.forgotPassword.subtitle')}
             </p>
 
             <div className="mt-16">
@@ -89,16 +97,9 @@ const ForgotPassword: React.FC = () => {
                     {t('auth.forgotPassword.successMessage')}
                   </p>
 
-                  <p className="mt-4 text-sm text-gray-500">
-                    {t('auth.forgotPassword.noAccountHint')}{' '}
-                    <Link to="/inscription" className="font-semibold text-blue-600 hover:text-blue-700">
-                      {t('auth.forgotPassword.createAccount')}
-                    </Link>
-                  </p>
-
                   <Link
                     to="/connexion"
-                    className="mt-8 inline-flex w-full justify-center rounded-lg bg-blue-600 px-6 py-3 text-sm font-bold text-white hover:bg-blue-700"
+                    className="mt-8 inline-flex w-full justify-center rounded-lg bg-[#2563FF] px-6 py-3 text-sm font-bold text-white hover:bg-[#1D4ED8]"
                   >
                     {t('auth.forgotPassword.backToLogin')}
                   </Link>
@@ -107,23 +108,37 @@ const ForgotPassword: React.FC = () => {
                 <form onSubmit={handleSubmit} noValidate className="space-y-6">
                   {apiError && (
                     <div
-                      className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3"
+                      className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-4"
                       role="alert"
                     >
-                      <AlertCircle size={16} className="text-red-500" />
-                      <p className="text-sm text-red-700">{apiError}</p>
+                      <div className="flex items-start gap-2">
+                        <AlertCircle size={16} className="text-amber-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-semibold text-amber-900">{apiError}</p>
+                          <p className="mt-2 text-sm text-amber-800">
+                            {t('auth.forgotPassword.noAccountHint')}{' '}
+                            <Link
+                              to="/inscription"
+                              className="font-semibold text-[#2563FF] hover:underline"
+                            >
+                              {t('auth.forgotPassword.createAccount')}
+                            </Link>
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   )}
 
                   <Input
-                    label="ADRESSE EMAIL"
+                    label={t('auth.forgotPassword.email')}
                     type="email"
                     autoComplete="email"
-                    placeholder="nom@exemple.com"
+                    placeholder={t('auth.forgotPassword.emailPlaceholder')}
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value)
                       setEmailError('')
+                      setApiError('')
                     }}
                     error={emailError}
                     leftIcon={<Mail size={16} />}
@@ -137,15 +152,15 @@ const ForgotPassword: React.FC = () => {
                     fullWidth
                     loading={mutation.isPending}
                   >
-                    Envoyer le lien
+                    {t('auth.forgotPassword.submit')}
                   </Button>
 
                   <div className="border-t border-gray-200 pt-6 text-center">
                     <span className="text-sm text-gray-500">
-                      Vous vous souvenez du mot de passe ?{' '}
+                      {t('auth.forgotPassword.rememberPassword')}{' '}
                     </span>
-                    <Link to="/connexion" className="text-sm font-bold text-blue-600">
-                      Se connecter
+                    <Link to="/connexion" className="text-sm font-bold text-[#2563FF]">
+                      {t('auth.forgotPassword.signIn')}
                     </Link>
                   </div>
                 </form>
@@ -167,7 +182,7 @@ const ForgotPassword: React.FC = () => {
           <Ship size={130} className="absolute right-20 top-16 text-white/25" />
 
           <div className="max-w-xl">
-            <span className="inline-block rounded bg-blue-600 px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
+            <span className="inline-block rounded bg-[#2563FF] px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
               Conciergerie 24/7
             </span>
 

@@ -539,7 +539,7 @@ export default function AdminRoles() {
                 <button
                   key={p}
                   onClick={() => setPage(p)}
-                  className={cn('w-8 h-8 rounded-lg text-xs font-medium transition-colors', p === page ? 'bg-brand-navy text-white' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700')}
+                  className={cn('w-8 h-8 rounded-lg text-xs font-medium transition-colors', p === page ? 'bg-brand-blue text-white' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700')}
                 >
                   {p}
                 </button>

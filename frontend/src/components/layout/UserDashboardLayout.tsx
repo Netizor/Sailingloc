@@ -225,8 +225,8 @@ const UserDashboardLayout: React.FC = () => {
                         cn(
                           'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mt-2 border border-dashed',
                           isActive
-                            ? 'bg-brand-navy text-white border-brand-navy'
-                            : 'text-brand-navy dark:text-gray-200 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50',
+                            ? 'bg-brand-blue text-white border-brand-blue'
+                            : 'text-brand-blue dark:text-gray-200 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50',
                         )
                       }
                     >
@@ -239,7 +239,7 @@ const UserDashboardLayout: React.FC = () => {
                 {isOwner && (
                   <button
                     onClick={() => navigate('/proprietaire/bateaux/nouveau')}
-                    className="w-full flex items-center justify-center gap-2.5 bg-brand-teal hover:bg-brand-teal/90 active:scale-[0.98] text-white text-sm font-semibold py-3.5 px-4 rounded-xl transition-all mt-2 shadow-lg shadow-brand-teal/30 ring-2 ring-brand-teal/20 hover:shadow-xl hover:ring-brand-teal/40"
+                    className="w-full flex items-center justify-center gap-2.5 bg-brand-blue hover:bg-ocean-600 active:scale-[0.98] text-white text-sm font-semibold py-3.5 px-4 rounded-xl transition-all mt-2 shadow-lg shadow-brand-blue/30 ring-2 ring-brand-blue/20 hover:shadow-xl hover:ring-brand-blue/40"
                   >
                     <Plus size={18} strokeWidth={2.5} />
                     {t('layout.addBoat')}

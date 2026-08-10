@@ -518,7 +518,7 @@
       "rememberMe": "Se souvenir de moi",
       "forgotPassword": "Mot de passe oublié ?",
       "submit": "Se connecter",
-      "quote": "« La mer est un espace de liberté infinie — nous en sommes les gardiens pour vos plus beaux souvenirs. »",
+      "quote": "« La mer est un espace de liberté infinie : nous en sommes les gardiens pour vos plus beaux souvenirs. »",
       "quoteAuthor": "CAPITAINE MARC L, EXPERT SAILINGLOC",
       "ownersTrust": "+1 200 propriétaires",
       "ownersTrustHint": "nous font confiance chaque jour",
@@ -534,15 +534,20 @@
     },
     "forgotPassword": {
       "title": "Mot de passe oublié",
-      "subtitle": "Saisissez votre email pour recevoir un lien de réinitialisation",
+      "titleLine1": "Réinitialiser votre",
+      "titleLine2": "mot de passe",
+      "subtitle": "Saisissez votre email pour recevoir un lien de réinitialisation sécurisé.",
       "email": "Adresse email",
       "emailPlaceholder": "vous@exemple.fr",
       "submit": "Envoyer le lien",
       "backToLogin": "Retour à la connexion",
       "successTitle": "Email envoyé !",
-      "successMessage": "Si cet email est associé à un compte, vous recevrez un lien de réinitialisation sous peu. Vérifiez également vos spams.",
+      "successMessage": "Un lien de réinitialisation a été envoyé à votre adresse email. Vérifiez également vos spams.",
+      "noAccountMessage": "Aucun compte n'est associé à cet email.",
       "noAccountHint": "Vous n'avez pas encore de compte ?",
       "createAccount": "Créer un compte",
+      "rememberPassword": "Vous vous souvenez du mot de passe ?",
+      "signIn": "Se connecter",
       "errorEmail": "L'email est requis",
       "errorEmailInvalid": "Email invalide",
       "errorGeneral": "Une erreur est survenue. Veuillez réessayer."
@@ -906,7 +911,23 @@
     "passwordMin": "Le nouveau mot de passe doit contenir au moins {{count}} caractères",
     "passwordMax": "Le mot de passe ne doit pas dépasser {{count}} caractères",
     "passwordWeak": "Le mot de passe doit contenir une majuscule, une minuscule, un chiffre et un caractère spécial",
-    "passwordMismatch": "Les mots de passe ne correspondent pas"
+    "passwordMismatch": "Les mots de passe ne correspondent pas",
+    "payment": {
+      "title": "Paiement",
+      "subtitle": "Gérez votre moyen de paiement et profitez d'un paiement sécurisé pour vos réservations.",
+      "account": "Compte de paiement",
+      "status": "Statut",
+      "statusValue": "Paiements sécurisés via Stripe",
+      "addCard": "Ajouter une carte",
+      "addCardHint": "Enregistrez une carte pour accélérer vos réservations et payer en toute sécurité.",
+      "stripeTitle": "Paiements Stripe",
+      "stripeHint": "Vos réservations utilisent Stripe comme moyen de paiement principal, avec une expérience sécurisée.",
+      "secure": "Sécurisé",
+      "saveCard": "Enregistrer la carte",
+      "cardAdded": "Carte ajoutée avec succès",
+      "setupError": "Impossible de démarrer l'ajout de carte pour le moment.",
+      "genericError": "Une erreur est survenue."
+    }
   },
   "messages": {
     "title": "Messages",
@@ -1410,7 +1431,7 @@
     "heroBadge": "Guide propriétaire",
     "heroTitle": "Louez votre bateau entre particuliers",
     "heroSubtitle": "Publiez votre voilier ou bateau à moteur, signez des contrats de location avec des locataires inscrits, et estimez vos revenus après la commission de 10 % de SailingLoc.",
-    "heroCta": "Devenir propriétaire — c'est gratuit",
+    "heroCta": "Devenir propriétaire : c'est gratuit",
     "stepsTitle": "5 étapes pour commencer à louer",
     "steps": {
       "1": {
@@ -1572,7 +1593,7 @@
       "publisherContact": "Contact : contact@sailingloc.fr",
       "hostingTitle": "Hébergement",
       "hostingP1Before": "Le site est hébergé par ",
-      "hostingP1After": ", 340 Pine Street, Suite 900, San Francisco, CA 94104, États-Unis — pour le frontend.",
+      "hostingP1After": ", 340 Pine Street, Suite 900, San Francisco, CA 94104, États-Unis ; pour le frontend.",
       "hostingP2Before": "Le backend est hébergé par ",
       "hostingP2After": ", 340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis.",
       "hostingP3Before": "Les médias (photos de bateaux) sont hébergés par ",
@@ -1596,7 +1617,7 @@
       "sections": {
         "1": {
           "title": "1. Responsable du traitement",
-          "body": "SailingLoc SAS, 12 Quai de la Joliette, 13002 Marseille — contact@sailingloc.fr. DPO : dpo@sailingloc.fr"
+          "body": "SailingLoc SAS, 12 Quai de la Joliette, 13002 Marseille ; contact@sailingloc.fr. DPO : dpo@sailingloc.fr"
         },
         "2": {
           "title": "2. Données collectées",

@@ -284,7 +284,7 @@ const Home: React.FC = () => {
       <section id="comment-ca-marche" className="pt-20 pb-14 bg-white" aria-labelledby="how-it-works-title">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-[#1A6FA8] text-sm font-medium mb-4">{t('home.conceptLabel')}</p>
+            <p className="text-[#2563FF] text-sm font-medium mb-4">{t('home.conceptLabel')}</p>
             <h2 id="how-it-works-title" className="font-serif text-3xl sm:text-4xl font-bold text-brand-navy">
               {t('home.howTitle')}
             </h2>
@@ -440,14 +440,14 @@ const Home: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/bateaux')}
-                  className="px-8 py-3 text-sm font-medium text-white bg-[#1A6FA8] rounded-full whitespace-nowrap"
+                  className="px-8 py-3 text-sm font-medium text-white bg-[#2563FF] rounded-full whitespace-nowrap"
                 >
                   {t('home.ctaRentBoat')}
                 </button>
                 <button
                   type="button"
                   onClick={() => navigate('/devenir-proprietaire')}
-                  className="px-8 py-3 text-sm font-medium text-white bg-[#003366] rounded-full whitespace-nowrap"
+                  className="px-8 py-3 text-sm font-medium text-white bg-[#2563FF] hover:bg-[#1D4ED8] rounded-full whitespace-nowrap"
                 >
                   {t('nav.becomeOwner')}
                 </button>

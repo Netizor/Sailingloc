@@ -36,7 +36,7 @@ const Spinner: React.FC<SpinnerProps> = ({
           'block rounded-full border-ocean-200 border-t-ocean-700 animate-spin',
           sizeClasses[size]
         )}
-        style={{ borderTopColor: '#0369a1', borderColor: '#bae6fd' }}
+        style={{ borderTopColor: '#2563FF', borderColor: '#bae6fd' }}
         aria-hidden="true"
       />
       <span className="sr-only">{ariaLabel}</span>

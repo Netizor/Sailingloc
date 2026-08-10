@@ -230,7 +230,7 @@ const APropos: React.FC = () => {
                   className={cn(
                     'rounded-2xl p-8 flex flex-col',
                     isRenter
-                      ? 'bg-brand-navy text-white shadow-xl ring-2 ring-brand-blue/40'
+                      ? 'bg-brand-blue text-white shadow-xl ring-2 ring-brand-blue/40'
                       : 'bg-ocean-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700',
                   )}
                 >
@@ -257,7 +257,7 @@ const APropos: React.FC = () => {
                       'mt-8 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-colors',
                       isRenter
                         ? 'bg-white text-brand-navy hover:bg-gray-100'
-                        : 'bg-brand-navy dark:bg-brand-blue text-white hover:bg-ocean-800 dark:hover:bg-ocean-600',
+                        : 'bg-brand-blue text-white hover:bg-ocean-600',
                     )}
                   >
                     {t(`aboutPage.audience.${key}.cta`)}

@@ -1,23 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <!-- Fond océan -->
-  <rect width="512" height="512" rx="112" fill="#0369a1"/>
-  <!-- Ancre (inspirée de Lucide Anchor, simplifiée) -->
-  <g transform="translate(256,256)" fill="none" stroke="white" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
-    <!-- Anneau du haut -->
-    <circle cx="0" cy="-110" r="30"/>
-    <!-- Tige verticale -->
-    <line x1="0" y1="-80" x2="0" y2="110"/>
-    <!-- Traverse horizontale -->
-    <line x1="-80" y1="-80" x2="80" y2="-80"/>
-    <!-- Arc bas gauche -->
-    <path d="M -110,50 A 110,110 0 0 1 0,110"/>
-    <!-- Arc bas droit -->
-    <path d="M 0,110 A 110,110 0 0 1 110,50"/>
-    <!-- Pointe gauche -->
-    <line x1="-110" y1="50" x2="-80" y2="20"/>
-    <line x1="-110" y1="50" x2="-80" y2="70"/>
-    <!-- Pointe droite -->
-    <line x1="110" y1="50" x2="80" y2="20"/>
-    <line x1="110" y1="50" x2="80" y2="70"/>
-  </g>
+  <rect width="512" height="512" rx="96" fill="#ffffff"/>
+  <!-- Vague principale (#2563FF) -->
+  <path
+    fill="#2563FF"
+    d="M96 280c48-120 120-176 196-176 40 0 72 18 88 48 20 38 12 90-28 128-48 46-120 62-188 52-44-6-72-28-68-52z"
+  />
+  <!-- Vagues secondaires (navy) -->
+  <path
+    fill="#003366"
+    d="M112 340c56-36 128-52 196-40 40 8 72 28 84 52 8 16-4 28-28 28H140c-28 0-40-16-28-40z"
+  />
+  <path
+    fill="#003366"
+    d="M128 400c48-24 112-36 172-28 36 4 64 18 76 36 6 10-2 20-20 20H148c-24 0-32-14-20-28z"
+  />
 </svg>

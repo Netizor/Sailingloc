@@ -222,7 +222,7 @@ const GuideProprietaire: React.FC = () => {
           </p>
           <Link
             to="/inscription"
-            className="inline-flex items-center gap-2 bg-ocean-700 hover:bg-ocean-800 text-white font-semibold px-7 py-3 rounded-xl transition-colors text-sm"
+            className="inline-flex items-center gap-2 bg-brand-blue hover:bg-ocean-600 text-white font-semibold px-7 py-3 rounded-xl transition-colors text-sm"
           >
             {t('ownerGuidePage.ctaButton')}
           </Link>

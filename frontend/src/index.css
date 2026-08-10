@@ -5,7 +5,7 @@
 @layer base {
   :root {
     --sl-navy: #003366;
-    --sl-blue: #1a6fa8;
+    --sl-blue: #2563FF;
     --sl-teal: #006875;
     --sl-slate: #1e293b;
     --sl-muted: #64748b;
@@ -26,7 +26,7 @@
     --status-info-dot: #0ea5e9;
     --status-primary-bg: #d6e4f5;
     --status-primary-text: #003366;
-    --status-primary-dot: #1A6FA8;
+    --status-primary-dot: #2563FF;
   }
 
   .dark {
@@ -44,7 +44,7 @@
     --status-info-dot: #0ea5e9;
     --status-primary-bg: #1e3a5f;
     --status-primary-text: #93c5fd;
-    --status-primary-dot: #1A6FA8;
+    --status-primary-dot: #2563FF;
   }
 
   html {
@@ -102,7 +102,7 @@
   }
 
   .dark .text-brand-blue {
-    color: #7eb8d9;
+    color: #60a5fa;
   }
 
   .dark .text-gray-600 {
@@ -144,8 +144,8 @@
     color: #e2e8f0 !important;
   }
 
-  .dark .text-\[\#1A6FA8\] {
-    color: #7eb8d9 !important;
+  .dark .text-\[\#2563FF\] {
+    color: #60a5fa !important;
   }
 
   .dark .text-\[\#006875\] {
@@ -202,7 +202,7 @@
 @layer components {
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 text-white font-semibold rounded-xl active:scale-95 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
-    background-color: #1A6FA8;
+    background-color: #2563FF;
   }
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 font-semibold rounded-xl active:scale-95 transition-all duration-150 disabled:opacity-50;
@@ -345,28 +345,28 @@
   }
 
   .sl-btn-navy {
-    background-color: var(--sl-navy);
+    background-color: #2563FF;
     color: #ffffff;
   }
 
   .sl-btn-navy:hover {
-    background-color: #002952;
+    background-color: #1D4ED8;
   }
 
   .sl-btn-outline {
     background-color: #ffffff;
-    color: var(--sl-blue);
-    border: 2px solid var(--sl-blue);
+    color: #2563FF;
+    border: 2px solid #2563FF;
   }
 
   .dark .sl-btn-outline {
     background-color: #1f2937;
-    color: #7eb8d9;
-    border-color: #1a6fa8;
+    color: #60a5fa;
+    border-color: #2563FF;
   }
 
   .sl-btn-outline:hover {
-    background-color: var(--sl-light);
+    background-color: #eff6ff;
   }
 
   .dark .sl-btn-outline:hover {
@@ -374,9 +374,14 @@
   }
 
   .sl-btn-filled {
-    background-color: var(--sl-navy);
+    background-color: #2563FF;
     color: #ffffff;
-    border: 2px solid var(--sl-navy);
+    border: 2px solid #2563FF;
+  }
+
+  .sl-btn-filled:hover {
+    background-color: #1D4ED8;
+    border-color: #1D4ED8;
   }
 
   /* ── Profil propriétaire : section avis animée ── */
@@ -578,7 +583,7 @@
 }
 
 @layer utilities {
-  /* Texte sur photo / fond coloré — lisible même pour faible contraste / daltonisme */
+  /* Texte sur photo / fond coloré : lisible même pour faible contraste / daltonisme */
   .text-on-media {
     color: #ffffff;
     text-shadow:
@@ -610,8 +615,8 @@
  * du type dark:text-gray-400.
  */
 html.dark {
-  /* Bleu mer lisible sur fond sombre (pas le bleu électrique Tailwind) */
-  --sl-blue: #7eb8d9;
+  /* Bleu principal lisible sur fond sombre */
+  --sl-blue: #60a5fa;
 }
 
 html.dark .text-gray-300,
@@ -626,16 +631,14 @@ html.dark .text-brand-slate {
 html.dark .text-brand-blue,
 html.dark .text-ocean-500,
 html.dark .text-ocean-600,
-html.dark .text-\[\#1A6FA8\],
-html.dark .text-\[\#1a6fa8\] {
-  color: #7eb8d9 !important;
+html.dark .text-\[\#2563FF\] {
+  color: #60a5fa !important;
 }
 
-html.dark .bg-\[\#1A6FA8\],
-html.dark .bg-\[\#1a6fa8\],
+html.dark .bg-\[\#2563FF\],
 html.dark .bg-brand-blue,
 html.dark .bg-ocean-500 {
-  background-color: #1a6fa8 !important;
+  background-color: #2563FF !important;
 }
 
 html.dark .text-white\/60,

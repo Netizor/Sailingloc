@@ -109,7 +109,7 @@ function ThemedToaster() {
         },
         success: {
           iconTheme: {
-            primary: '#0369a1',
+            primary: '#2563FF',
             secondary: theme === 'dark' ? '#1f2937' : '#fff',
           },
         },

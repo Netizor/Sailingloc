@@ -268,7 +268,7 @@ reviewsRouter.delete('/admin/:id', authenticate, requireRole('ADMIN'), async (re
 // ═══════════════════════════════════════════════════════════
 export const messagesRouter = Router()
 
-// Conversation ID = "${minUserId}-${maxUserId}" — stable, no separate table needed
+// Conversation ID = "${minUserId}-${maxUserId}" : stable, no separate table needed
 export function buildConvId(a, b) {
   return `${Math.min(Number(a), Number(b))}-${Math.max(Number(a), Number(b))}`
 }
@@ -356,7 +356,7 @@ messagesRouter.get('/conversation/:conversationId', authenticate, async (req, re
   })
 })
 
-// SSE global — notifie le destinataire de tout nouveau message reçu (toutes conversations)
+// SSE global : notifie le destinataire de tout nouveau message reçu (toutes conversations)
 messagesRouter.get('/stream', async (req, res) => {
   const token = req.query.token
   if (!token) return res.status(401).json({ message: 'Token manquant' })
@@ -399,7 +399,7 @@ messagesRouter.get('/stream', async (req, res) => {
   req.on('close', () => clearInterval(interval))
 })
 
-// SSE par conversation — EventSource ne peut pas envoyer d'en-têtes, auth via ?token=
+// SSE par conversation : EventSource ne peut pas envoyer d'en-têtes, auth via ?token=
 messagesRouter.get('/stream/:conversationId', async (req, res) => {
   const token = req.query.token
   if (!token) return res.status(401).json({ message: 'Token manquant' })
@@ -896,7 +896,7 @@ adminRouter.delete('/users/:id', async (req, res) => {
   if (String(req.params.id) === String(req.user.id)) return res.status(403).json({ message: 'Vous ne pouvez pas supprimer votre propre compte' })
   const { count } = await supabase.from('bookings').select('id', { count: 'exact', head: true })
     .eq('renter_id', req.params.id).in('status', ['PENDING', 'CONFIRMED'])
-  if (count > 0) return res.status(409).json({ message: `${count} réservation(s) active(s) — annulez-les d'abord` })
+  if (count > 0) return res.status(409).json({ message: `${count} réservation(s) active(s) : annulez-les d'abord` })
   const { error } = await supabase.from('users').delete().eq('id', req.params.id)
   if (error) return res.status(500).json({ message: error.message })
   return res.json({ message: 'Utilisateur supprimé' })
@@ -948,7 +948,7 @@ adminRouter.delete('/roles/:id', async (req, res) => {
   if (!role) return res.status(404).json({ message: 'Rôle introuvable' })
   if (role.is_system) return res.status(403).json({ message: 'Les rôles système ne peuvent pas être supprimés' })
   const { count } = await supabase.from('users').select('id', { count: 'exact', head: true }).eq('role', role.name)
-  if (count > 0) return res.status(409).json({ message: `${count} utilisateur(s) ont ce rôle — réattribuez-les d'abord` })
+  if (count > 0) return res.status(409).json({ message: `${count} utilisateur(s) ont ce rôle : réattribuez-les d'abord` })
   await supabase.from('roles').delete().eq('id', req.params.id)
   return res.json({ message: 'Rôle supprimé' })
 })
@@ -1133,8 +1133,8 @@ adminRouter.get('/reports', async (req, res) => {
     .range((page - 1) * limit, page * limit - 1)
 
   const reports = await Promise.all((data || []).map(async (r) => {
-    let boatTitle = '—'
-    let reporterName = '—'
+    let boatTitle = '-'
+    let reporterName = '-'
     if (r.target_type === 'boat' || r.target_type === 'BOAT') {
       const { data: boat } = await supabase.from('boats').select('title').eq('id', r.target_id).single()
       boatTitle = boat?.title || `Bateau #${r.target_id}`

@@ -22,7 +22,7 @@ export async function authenticate(req, res, next) {
   }
 
   // select('*') : évite les erreurs si des colonnes optionnelles (ex. sailing_experience_years)
-  // ne sont pas encore migrées sur Supabase — une liste explicite avec colonne manquante
+  // ne sont pas encore migrées sur Supabase : une liste explicite avec colonne manquante
   // renvoie 401 et déclenche une déconnexion côté frontend.
   const { data: user, error } = await supabase
     .from('users')

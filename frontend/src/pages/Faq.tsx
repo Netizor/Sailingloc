@@ -159,7 +159,7 @@ const Faq: React.FC = () => {
               onClick={() => setActiveCategory(key)}
               className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                 activeCategory === key
-                  ? 'bg-ocean-700 text-white'
+                  ? 'bg-brand-blue text-white'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'
               }`}
             >
@@ -197,7 +197,7 @@ const Faq: React.FC = () => {
           </p>
           <Link
             to="/contact"
-            className="inline-flex items-center gap-2 bg-ocean-700 hover:bg-ocean-800 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition-colors"
+            className="inline-flex items-center gap-2 bg-brand-blue hover:bg-ocean-600 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition-colors"
           >
             {t('faqPage.ctaButton')}
           </Link>

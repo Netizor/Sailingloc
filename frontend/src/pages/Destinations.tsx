@@ -58,7 +58,7 @@ const DestinationCard: React.FC<{
     <div className="absolute inset-0 bg-gradient-to-t from-[#003366]/90 via-[#003366]/20 to-transparent" />
 
     {dest.badge && (
-      <span className="absolute top-4 left-4 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white bg-[#1A6FA8] rounded-full">
+      <span className="absolute top-4 left-4 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white bg-[#2563FF] rounded-full">
         {dest.badge}
       </span>
     )}
@@ -177,8 +177,8 @@ const Destinations: React.FC = () => {
                 className={cn(
                   'px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-[0.08em] transition-colors border-2',
                   region === id
-                    ? 'bg-[#003366] text-white border-[#003366]'
-                    : 'bg-white dark:bg-gray-800 text-[#003366] dark:text-gray-200 border-[#003366]/20 hover:border-[#1A6FA8] hover:text-[#1A6FA8]',
+                    ? 'bg-[#2563FF] text-white border-[#2563FF]'
+                    : 'bg-white dark:bg-gray-800 text-[#003366] dark:text-gray-200 border-[#003366]/20 hover:border-[#2563FF] hover:text-[#2563FF]',
                 )}
               >
                 {label}
@@ -226,7 +226,7 @@ const Destinations: React.FC = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#003366]/90 via-[#003366]/20 to-transparent" />
                   {item.badge && (
-                    <span className="absolute top-4 left-4 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white bg-[#1A6FA8] rounded-full">
+                    <span className="absolute top-4 left-4 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white bg-[#2563FF] rounded-full">
                       {item.badge}
                     </span>
                   )}
